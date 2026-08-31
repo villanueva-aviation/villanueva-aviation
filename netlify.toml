@@ -1,0 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Client-side routing (React Router): let index.html handle every path
+# so refreshing or linking directly to e.g. /academia/fundamentos works.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
