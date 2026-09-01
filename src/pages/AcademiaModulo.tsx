@@ -23,6 +23,7 @@ import { ScenarioSimulator } from "../features/academia/ScenarioSimulator";
 import { DragSlider } from "../features/academia/DragSlider";
 import { AudioPhraseology } from "../features/academia/AudioPhraseology";
 import { TermMatch } from "../features/academia/TermMatch";
+import { TopicExplorer } from "../features/academia/TopicExplorer";
 import { Quiz } from "../features/academia/Quiz";
 import { Reveal } from "../components/ui/Reveal";
 
@@ -158,21 +159,11 @@ export function AcademiaModulo() {
                       {completada && <CheckCircle2 size={20} className="shrink-0 text-gold-400" />}
                     </div>
                     {leccion ? (
-                      <div className="mt-4 flex flex-col gap-3">
-                        {leccion.contenido.map((p, j) => (
-                          <p key={j} className="text-sm leading-relaxed text-white/65">
-                            {p}
-                          </p>
-                        ))}
-                        {leccion.imagenes && leccion.imagenes.length > 0 && (
-                          <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                            {leccion.imagenes.map((src) => (
-                              <div key={src} className="overflow-hidden rounded-xl border border-white/10">
-                                <img src={src} alt={leccion.titulo} className="w-full" />
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                      <div className="mt-4">
+                        <TopicExplorer
+                          temas={leccion.temas}
+                          onAllExplored={() => completarActividad(modulo.slug, actividad.id)}
+                        />
                       </div>
                     ) : modulo.imagenLeccion ? (
                       <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
