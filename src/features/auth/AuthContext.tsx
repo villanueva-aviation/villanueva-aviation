@@ -13,6 +13,7 @@ interface AuthContextValue {
   /** Verdadero mientras se confirma la sesión inicial (evita redirigir a /ingresar antes de tiempo). */
   loading: boolean;
   sendMagicLink: (email: string, redirectTo: string) => Promise<{ error: string | null }>;
+  loginWithGoogle: (redirectTo: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
 }
 
@@ -21,8 +22,9 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 function toCadetUser(session: Session | null): CadetUser | null {
   const email = session?.user?.email;
   if (!email) return null;
-  const nombre = email.split("@")[0];
-  return { nombre: nombre.charAt(0).toUpperCase() + nombre.slice(1), email };
+  const fullName = session?.user?.user_metadata?.full_name || session?.user?.user_metadata?.name;
+  const nombre = fullName || email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1);
+  return { nombre, email };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -52,6 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { error } = await supabase.auth.signInWithOtp({
           email,
           options: { emailRedirectTo: redirectTo },
+        });
+        return { error: error?.message ?? null };
+      },
+      loginWithGoogle: async (redirectTo: string) => {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo },
         });
         return { error: error?.message ?? null };
       },
