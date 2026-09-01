@@ -12,8 +12,8 @@ export const CESSNA_HOTSPOTS: Hotspot[] = [
     id: "motor",
     label: "Motor / Hélice",
     description: "Produce el empuje que mueve la aeronave hacia adelante.",
-    xPct: 13,
-    yPct: 62,
+    xPct: 24,
+    yPct: 59,
   },
   {
     id: "tren",
@@ -33,8 +33,8 @@ export const CESSNA_HOTSPOTS: Hotspot[] = [
     id: "fuselaje",
     label: "Fuselaje",
     description: "Estructura principal que conecta la cabina con el empenaje y aloja la carga.",
-    xPct: 51,
-    yPct: 43,
+    xPct: 68,
+    yPct: 34,
   },
   {
     id: "ala",
@@ -54,8 +54,8 @@ export const CESSNA_HOTSPOTS: Hotspot[] = [
     id: "flaps",
     label: "Flaps",
     description: "Superficie móvil en el borde de salida, cerca del fuselaje, que aumenta la sustentación en despegue y aterrizaje.",
-    xPct: 38,
-    yPct: 38,
+    xPct: 33,
+    yPct: 30,
   },
   {
     id: "estabilizador-horizontal",
@@ -68,8 +68,8 @@ export const CESSNA_HOTSPOTS: Hotspot[] = [
     id: "elevador",
     label: "Elevador",
     description: "Superficie móvil en el borde de salida del estabilizador horizontal que controla el cabeceo (pitch).",
-    xPct: 92,
-    yPct: 36,
+    xPct: 86,
+    yPct: 38,
   },
   {
     id: "estabilizador-vertical",
