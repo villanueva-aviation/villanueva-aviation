@@ -33,8 +33,8 @@ export const CESSNA_HOTSPOTS: Hotspot[] = [
     id: "fuselaje",
     label: "Fuselaje",
     description: "Estructura principal que conecta la cabina con el empenaje y aloja la carga.",
-    xPct: 68,
-    yPct: 34,
+    xPct: 33,
+    yPct: 54,
   },
   {
     id: "ala",
@@ -54,8 +54,8 @@ export const CESSNA_HOTSPOTS: Hotspot[] = [
     id: "flaps",
     label: "Flaps",
     description: "Superficie móvil en el borde de salida, cerca del fuselaje, que aumenta la sustentación en despegue y aterrizaje.",
-    xPct: 33,
-    yPct: 30,
+    xPct: 28,
+    yPct: 35,
   },
   {
     id: "estabilizador-horizontal",
