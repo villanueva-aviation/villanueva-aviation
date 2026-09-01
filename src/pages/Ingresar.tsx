@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { LogIn, PlaneTakeoff } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { Mail, PlaneTakeoff } from "lucide-react";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "../features/auth/AuthContext";
@@ -8,16 +8,24 @@ import { Reveal } from "../components/ui/Reveal";
 import { ROUTES } from "../lib/routes";
 
 export function Ingresar() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const { sendMagicLink } = useAuth();
   const [params] = useSearchParams();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    login(email || "cadete@villanuevaaviation.com", password);
-    navigate(params.get("from") || ROUTES.miFormacion, { replace: true });
+    setStatus("sending");
+    setError(null);
+    const redirectTo = `${window.location.origin}${params.get("from") || ROUTES.miFormacion}`;
+    const { error: sendError } = await sendMagicLink(email, redirectTo);
+    if (sendError) {
+      setError(sendError);
+      setStatus("error");
+    } else {
+      setStatus("sent");
+    }
   }
 
   return (
@@ -30,40 +38,38 @@ export function Ingresar() {
           </div>
           <h1 className="mt-5 font-display text-2xl font-semibold text-white">Acceso de cadete</h1>
           <p className="mt-2 text-sm text-white/55">
-            Ingresa a tu cabina de entrenamiento personal para continuar tu formación.
+            Crea tu cuenta o inicia sesión con tu correo para acceder a la Academia y tu cabina de entrenamiento.
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
-            <label className="flex flex-col gap-1.5 text-sm text-white/70">
-              Correo electrónico
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@correo.com"
-                className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-white placeholder:text-white/30 outline-none transition-colors focus:border-gold-500/50"
-              />
-            </label>
-            <label className="flex flex-col gap-1.5 text-sm text-white/70">
-              Contraseña
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-white placeholder:text-white/30 outline-none transition-colors focus:border-gold-500/50"
-              />
-            </label>
+          {status === "sent" ? (
+            <div className="mt-8 rounded-xl border border-gold-500/30 bg-gold-500/10 p-5 text-sm text-white/80">
+              Te enviamos un enlace de acceso a <span className="text-gold-400">{email}</span>. Ábrelo desde este
+              mismo dispositivo para entrar — puedes cerrar esta pestaña.
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+              <label className="flex flex-col gap-1.5 text-sm text-white/70">
+                Correo electrónico
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="tu@correo.com"
+                  className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-white placeholder:text-white/30 outline-none transition-colors focus:border-gold-500/50"
+                />
+              </label>
 
-            <Button type="submit" variant="primary" className="mt-2 w-full">
-              <LogIn size={16} /> Ingresar
-            </Button>
-          </form>
+              {error && <p className="text-sm text-red-400">{error}</p>}
+
+              <Button type="submit" variant="primary" className="mt-2 w-full" disabled={status === "sending"}>
+                <Mail size={16} /> {status === "sending" ? "Enviando..." : "Enviar enlace de acceso"}
+              </Button>
+            </form>
+          )}
 
           <p className="mt-6 text-center text-xs text-white/35">
-            Versión de demostración — cualquier correo y contraseña te dará acceso a la vista de cadete.
+            Sin contraseñas — te enviamos un enlace de un solo uso a tu correo para entrar de forma segura.
           </p>
         </Reveal>
       </Container>

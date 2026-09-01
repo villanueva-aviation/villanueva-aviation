@@ -7,7 +7,7 @@ import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { ACADEMIA_MODULOS, type ActividadTipo, type InteractividadTipo, type ModuloActividad } from "../data/academia";
 import {
-  MODULE_LECCIONES,
+  flattenTemas,
   MODULE_TERMS,
   MODULE_PRACTICA,
   MODULE_EVALUACION,
@@ -23,6 +23,7 @@ import { ScenarioSimulator } from "../features/academia/ScenarioSimulator";
 import { DragSlider } from "../features/academia/DragSlider";
 import { AudioPhraseology } from "../features/academia/AudioPhraseology";
 import { TermMatch } from "../features/academia/TermMatch";
+import { LessonFlow } from "../features/academia/LessonFlow";
 import { Quiz } from "../features/academia/Quiz";
 import { Reveal } from "../components/ui/Reveal";
 
@@ -97,7 +98,7 @@ export function AcademiaModulo() {
   const practicaActividad = modulo.actividades.find((a) => a.tipo === "practica");
   const evaluacionActividad = modulo.actividades.find((a) => a.tipo === "evaluacion");
 
-  const lecciones = MODULE_LECCIONES[modulo.slug];
+  const temas = flattenTemas(modulo.slug);
   const practicaPreguntas = MODULE_PRACTICA[modulo.slug];
   const evaluacionPreguntas = MODULE_EVALUACION[modulo.slug];
 
@@ -148,53 +149,45 @@ export function AcademiaModulo() {
 
           {activeStage === "leccion" && (
             <div className="flex flex-col gap-5">
-              {leccionActividades.map((actividad, i) => {
-                const completada = isActividadCompletada(modulo.slug, actividad.id);
-                const leccion = lecciones?.[i];
-                return (
-                  <div key={actividad.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-                    <div className="flex items-start justify-between gap-4">
-                      <h3 className="font-display text-lg font-semibold text-white">{actividad.titulo}</h3>
-                      {completada && <CheckCircle2 size={20} className="shrink-0 text-gold-400" />}
+              {temas ? (
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+                  <LessonFlow
+                    temas={temas}
+                    isCompleted={(id) => isActividadCompletada(modulo.slug, id)}
+                    onAdvance={(id) => completarActividad(modulo.slug, id)}
+                  />
+                </div>
+              ) : (
+                leccionActividades.map((actividad) => {
+                  const completada = isActividadCompletada(modulo.slug, actividad.id);
+                  return (
+                    <div key={actividad.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+                      <div className="flex items-start justify-between gap-4">
+                        <h3 className="font-display text-lg font-semibold text-white">{actividad.titulo}</h3>
+                        {completada && <CheckCircle2 size={20} className="shrink-0 text-gold-400" />}
+                      </div>
+                      {modulo.imagenLeccion ? (
+                        <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
+                          <img src={modulo.imagenLeccion} alt={actividad.titulo} className="w-full" />
+                        </div>
+                      ) : (
+                        <p className="mt-4 flex items-center gap-2 text-sm text-white/45">
+                          <Lock size={14} /> Contenido en preparación — se publicará próximamente.
+                        </p>
+                      )}
+                      {!completada && (
+                        <Button
+                          variant="secondary"
+                          className="mt-5"
+                          onClick={() => completarActividad(modulo.slug, actividad.id)}
+                        >
+                          Marcar como completada
+                        </Button>
+                      )}
                     </div>
-                    {leccion ? (
-                      <div className="mt-4 flex flex-col gap-3">
-                        {leccion.contenido.map((p, j) => (
-                          <p key={j} className="text-sm leading-relaxed text-white/65">
-                            {p}
-                          </p>
-                        ))}
-                        {leccion.imagenes && leccion.imagenes.length > 0 && (
-                          <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                            {leccion.imagenes.map((src) => (
-                              <div key={src} className="overflow-hidden rounded-xl border border-white/10">
-                                <img src={src} alt={leccion.titulo} className="w-full" />
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ) : modulo.imagenLeccion ? (
-                      <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
-                        <img src={modulo.imagenLeccion} alt={actividad.titulo} className="w-full" />
-                      </div>
-                    ) : (
-                      <p className="mt-4 flex items-center gap-2 text-sm text-white/45">
-                        <Lock size={14} /> Contenido en preparación — se publicará próximamente.
-                      </p>
-                    )}
-                    {!completada && (
-                      <Button
-                        variant="secondary"
-                        className="mt-5"
-                        onClick={() => completarActividad(modulo.slug, actividad.id)}
-                      >
-                        Marcar como completada
-                      </Button>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
               <div className="flex justify-end">
                 <Button
                   onClick={() =>
