@@ -5,7 +5,15 @@ import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
-import { ACADEMIA_MODULOS, type ActividadTipo } from "../data/academia";
+import { ACADEMIA_MODULOS, type ActividadTipo, type InteractividadTipo, type ModuloActividad } from "../data/academia";
+import {
+  MODULE_LECCIONES,
+  MODULE_TERMS,
+  MODULE_PRACTICA,
+  MODULE_EVALUACION,
+  MODULE_SCENARIOS,
+  MODULE_SLIDERS,
+} from "../data/moduleContent";
 import { ROUTES } from "../lib/routes";
 import { useProgress } from "../features/progress/ProgressContext";
 import { ModuleStepper, type StepperStage } from "../features/academia/ModuleStepper";
@@ -14,34 +22,17 @@ import { DragDropLabels } from "../features/academia/DragDropLabels";
 import { ScenarioSimulator } from "../features/academia/ScenarioSimulator";
 import { DragSlider } from "../features/academia/DragSlider";
 import { AudioPhraseology } from "../features/academia/AudioPhraseology";
+import { TermMatch } from "../features/academia/TermMatch";
 import { Quiz } from "../features/academia/Quiz";
-import { PRACTICA_FUNDAMENTOS, EVALUACION_FUNDAMENTOS } from "../features/academia/quizData";
 import { Reveal } from "../components/ui/Reveal";
 
-const LECCIONES_FUNDAMENTOS: Record<string, { titulo: string; contenido: string[] }> = {
-  "leccion-1": {
-    titulo: "Partes de la aeronave",
-    contenido: [
-      "Toda aeronave de ala fija comparte una estructura básica: fuselaje, alas, empenaje (estabilizadores) y tren de aterrizaje.",
-      "El fuselaje aloja la cabina, los pasajeros y la carga, y sirve como columna vertebral estructural de la aeronave.",
-      "Las alas generan la sustentación necesaria para volar y alojan superficies de control como los alerones y, en muchos modelos, los flaps.",
-    ],
-  },
-  "leccion-2": {
-    titulo: "Principios de vuelo",
-    contenido: [
-      "El vuelo es el resultado del equilibrio entre cuatro fuerzas: sustentación, peso, empuje y resistencia.",
-      "La sustentación se genera por la diferencia de presión entre la parte superior e inferior del ala, producto de su perfil aerodinámico.",
-      "El piloto controla la aeronave sobre tres ejes —longitudinal, lateral y vertical— usando alerones, elevador y timón de dirección.",
-    ],
-  },
-};
-
-const INTERACTIVIDAD_INTRO: Record<string, string> = {
+const INTERACTIVIDAD_INTRO: Record<InteractividadTipo, string> = {
   diagrama: "Explora el diagrama y haz clic en cada componente para conocer su función.",
+  dragdrop: "Practica una vez más, esta vez arrastrando el nombre correcto a su lugar en la aeronave.",
   escenario: "Toma decisiones en un escenario de vuelo y descubre las consecuencias de cada una.",
-  slider: "Mueve el control y observa en vivo cómo cambian velocidad, consumo y resistencia.",
+  slider: "Mueve el control y observa en vivo cómo cambian las variables involucradas.",
   audio: "Escucha la fraseología correcta y compárala con lo que tú dirías en cada situación.",
+  terminos: "Relaciona cada término con su definición correcta.",
 };
 
 const STAGE_LABELS: Record<ActividadTipo | "introduccion", string> = {
@@ -51,6 +42,38 @@ const STAGE_LABELS: Record<ActividadTipo | "introduccion", string> = {
   practica: "Práctica",
   evaluacion: "Evaluación",
 };
+
+function InteractividadWidget({
+  modulo,
+  actividad,
+  onComplete,
+}: {
+  modulo: (typeof ACADEMIA_MODULOS)[number];
+  actividad: ModuloActividad;
+  onComplete: () => void;
+}) {
+  switch (actividad.widget) {
+    case "dragdrop":
+      return <DragDropLabels onComplete={onComplete} />;
+    case "escenario": {
+      const scenario = MODULE_SCENARIOS[modulo.slug];
+      return scenario ? <ScenarioSimulator tree={scenario.tree} startId={scenario.startId} /> : <ScenarioSimulator />;
+    }
+    case "slider": {
+      const config = MODULE_SLIDERS[modulo.slug];
+      return config ? <DragSlider config={config} /> : <DragSlider />;
+    }
+    case "audio":
+      return <AudioPhraseology onComplete={onComplete} />;
+    case "terminos": {
+      const pairs = MODULE_TERMS[actividad.termSetId ?? modulo.slug] ?? [];
+      return <TermMatch pairs={pairs} onComplete={onComplete} />;
+    }
+    case "diagrama":
+    default:
+      return <AirplaneDiagram />;
+  }
+}
 
 export function AcademiaModulo() {
   const { slug } = useParams<{ slug: string }>();
@@ -70,14 +93,18 @@ export function AcademiaModulo() {
 
   const progreso = moduloProgreso(modulo.slug);
   const leccionActividades = modulo.actividades.filter((a) => a.tipo === "leccion");
-  const interactividadActividad = modulo.actividades.find((a) => a.tipo === "interactividad");
+  const interactividadActividades = modulo.actividades.filter((a) => a.tipo === "interactividad");
   const practicaActividad = modulo.actividades.find((a) => a.tipo === "practica");
   const evaluacionActividad = modulo.actividades.find((a) => a.tipo === "evaluacion");
+
+  const lecciones = MODULE_LECCIONES[modulo.slug];
+  const practicaPreguntas = MODULE_PRACTICA[modulo.slug];
+  const evaluacionPreguntas = MODULE_EVALUACION[modulo.slug];
 
   const stages: StepperStage[] = stageKeys.map((key) => {
     let done = false;
     if (key === "leccion") done = leccionActividades.every((a) => isActividadCompletada(modulo.slug, a.id));
-    else if (key === "interactividad" && interactividadActividad) done = isActividadCompletada(modulo.slug, interactividadActividad.id);
+    else if (key === "interactividad") done = interactividadActividades.every((a) => isActividadCompletada(modulo.slug, a.id));
     else if (key === "practica" && practicaActividad) done = isActividadCompletada(modulo.slug, practicaActividad.id);
     else if (key === "evaluacion" && evaluacionActividad) done = isActividadCompletada(modulo.slug, evaluacionActividad.id);
     else if (key === "introduccion") done = true;
@@ -111,7 +138,7 @@ export function AcademiaModulo() {
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/65">{modulo.resumen}</p>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50">
                 Esta sección te guiará a través de una experiencia estructurada: lección teórica
-                {interactividadActividad ? ", un ejercicio interactivo" : ""}, práctica y evaluación final.
+                {interactividadActividades.length > 0 ? ", ejercicios interactivos" : ""}, práctica y evaluación final.
               </p>
               <Button className="mt-6" onClick={() => setActiveStage("leccion")}>
                 Comenzar lección
@@ -121,22 +148,31 @@ export function AcademiaModulo() {
 
           {activeStage === "leccion" && (
             <div className="flex flex-col gap-5">
-              {leccionActividades.map((actividad) => {
+              {leccionActividades.map((actividad, i) => {
                 const completada = isActividadCompletada(modulo.slug, actividad.id);
-                const contenido = modulo.interactivo ? LECCIONES_FUNDAMENTOS[actividad.id] : undefined;
+                const leccion = lecciones?.[i];
                 return (
                   <div key={actividad.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
                     <div className="flex items-start justify-between gap-4">
                       <h3 className="font-display text-lg font-semibold text-white">{actividad.titulo}</h3>
                       {completada && <CheckCircle2 size={20} className="shrink-0 text-gold-400" />}
                     </div>
-                    {contenido ? (
+                    {leccion ? (
                       <div className="mt-4 flex flex-col gap-3">
-                        {contenido.contenido.map((p, i) => (
-                          <p key={i} className="text-sm leading-relaxed text-white/65">
+                        {leccion.contenido.map((p, j) => (
+                          <p key={j} className="text-sm leading-relaxed text-white/65">
                             {p}
                           </p>
                         ))}
+                        {leccion.imagenes && leccion.imagenes.length > 0 && (
+                          <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            {leccion.imagenes.map((src) => (
+                              <div key={src} className="overflow-hidden rounded-xl border border-white/10">
+                                <img src={src} alt={leccion.titulo} className="w-full" />
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ) : modulo.imagenLeccion ? (
                       <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
@@ -160,52 +196,48 @@ export function AcademiaModulo() {
                 );
               })}
               <div className="flex justify-end">
-                <Button onClick={() => setActiveStage(interactividadActividad ? "interactividad" : practicaActividad ? "practica" : "evaluacion")}>
+                <Button
+                  onClick={() =>
+                    setActiveStage(interactividadActividades.length > 0 ? "interactividad" : practicaActividad ? "practica" : "evaluacion")
+                  }
+                >
                   Continuar
                 </Button>
               </div>
             </div>
           )}
 
-          {activeStage === "interactividad" && interactividadActividad && (
+          {activeStage === "interactividad" && interactividadActividades.length > 0 && (
             <div className="flex flex-col gap-6">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-                <h3 className="font-display text-lg font-semibold text-white">{interactividadActividad.titulo}</h3>
-                <p className="mt-2 text-sm text-white/60">
-                  {INTERACTIVIDAD_INTRO[modulo.interactividadTipo ?? "diagrama"]}
-                </p>
-                <div className="mt-6">
-                  {modulo.interactividadTipo === "escenario" && <ScenarioSimulator />}
-                  {modulo.interactividadTipo === "slider" && <DragSlider />}
-                  {modulo.interactividadTipo === "audio" && (
-                    <AudioPhraseology
-                      onComplete={() => completarActividad(modulo.slug, interactividadActividad.id)}
-                    />
-                  )}
-                  {(!modulo.interactividadTipo || modulo.interactividadTipo === "diagrama") && <AirplaneDiagram />}
-                </div>
-              </div>
-
-              {modulo.slug === "fundamentos" && (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-                  <h3 className="font-display text-lg font-semibold text-white">
-                    Segundo ejercicio: arrastra las etiquetas
-                  </h3>
-                  <p className="mt-2 text-sm text-white/60">
-                    Practica una vez más, esta vez arrastrando el nombre correcto a su lugar en la aeronave.
-                  </p>
-                  <div className="mt-6">
-                    <DragDropLabels onComplete={() => completarActividad(modulo.slug, interactividadActividad.id)} />
+              {interactividadActividades.map((actividad) => {
+                const completada = isActividadCompletada(modulo.slug, actividad.id);
+                return (
+                  <div key={actividad.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+                    <div className="flex items-start justify-between gap-4">
+                      <h3 className="font-display text-lg font-semibold text-white">{actividad.titulo}</h3>
+                      {completada && <CheckCircle2 size={20} className="shrink-0 text-gold-400" />}
+                    </div>
+                    <p className="mt-2 text-sm text-white/60">{INTERACTIVIDAD_INTRO[actividad.widget ?? "diagrama"]}</p>
+                    <div className="mt-6">
+                      <InteractividadWidget
+                        modulo={modulo}
+                        actividad={actividad}
+                        onComplete={() => completarActividad(modulo.slug, actividad.id)}
+                      />
+                    </div>
+                    {!completada && (
+                      <Button
+                        variant="secondary"
+                        className="mt-5"
+                        onClick={() => completarActividad(modulo.slug, actividad.id)}
+                      >
+                        Marcar como completada
+                      </Button>
+                    )}
                   </div>
-                </div>
-              )}
-
-              <div className="flex justify-end gap-3">
-                {!isActividadCompletada(modulo.slug, interactividadActividad.id) && (
-                  <Button variant="secondary" onClick={() => completarActividad(modulo.slug, interactividadActividad.id)}>
-                    Marcar como completada
-                  </Button>
-                )}
+                );
+              })}
+              <div className="flex justify-end">
                 <Button onClick={() => setActiveStage("practica")}>Continuar a práctica</Button>
               </div>
             </div>
@@ -213,9 +245,9 @@ export function AcademiaModulo() {
 
           {activeStage === "practica" && practicaActividad && (
             <div className="flex flex-col gap-6">
-              {modulo.interactivo ? (
+              {practicaPreguntas ? (
                 <Quiz
-                  preguntas={PRACTICA_FUNDAMENTOS}
+                  preguntas={practicaPreguntas}
                   passingScore={0}
                   onFinish={() => completarActividad(modulo.slug, practicaActividad.id)}
                 />
@@ -237,9 +269,9 @@ export function AcademiaModulo() {
 
           {activeStage === "evaluacion" && evaluacionActividad && (
             <div className="flex flex-col gap-6">
-              {modulo.interactivo ? (
+              {evaluacionPreguntas ? (
                 <Quiz
-                  preguntas={EVALUACION_FUNDAMENTOS}
+                  preguntas={evaluacionPreguntas}
                   passingScore={70}
                   onFinish={(score, passed) => registrarExamen(modulo.slug, evaluacionActividad.id, score, passed)}
                 />
