@@ -10,6 +10,10 @@ import { ROUTES } from "../lib/routes";
 import { useProgress } from "../features/progress/ProgressContext";
 import { ModuleStepper, type StepperStage } from "../features/academia/ModuleStepper";
 import { AirplaneDiagram } from "../features/academia/AirplaneDiagram";
+import { DragDropLabels } from "../features/academia/DragDropLabels";
+import { ScenarioSimulator } from "../features/academia/ScenarioSimulator";
+import { DragSlider } from "../features/academia/DragSlider";
+import { AudioPhraseology } from "../features/academia/AudioPhraseology";
 import { Quiz } from "../features/academia/Quiz";
 import { PRACTICA_FUNDAMENTOS, EVALUACION_FUNDAMENTOS } from "../features/academia/quizData";
 import { Reveal } from "../components/ui/Reveal";
@@ -31,6 +35,13 @@ const LECCIONES_FUNDAMENTOS: Record<string, { titulo: string; contenido: string[
       "El piloto controla la aeronave sobre tres ejes —longitudinal, lateral y vertical— usando alerones, elevador y timón de dirección.",
     ],
   },
+};
+
+const INTERACTIVIDAD_INTRO: Record<string, string> = {
+  diagrama: "Explora el diagrama y haz clic en cada componente para conocer su función.",
+  escenario: "Toma decisiones en un escenario de vuelo y descubre las consecuencias de cada una.",
+  slider: "Mueve el control y observa en vivo cómo cambian velocidad, consumo y resistencia.",
+  audio: "Escucha la fraseología correcta y compárala con lo que tú dirías en cada situación.",
 };
 
 const STAGE_LABELS: Record<ActividadTipo | "introduccion", string> = {
@@ -161,12 +172,34 @@ export function AcademiaModulo() {
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
                 <h3 className="font-display text-lg font-semibold text-white">{interactividadActividad.titulo}</h3>
                 <p className="mt-2 text-sm text-white/60">
-                  Explora el diagrama y haz clic en cada componente para conocer su función.
+                  {INTERACTIVIDAD_INTRO[modulo.interactividadTipo ?? "diagrama"]}
                 </p>
                 <div className="mt-6">
-                  <AirplaneDiagram />
+                  {modulo.interactividadTipo === "escenario" && <ScenarioSimulator />}
+                  {modulo.interactividadTipo === "slider" && <DragSlider />}
+                  {modulo.interactividadTipo === "audio" && (
+                    <AudioPhraseology
+                      onComplete={() => completarActividad(modulo.slug, interactividadActividad.id)}
+                    />
+                  )}
+                  {(!modulo.interactividadTipo || modulo.interactividadTipo === "diagrama") && <AirplaneDiagram />}
                 </div>
               </div>
+
+              {modulo.slug === "fundamentos" && (
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
+                  <h3 className="font-display text-lg font-semibold text-white">
+                    Segundo ejercicio: arrastra las etiquetas
+                  </h3>
+                  <p className="mt-2 text-sm text-white/60">
+                    Practica una vez más, esta vez arrastrando el nombre correcto a su lugar en la aeronave.
+                  </p>
+                  <div className="mt-6">
+                    <DragDropLabels onComplete={() => completarActividad(modulo.slug, interactividadActividad.id)} />
+                  </div>
+                </div>
+              )}
+
               <div className="flex justify-end gap-3">
                 {!isActividadCompletada(modulo.slug, interactividadActividad.id) && (
                   <Button variant="secondary" onClick={() => completarActividad(modulo.slug, interactividadActividad.id)}>

@@ -11,6 +11,8 @@ import {
 
 export type ActividadTipo = "leccion" | "interactividad" | "practica" | "evaluacion";
 
+export type InteractividadTipo = "diagrama" | "escenario" | "slider" | "audio";
+
 export interface ModuloActividad {
   id: string;
   tipo: ActividadTipo;
@@ -28,6 +30,8 @@ export interface AcademiaModulo {
   actividades: ModuloActividad[];
   /** Infografía de la lección, cuando el módulo aún no tiene la experiencia interactiva completa. */
   imagenLeccion?: string;
+  /** Qué widget usar en la etapa de Interactividad, cuando el módulo la tiene. */
+  interactividadTipo?: InteractividadTipo;
 }
 
 export const ACADEMIA_MODULOS: AcademiaModulo[] = [
@@ -39,6 +43,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: BookOpen,
     nivel: "Básico",
     interactivo: true,
+    interactividadTipo: "diagrama",
     actividades: [
       { id: "leccion-1", tipo: "leccion", titulo: "Partes de la aeronave" },
       { id: "leccion-2", tipo: "leccion", titulo: "Principios de vuelo" },
@@ -71,9 +76,11 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     nivel: "Intermedio",
     interactivo: false,
     imagenLeccion: "/images/infografia-4fuerzas.jpg",
+    interactividadTipo: "slider",
     actividades: [
       { id: "leccion-1", tipo: "leccion", titulo: "Las cuatro fuerzas del vuelo" },
       { id: "leccion-2", tipo: "leccion", titulo: "Superficies de control" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Simulador de configuración vs. resistencia" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: efectos de control" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Aerodinámica" },
     ],
@@ -101,9 +108,11 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     nivel: "Básico",
     interactivo: false,
     imagenLeccion: "/images/infografia-fraseologia.jpg",
+    interactividadTipo: "audio",
     actividades: [
       { id: "leccion-1", tipo: "leccion", titulo: "Fraseología estándar" },
       { id: "leccion-2", tipo: "leccion", titulo: "Comunicación en emergencias" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Práctica de fraseología con audio" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: simulacro de llamadas" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Comunicaciones" },
     ],
@@ -116,9 +125,11 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     nivel: "Intermedio",
     interactivo: false,
     imagenLeccion: "/images/infografia-vfr.jpg",
+    interactividadTipo: "escenario",
     actividades: [
       { id: "leccion-1", tipo: "leccion", titulo: "Mínimos meteorológicos VFR" },
       { id: "leccion-2", tipo: "leccion", titulo: "Procedimientos de patrón de tráfico" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Simulador de decisión: clima cambiante" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: planificación VFR" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de VFR" },
     ],
