@@ -38,8 +38,22 @@ function App() {
           <main className="flex-1">
             <Routes>
               <Route path={ROUTES.home} element={<Home />} />
-              <Route path={ROUTES.academia} element={<Academia />} />
-              <Route path="/academia/:slug" element={<AcademiaModulo />} />
+              <Route
+                path={ROUTES.academia}
+                element={
+                  <ProtectedRoute>
+                    <Academia />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/academia/:slug"
+                element={
+                  <ProtectedRoute>
+                    <AcademiaModulo />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path={ROUTES.miFormacion}
                 element={
