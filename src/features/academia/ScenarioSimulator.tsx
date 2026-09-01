@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { AlertTriangle, CheckCircle2, RotateCcw, XCircle } from "lucide-react";
 
-interface ScenarioOption {
+export interface ScenarioOption {
   label: string;
   next: string;
 }
 
-interface ScenarioNode {
+export interface ScenarioNode {
   id: string;
   prompt: string;
   options: ScenarioOption[];
   outcome?: { correct: boolean; feedback: string };
 }
 
-const SCENARIO: Record<string, ScenarioNode> = {
+const DEFAULT_SCENARIO: Record<string, ScenarioNode> = {
   inicio: {
     id: "inicio",
     prompt:
@@ -64,12 +64,18 @@ const SCENARIO: Record<string, ScenarioNode> = {
   },
 };
 
-export function ScenarioSimulator() {
-  const [nodeId, setNodeId] = useState("inicio");
-  const node = SCENARIO[nodeId];
+export function ScenarioSimulator({
+  tree = DEFAULT_SCENARIO,
+  startId = "inicio",
+}: {
+  tree?: Record<string, ScenarioNode>;
+  startId?: string;
+}) {
+  const [nodeId, setNodeId] = useState(startId);
+  const node = tree[nodeId];
 
   function restart() {
-    setNodeId("inicio");
+    setNodeId(startId);
   }
 
   if (node.outcome) {

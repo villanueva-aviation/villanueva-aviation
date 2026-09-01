@@ -7,16 +7,26 @@ import {
   Radio,
   Eye,
   CloudFog,
+  Map,
+  Gauge,
+  Scale,
+  ClipboardList,
+  Layers,
+  Gavel,
 } from "lucide-react";
 
 export type ActividadTipo = "leccion" | "interactividad" | "practica" | "evaluacion";
 
-export type InteractividadTipo = "diagrama" | "escenario" | "slider" | "audio";
+export type InteractividadTipo = "diagrama" | "dragdrop" | "escenario" | "slider" | "audio" | "terminos";
 
 export interface ModuloActividad {
   id: string;
   tipo: ActividadTipo;
   titulo: string;
+  /** Solo para tipo "interactividad": qué widget renderizar. */
+  widget?: InteractividadTipo;
+  /** Solo para widget "terminos": qué set de términos usar (por defecto, el slug del módulo). */
+  termSetId?: string;
 }
 
 export interface AcademiaModulo {
@@ -25,13 +35,9 @@ export interface AcademiaModulo {
   resumen: string;
   icon: LucideIcon;
   nivel: "Básico" | "Intermedio" | "Avanzado";
-  /** Solo el módulo de referencia trae la experiencia interactiva completa construida. */
-  interactivo: boolean;
   actividades: ModuloActividad[];
-  /** Infografía de la lección, cuando el módulo aún no tiene la experiencia interactiva completa. */
+  /** Infografía de la lección, cuando el módulo aún no tiene lecciones de texto en moduleContent.ts. */
   imagenLeccion?: string;
-  /** Qué widget usar en la etapa de Interactividad, cuando el módulo la tiene. */
-  interactividadTipo?: InteractividadTipo;
 }
 
 export const ACADEMIA_MODULOS: AcademiaModulo[] = [
@@ -42,12 +48,11 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
       "Bases teóricas y conceptos esenciales para comenzar en el mundo de la aviación.",
     icon: BookOpen,
     nivel: "Básico",
-    interactivo: true,
-    interactividadTipo: "diagrama",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Partes de la aeronave" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Principios de vuelo" },
-      { id: "interactividad-1", tipo: "interactividad", titulo: "Diagrama interactivo del avión" },
+      { id: "leccion-1", tipo: "leccion", titulo: "Por qué vuela un avión: las 4 fuerzas y los principios físicos" },
+      { id: "leccion-2", tipo: "leccion", titulo: "Superficies, ejes, controles e instrumentos básicos" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Diagrama interactivo del avión", widget: "diagrama" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Arrastra las etiquetas", widget: "dragdrop" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: identifica los componentes" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Fundamentos" },
     ],
@@ -59,11 +64,12 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
       "Interpretación de condiciones meteorológicas aplicadas a la operación de vuelo.",
     icon: CloudSun,
     nivel: "Básico",
-    interactivo: false,
     imagenLeccion: "/images/infografia-metar-rmk.jpg",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Masas de aire y frentes" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Lectura de METAR y TAF" },
+      { id: "leccion-1", tipo: "leccion", titulo: "Cómo leer METAR y TAF" },
+      { id: "leccion-2", tipo: "leccion", titulo: "Nubes, frentes, turbulencia y hielo" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: tormenta en ruta", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: interpretar reportes" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Meteorología" },
     ],
@@ -74,13 +80,11 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     resumen: "Principios físicos que permiten el vuelo y el control de la aeronave.",
     icon: Wind,
     nivel: "Intermedio",
-    interactivo: false,
     imagenLeccion: "/images/infografia-4fuerzas.jpg",
-    interactividadTipo: "slider",
     actividades: [
       { id: "leccion-1", tipo: "leccion", titulo: "Las cuatro fuerzas del vuelo" },
       { id: "leccion-2", tipo: "leccion", titulo: "Superficies de control" },
-      { id: "interactividad-1", tipo: "interactividad", titulo: "Simulador de configuración vs. resistencia" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Simulador de configuración vs. resistencia", widget: "slider" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: efectos de control" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Aerodinámica" },
     ],
@@ -88,16 +92,31 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
   {
     slug: "navegacion",
     titulo: "Navegación",
-    resumen: "Planificación de rutas, cartas y técnicas de navegación aérea.",
+    resumen: "Radionavegación VOR/DME/HSI, cartas VFR y planificación de rutas.",
     icon: Compass,
     nivel: "Intermedio",
-    interactivo: false,
-    imagenLeccion: "/images/infografia-vor.jpg",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Cartas de navegación VFR" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Navegación por instrumentos VOR/GPS" },
+      { id: "leccion-1", tipo: "leccion", titulo: "Radionavegación: VOR, CDI, DME, HSI y ADF" },
+      { id: "leccion-2", tipo: "leccion", titulo: "Cartas VFR y planificación de ruta" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de viento en contra", widget: "slider" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: planificación de ruta" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Navegación" },
+    ],
+  },
+  {
+    slug: "cartografia",
+    titulo: "Cartografía Aeronáutica",
+    resumen: "Símbolos, espacios aéreos, elevaciones y lectura completa de cartas VFR.",
+    icon: Map,
+    nivel: "Intermedio",
+    actividades: [
+      { id: "leccion-1", tipo: "leccion", titulo: "Elementos y símbolos de la carta VFR" },
+      { id: "leccion-2", tipo: "leccion", titulo: "Elevaciones, frecuencias, puntos VFR y lectura completa" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona símbolos y espacios aéreos", widget: "terminos" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona elevaciones y frecuencias", widget: "terminos", termSetId: "cartografia-2" },
+      { id: "practica-1", tipo: "practica", titulo: "Práctica: lectura de cartas" },
+      { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Cartografía" },
     ],
   },
   {
@@ -106,15 +125,44 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     resumen: "Estándares de comunicación radiofónica entre piloto y controlador.",
     icon: Radio,
     nivel: "Básico",
-    interactivo: false,
     imagenLeccion: "/images/infografia-fraseologia.jpg",
-    interactividadTipo: "audio",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Fraseología estándar" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Comunicación en emergencias" },
-      { id: "interactividad-1", tipo: "interactividad", titulo: "Práctica de fraseología con audio" },
+      { id: "leccion-1", tipo: "leccion", titulo: "Fraseología estándar: torre, rodaje y despegue" },
+      { id: "leccion-2", tipo: "leccion", titulo: "Circuito, aproximación, IFR, emergencias y errores comunes" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Práctica de fraseología con audio", widget: "audio" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: simulacro de llamadas" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Comunicaciones" },
+    ],
+  },
+  {
+    slug: "instrumentos",
+    titulo: "Instrumentos de Vuelo",
+    resumen: "El Six Pack, radionavegación en cabina y equipo de vigilancia.",
+    icon: Gauge,
+    nivel: "Intermedio",
+    actividades: [
+      { id: "leccion-1", tipo: "leccion", titulo: "Instrumentos de vuelo: altímetro, velocidad, actitud y viraje" },
+      { id: "leccion-2", tipo: "leccion", titulo: "VSI, compás, HSI, RMI, DME y transponder" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: falla de vacío", widget: "escenario" },
+      { id: "practica-1", tipo: "practica", titulo: "Práctica: lectura de instrumentos" },
+      { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Instrumentos" },
+    ],
+  },
+  {
+    slug: "rendimiento",
+    titulo: "Peso y Rendimiento",
+    resumen: "Peso, balance, distancias de despegue/aterrizaje y V-speeds.",
+    icon: Scale,
+    nivel: "Intermedio",
+    actividades: [
+      { id: "leccion-1", tipo: "leccion", titulo: "Peso, balance y distancias de despegue/aterrizaje" },
+      { id: "leccion-2", tipo: "leccion", titulo: "Performance, V-speeds y viento cruzado" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de altitud de densidad", widget: "slider" },
+      { id: "practica-1", tipo: "practica", titulo: "Práctica: cálculos de rendimiento" },
+      { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Rendimiento" },
     ],
   },
   {
@@ -123,15 +171,58 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     resumen: "Reglas de vuelo visual: mínimos, procedimientos y planificación.",
     icon: Eye,
     nivel: "Intermedio",
-    interactivo: false,
     imagenLeccion: "/images/infografia-vfr.jpg",
-    interactividadTipo: "escenario",
     actividades: [
       { id: "leccion-1", tipo: "leccion", titulo: "Mínimos meteorológicos VFR" },
       { id: "leccion-2", tipo: "leccion", titulo: "Procedimientos de patrón de tráfico" },
-      { id: "interactividad-1", tipo: "interactividad", titulo: "Simulador de decisión: clima cambiante" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Simulador de decisión: clima cambiante", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: planificación VFR" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de VFR" },
+    ],
+  },
+  {
+    slug: "operacion",
+    titulo: "Operación de Aeronave",
+    resumen: "Del walk-around al apagado: procedimientos completos de cada fase de vuelo.",
+    icon: ClipboardList,
+    nivel: "Intermedio",
+    actividades: [
+      { id: "leccion-1", tipo: "leccion", titulo: "Inspección, arranque, taxi, run-up y despegue" },
+      { id: "leccion-2", tipo: "leccion", titulo: "Ascenso, crucero, descenso, aproximación y aterrizaje" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: fuego en el arranque", widget: "escenario" },
+      { id: "practica-1", tipo: "practica", titulo: "Práctica: secuencia de procedimientos" },
+      { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Operación" },
+    ],
+  },
+  {
+    slug: "espacios-aereos",
+    titulo: "Espacios Aéreos",
+    resumen: "Clasificación del espacio aéreo controlado y no controlado, y áreas especiales.",
+    icon: Layers,
+    nivel: "Intermedio",
+    actividades: [
+      { id: "leccion-1", tipo: "leccion", titulo: "Espacio aéreo controlado: Clases A a E" },
+      { id: "leccion-2", tipo: "leccion", titulo: "Espacio aéreo Clase G y áreas especiales" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: cruce de espacio Clase C", widget: "escenario" },
+      { id: "practica-1", tipo: "practica", titulo: "Práctica: clasificación de espacios" },
+      { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Espacios Aéreos" },
+    ],
+  },
+  {
+    slug: "reglamentacion",
+    titulo: "Reglamentación",
+    resumen: "Reglas VFR/IFR, licencias, requisitos y mínimos regulatorios.",
+    icon: Gavel,
+    nivel: "Básico",
+    actividades: [
+      { id: "leccion-1", tipo: "leccion", titulo: "Reglas VFR/IFR, licencias y horas de vuelo" },
+      { id: "leccion-2", tipo: "leccion", titulo: "Requisitos, mínimos meteorológicos y combustible de reserva" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona requisitos y mínimos", widget: "terminos", termSetId: "reglamentacion-2" },
+      { id: "practica-1", tipo: "practica", titulo: "Práctica: marco regulatorio" },
+      { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Reglamentación" },
     ],
   },
   {
@@ -140,10 +231,11 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     resumen: "Reglas de vuelo por instrumentos: procedimientos y navegación avanzada.",
     icon: CloudFog,
     nivel: "Avanzado",
-    interactivo: false,
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Cartas de aproximación por instrumentos" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Procedimientos IFR en ruta" },
+      { id: "leccion-1", tipo: "leccion", titulo: "Plan de vuelo IFR: SID, aerovías y STAR" },
+      { id: "leccion-2", tipo: "leccion", titulo: "Aproximaciones: ILS, RNAV, VOR y holding" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: aproximación frustrada", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: interpretación de cartas IFR" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de IFR" },
     ],
