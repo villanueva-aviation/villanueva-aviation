@@ -14,6 +14,7 @@ import {
   Layers,
   Gavel,
 } from "lucide-react";
+import { flattenTemas } from "./moduleContent";
 
 export type ActividadTipo = "leccion" | "interactividad" | "practica" | "evaluacion";
 
@@ -40,6 +41,11 @@ export interface AcademiaModulo {
   imagenLeccion?: string;
 }
 
+/** Cada subtema de un módulo se convierte en su propia actividad de tipo "leccion". */
+function leccionesDeTemas(slug: string): ModuloActividad[] {
+  return (flattenTemas(slug) ?? []).map((t) => ({ id: t.id, tipo: "leccion", titulo: t.titulo }));
+}
+
 export const ACADEMIA_MODULOS: AcademiaModulo[] = [
   {
     slug: "fundamentos",
@@ -49,8 +55,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: BookOpen,
     nivel: "Básico",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Por qué vuela un avión: las 4 fuerzas y los principios físicos" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Superficies, ejes, controles e instrumentos básicos" },
+      ...leccionesDeTemas("fundamentos"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Diagrama interactivo del avión", widget: "diagrama" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Arrastra las etiquetas", widget: "dragdrop" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: identifica los componentes" },
@@ -66,8 +71,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     nivel: "Básico",
     imagenLeccion: "/images/infografia-metar-rmk.jpg",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Cómo leer METAR y TAF" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Nubes, frentes, turbulencia y hielo" },
+      ...leccionesDeTemas("meteorologia"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: tormenta en ruta", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: interpretar reportes" },
@@ -96,8 +100,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: Compass,
     nivel: "Intermedio",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Radionavegación: VOR, CDI, DME, HSI y ADF" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Cartas VFR y planificación de ruta" },
+      ...leccionesDeTemas("navegacion"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de viento en contra", widget: "slider" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: planificación de ruta" },
@@ -111,8 +114,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: Map,
     nivel: "Intermedio",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Elementos y símbolos de la carta VFR" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Elevaciones, frecuencias, puntos VFR y lectura completa" },
+      ...leccionesDeTemas("cartografia"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona símbolos y espacios aéreos", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona elevaciones y frecuencias", widget: "terminos", termSetId: "cartografia-2" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: lectura de cartas" },
@@ -127,8 +129,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     nivel: "Básico",
     imagenLeccion: "/images/infografia-fraseologia.jpg",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Fraseología estándar: torre, rodaje y despegue" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Circuito, aproximación, IFR, emergencias y errores comunes" },
+      ...leccionesDeTemas("comunicaciones"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Práctica de fraseología con audio", widget: "audio" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: simulacro de llamadas" },
@@ -142,8 +143,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: Gauge,
     nivel: "Intermedio",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Instrumentos de vuelo: altímetro, velocidad, actitud y viraje" },
-      { id: "leccion-2", tipo: "leccion", titulo: "VSI, compás, HSI, RMI, DME y transponder" },
+      ...leccionesDeTemas("instrumentos"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: falla de vacío", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: lectura de instrumentos" },
@@ -157,8 +157,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: Scale,
     nivel: "Intermedio",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Peso, balance y distancias de despegue/aterrizaje" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Performance, V-speeds y viento cruzado" },
+      ...leccionesDeTemas("rendimiento"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de altitud de densidad", widget: "slider" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: cálculos de rendimiento" },
@@ -187,8 +186,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: ClipboardList,
     nivel: "Intermedio",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Inspección, arranque, taxi, run-up y despegue" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Ascenso, crucero, descenso, aproximación y aterrizaje" },
+      ...leccionesDeTemas("operacion"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: fuego en el arranque", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: secuencia de procedimientos" },
@@ -202,8 +200,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: Layers,
     nivel: "Intermedio",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Espacio aéreo controlado: Clases A a E" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Espacio aéreo Clase G y áreas especiales" },
+      ...leccionesDeTemas("espacios-aereos"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: cruce de espacio Clase C", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: clasificación de espacios" },
@@ -217,8 +214,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: Gavel,
     nivel: "Básico",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Reglas VFR/IFR, licencias y horas de vuelo" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Requisitos, mínimos meteorológicos y combustible de reserva" },
+      ...leccionesDeTemas("reglamentacion"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona requisitos y mínimos", widget: "terminos", termSetId: "reglamentacion-2" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: marco regulatorio" },
@@ -232,8 +228,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: CloudFog,
     nivel: "Avanzado",
     actividades: [
-      { id: "leccion-1", tipo: "leccion", titulo: "Plan de vuelo IFR: SID, aerovías y STAR" },
-      { id: "leccion-2", tipo: "leccion", titulo: "Aproximaciones: ILS, RNAV, VOR y holding" },
+      ...leccionesDeTemas("ifr"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: aproximación frustrada", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: interpretación de cartas IFR" },

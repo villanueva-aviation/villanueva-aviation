@@ -272,6 +272,12 @@ export const MODULE_LECCIONES: Record<string, LeccionContenido[]> = {
   ],
 };
 
+/** Aplana las lecciones de un módulo en su lista de temas (subtemas → lecciones individuales). */
+export function flattenTemas(slug: string): Tema[] | undefined {
+  const lecciones = MODULE_LECCIONES[slug];
+  return lecciones?.flatMap((l) => l.temas);
+}
+
 // ---------- Términos (para el widget de relacionar) ----------
 
 export const MODULE_TERMS: Record<string, TermPair[]> = {
