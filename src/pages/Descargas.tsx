@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Download } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Download, ListChecks } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { CATEGORIAS_DESCARGAS, RECURSOS_DESCARGAS } from "../data/descargas";
@@ -51,10 +52,18 @@ export function Descargas() {
                   <span>{r.version}</span>
                   <span>{r.fecha}</span>
                 </div>
+                {r.interactivoHref && (
+                  <Link
+                    to={r.interactivoHref}
+                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold-500 py-2.5 text-sm font-semibold text-navy-950 transition-colors hover:bg-gold-400"
+                  >
+                    <ListChecks size={15} /> Ver checklist interactivo
+                  </Link>
+                )}
                 <button
                   disabled
                   title="Disponible próximamente"
-                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-white/15 py-2.5 text-sm font-semibold text-white/40 cursor-not-allowed"
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-white/15 py-2.5 text-sm font-semibold text-white/40 cursor-not-allowed"
                 >
                   <Download size={15} /> Disponible próximamente
                 </button>

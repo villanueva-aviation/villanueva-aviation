@@ -6,6 +6,8 @@ export interface RecursoDescarga {
   version: string;
   fecha: string;
   imagen: string;
+  /** Ruta a una versión interactiva en el sitio, cuando el recurso la tiene además del PDF. */
+  interactivoHref?: string;
 }
 
 export const CATEGORIAS_DESCARGAS = [
@@ -37,6 +39,7 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v2.0",
     fecha: "2026-05-28",
     imagen: "/images/msfs-sunset-wing.jpg",
+    interactivoHref: "/checklist-c172",
   },
   {
     id: "guia-vfr",

@@ -15,6 +15,7 @@ import { Tracker } from "./pages/Tracker";
 import { Evaluaciones } from "./pages/Evaluaciones";
 import { ContenidoExclusivo } from "./pages/ContenidoExclusivo";
 import { Descargas } from "./pages/Descargas";
+import { ChecklistC172 } from "./pages/ChecklistC172";
 import { Comunidad } from "./pages/Comunidad";
 import { Perfil } from "./pages/Perfil";
 import { Ingresar } from "./pages/Ingresar";
@@ -80,6 +81,7 @@ function App() {
               />
               <Route path={ROUTES.contenidoExclusivo} element={<ContenidoExclusivo />} />
               <Route path={ROUTES.descargas} element={<Descargas />} />
+              <Route path={ROUTES.checklistC172} element={<ChecklistC172 />} />
               <Route path={ROUTES.comunidad} element={<Comunidad />} />
               <Route
                 path={ROUTES.perfil}

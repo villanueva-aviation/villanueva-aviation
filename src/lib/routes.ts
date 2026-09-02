@@ -9,6 +9,7 @@ export const ROUTES = {
   evaluaciones: "/evaluaciones",
   contenidoExclusivo: "/contenido-exclusivo",
   descargas: "/descargas",
+  checklistC172: "/checklist-c172",
   comunidad: "/comunidad",
   perfil: "/perfil",
   ingresar: "/ingresar",
