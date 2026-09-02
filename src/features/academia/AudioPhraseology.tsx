@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, ChevronRight, Mic, Volume2, X } from "lucide-react";
 import { evaluarRespuesta, type EvaluationResult } from "./phraseologyEvaluator";
 import { useSpeechRecognition } from "./useSpeechRecognition";
@@ -12,6 +12,8 @@ export interface PhraseologyCard {
   situacion: string;
   callout: string;
   elementos: PhraseologyElement[];
+  /** Ruta a una grabación real (ej. "/audio/fraseologia/rodaje-1.mp3"). Si no se define, se usa voz sintetizada. */
+  audioUrl?: string;
 }
 
 const DEFAULT_CARDS: PhraseologyCard[] = [
@@ -91,6 +93,8 @@ export function AudioPhraseology({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speech.listening, speech.transcript]);
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   function speak(text: string) {
     if (!supported) return;
     window.speechSynthesis.cancel();
@@ -98,6 +102,19 @@ export function AudioPhraseology({
     utterance.lang = "es-MX";
     utterance.rate = 0.95;
     window.speechSynthesis.speak(utterance);
+  }
+
+  function escucharFraseologia() {
+    if (!card.audioUrl) {
+      speak(card.callout);
+      return;
+    }
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.onerror = () => speak(card.callout);
+    }
+    audioRef.current.src = card.audioUrl;
+    audioRef.current.play().catch(() => speak(card.callout));
   }
 
   function next() {
@@ -131,16 +148,16 @@ export function AudioPhraseology({
       </p>
 
       <button
-        onClick={() => speak(card.callout)}
-        disabled={!supported}
+        onClick={escucharFraseologia}
+        disabled={!supported && !card.audioUrl}
         className="mt-3 inline-flex items-center gap-2 rounded-full border border-gold-500/40 bg-gold-500/10 px-4 py-2 text-sm font-semibold text-gold-400 transition-colors hover:bg-gold-500/20 disabled:cursor-not-allowed disabled:opacity-40"
       >
         <Volume2 size={16} /> {L.escuchar}
       </button>
-      {!supported && (
+      {!supported && !card.audioUrl && (
         <p className="mt-2 text-xs text-white/40">Tu navegador no soporta síntesis de voz — lee el texto abajo.</p>
       )}
-      {vozEspanolDisponible === false && (
+      {!card.audioUrl && vozEspanolDisponible === false && (
         <p className="mt-2 text-xs text-amber-400">
           Tu navegador no tiene una voz en español instalada — el audio podría sonar en otro idioma.
         </p>
