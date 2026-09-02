@@ -66,7 +66,20 @@ export function AudioPhraseology({
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [supported] = useState(() => typeof window !== "undefined" && "speechSynthesis" in window);
+  const [vozEspanolDisponible, setVozEspanolDisponible] = useState<boolean | null>(null);
   const card = cards[index];
+
+  useEffect(() => {
+    if (!supported) return;
+    function revisarVoces() {
+      const voces = window.speechSynthesis.getVoices();
+      if (voces.length === 0) return;
+      setVozEspanolDisponible(voces.some((v) => v.lang.toLowerCase().startsWith("es")));
+    }
+    revisarVoces();
+    window.speechSynthesis.addEventListener("voiceschanged", revisarVoces);
+    return () => window.speechSynthesis.removeEventListener("voiceschanged", revisarVoces);
+  }, [supported]);
 
   const speech = useSpeechRecognition();
   const [resultado, setResultado] = useState<{ transcript: string; items: EvaluationResult[] } | null>(null);
@@ -126,6 +139,11 @@ export function AudioPhraseology({
       </button>
       {!supported && (
         <p className="mt-2 text-xs text-white/40">Tu navegador no soporta síntesis de voz — lee el texto abajo.</p>
+      )}
+      {vozEspanolDisponible === false && (
+        <p className="mt-2 text-xs text-amber-400">
+          Tu navegador no tiene una voz en español instalada — el audio podría sonar en otro idioma.
+        </p>
       )}
 
       {speech.supported && (
