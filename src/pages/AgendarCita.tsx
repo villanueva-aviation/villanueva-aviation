@@ -8,6 +8,7 @@ import { Badge } from "../components/ui/Badge";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../features/auth/AuthContext";
 import { ROUTES } from "../lib/routes";
+import { fechaMinima, horariosDisponibles } from "../lib/agendaSlots";
 
 interface Reserva {
   id: string;
@@ -36,6 +37,8 @@ export function AgendarCita() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [reservas, setReservas] = useState<Reserva[]>([]);
+  const minFecha = fechaMinima();
+  const slots = horariosDisponibles(fecha);
 
   async function cargarReservas() {
     const { data } = await supabase
@@ -53,6 +56,17 @@ export function AgendarCita() {
     e.preventDefault();
     setStatus("sending");
     setError(null);
+
+    if (fecha && fecha < minFecha) {
+      setError("Elige una fecha con al menos 2 días de anticipación.");
+      setStatus("error");
+      return;
+    }
+    if (fecha && !horario) {
+      setError("Elige un horario disponible para esa fecha.");
+      setStatus("error");
+      return;
+    }
 
     const { data: sessionData } = await supabase.auth.getSession();
     const userId = sessionData.session?.user?.id;
@@ -146,20 +160,34 @@ export function AgendarCita() {
                   <input
                     type="date"
                     value={fecha}
-                    onChange={(e) => setFecha(e.target.value)}
+                    min={minFecha}
+                    onChange={(e) => {
+                      setFecha(e.target.value);
+                      setHorario("");
+                    }}
                     className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-white outline-none transition-colors focus:border-gold-500/50"
                   />
                 </label>
                 <label className="flex flex-col gap-1.5 text-sm text-white/70">
                   Horario preferido
-                  <input
+                  <select
                     value={horario}
                     onChange={(e) => setHorario(e.target.value)}
-                    placeholder="Ej. Mañana, después de las 4pm..."
-                    className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-white outline-none transition-colors focus:border-gold-500/50"
-                  />
+                    disabled={!fecha}
+                    className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-white outline-none transition-colors focus:border-gold-500/50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">{fecha ? "Elige un horario" : "Elige primero una fecha"}</option>
+                    {slots.map((s) => (
+                      <option key={s.value} value={s.value}>
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
                 </label>
               </div>
+              <p className="-mt-2 text-xs text-white/40">
+                Agenda con al menos 2 días de anticipación. Horarios: lunes a viernes 5pm-10pm, sábado y domingo 8am-10pm.
+              </p>
               <label className="flex flex-col gap-1.5 text-sm text-white/70">
                 Comentarios
                 <textarea
