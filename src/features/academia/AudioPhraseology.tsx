@@ -28,10 +28,20 @@ const DEFAULT_CARDS: PhraseologyCard[] = [
 export function AudioPhraseology({
   cards = DEFAULT_CARDS,
   onComplete,
+  labels,
 }: {
   cards?: PhraseologyCard[];
   onComplete?: () => void;
+  labels?: { unidad?: string; escuchar?: string; mostrar?: string; siguiente?: string; terminar?: string };
 }) {
+  const L = {
+    unidad: "Situación",
+    escuchar: "Escuchar fraseología correcta",
+    mostrar: "Mostrar texto y elementos clave",
+    siguiente: "Siguiente situación",
+    terminar: "Terminar práctica",
+    ...labels,
+  };
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [supported] = useState(() => typeof window !== "undefined" && "speechSynthesis" in window);
@@ -59,14 +69,14 @@ export function AudioPhraseology({
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
       <div className="flex items-center justify-between text-xs text-white/50">
         <span>
-          Situación {index + 1} de {cards.length}
+          {L.unidad} {index + 1} de {cards.length}
         </span>
       </div>
 
       <p className="mt-4 text-sm leading-relaxed text-white/80">{card.situacion}</p>
 
       <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-gold-500">
-        Piensa en tu llamada, luego escucha la fraseología correcta
+        Piensa tu respuesta, luego escucha o revisa la correcta
       </p>
 
       <button
@@ -74,7 +84,7 @@ export function AudioPhraseology({
         disabled={!supported}
         className="mt-3 inline-flex items-center gap-2 rounded-full border border-gold-500/40 bg-gold-500/10 px-4 py-2 text-sm font-semibold text-gold-400 transition-colors hover:bg-gold-500/20 disabled:cursor-not-allowed disabled:opacity-40"
       >
-        <Volume2 size={16} /> Escuchar fraseología correcta
+        <Volume2 size={16} /> {L.escuchar}
       </button>
       {!supported && (
         <p className="mt-2 text-xs text-white/40">Tu navegador no soporta síntesis de voz — lee el texto abajo.</p>
@@ -85,7 +95,7 @@ export function AudioPhraseology({
           onClick={() => setRevealed(true)}
           className="mt-5 block text-sm font-medium text-white/60 underline decoration-dotted hover:text-white"
         >
-          Mostrar texto y elementos clave
+          {L.mostrar}
         </button>
       ) : (
         <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.02] p-4">
@@ -106,7 +116,7 @@ export function AudioPhraseology({
           disabled={!revealed}
           className="inline-flex items-center gap-1.5 rounded-full bg-gold-500 px-5 py-2.5 text-sm font-semibold text-navy-950 transition-colors hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {index + 1 >= cards.length ? "Terminar práctica" : "Siguiente situación"}
+          {index + 1 >= cards.length ? L.terminar : L.siguiente}
           <ChevronRight size={15} />
         </button>
       </div>

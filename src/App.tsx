@@ -23,6 +23,11 @@ import { BitacoraVuelo } from "./pages/BitacoraVuelo";
 import { PesoBalance } from "./pages/PesoBalance";
 import { AudioRodajeDespegue } from "./pages/AudioRodajeDespegue";
 import { AudioEmergenciasAproximacion } from "./pages/AudioEmergenciasAproximacion";
+import { ChecklistPremiumC172 } from "./pages/ChecklistPremiumC172";
+import { ChecklistPremiumC152 } from "./pages/ChecklistPremiumC152";
+import { SimulacroOral } from "./pages/SimulacroOral";
+import { SimulacroVuelo } from "./pages/SimulacroVuelo";
+import { AgendarCita } from "./pages/AgendarCita";
 import { GuiaVFR } from "./pages/GuiaVFR";
 import { Comunidad } from "./pages/Comunidad";
 import { Perfil } from "./pages/Perfil";
@@ -97,6 +102,46 @@ function App() {
               <Route path={ROUTES.pesoBalance} element={<PesoBalance />} />
               <Route path={ROUTES.audioRodajeDespegue} element={<AudioRodajeDespegue />} />
               <Route path={ROUTES.audioEmergenciasAproximacion} element={<AudioEmergenciasAproximacion />} />
+              <Route
+                path={ROUTES.checklistPremiumC172}
+                element={
+                  <ProtectedRoute>
+                    <ChecklistPremiumC172 />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.checklistPremiumC152}
+                element={
+                  <ProtectedRoute>
+                    <ChecklistPremiumC152 />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.simulacroOral}
+                element={
+                  <ProtectedRoute>
+                    <SimulacroOral />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.simulacroVuelo}
+                element={
+                  <ProtectedRoute>
+                    <SimulacroVuelo />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.agendarCita}
+                element={
+                  <ProtectedRoute>
+                    <AgendarCita />
+                  </ProtectedRoute>
+                }
+              />
               <Route path={ROUTES.guiaVFR} element={<GuiaVFR />} />
               <Route path={ROUTES.comunidad} element={<Comunidad />} />
               <Route
