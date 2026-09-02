@@ -8,6 +8,8 @@ export interface RecursoDescarga {
   imagen: string;
   /** Ruta a una versión interactiva en el sitio, cuando el recurso la tiene además del PDF. */
   interactivoHref?: string;
+  /** Ruta al archivo descargable en public/, cuando ya está disponible. */
+  archivoHref?: string;
 }
 
 export const CATEGORIAS_DESCARGAS = [
@@ -40,6 +42,7 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     fecha: "2026-05-28",
     imagen: "/images/msfs-sunset-wing.jpg",
     interactivoHref: "/checklist-c172",
+    archivoHref: "/downloads/checklist-cessna-172.pdf",
   },
   {
     id: "guia-vfr",

@@ -60,13 +60,23 @@ export function Descargas() {
                     <ListChecks size={15} /> Ver checklist interactivo
                   </Link>
                 )}
-                <button
-                  disabled
-                  title="Disponible próximamente"
-                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-white/15 py-2.5 text-sm font-semibold text-white/40 cursor-not-allowed"
-                >
-                  <Download size={15} /> Disponible próximamente
-                </button>
+                {r.archivoHref ? (
+                  <a
+                    href={r.archivoHref}
+                    download
+                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-white/20 py-2.5 text-sm font-semibold text-white transition-colors hover:border-gold-500/50 hover:text-gold-400"
+                  >
+                    <Download size={15} /> Descargar PDF
+                  </a>
+                ) : (
+                  <button
+                    disabled
+                    title="Disponible próximamente"
+                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-white/15 py-2.5 text-sm font-semibold text-white/40 cursor-not-allowed"
+                  >
+                    <Download size={15} /> Disponible próximamente
+                  </button>
+                )}
               </div>
             </Reveal>
           ))}
