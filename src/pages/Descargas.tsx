@@ -57,7 +57,7 @@ export function Descargas() {
                     to={r.interactivoHref}
                     className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold-500 py-2.5 text-sm font-semibold text-navy-950 transition-colors hover:bg-gold-400"
                   >
-                    <ListChecks size={15} /> Ver checklist interactivo
+                    <ListChecks size={15} /> Ver versión interactiva
                   </Link>
                 )}
                 {r.archivoHref ? (

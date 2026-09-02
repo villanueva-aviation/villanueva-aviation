@@ -52,6 +52,8 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.0",
     fecha: "2026-04-15",
     imagen: "/images/msfs-aeromexico-clouds.jpg",
+    interactivoHref: "/guia-vfr",
+    archivoHref: "/downloads/guia-planificacion-vfr.pdf",
   },
   {
     id: "material-meteo",

@@ -10,6 +10,7 @@ export const ROUTES = {
   contenidoExclusivo: "/contenido-exclusivo",
   descargas: "/descargas",
   checklistC172: "/checklist-c172",
+  guiaVFR: "/guia-vfr",
   comunidad: "/comunidad",
   perfil: "/perfil",
   ingresar: "/ingresar",
