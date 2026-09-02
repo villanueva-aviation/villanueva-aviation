@@ -94,6 +94,7 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.0",
     fecha: "2026-07-05",
     imagen: "/images/msfs-aeromexico-clouds.jpg",
+    interactivoHref: "/bitacora-de-vuelo",
   },
   {
     id: "formulario-peso-balance",
@@ -103,6 +104,7 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.0",
     fecha: "2026-07-05",
     imagen: "/images/msfs-xbvla-farmland.jpg",
+    interactivoHref: "/peso-y-balance",
   },
   {
     id: "audio-atc-rodaje",
@@ -112,6 +114,7 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.0",
     fecha: "2026-07-12",
     imagen: "/images/msfs-volaris-climb.jpg",
+    interactivoHref: "/audio-rodaje-despegue",
   },
   {
     id: "audio-atc-emergencias",
@@ -121,5 +124,6 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.0",
     fecha: "2026-07-12",
     imagen: "/images/msfs-sunset-wing.jpg",
+    interactivoHref: "/audio-emergencias-aproximacion",
   },
 ];
