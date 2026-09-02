@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Download } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Download, ListChecks } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { CATEGORIAS_DESCARGAS, RECURSOS_DESCARGAS } from "../data/descargas";
@@ -51,13 +52,31 @@ export function Descargas() {
                   <span>{r.version}</span>
                   <span>{r.fecha}</span>
                 </div>
-                <button
-                  disabled
-                  title="Disponible próximamente"
-                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-full border border-white/15 py-2.5 text-sm font-semibold text-white/40 cursor-not-allowed"
-                >
-                  <Download size={15} /> Disponible próximamente
-                </button>
+                {r.interactivoHref && (
+                  <Link
+                    to={r.interactivoHref}
+                    className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gold-500 py-2.5 text-sm font-semibold text-navy-950 transition-colors hover:bg-gold-400"
+                  >
+                    <ListChecks size={15} /> Ver versión interactiva
+                  </Link>
+                )}
+                {r.archivoHref ? (
+                  <a
+                    href={r.archivoHref}
+                    download
+                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-white/20 py-2.5 text-sm font-semibold text-white transition-colors hover:border-gold-500/50 hover:text-gold-400"
+                  >
+                    <Download size={15} /> Descargar PDF
+                  </a>
+                ) : (
+                  <button
+                    disabled
+                    title="Disponible próximamente"
+                    className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-white/15 py-2.5 text-sm font-semibold text-white/40 cursor-not-allowed"
+                  >
+                    <Download size={15} /> Disponible próximamente
+                  </button>
+                )}
               </div>
             </Reveal>
           ))}

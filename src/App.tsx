@@ -15,6 +15,15 @@ import { Tracker } from "./pages/Tracker";
 import { Evaluaciones } from "./pages/Evaluaciones";
 import { ContenidoExclusivo } from "./pages/ContenidoExclusivo";
 import { Descargas } from "./pages/Descargas";
+import { ChecklistC172 } from "./pages/ChecklistC172";
+import { ChecklistC152 } from "./pages/ChecklistC152";
+import { ResumenMeteorologia } from "./pages/ResumenMeteorologia";
+import { PlanDeVuelo } from "./pages/PlanDeVuelo";
+import { BitacoraVuelo } from "./pages/BitacoraVuelo";
+import { PesoBalance } from "./pages/PesoBalance";
+import { AudioRodajeDespegue } from "./pages/AudioRodajeDespegue";
+import { AudioEmergenciasAproximacion } from "./pages/AudioEmergenciasAproximacion";
+import { GuiaVFR } from "./pages/GuiaVFR";
 import { Comunidad } from "./pages/Comunidad";
 import { Perfil } from "./pages/Perfil";
 import { Ingresar } from "./pages/Ingresar";
@@ -80,6 +89,15 @@ function App() {
               />
               <Route path={ROUTES.contenidoExclusivo} element={<ContenidoExclusivo />} />
               <Route path={ROUTES.descargas} element={<Descargas />} />
+              <Route path={ROUTES.checklistC172} element={<ChecklistC172 />} />
+              <Route path={ROUTES.checklistC152} element={<ChecklistC152 />} />
+              <Route path={ROUTES.resumenMeteorologia} element={<ResumenMeteorologia />} />
+              <Route path={ROUTES.planVuelo} element={<PlanDeVuelo />} />
+              <Route path={ROUTES.bitacoraVuelo} element={<BitacoraVuelo />} />
+              <Route path={ROUTES.pesoBalance} element={<PesoBalance />} />
+              <Route path={ROUTES.audioRodajeDespegue} element={<AudioRodajeDespegue />} />
+              <Route path={ROUTES.audioEmergenciasAproximacion} element={<AudioEmergenciasAproximacion />} />
+              <Route path={ROUTES.guiaVFR} element={<GuiaVFR />} />
               <Route path={ROUTES.comunidad} element={<Comunidad />} />
               <Route
                 path={ROUTES.perfil}

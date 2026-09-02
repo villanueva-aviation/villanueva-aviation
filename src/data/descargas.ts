@@ -6,6 +6,10 @@ export interface RecursoDescarga {
   version: string;
   fecha: string;
   imagen: string;
+  /** Ruta a una versión interactiva en el sitio, cuando el recurso la tiene además del PDF. */
+  interactivoHref?: string;
+  /** Ruta al archivo descargable en public/, cuando ya está disponible. */
+  archivoHref?: string;
 }
 
 export const CATEGORIAS_DESCARGAS = [
@@ -14,7 +18,6 @@ export const CATEGORIAS_DESCARGAS = [
   "Material de estudio",
   "Guías",
   "Plantillas",
-  "Recursos MSFS",
   "Formularios oficiales",
   "Audio ATC",
 ] as const;
@@ -37,6 +40,8 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v2.0",
     fecha: "2026-05-28",
     imagen: "/images/msfs-sunset-wing.jpg",
+    interactivoHref: "/checklist-c172",
+    archivoHref: "/downloads/checklist-cessna-172.pdf",
   },
   {
     id: "guia-vfr",
@@ -46,6 +51,8 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.0",
     fecha: "2026-04-15",
     imagen: "/images/msfs-aeromexico-clouds.jpg",
+    interactivoHref: "/guia-vfr",
+    archivoHref: "/downloads/guia-planificacion-vfr.pdf",
   },
   {
     id: "material-meteo",
@@ -55,6 +62,8 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.1",
     fecha: "2026-03-30",
     imagen: "/images/msfs-volaris-climb.jpg",
+    interactivoHref: "/resumen-meteorologia",
+    archivoHref: "/downloads/resumen-meteorologia.pdf",
   },
   {
     id: "plantilla-plan-vuelo",
@@ -64,15 +73,18 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.0",
     fecha: "2026-03-02",
     imagen: "/images/msfs-xbvla-farmland.jpg",
+    interactivoHref: "/plan-de-vuelo",
   },
   {
-    id: "msfs-livery",
-    categoria: "Recursos MSFS",
-    nombre: "Pack de configuración MSFS — Academia",
-    descripcion: "Ajustes recomendados de Microsoft Flight Simulator para entrenamiento.",
+    id: "checklist-c152",
+    categoria: "Checklists",
+    nombre: "Checklist Cessna 152 — Normal y emergencia",
+    descripcion: "Lista de verificación completa, análoga a la del C172, para operaciones normales y procedimientos de emergencia.",
     version: "v1.0",
-    fecha: "2026-02-18",
+    fecha: "2026-08-01",
     imagen: "/images/msfs-sunset-wing.jpg",
+    interactivoHref: "/checklist-c152",
+    archivoHref: "/downloads/checklist-cessna-152.pdf",
   },
   {
     id: "formulario-bitacora",
@@ -82,6 +94,7 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.0",
     fecha: "2026-07-05",
     imagen: "/images/msfs-aeromexico-clouds.jpg",
+    interactivoHref: "/bitacora-de-vuelo",
   },
   {
     id: "formulario-peso-balance",
@@ -91,6 +104,7 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.0",
     fecha: "2026-07-05",
     imagen: "/images/msfs-xbvla-farmland.jpg",
+    interactivoHref: "/peso-y-balance",
   },
   {
     id: "audio-atc-rodaje",
@@ -100,6 +114,7 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.0",
     fecha: "2026-07-12",
     imagen: "/images/msfs-volaris-climb.jpg",
+    interactivoHref: "/audio-rodaje-despegue",
   },
   {
     id: "audio-atc-emergencias",
@@ -109,5 +124,6 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     version: "v1.0",
     fecha: "2026-07-12",
     imagen: "/images/msfs-sunset-wing.jpg",
+    interactivoHref: "/audio-emergencias-aproximacion",
   },
 ];

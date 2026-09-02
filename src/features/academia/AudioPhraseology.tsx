@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Check, ChevronRight, Volume2 } from "lucide-react";
 
-interface PhraseologyCard {
+export interface PhraseologyCard {
   situacion: string;
   callout: string;
   elementos: string[];
 }
 
-const CARDS: PhraseologyCard[] = [
+const DEFAULT_CARDS: PhraseologyCard[] = [
   {
     situacion: "Estás en la plataforma de MMGL, listo para solicitar rodaje hacia la pista activa.",
     callout: "Guadalajara Torre, XB-VLA, plataforma de aviación general, solicito rodaje, con información Alfa.",
@@ -25,11 +25,17 @@ const CARDS: PhraseologyCard[] = [
   },
 ];
 
-export function AudioPhraseology({ onComplete }: { onComplete: () => void }) {
+export function AudioPhraseology({
+  cards = DEFAULT_CARDS,
+  onComplete,
+}: {
+  cards?: PhraseologyCard[];
+  onComplete?: () => void;
+}) {
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [supported] = useState(() => typeof window !== "undefined" && "speechSynthesis" in window);
-  const card = CARDS[index];
+  const card = cards[index];
 
   function speak(text: string) {
     if (!supported) return;
@@ -41,8 +47,8 @@ export function AudioPhraseology({ onComplete }: { onComplete: () => void }) {
   }
 
   function next() {
-    if (index + 1 >= CARDS.length) {
-      onComplete();
+    if (index + 1 >= cards.length) {
+      onComplete?.();
       return;
     }
     setIndex((i) => i + 1);
@@ -53,7 +59,7 @@ export function AudioPhraseology({ onComplete }: { onComplete: () => void }) {
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
       <div className="flex items-center justify-between text-xs text-white/50">
         <span>
-          Situación {index + 1} de {CARDS.length}
+          Situación {index + 1} de {cards.length}
         </span>
       </div>
 
@@ -100,7 +106,7 @@ export function AudioPhraseology({ onComplete }: { onComplete: () => void }) {
           disabled={!revealed}
           className="inline-flex items-center gap-1.5 rounded-full bg-gold-500 px-5 py-2.5 text-sm font-semibold text-navy-950 transition-colors hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {index + 1 >= CARDS.length ? "Terminar práctica" : "Siguiente situación"}
+          {index + 1 >= cards.length ? "Terminar práctica" : "Siguiente situación"}
           <ChevronRight size={15} />
         </button>
       </div>
