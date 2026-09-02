@@ -176,9 +176,11 @@ export function AgendarCita() {
                     disabled={!fecha}
                     className="rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-white outline-none transition-colors focus:border-gold-500/50 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <option value="">{fecha ? "Elige un horario" : "Elige primero una fecha"}</option>
+                    <option value="" style={{ backgroundColor: "#0b1d34", color: "#fff" }}>
+                      {fecha ? "Elige un horario" : "Elige primero una fecha"}
+                    </option>
                     {slots.map((s) => (
-                      <option key={s.value} value={s.value}>
+                      <option key={s.value} value={s.value} style={{ backgroundColor: "#0b1d34", color: "#fff" }}>
                         {s.label}
                       </option>
                     ))}
