@@ -92,6 +92,7 @@ export function AudioPhraseology({
       onComplete?.();
       return;
     }
+    speech.stop();
     setIndex((i) => i + 1);
     setRevealed(false);
     setResultado(null);
