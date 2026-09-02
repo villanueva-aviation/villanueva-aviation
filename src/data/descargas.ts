@@ -15,6 +15,8 @@ export const CATEGORIAS_DESCARGAS = [
   "Guías",
   "Plantillas",
   "Recursos MSFS",
+  "Formularios oficiales",
+  "Audio ATC",
 ] as const;
 
 export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
@@ -70,6 +72,42 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     descripcion: "Ajustes recomendados de Microsoft Flight Simulator para entrenamiento.",
     version: "v1.0",
     fecha: "2026-02-18",
+    imagen: "/images/msfs-sunset-wing.jpg",
+  },
+  {
+    id: "formulario-bitacora",
+    categoria: "Formularios oficiales",
+    nombre: "Bitácora de vuelo editable",
+    descripcion: "Formato oficial de bitácora de vuelo en versión editable, listo para llenar e imprimir.",
+    version: "v1.0",
+    fecha: "2026-07-05",
+    imagen: "/images/msfs-aeromexico-clouds.jpg",
+  },
+  {
+    id: "formulario-peso-balance",
+    categoria: "Formularios oficiales",
+    nombre: "Hoja de peso y balance editable",
+    descripcion: "Formato editable para calcular y documentar peso y balance antes de cada vuelo.",
+    version: "v1.0",
+    fecha: "2026-07-05",
+    imagen: "/images/msfs-xbvla-farmland.jpg",
+  },
+  {
+    id: "audio-atc-rodaje",
+    categoria: "Audio ATC",
+    nombre: "Fraseología ATC: rodaje y despegue",
+    descripcion: "Audio de práctica con llamadas reales de rodaje, autorización y despegue para escuchar en cualquier momento.",
+    version: "v1.0",
+    fecha: "2026-07-12",
+    imagen: "/images/msfs-volaris-climb.jpg",
+  },
+  {
+    id: "audio-atc-emergencias",
+    categoria: "Audio ATC",
+    nombre: "Fraseología ATC: emergencias y aproximación",
+    descripcion: "Audio de práctica con llamadas de aproximación, tránsito y procedimientos de emergencia.",
+    version: "v1.0",
+    fecha: "2026-07-12",
     imagen: "/images/msfs-sunset-wing.jpg",
   },
 ];
