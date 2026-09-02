@@ -11,9 +11,9 @@ export const CHECKRIDE_ORAL: PhraseologyCard[] = [
     callout:
       "La pérdida ocurre cuando se excede el ángulo crítico de ataque del ala, sin importar la velocidad o actitud — el flujo de aire se separa de la superficie superior y la sustentación colapsa.",
     elementos: [
-      "Se excede el ángulo crítico de ataque, no depende solo de la velocidad",
-      "El flujo de aire se separa de la superficie superior del ala",
-      "Puede ocurrir a cualquier velocidad y actitud",
+      { descripcion: "Se excede el ángulo crítico de ataque, no depende solo de la velocidad", palabrasClave: ["ángulo crítico", "angulo critico", "ángulo de ataque"] },
+      { descripcion: "El flujo de aire se separa de la superficie superior del ala", palabrasClave: ["flujo de aire", "se separa", "superficie superior"] },
+      { descripcion: "Puede ocurrir a cualquier velocidad y actitud", palabrasClave: ["cualquier velocidad", "cualquier actitud"] },
     ],
   },
   {
@@ -21,9 +21,9 @@ export const CHECKRIDE_ORAL: PhraseologyCard[] = [
     callout:
       "El METAR es una observación de las condiciones actuales, válida para el momento en que se emitió. El TAF es un pronóstico, válido típicamente por 24 a 30 horas.",
     elementos: [
-      "METAR: observación actual, válida para esa hora específica",
-      "TAF: pronóstico, válido típicamente 24-30 horas",
-      "Ambos usan el mismo lenguaje codificado",
+      { descripcion: "METAR: observación actual, válida para esa hora específica", palabrasClave: ["observación actual", "observacion actual", "metar"] },
+      { descripcion: "TAF: pronóstico, válido típicamente 24-30 horas", palabrasClave: ["pronóstico", "pronostico", "taf"] },
+      { descripcion: "Ambos usan el mismo lenguaje codificado", palabrasClave: ["lenguaje codificado", "código", "codigo"] },
     ],
   },
   {
@@ -31,10 +31,10 @@ export const CHECKRIDE_ORAL: PhraseologyCard[] = [
     callout:
       "El certificado de matrícula, el certificado de aeronavegabilidad, el manual de vuelo (POH/AFM) y las bitácoras de la aeronave.",
     elementos: [
-      "Certificado de matrícula",
-      "Certificado de aeronavegabilidad",
-      "Manual de vuelo (POH/AFM)",
-      "Bitácoras de la aeronave",
+      { descripcion: "Certificado de matrícula", palabrasClave: ["matrícula", "matricula"] },
+      { descripcion: "Certificado de aeronavegabilidad", palabrasClave: ["aeronavegabilidad"] },
+      { descripcion: "Manual de vuelo (POH/AFM)", palabrasClave: ["manual de vuelo", "poh", "afm"] },
+      { descripcion: "Bitácoras de la aeronave", palabrasClave: ["bitácoras", "bitacoras"] },
     ],
   },
   {
@@ -42,9 +42,9 @@ export const CHECKRIDE_ORAL: PhraseologyCard[] = [
     callout:
       "La Clase B requiere autorización EXPLÍCITA de control antes de entrar. La Clase C solo requiere establecer contacto bidireccional — basta con que el controlador confirme tu matrícula de vuelta.",
     elementos: [
-      "Clase B requiere autorización explícita antes de entrar",
-      "Clase C solo requiere contacto bidireccional establecido",
-      "Ambos suelen requerir transponder Modo C",
+      { descripcion: "Clase B requiere autorización explícita antes de entrar", palabrasClave: ["autorización explícita", "autorizacion explicita", "clase b"] },
+      { descripcion: "Clase C solo requiere contacto bidireccional establecido", palabrasClave: ["contacto bidireccional", "clase c"] },
+      { descripcion: "Ambos suelen requerir transponder Modo C", palabrasClave: ["transponder", "modo c"] },
     ],
   },
   {
@@ -52,9 +52,9 @@ export const CHECKRIDE_ORAL: PhraseologyCard[] = [
     callout:
       "El avión se vuelve más ágil pero peligrosamente inestable en cabeceo, con riesgo real de entrar en pérdida sin previo aviso claro y, en casos extremos, sin poder recuperarla.",
     elementos: [
-      "Más ágil pero peligrosamente inestable",
-      "Riesgo de pérdida sin previo aviso claro",
-      "Puede volverse irrecuperable en casos extremos",
+      { descripcion: "Más ágil pero peligrosamente inestable", palabrasClave: ["inestable", "ágil", "agil"] },
+      { descripcion: "Riesgo de pérdida sin previo aviso claro", palabrasClave: ["pérdida", "perdida", "sin previo aviso"] },
+      { descripcion: "Puede volverse irrecuperable en casos extremos", palabrasClave: ["irrecuperable"] },
     ],
   },
   {
@@ -62,9 +62,9 @@ export const CHECKRIDE_ORAL: PhraseologyCard[] = [
     callout:
       "Hay un tanque en cada ala, con un selector que permite elegir izquierdo, derecho o ambos. Antes de volar se drenan los sumps para revisar que no haya agua ni sedimento.",
     elementos: [
-      "Tanques en cada ala",
-      "Selector de combustible: IZQUIERDO / DERECHO / AMBOS",
-      "Drenados (sumps) antes del vuelo",
+      { descripcion: "Tanques en cada ala", palabrasClave: ["tanque", "cada ala"] },
+      { descripcion: "Selector de combustible: IZQUIERDO / DERECHO / AMBOS", palabrasClave: ["izquierdo", "derecho", "ambos", "selector"] },
+      { descripcion: "Drenados (sumps) antes del vuelo", palabrasClave: ["sumps", "drenado", "drenados"] },
     ],
   },
   {
@@ -72,10 +72,10 @@ export const CHECKRIDE_ORAL: PhraseologyCard[] = [
     callout:
       "Primero establecer la velocidad de mejor planeo, luego seleccionar un área de aterrizaje dentro del alcance, después intentar restablecer potencia, y declarar la emergencia si el tiempo lo permite.",
     elementos: [
-      "Velocidad de mejor planeo de inmediato",
-      "Área de aterrizaje dentro del alcance",
-      "Intentar restablecer potencia (combustible, mezcla, magnetos)",
-      "Declarar emergencia si el tiempo lo permite",
+      { descripcion: "Velocidad de mejor planeo de inmediato", palabrasClave: ["mejor planeo", "velocidad de planeo"] },
+      { descripcion: "Área de aterrizaje dentro del alcance", palabrasClave: ["área de aterrizaje", "area de aterrizaje", "alcance"] },
+      { descripcion: "Intentar restablecer potencia (combustible, mezcla, magnetos)", palabrasClave: ["restablecer potencia", "mezcla", "magnetos"] },
+      { descripcion: "Declarar emergencia si el tiempo lo permite", palabrasClave: ["declarar emergencia"] },
     ],
   },
   {
@@ -83,9 +83,9 @@ export const CHECKRIDE_ORAL: PhraseologyCard[] = [
     callout:
       "Revisando la manga de viento, escuchando reportes de otros pilotos en la frecuencia CTAF, y asumiendo un patrón estándar con virajes a la izquierda salvo que se indique lo contrario.",
     elementos: [
-      "Manga de viento y frecuencia CTAF",
-      "Reportes de otros pilotos en la frecuencia",
-      "Patrón estándar (virajes a la izquierda) salvo indicación contraria",
+      { descripcion: "Manga de viento y frecuencia CTAF", palabrasClave: ["manga de viento", "ctaf"] },
+      { descripcion: "Reportes de otros pilotos en la frecuencia", palabrasClave: ["reportes", "otros pilotos"] },
+      { descripcion: "Patrón estándar (virajes a la izquierda) salvo indicación contraria", palabrasClave: ["patrón estándar", "patron estandar", "virajes a la izquierda"] },
     ],
   },
 ];
