@@ -1,27 +1,46 @@
 import { useState } from "react";
 import { Check, ChevronRight, Volume2 } from "lucide-react";
 
+export interface PhraseologyElement {
+  descripcion: string;
+  palabrasClave: string[];
+}
+
 export interface PhraseologyCard {
   situacion: string;
   callout: string;
-  elementos: string[];
+  elementos: PhraseologyElement[];
 }
 
 const DEFAULT_CARDS: PhraseologyCard[] = [
   {
     situacion: "Estás en la plataforma de MMGL, listo para solicitar rodaje hacia la pista activa.",
     callout: "Guadalajara Torre, XB-VLA, plataforma de aviación general, solicito rodaje, con información Alfa.",
-    elementos: ["A quién llamas (Torre)", "Tu identificación (XB-VLA)", "Tu posición", "Qué necesitas (rodaje)"],
+    elementos: [
+      { descripcion: "A quién llamas (Torre)", palabrasClave: ["torre"] },
+      { descripcion: "Tu identificación (XB-VLA)", palabrasClave: ["xb vla", "xb-vla", "equis be uve ele a"] },
+      { descripcion: "Tu posición", palabrasClave: ["plataforma", "aviación general", "aviacion general"] },
+      { descripcion: "Qué necesitas (rodaje)", palabrasClave: ["rodaje", "solicito rodaje"] },
+    ],
   },
   {
     situacion: "Vas a ingresar a la frecuencia de un aeródromo no controlado para anunciar tu llegada.",
     callout: "Tráfico Manzanillo, XB-VLA, a 10 millas al norte, descendiendo para entrar al circuito de tráfico, Manzanillo.",
-    elementos: ["A quién llamas (tráfico en la frecuencia)", "Tu identificación", "Posición y altitud", "Tu intención"],
+    elementos: [
+      { descripcion: "A quién llamas (tráfico en la frecuencia)", palabrasClave: ["tráfico", "trafico"] },
+      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla"] },
+      { descripcion: "Posición y altitud", palabrasClave: ["millas", "norte"] },
+      { descripcion: "Tu intención", palabrasClave: ["circuito de tráfico", "circuito de trafico", "entrar al circuito"] },
+    ],
   },
   {
     situacion: "El controlador te autoriza a despegar. Debes confirmar la instrucción (read-back).",
     callout: "Autorizado a despegar pista 20, XB-VLA.",
-    elementos: ["Repites la instrucción exacta", "Confirmas la pista", "Terminas con tu identificación"],
+    elementos: [
+      { descripcion: "Repites la instrucción exacta", palabrasClave: ["autorizado a despegar", "autorizado despegar"] },
+      { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte"] },
+      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla"] },
+    ],
   },
 ];
 
@@ -102,8 +121,8 @@ export function AudioPhraseology({
           <p className="font-display text-sm text-white">"{card.callout}"</p>
           <ul className="mt-3 flex flex-col gap-1.5">
             {card.elementos.map((el) => (
-              <li key={el} className="flex items-center gap-2 text-xs text-white/60">
-                <Check size={12} className="shrink-0 text-gold-400" /> {el}
+              <li key={el.descripcion} className="flex items-center gap-2 text-xs text-white/60">
+                <Check size={12} className="shrink-0 text-gold-400" /> {el.descripcion}
               </li>
             ))}
           </ul>
