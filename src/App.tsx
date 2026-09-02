@@ -16,6 +16,9 @@ import { Evaluaciones } from "./pages/Evaluaciones";
 import { ContenidoExclusivo } from "./pages/ContenidoExclusivo";
 import { Descargas } from "./pages/Descargas";
 import { ChecklistC172 } from "./pages/ChecklistC172";
+import { ChecklistC152 } from "./pages/ChecklistC152";
+import { ResumenMeteorologia } from "./pages/ResumenMeteorologia";
+import { PlanDeVuelo } from "./pages/PlanDeVuelo";
 import { GuiaVFR } from "./pages/GuiaVFR";
 import { Comunidad } from "./pages/Comunidad";
 import { Perfil } from "./pages/Perfil";
@@ -83,6 +86,9 @@ function App() {
               <Route path={ROUTES.contenidoExclusivo} element={<ContenidoExclusivo />} />
               <Route path={ROUTES.descargas} element={<Descargas />} />
               <Route path={ROUTES.checklistC172} element={<ChecklistC172 />} />
+              <Route path={ROUTES.checklistC152} element={<ChecklistC152 />} />
+              <Route path={ROUTES.resumenMeteorologia} element={<ResumenMeteorologia />} />
+              <Route path={ROUTES.planVuelo} element={<PlanDeVuelo />} />
               <Route path={ROUTES.guiaVFR} element={<GuiaVFR />} />
               <Route path={ROUTES.comunidad} element={<Comunidad />} />
               <Route
