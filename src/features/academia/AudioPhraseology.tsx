@@ -69,11 +69,11 @@ export function AudioPhraseology({
   const card = cards[index];
 
   const speech = useSpeechRecognition();
-  const [resultado, setResultado] = useState<EvaluationResult[] | null>(null);
+  const [resultado, setResultado] = useState<{ transcript: string; items: EvaluationResult[] } | null>(null);
 
   useEffect(() => {
     if (!speech.listening && speech.transcript && !resultado) {
-      setResultado(evaluarRespuesta(speech.transcript, card.elementos));
+      setResultado({ transcript: speech.transcript, items: evaluarRespuesta(speech.transcript, card.elementos) });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speech.listening, speech.transcript]);
@@ -92,7 +92,6 @@ export function AudioPhraseology({
       onComplete?.();
       return;
     }
-    speech.stop();
     setIndex((i) => i + 1);
     setRevealed(false);
     setResultado(null);
@@ -156,16 +155,16 @@ export function AudioPhraseology({
         <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.02] p-4">
           {resultado && (
             <>
-              <p className="text-xs text-white/50">Dijiste: "{speech.transcript}"</p>
+              <p className="text-xs text-white/50">Dijiste: "{resultado.transcript}"</p>
               <p className="mt-1 text-xs font-semibold text-gold-400">
-                {resultado.filter((r) => r.dicho).length} de {resultado.length} elementos correctos
+                {resultado.items.filter((r) => r.dicho).length} de {resultado.items.length} elementos correctos
               </p>
             </>
           )}
           <p className="mt-3 font-display text-sm text-white">"{card.callout}"</p>
           <ul className="mt-3 flex flex-col gap-1.5">
             {card.elementos.map((el, i) => {
-              const dicho = resultado?.[i]?.dicho;
+              const dicho = resultado?.items[i]?.dicho;
               return (
                 <li key={el.descripcion} className="flex items-center gap-2 text-xs text-white/60">
                   {resultado ? (

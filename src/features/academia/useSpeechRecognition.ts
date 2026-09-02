@@ -15,6 +15,7 @@ interface SpeechRecognitionLike {
   interimResults: boolean;
   start: () => void;
   stop: () => void;
+  abort: () => void;
   onresult: ((event: SpeechRecognitionEventLike) => void) | null;
   onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
   onend: (() => void) | null;
@@ -66,6 +67,7 @@ export function useSpeechRecognition(lang = "es-MX"): UseSpeechRecognitionResult
       setTranscript(texto);
     };
     recognition.onerror = (event) => {
+      if (event.error === "aborted") return;
       setError(ERROR_MESSAGES[event.error] ?? "No se pudo procesar el audio, intenta de nuevo.");
       setListening(false);
     };
@@ -73,7 +75,7 @@ export function useSpeechRecognition(lang = "es-MX"): UseSpeechRecognitionResult
 
     recognitionRef.current = recognition;
     return () => {
-      recognition.stop();
+      recognition.abort();
       recognitionRef.current = null;
     };
   }, [SpeechRecognitionCtor, lang]);
@@ -91,6 +93,7 @@ export function useSpeechRecognition(lang = "es-MX"): UseSpeechRecognitionResult
   }, []);
 
   const reset = useCallback(() => {
+    recognitionRef.current?.abort();
     setTranscript("");
     setError(null);
     setListening(false);
