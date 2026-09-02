@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { Check, ChevronRight, Volume2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, ChevronRight, Mic, Volume2, X } from "lucide-react";
+import { evaluarRespuesta, type EvaluationResult } from "./phraseologyEvaluator";
+import { useSpeechRecognition } from "./useSpeechRecognition";
 
 export interface PhraseologyElement {
   descripcion: string;
@@ -66,6 +68,16 @@ export function AudioPhraseology({
   const [supported] = useState(() => typeof window !== "undefined" && "speechSynthesis" in window);
   const card = cards[index];
 
+  const speech = useSpeechRecognition();
+  const [resultado, setResultado] = useState<EvaluationResult[] | null>(null);
+
+  useEffect(() => {
+    if (!speech.listening && speech.transcript && !resultado) {
+      setResultado(evaluarRespuesta(speech.transcript, card.elementos));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [speech.listening, speech.transcript]);
+
   function speak(text: string) {
     if (!supported) return;
     window.speechSynthesis.cancel();
@@ -82,6 +94,13 @@ export function AudioPhraseology({
     }
     setIndex((i) => i + 1);
     setRevealed(false);
+    setResultado(null);
+    speech.reset();
+  }
+
+  function handleStart() {
+    setResultado(null);
+    speech.start();
   }
 
   return (
@@ -109,6 +128,22 @@ export function AudioPhraseology({
         <p className="mt-2 text-xs text-white/40">Tu navegador no soporta síntesis de voz — lee el texto abajo.</p>
       )}
 
+      {speech.supported && (
+        <button
+          onClick={speech.listening ? speech.stop : handleStart}
+          className="mt-3 ml-2 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition-colors hover:bg-white/10"
+        >
+          <Mic size={16} className={speech.listening ? "animate-pulse text-red-400" : undefined} />
+          {speech.listening ? "Detener" : "Practica hablando"}
+        </button>
+      )}
+
+      {speech.listening && (
+        <p className="mt-2 text-xs text-white/50">Escuchando… {speech.transcript}</p>
+      )}
+
+      {speech.error && <p className="mt-2 text-xs text-red-400">{speech.error}</p>}
+
       {!revealed ? (
         <button
           onClick={() => setRevealed(true)}
@@ -118,13 +153,33 @@ export function AudioPhraseology({
         </button>
       ) : (
         <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.02] p-4">
-          <p className="font-display text-sm text-white">"{card.callout}"</p>
+          {resultado && (
+            <>
+              <p className="text-xs text-white/50">Dijiste: "{speech.transcript}"</p>
+              <p className="mt-1 text-xs font-semibold text-gold-400">
+                {resultado.filter((r) => r.dicho).length} de {resultado.length} elementos correctos
+              </p>
+            </>
+          )}
+          <p className="mt-3 font-display text-sm text-white">"{card.callout}"</p>
           <ul className="mt-3 flex flex-col gap-1.5">
-            {card.elementos.map((el) => (
-              <li key={el.descripcion} className="flex items-center gap-2 text-xs text-white/60">
-                <Check size={12} className="shrink-0 text-gold-400" /> {el.descripcion}
-              </li>
-            ))}
+            {card.elementos.map((el, i) => {
+              const dicho = resultado?.[i]?.dicho;
+              return (
+                <li key={el.descripcion} className="flex items-center gap-2 text-xs text-white/60">
+                  {resultado ? (
+                    dicho ? (
+                      <Check size={12} className="shrink-0 text-emerald-400" />
+                    ) : (
+                      <X size={12} className="shrink-0 text-red-400" />
+                    )
+                  ) : (
+                    <Check size={12} className="shrink-0 text-gold-400" />
+                  )}
+                  {el.descripcion}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
