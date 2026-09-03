@@ -26,13 +26,16 @@ function elegirSituacionAleatoria(excluirId?: string): SituacionCircuito {
   return opciones[Math.floor(Math.random() * opciones.length)];
 }
 
-/** Rumbo del avión durante cada tramo, en grados, hacia el siguiente punto del circuito. */
+/**
+ * Rumbo del avión en cada parada, alineado con el borde recto del tablero donde está posada
+ * (0° = arriba, 90° = derecha, 180° = abajo, -90° = izquierda), en la dirección en que avanza.
+ */
 const ROTACION_TRAMO: Record<string, number> = {
-  "viento-en-cara": 30,
-  "viento-cruzado": -45,
-  "viento-en-cola": -135,
-  base: 135,
-  final: 90,
+  "viento-en-cara": 90, // borde inferior, avanzando hacia la esquina derecha (recién despegó)
+  "viento-cruzado": 0, // borde derecho, subiendo
+  "viento-en-cola": -90, // borde superior, avanzando hacia la izquierda
+  base: 180, // borde izquierdo, bajando
+  final: 90, // borde inferior, avanzando hacia la pista para aterrizar
 };
 
 /**
@@ -52,6 +55,13 @@ export interface PuntoTablero {
   yPct: number;
 }
 
+export interface RutaAvion {
+  /** Puntos intermedios (esquina) por los que pasa el avión antes de llegar a tramoActivoId. */
+  puntos: PuntoTablero[];
+  /** Rumbo del que parte, para que gire suavemente hacia el rumbo de la parada destino durante el vuelo. */
+  rotacionOrigen: number;
+}
+
 function TableroCircuito({
   tramoActivoId,
   rutaAvion,
@@ -60,8 +70,7 @@ function TableroCircuito({
   onClickTramo,
 }: {
   tramoActivoId?: string;
-  /** Puntos intermedios (esquina + destino) por los que debe pasar el avión para llegar a tramoActivoId. */
-  rutaAvion?: PuntoTablero[];
+  rutaAvion?: RutaAvion;
   tramoCorrectoId?: string;
   tramoIncorrectoId?: string;
   onClickTramo?: (id: string) => void;
@@ -194,14 +203,16 @@ function TableroCircuito({
             initial={false}
             animate={{
               left: rutaAvion
-                ? [...rutaAvion.map((p) => `${p.xPct}%`), `${posiciones[tramoAvion.id].xPct}%`]
+                ? [...rutaAvion.puntos.map((p) => `${p.xPct}%`), `${posiciones[tramoAvion.id].xPct}%`]
                 : `${posiciones[tramoAvion.id].xPct}%`,
               top: rutaAvion
-                ? [...rutaAvion.map((p) => `${p.yPct}%`), `${posiciones[tramoAvion.id].yPct}%`]
+                ? [...rutaAvion.puntos.map((p) => `${p.yPct}%`), `${posiciones[tramoAvion.id].yPct}%`]
                 : `${posiciones[tramoAvion.id].yPct}%`,
               x: "-50%",
               y: "-50%",
-              rotate: ROTACION_TRAMO[tramoAvion.id] ?? 0,
+              rotate: rutaAvion
+                ? [rutaAvion.rotacionOrigen, ROTACION_TRAMO[tramoAvion.id] ?? 0]
+                : (ROTACION_TRAMO[tramoAvion.id] ?? 0),
             }}
             transition={{ duration: rutaAvion ? 0.9 : 0.6, ease: "easeInOut" }}
           >
@@ -223,7 +234,7 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
   const [modo, setModo] = useState<"aprende" | "prueba">("aprende");
 
   const [paradaActiva, setParadaActiva] = useState(1);
-  const [rutaAvion, setRutaAvion] = useState<PuntoTablero[] | undefined>(undefined);
+  const [rutaAvion, setRutaAvion] = useState<RutaAvion | undefined>(undefined);
   const tramoActivo = TRAMOS_CIRCUITO.find((t) => t.numero === paradaActiva)!;
 
   const [situacionActual, setSituacionActual] = useState<SituacionCircuito>(() => elegirSituacionAleatoria());
@@ -261,13 +272,16 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
       onComplete?.();
       return;
     }
-    setRutaAvion([ESQUINAS_SEGMENTO[paradaActiva]]);
+    setRutaAvion({ puntos: [ESQUINAS_SEGMENTO[paradaActiva]], rotacionOrigen: ROTACION_TRAMO[tramoActivo.id] ?? 0 });
     setParadaActiva((p) => p + 1);
   }
 
   function anteriorParada() {
     if (paradaActiva <= 1) return;
-    setRutaAvion([ESQUINAS_SEGMENTO[paradaActiva - 1]]);
+    setRutaAvion({
+      puntos: [ESQUINAS_SEGMENTO[paradaActiva - 1]],
+      rotacionOrigen: ROTACION_TRAMO[tramoActivo.id] ?? 0,
+    });
     setParadaActiva((p) => p - 1);
   }
 
