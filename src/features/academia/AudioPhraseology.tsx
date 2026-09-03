@@ -20,6 +20,7 @@ const DEFAULT_CARDS: PhraseologyCard[] = [
   {
     situacion: "Estás en la plataforma de MMGL, listo para solicitar rodaje hacia la pista activa.",
     callout: "Guadalajara Torre, XB-VLA, plataforma de aviación general, solicito rodaje, con información Alfa.",
+    audioUrl: "/audio/fraseologia/academia-1.mp3",
     elementos: [
       { descripcion: "A quién llamas (Torre)", palabrasClave: ["torre"] },
       { descripcion: "Tu identificación (XB-VLA)", palabrasClave: ["xb vla", "xb-vla", "equis be uve ele a"] },
@@ -30,6 +31,7 @@ const DEFAULT_CARDS: PhraseologyCard[] = [
   {
     situacion: "Vas a ingresar a la frecuencia de un aeródromo no controlado para anunciar tu llegada.",
     callout: "Tráfico Manzanillo, XB-VLA, a 10 millas al norte, descendiendo para entrar al circuito de tráfico, Manzanillo.",
+    audioUrl: "/audio/fraseologia/academia-2.mp3",
     elementos: [
       { descripcion: "A quién llamas (tráfico en la frecuencia)", palabrasClave: ["tráfico", "trafico"] },
       { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla"] },
@@ -40,6 +42,7 @@ const DEFAULT_CARDS: PhraseologyCard[] = [
   {
     situacion: "El controlador te autoriza a despegar. Debes confirmar la instrucción (read-back).",
     callout: "Autorizado a despegar pista 20, XB-VLA.",
+    audioUrl: "/audio/fraseologia/academia-3.mp3",
     elementos: [
       { descripcion: "Repites la instrucción exacta", palabrasClave: ["autorizado a despegar", "autorizado despegar"] },
       { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte"] },
