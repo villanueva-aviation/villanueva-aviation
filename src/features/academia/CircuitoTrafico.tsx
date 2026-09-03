@@ -176,8 +176,20 @@ function TableroCircuito({
             className="stroke-white/25"
             strokeWidth="1.5"
           />
-          <rect x="38" y="74" width="24" height="12" className="fill-white/15" />
-          <line x1="41" y1="80" x2="59" y2="80" className="stroke-white/25" strokeWidth="0.6" strokeDasharray="2.5 2.5" />
+          <rect x="38" y="74" width="24" height="12" className="fill-white/15 stroke-white/25" strokeWidth="0.4" />
+          <line x1="44" y1="80" x2="56" y2="80" className="stroke-white/30" strokeWidth="0.6" strokeDasharray="2 2" />
+          {[40, 41.4, 42.8].map((x) => (
+            <line key={`umbral-izq-${x}`} x1={x} y1="76" x2={x} y2="84" className="stroke-white/50" strokeWidth="0.6" />
+          ))}
+          {[57.2, 58.6, 60].map((x) => (
+            <line key={`umbral-der-${x}`} x1={x} y1="76" x2={x} y2="84" className="stroke-white/50" strokeWidth="0.6" />
+          ))}
+          <text x="45" y="83.5" textAnchor="middle" fontSize="4.5" fontWeight="700" className="fill-white/60">
+            02
+          </text>
+          <text x="55" y="83.5" textAnchor="middle" fontSize="4.5" fontWeight="700" className="fill-white/60">
+            20
+          </text>
         </svg>
         {TRAMOS_CIRCUITO.map((tramo) => {
           const pos = posiciones[tramo.id];
