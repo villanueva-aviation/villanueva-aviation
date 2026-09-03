@@ -60,8 +60,6 @@ export interface RutaAvion {
   origen: PuntoTablero;
   /** Puntos intermedios (esquina) por los que pasa el avión antes de llegar a tramoActivoId. */
   puntos: PuntoTablero[];
-  /** Rumbo del que parte, para que gire suavemente hacia el rumbo de la parada destino durante el vuelo. */
-  rotacionOrigen: number;
 }
 
 function distancia(a: PuntoTablero, b: PuntoTablero): number {
@@ -215,6 +213,31 @@ function TableroCircuito({
             </button>
           );
         })}
+        {tramoAvion && rutaAvion && (
+          <>
+            {[0.24, 0.12].map((delay, i) => (
+              <motion.div
+                key={`rastro-${i}`}
+                className="pointer-events-none absolute z-[9] rounded-full bg-gold-500"
+                style={{ width: 9 - i * 3, height: 9 - i * 3 }}
+                initial={false}
+                animate={{
+                  left: [...rutaAvion.puntos.map((p) => `${p.xPct}%`), `${posiciones[tramoAvion.id].xPct}%`],
+                  top: [...rutaAvion.puntos.map((p) => `${p.yPct}%`), `${posiciones[tramoAvion.id].yPct}%`],
+                  x: "-50%",
+                  y: "-50%",
+                  opacity: [0.3 - i * 0.12, 0],
+                }}
+                transition={{
+                  duration: 1.1,
+                  ease: "easeInOut",
+                  times: tiemposVuelo(rutaAvion, posiciones[tramoAvion.id]),
+                  delay,
+                }}
+              />
+            ))}
+          </>
+        )}
         {tramoAvion && (
           <motion.div
             className="pointer-events-none absolute z-10 text-gold-400"
@@ -228,14 +251,20 @@ function TableroCircuito({
                 : `${posiciones[tramoAvion.id].yPct}%`,
               x: "-50%",
               y: "-50%",
-              rotate: rutaAvion
-                ? [rutaAvion.rotacionOrigen, ROTACION_TRAMO[tramoAvion.id] ?? 0]
-                : (ROTACION_TRAMO[tramoAvion.id] ?? 0),
+              rotate: ROTACION_TRAMO[tramoAvion.id] ?? 0,
             }}
             transition={{
-              duration: rutaAvion ? 1.1 : 0.6,
-              ease: "easeInOut",
-              times: rutaAvion ? tiemposVuelo(rutaAvion, posiciones[tramoAvion.id]) : undefined,
+              left: {
+                duration: rutaAvion ? 1.1 : 0.6,
+                ease: "easeInOut",
+                times: rutaAvion ? tiemposVuelo(rutaAvion, posiciones[tramoAvion.id]) : undefined,
+              },
+              top: {
+                duration: rutaAvion ? 1.1 : 0.6,
+                ease: "easeInOut",
+                times: rutaAvion ? tiemposVuelo(rutaAvion, posiciones[tramoAvion.id]) : undefined,
+              },
+              rotate: { type: "spring", stiffness: 120, damping: 14 },
             }}
           >
             <IconAvionCircuito size={36} className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" />
@@ -297,7 +326,6 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
     setRutaAvion({
       origen: { xPct: tramoActivo.xPct, yPct: tramoActivo.yPct },
       puntos: [ESQUINAS_SEGMENTO[paradaActiva]],
-      rotacionOrigen: ROTACION_TRAMO[tramoActivo.id] ?? 0,
     });
     setParadaActiva((p) => p + 1);
   }
@@ -307,7 +335,6 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
     setRutaAvion({
       origen: { xPct: tramoActivo.xPct, yPct: tramoActivo.yPct },
       puntos: [ESQUINAS_SEGMENTO[paradaActiva - 1]],
-      rotacionOrigen: ROTACION_TRAMO[tramoActivo.id] ?? 0,
     });
     setParadaActiva((p) => p - 1);
   }
