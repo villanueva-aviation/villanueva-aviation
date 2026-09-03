@@ -45,12 +45,47 @@ function TableroCircuito({
     <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-950">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
         <rect x="44" y="35" width="12" height="38" className="fill-white/10" />
+        <line x1="50" y1="39" x2="50" y2="69" className="stroke-white/20" strokeWidth="0.6" strokeDasharray="2.5 2.5" />
         <polyline points="50,35 50,15 19,15 19,73 50,73 50,92" fill="none" className="stroke-white/20" strokeWidth="1" />
         <line x1="50" y1="92" x2="50" y2="35" className="stroke-white/10" strokeWidth="1" strokeDasharray="2 2" />
       </svg>
+      {TRAMOS_CIRCUITO.map((tramo) => {
+        const esActivo = tramo.id === tramoActivoId;
+        const esCorrecto = tramo.id === tramoCorrectoId;
+        const esIncorrecto = tramo.id === tramoIncorrectoId;
+        const rotacion = ROTACION_TRAMO[tramo.id] ?? 0;
+        return (
+          <button
+            key={tramo.id}
+            onClick={() => onClickTramo?.(tramo.id)}
+            disabled={!onClickTramo}
+            aria-label={tramo.nombre}
+            className="absolute disabled:cursor-default"
+            style={{ left: `${tramo.xPct}%`, top: `${tramo.yPct}%`, transform: "translate(-50%, -50%)" }}
+          >
+            {(esActivo || esCorrecto) && (
+              <span className="absolute inset-0 -m-2 animate-ping rounded-full bg-gold-500/50" />
+            )}
+            <span className="relative inline-block" style={{ transform: `rotate(${rotacion}deg)` }}>
+              <IconAvionCircuito
+                size={18}
+                className={`drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] transition-colors duration-200 ${
+                  esCorrecto
+                    ? "text-emerald-400"
+                    : esIncorrecto
+                      ? "text-red-400"
+                      : onClickTramo
+                        ? "text-white/35 hover:text-white/60"
+                        : "text-white/35"
+                }`}
+              />
+            </span>
+          </button>
+        );
+      })}
       {tramoAvion && (
         <motion.div
-          className="pointer-events-none absolute text-white"
+          className="pointer-events-none absolute z-10 text-gold-400"
           initial={false}
           animate={{
             left: `${tramoAvion.xPct}%`,
@@ -61,43 +96,9 @@ function TableroCircuito({
           }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
         >
-          <IconAvionCircuito size={20} className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]" />
+          <IconAvionCircuito size={26} className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" />
         </motion.div>
       )}
-      {TRAMOS_CIRCUITO.map((tramo) => {
-        const esActivo = tramo.id === tramoActivoId;
-        const esCorrecto = tramo.id === tramoCorrectoId;
-        const esIncorrecto = tramo.id === tramoIncorrectoId;
-        return (
-          <button
-            key={tramo.id}
-            onClick={() => onClickTramo?.(tramo.id)}
-            disabled={!onClickTramo}
-            aria-label={tramo.nombre}
-            className="absolute -translate-x-1/2 -translate-y-1/2 disabled:cursor-default"
-            style={{ left: `${tramo.xPct}%`, top: `${tramo.yPct}%` }}
-          >
-            {(esActivo || esCorrecto) && (
-              <span className="absolute inset-0 -m-2 animate-ping rounded-full bg-gold-500/50" />
-            )}
-            <span
-              className={`relative flex h-5 w-5 items-center justify-center rounded-full border-2 border-navy-950 text-[10px] font-bold text-navy-950 transition-colors duration-200 ${
-                esCorrecto
-                  ? "bg-emerald-400"
-                  : esIncorrecto
-                    ? "bg-red-400"
-                    : esActivo
-                      ? "bg-gold-500"
-                      : onClickTramo
-                        ? "bg-gold-500/40 hover:bg-gold-400/70"
-                        : "bg-gold-500/40"
-              }`}
-            >
-              {tramo.numero}
-            </span>
-          </button>
-        );
-      })}
     </div>
   );
 }
