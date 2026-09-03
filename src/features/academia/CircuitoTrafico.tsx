@@ -1,7 +1,47 @@
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { CheckCircle2, ChevronLeft, ChevronRight, XCircle } from "lucide-react";
+import { Check, CheckCircle2, ChevronLeft, ChevronRight, Copy, RotateCcw, XCircle } from "lucide-react";
 import { SITUACIONES_CIRCUITO, TRAMOS_CIRCUITO, type SituacionCircuito } from "../../data/circuitoTrafico";
+
+type PosicionesTablero = Record<string, { xPct: number; yPct: number }>;
+
+function posicionesIniciales(): PosicionesTablero {
+  return Object.fromEntries(TRAMOS_CIRCUITO.map((t) => [t.id, { xPct: t.xPct, yPct: t.yPct }]));
+}
+
+/** Construye el trazo del circuito con esquinas redondeadas a partir de las posiciones actuales de los 5 tramos. */
+function construirPathCircuito(pos: PosicionesTablero): string {
+  const r = 4;
+  const p1 = pos["viento-en-cara"];
+  const p2 = pos["viento-cruzado"];
+  const p3 = pos["viento-en-cola"];
+  const p4 = pos["base"];
+  const p5 = pos["final"];
+  const bend = { xPct: p5.xPct, yPct: p4.yPct };
+  const puntos = [p1, p2, p3, p4, bend, p5];
+
+  const signo = (a: number, b: number) => (b > a ? 1 : b < a ? -1 : 0);
+  const partes: string[] = [`M ${p1.xPct} ${p1.yPct}`];
+
+  for (let i = 1; i < puntos.length; i++) {
+    const anterior = puntos[i - 1];
+    const actual = puntos[i];
+    const siguiente = puntos[i + 1];
+    if (siguiente) {
+      const dx1 = signo(anterior.xPct, actual.xPct);
+      const dy1 = signo(anterior.yPct, actual.yPct);
+      const dx2 = signo(actual.xPct, siguiente.xPct);
+      const dy2 = signo(actual.yPct, siguiente.yPct);
+      const entrada = { xPct: actual.xPct - dx1 * r, yPct: actual.yPct - dy1 * r };
+      const salida = { xPct: actual.xPct + dx2 * r, yPct: actual.yPct + dy2 * r };
+      partes.push(`L ${entrada.xPct} ${entrada.yPct}`, `Q ${actual.xPct} ${actual.yPct} ${salida.xPct} ${salida.yPct}`);
+    } else {
+      partes.push(`L ${actual.xPct} ${actual.yPct}`);
+    }
+  }
+  return partes.join(" ");
+}
 
 /** Silueta simple de avión, apuntando hacia arriba por defecto (0°) para que ROTACION_TRAMO sea exacta. */
 function IconAvionCircuito({ size = 20, className }: { size?: number; className?: string }) {
@@ -39,70 +79,136 @@ function TableroCircuito({
   tramoIncorrectoId?: string;
   onClickTramo?: (id: string) => void;
 }) {
+  const [searchParams] = useSearchParams();
+  const editable = searchParams.has("editar");
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [posiciones, setPosiciones] = useState<PosicionesTablero>(posicionesIniciales);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [copiado, setCopiado] = useState(false);
+
   const tramoAvion = tramoActivoId ? TRAMOS_CIRCUITO.find((t) => t.id === tramoActivoId) : undefined;
+  const path = construirPathCircuito(posiciones);
+
+  function actualizarDesdePuntero(id: string, clientX: number, clientY: number) {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const xPct = Math.round((((clientX - rect.left) / rect.width) * 100) * 10) / 10;
+    const yPct = Math.round((((clientY - rect.top) / rect.height) * 100) * 10) / 10;
+    setPosiciones((prev) => ({
+      ...prev,
+      [id]: { xPct: Math.min(100, Math.max(0, xPct)), yPct: Math.min(100, Math.max(0, yPct)) },
+    }));
+  }
+
+  function handlePointerDown(id: string, e: React.PointerEvent) {
+    if (!editable) return;
+    (e.target as Element).setPointerCapture(e.pointerId);
+    setDraggingId(id);
+  }
+
+  function handlePointerMove(e: React.PointerEvent) {
+    if (!draggingId) return;
+    actualizarDesdePuntero(draggingId, e.clientX, e.clientY);
+  }
+
+  function restablecerPosiciones() {
+    setPosiciones(posicionesIniciales());
+  }
+
+  function copiarCodigo() {
+    const codigo = TRAMOS_CIRCUITO.map(
+      (t) => `${t.id}: { xPct: ${posiciones[t.id].xPct}, yPct: ${posiciones[t.id].yPct} }`,
+    ).join("\n");
+    navigator.clipboard.writeText(codigo);
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 1500);
+  }
 
   return (
-    <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-950">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-        <rect x="44" y="35" width="12" height="38" className="fill-white/10" />
-        <line x1="50" y1="39" x2="50" y2="69" className="stroke-white/20" strokeWidth="0.6" strokeDasharray="2.5 2.5" />
-        <path
-          d="M 50 35 L 50 19 Q 50 15 46 15 L 23 15 Q 19 15 19 19 L 19 69 Q 19 73 23 73 L 46 73 Q 50 73 50 77 L 50 92"
-          fill="none"
-          className="stroke-white/20"
-          strokeWidth="1"
-        />
-      </svg>
-      {TRAMOS_CIRCUITO.map((tramo) => {
-        const esActivo = tramo.id === tramoActivoId;
-        const esCorrecto = tramo.id === tramoCorrectoId;
-        const esIncorrecto = tramo.id === tramoIncorrectoId;
-        const rotacion = ROTACION_TRAMO[tramo.id] ?? 0;
-        return (
-          <button
-            key={tramo.id}
-            onClick={() => onClickTramo?.(tramo.id)}
-            disabled={!onClickTramo}
-            aria-label={tramo.nombre}
-            className="absolute disabled:cursor-default"
-            style={{ left: `${tramo.xPct}%`, top: `${tramo.yPct}%`, transform: "translate(-50%, -50%)" }}
-          >
-            {(esActivo || esCorrecto) && (
-              <span className="absolute inset-0 -m-2 animate-ping rounded-full bg-gold-500/50" />
-            )}
-            <span className="relative inline-block" style={{ transform: `rotate(${rotacion}deg)` }}>
-              <IconAvionCircuito
-                size={18}
-                className={`drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] transition-colors duration-200 ${
-                  esCorrecto
-                    ? "text-emerald-400"
-                    : esIncorrecto
-                      ? "text-red-400"
-                      : onClickTramo
-                        ? "text-white/35 hover:text-white/60"
-                        : "text-white/35"
-                }`}
-              />
-            </span>
-          </button>
-        );
-      })}
-      {tramoAvion && (
-        <motion.div
-          className="pointer-events-none absolute z-10 text-gold-400"
-          initial={false}
-          animate={{
-            left: `${tramoAvion.xPct}%`,
-            top: `${tramoAvion.yPct}%`,
-            x: "-50%",
-            y: "-50%",
-            rotate: ROTACION_TRAMO[tramoAvion.id] ?? 0,
-          }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-        >
-          <IconAvionCircuito size={26} className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" />
-        </motion.div>
+    <div>
+      {editable && (
+        <div className="mb-3 flex items-center justify-between rounded-lg border border-gold-500/30 bg-gold-500/10 px-3 py-2 text-xs text-gold-400">
+          <span>Modo edición: arrastra los puntos con el mouse.</span>
+          <div className="flex gap-2">
+            <button onClick={restablecerPosiciones} className="inline-flex items-center gap-1 hover:text-white">
+              <RotateCcw size={12} /> Restablecer
+            </button>
+            <button onClick={copiarCodigo} className="inline-flex items-center gap-1 hover:text-white">
+              {copiado ? <Check size={12} /> : <Copy size={12} />} {copiado ? "Copiado" : "Copiar código"}
+            </button>
+          </div>
+        </div>
       )}
+      <div
+        ref={containerRef}
+        onPointerMove={handlePointerMove}
+        onPointerUp={() => setDraggingId(null)}
+        className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-950 select-none"
+      >
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+          <rect x="44" y="35" width="12" height="38" className="fill-white/10" />
+          <line x1="50" y1="39" x2="50" y2="69" className="stroke-white/20" strokeWidth="0.6" strokeDasharray="2.5 2.5" />
+          <path d={path} fill="none" className="stroke-white/20" strokeWidth="1" />
+        </svg>
+        {TRAMOS_CIRCUITO.map((tramo) => {
+          const pos = posiciones[tramo.id];
+          const esActivo = tramo.id === tramoActivoId;
+          const esCorrecto = tramo.id === tramoCorrectoId;
+          const esIncorrecto = tramo.id === tramoIncorrectoId;
+          const rotacion = ROTACION_TRAMO[tramo.id] ?? 0;
+          return (
+            <button
+              key={tramo.id}
+              onPointerDown={(e) => handlePointerDown(tramo.id, e)}
+              onClick={() => !editable && onClickTramo?.(tramo.id)}
+              disabled={!editable && !onClickTramo}
+              aria-label={tramo.nombre}
+              className={`absolute ${editable ? "cursor-grab active:cursor-grabbing" : "disabled:cursor-default"}`}
+              style={{ left: `${pos.xPct}%`, top: `${pos.yPct}%`, transform: "translate(-50%, -50%)" }}
+            >
+              {(esActivo || esCorrecto) && (
+                <span className="absolute inset-0 -m-2 animate-ping rounded-full bg-gold-500/50" />
+              )}
+              <span className="relative inline-block" style={{ transform: `rotate(${rotacion}deg)` }}>
+                <IconAvionCircuito
+                  size={18}
+                  className={`drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] transition-colors duration-200 ${
+                    esCorrecto
+                      ? "text-emerald-400"
+                      : esIncorrecto
+                        ? "text-red-400"
+                        : editable || onClickTramo
+                          ? "text-white/35 hover:text-white/60"
+                          : "text-white/35"
+                  }`}
+                />
+              </span>
+              {editable && (
+                <span className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded bg-navy-950 px-1.5 py-0.5 text-[10px] text-gold-400">
+                  {pos.xPct}%, {pos.yPct}%
+                </span>
+              )}
+            </button>
+          );
+        })}
+        {tramoAvion && (
+          <motion.div
+            className="pointer-events-none absolute z-10 text-gold-400"
+            initial={false}
+            animate={{
+              left: `${posiciones[tramoAvion.id].xPct}%`,
+              top: `${posiciones[tramoAvion.id].yPct}%`,
+              x: "-50%",
+              y: "-50%",
+              rotate: ROTACION_TRAMO[tramoAvion.id] ?? 0,
+            }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+          >
+            <IconAvionCircuito size={26} className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" />
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 }
