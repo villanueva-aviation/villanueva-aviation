@@ -22,6 +22,7 @@ import { DragDropLabels } from "../features/academia/DragDropLabels";
 import { ScenarioSimulator } from "../features/academia/ScenarioSimulator";
 import { DragSlider } from "../features/academia/DragSlider";
 import { AudioPhraseology } from "../features/academia/AudioPhraseology";
+import { CircuitoTrafico } from "../features/academia/CircuitoTrafico";
 import { TermMatch } from "../features/academia/TermMatch";
 import { LessonFlow } from "../features/academia/LessonFlow";
 import { Quiz } from "../features/academia/Quiz";
@@ -34,6 +35,7 @@ const INTERACTIVIDAD_INTRO: Record<InteractividadTipo, string> = {
   slider: "Mueve el control y observa en vivo cómo cambian las variables involucradas.",
   audio: "Escucha la fraseología correcta y compárala con lo que tú dirías en cada situación.",
   terminos: "Relaciona cada término con su definición correcta.",
+  circuito: "Recorre el circuito de tráfico paso a paso, luego pon a prueba tu ubicación.",
 };
 
 const STAGE_LABELS: Record<ActividadTipo | "introduccion", string> = {
@@ -70,6 +72,8 @@ function InteractividadWidget({
       const pairs = MODULE_TERMS[actividad.termSetId ?? modulo.slug] ?? [];
       return <TermMatch pairs={pairs} onComplete={onComplete} />;
     }
+    case "circuito":
+      return <CircuitoTrafico onComplete={onComplete} />;
     case "diagrama":
     default:
       return <AirplaneDiagram />;

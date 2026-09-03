@@ -18,7 +18,7 @@ import { flattenTemas } from "./moduleContent";
 
 export type ActividadTipo = "leccion" | "interactividad" | "practica" | "evaluacion";
 
-export type InteractividadTipo = "diagrama" | "dragdrop" | "escenario" | "slider" | "audio" | "terminos";
+export type InteractividadTipo = "diagrama" | "dragdrop" | "escenario" | "slider" | "audio" | "terminos" | "circuito";
 
 export interface ModuloActividad {
   id: string;
@@ -132,6 +132,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
       ...leccionesDeTemas("comunicaciones"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Práctica de fraseología con audio", widget: "audio" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
+      { id: "interactividad-3", tipo: "interactividad", titulo: "Circuito de tráfico: recorrido y práctica", widget: "circuito" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: simulacro de llamadas" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Comunicaciones" },
     ],
