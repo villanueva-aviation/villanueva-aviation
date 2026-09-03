@@ -12,7 +12,7 @@ function posicionesIniciales(): PosicionesTablero {
 
 /** Construye el trazo del circuito con esquinas redondeadas a partir de las posiciones actuales de los 5 tramos. */
 function construirPathCircuito(pos: PosicionesTablero): string {
-  const r = 4;
+  const r = 8;
   const p1 = pos["viento-en-cara"];
   const p2 = pos["viento-cruzado"];
   const p3 = pos["viento-en-cola"];
@@ -65,7 +65,7 @@ const ROTACION_TRAMO: Record<string, number> = {
   "viento-cruzado": -90,
   "viento-en-cola": 180,
   base: 90,
-  final: 0,
+  final: 90,
 };
 
 function TableroCircuito({
@@ -154,8 +154,8 @@ function TableroCircuito({
         className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-950 select-none"
       >
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-          <rect x="44" y="35" width="12" height="38" className="fill-white/10" />
-          <line x1="50" y1="39" x2="50" y2="69" className="stroke-white/20" strokeWidth="0.6" strokeDasharray="2.5 2.5" />
+          <rect x="48" y="76" width="19" height="12" className="fill-white/10" />
+          <line x1="51" y1="82" x2="64" y2="82" className="stroke-white/20" strokeWidth="0.6" strokeDasharray="2.5 2.5" />
           <path d={path} fill="none" className="stroke-white/20" strokeWidth="1" />
         </svg>
         {TRAMOS_CIRCUITO.map((tramo) => {
