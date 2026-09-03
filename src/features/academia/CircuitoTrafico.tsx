@@ -184,13 +184,19 @@ function TableroCircuito({
           {[57.2, 58.6, 60].map((x) => (
             <line key={`umbral-der-${x}`} x1={x} y1="76" x2={x} y2="84" className="stroke-white/50" strokeWidth="0.6" />
           ))}
-          <text x="45" y="83.5" textAnchor="middle" fontSize="4.5" fontWeight="700" className="fill-white/60">
-            02
-          </text>
-          <text x="55" y="83.5" textAnchor="middle" fontSize="4.5" fontWeight="700" className="fill-white/60">
-            20
-          </text>
         </svg>
+        <span
+          className="pointer-events-none absolute text-[11px] font-bold text-white/60"
+          style={{ left: "45%", top: "80%", transform: "translate(-50%, -50%)" }}
+        >
+          02
+        </span>
+        <span
+          className="pointer-events-none absolute text-[11px] font-bold text-white/60"
+          style={{ left: "55%", top: "80%", transform: "translate(-50%, -50%)" }}
+        >
+          20
+        </span>
         {TRAMOS_CIRCUITO.map((tramo) => {
           const pos = posiciones[tramo.id];
           const esCorrecto = tramo.id === tramoCorrectoId;
