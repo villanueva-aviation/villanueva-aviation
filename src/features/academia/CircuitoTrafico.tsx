@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CheckCircle2, ChevronLeft, ChevronRight, XCircle } from "lucide-react";
 import { SITUACIONES_CIRCUITO, TRAMOS_CIRCUITO, type SituacionCircuito } from "../../data/circuitoTrafico";
 
@@ -24,7 +24,7 @@ function TableroCircuito({
     <div className="relative aspect-[5/4] w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-950">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
         <rect x="44" y="35" width="12" height="38" className="fill-white/10" />
-        <polyline points="50,35 50,15 81,15 81,73 50,73" fill="none" className="stroke-white/20" strokeWidth="1" />
+        <polyline points="50,35 50,15 19,15 19,73 50,73" fill="none" className="stroke-white/20" strokeWidth="1" />
         <line x1="50" y1="73" x2="50" y2="35" className="stroke-white/10" strokeWidth="1" strokeDasharray="2 2" />
       </svg>
       {TRAMOS_CIRCUITO.map((tramo) => {
@@ -35,24 +35,29 @@ function TableroCircuito({
           <button
             key={tramo.id}
             onClick={() => onClickTramo?.(tramo.id)}
+            disabled={!onClickTramo}
             aria-label={tramo.nombre}
-            className="absolute -translate-x-1/2 -translate-y-1/2"
+            className="absolute -translate-x-1/2 -translate-y-1/2 disabled:cursor-default"
             style={{ left: `${tramo.xPct}%`, top: `${tramo.yPct}%` }}
           >
             {(esActivo || esCorrecto) && (
               <span className="absolute inset-0 -m-2 animate-ping rounded-full bg-gold-500/50" />
             )}
             <span
-              className={`relative block h-5 w-5 rounded-full border-2 border-navy-950 transition-colors duration-200 ${
+              className={`relative flex h-5 w-5 items-center justify-center rounded-full border-2 border-navy-950 text-[10px] font-bold text-navy-950 transition-colors duration-200 ${
                 esCorrecto
                   ? "bg-emerald-400"
                   : esIncorrecto
                     ? "bg-red-400"
                     : esActivo
                       ? "bg-gold-500"
-                      : "bg-gold-500/40 hover:bg-gold-400/70"
+                      : onClickTramo
+                        ? "bg-gold-500/40 hover:bg-gold-400/70"
+                        : "bg-gold-500/40"
               }`}
-            />
+            >
+              {tramo.numero}
+            </span>
           </button>
         );
       })}
@@ -70,11 +75,22 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
   const [tramoElegidoId, setTramoElegidoId] = useState<string | null>(null);
   const [aciertos, setAciertos] = useState(0);
   const [intentos, setIntentos] = useState(0);
+  const autoAvanzarRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (autoAvanzarRef.current) clearTimeout(autoAvanzarRef.current);
+    };
+  }, []);
 
   const respondioCorrecto = tramoElegidoId !== null && tramoElegidoId === situacionActual.tramoCorrectoId;
   const respondioIncorrecto = tramoElegidoId !== null && !respondioCorrecto;
 
   function cambiarModo(nuevo: "aprende" | "prueba") {
+    if (autoAvanzarRef.current) {
+      clearTimeout(autoAvanzarRef.current);
+      autoAvanzarRef.current = null;
+    }
     setModo(nuevo);
     if (nuevo === "prueba") {
       setSituacionActual(elegirSituacionAleatoria());
@@ -102,9 +118,10 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
     setIntentos((i) => i + 1);
     if (id === situacionActual.tramoCorrectoId) {
       setAciertos((a) => a + 1);
-      setTimeout(() => {
+      autoAvanzarRef.current = setTimeout(() => {
         setSituacionActual((actual) => elegirSituacionAleatoria(actual.id));
         setTramoElegidoId(null);
+        autoAvanzarRef.current = null;
       }, 1000);
     }
   }
@@ -204,7 +221,7 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
               onClick={siguienteParada}
               className="inline-flex items-center gap-1 rounded-full bg-gold-500 px-4 py-2 text-sm font-semibold text-navy-950 transition-colors hover:bg-gold-400"
             >
-              Siguiente <ChevronRight size={15} />
+              {paradaActiva >= TRAMOS_CIRCUITO.length ? "Terminar recorrido" : "Siguiente"} <ChevronRight size={15} />
             </button>
           </div>
         )}
