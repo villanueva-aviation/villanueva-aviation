@@ -93,12 +93,15 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: Wind,
     nivel: "Intermedio",
     imagenLeccion: "/images/infografia-4fuerzas.jpg",
+    proyectoPrompt:
+      "Elige una maniobra (viraje pronunciado, despegue con viento cruzado, o recuperación de pérdida) y explica, con tus propias palabras, qué fuerzas y tendencias aerodinámicas actúan durante esa maniobra y cómo las compensarías con los controles. Envíalo para revisión.",
     actividades: [
       { id: "leccion-1", tipo: "leccion", titulo: "Las cuatro fuerzas del vuelo" },
       { id: "leccion-2", tipo: "leccion", titulo: "Superficies de control" },
       { id: "interactividad-1", tipo: "interactividad", titulo: "Simulador de configuración vs. resistencia", widget: "slider" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: efectos de control" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Aerodinámica" },
+      { id: "proyecto-1", tipo: "proyecto", titulo: "Proyecto final: analiza tu propia maniobra" },
     ],
   },
   {
@@ -195,12 +198,15 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: Eye,
     nivel: "Intermedio",
     imagenLeccion: "/images/infografia-vfr.jpg",
+    proyectoPrompt:
+      "Elige un aeropuerto no controlado real y describe el procedimiento completo de llegada VFR: cómo entrarías al patrón, qué reportes de posición harías en cada tramo, y qué mínimos meteorológicos necesitarías para operar ahí con seguridad. Envíalo para revisión.",
     actividades: [
       { id: "leccion-1", tipo: "leccion", titulo: "Mínimos meteorológicos VFR" },
       { id: "leccion-2", tipo: "leccion", titulo: "Procedimientos de patrón de tráfico" },
       { id: "interactividad-1", tipo: "interactividad", titulo: "Simulador de decisión: clima cambiante", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: planificación VFR" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de VFR" },
+      { id: "proyecto-1", tipo: "proyecto", titulo: "Proyecto final: tu propia llegada VFR" },
     ],
   },
   {
