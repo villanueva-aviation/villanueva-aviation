@@ -186,14 +186,14 @@ function TableroCircuito({
           ))}
         </svg>
         <span
-          className="pointer-events-none absolute text-[11px] font-bold text-white/60"
-          style={{ left: "45%", top: "80%", transform: "translate(-50%, -50%)" }}
+          className="pointer-events-none absolute text-[10px] font-bold leading-none text-white/70"
+          style={{ left: "43.5%", top: "80%", transform: "translate(-50%, -50%) rotate(90deg)" }}
         >
           02
         </span>
         <span
-          className="pointer-events-none absolute text-[11px] font-bold text-white/60"
-          style={{ left: "55%", top: "80%", transform: "translate(-50%, -50%)" }}
+          className="pointer-events-none absolute text-[10px] font-bold leading-none text-white/70"
+          style={{ left: "56.5%", top: "80%", transform: "translate(-50%, -50%) rotate(90deg)" }}
         >
           20
         </span>
