@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { CheckCircle2, ChevronLeft, ChevronRight, XCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import { CheckCircle2, ChevronLeft, ChevronRight, Plane, XCircle } from "lucide-react";
 import { SITUACIONES_CIRCUITO, TRAMOS_CIRCUITO, type SituacionCircuito } from "../../data/circuitoTrafico";
 
 function elegirSituacionAleatoria(excluirId?: string): SituacionCircuito {
@@ -8,6 +9,15 @@ function elegirSituacionAleatoria(excluirId?: string): SituacionCircuito {
     : SITUACIONES_CIRCUITO;
   return opciones[Math.floor(Math.random() * opciones.length)];
 }
+
+/** Rumbo del avión durante cada tramo, en grados, hacia el siguiente punto del circuito. */
+const ROTACION_TRAMO: Record<string, number> = {
+  "viento-en-cara": 0,
+  "viento-cruzado": -90,
+  "viento-en-cola": 180,
+  base: 90,
+  final: 0,
+};
 
 function TableroCircuito({
   tramoActivoId,
@@ -20,6 +30,8 @@ function TableroCircuito({
   tramoIncorrectoId?: string;
   onClickTramo?: (id: string) => void;
 }) {
+  const tramoAvion = tramoActivoId ? TRAMOS_CIRCUITO.find((t) => t.id === tramoActivoId) : undefined;
+
   return (
     <div className="relative aspect-[5/4] w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-950">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
@@ -27,6 +39,15 @@ function TableroCircuito({
         <polyline points="50,35 50,15 19,15 19,73 50,73" fill="none" className="stroke-white/20" strokeWidth="1" />
         <line x1="50" y1="73" x2="50" y2="35" className="stroke-white/10" strokeWidth="1" strokeDasharray="2 2" />
       </svg>
+      {tramoAvion && (
+        <motion.div
+          className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 text-gold-400"
+          animate={{ left: `${tramoAvion.xPct}%`, top: `${tramoAvion.yPct}%`, rotate: ROTACION_TRAMO[tramoAvion.id] ?? 0 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+        >
+          <Plane size={18} />
+        </motion.div>
+      )}
       {TRAMOS_CIRCUITO.map((tramo) => {
         const esActivo = tramo.id === tramoActivoId;
         const esCorrecto = tramo.id === tramoCorrectoId;
