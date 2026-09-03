@@ -35,12 +35,16 @@ const ROTACION_TRAMO: Record<string, number> = {
   final: 90,
 };
 
-/** Esquina del rectángulo por la que pasa el avión entre la parada N y la N+1 (índice = N). */
+/**
+ * Punto medio de la curva redondeada por la que pasa el avión entre la parada N y la N+1 (índice = N).
+ * El tablero usa rx=ry=10 sobre un rectángulo de 15,20 a 85,80 — estos puntos caen justo sobre esa curva,
+ * no en la esquina "afilada" matemática del rectángulo (que el trazo redondeado nunca toca).
+ */
 const ESQUINAS_SEGMENTO: Record<number, { xPct: number; yPct: number }> = {
-  1: { xPct: 85, yPct: 80 },
-  2: { xPct: 85, yPct: 20 },
-  3: { xPct: 15, yPct: 20 },
-  4: { xPct: 15, yPct: 80 },
+  1: { xPct: 82.1, yPct: 77.1 }, // esquina inferior derecha
+  2: { xPct: 82.1, yPct: 22.9 }, // esquina superior derecha
+  3: { xPct: 17.9, yPct: 22.9 }, // esquina superior izquierda
+  4: { xPct: 17.9, yPct: 77.1 }, // esquina inferior izquierda
 };
 
 export interface PuntoTablero {
