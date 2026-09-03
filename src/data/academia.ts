@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { flattenTemas } from "./moduleContent";
 
-export type ActividadTipo = "leccion" | "interactividad" | "practica" | "evaluacion";
+export type ActividadTipo = "leccion" | "interactividad" | "practica" | "evaluacion" | "proyecto";
 
 export type InteractividadTipo = "diagrama" | "dragdrop" | "escenario" | "slider" | "audio" | "terminos" | "circuito";
 
@@ -39,6 +39,8 @@ export interface AcademiaModulo {
   actividades: ModuloActividad[];
   /** Infografía de la lección, cuando el módulo aún no tiene lecciones de texto en moduleContent.ts. */
   imagenLeccion?: string;
+  /** Consigna del proyecto final (nivel Crear), cuando el módulo tiene una actividad tipo "proyecto". */
+  proyectoPrompt?: string;
 }
 
 /** Cada subtema de un módulo se convierte en su propia actividad de tipo "leccion". */
@@ -99,12 +101,15 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     resumen: "Radionavegación VOR/DME/HSI, cartas VFR y planificación de rutas.",
     icon: Compass,
     nivel: "Intermedio",
+    proyectoPrompt:
+      "Planifica de cero una ruta VFR real entre dos aeropuertos que elijas (sin usar ninguna plantilla): traza los checkpoints, calcula el rumbo magnético y la distancia de cada tramo, estima el tiempo y el combustible necesarios considerando un viento hipotético, y define tu aeropuerto alterno. Envía tu plan completo para que un instructor lo revise.",
     actividades: [
       ...leccionesDeTemas("navegacion"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de viento en contra", widget: "slider" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: planificación de ruta" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Navegación" },
+      { id: "proyecto-1", tipo: "proyecto", titulo: "Proyecto final: planifica tu propia ruta VFR" },
     ],
   },
   {

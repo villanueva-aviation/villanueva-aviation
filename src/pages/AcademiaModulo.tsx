@@ -26,6 +26,7 @@ import { CircuitoTrafico } from "../features/academia/CircuitoTrafico";
 import { TermMatch } from "../features/academia/TermMatch";
 import { LessonFlow } from "../features/academia/LessonFlow";
 import { Quiz } from "../features/academia/Quiz";
+import { ProyectoFinal } from "../features/academia/ProyectoFinal";
 import { Reveal } from "../components/ui/Reveal";
 
 const INTERACTIVIDAD_INTRO: Record<InteractividadTipo, string> = {
@@ -44,6 +45,7 @@ const STAGE_LABELS: Record<ActividadTipo | "introduccion", string> = {
   interactividad: "Interactividad",
   practica: "Práctica",
   evaluacion: "Evaluación",
+  proyecto: "Proyecto final",
 };
 
 function InteractividadWidget({
@@ -88,7 +90,7 @@ export function AcademiaModulo() {
   const stageKeys = useMemo(() => {
     if (!modulo) return [];
     const tipos = new Set<ActividadTipo>(modulo.actividades.map((a) => a.tipo));
-    const order: ActividadTipo[] = ["leccion", "interactividad", "practica", "evaluacion"];
+    const order: ActividadTipo[] = ["leccion", "interactividad", "practica", "evaluacion", "proyecto"];
     return ["introduccion", ...order.filter((t) => tipos.has(t))];
   }, [modulo]);
 
@@ -101,6 +103,7 @@ export function AcademiaModulo() {
   const interactividadActividades = modulo.actividades.filter((a) => a.tipo === "interactividad");
   const practicaActividad = modulo.actividades.find((a) => a.tipo === "practica");
   const evaluacionActividad = modulo.actividades.find((a) => a.tipo === "evaluacion");
+  const proyectoActividad = modulo.actividades.find((a) => a.tipo === "proyecto");
 
   const temas = flattenTemas(modulo.slug);
   const practicaPreguntas = MODULE_PRACTICA[modulo.slug];
@@ -112,6 +115,7 @@ export function AcademiaModulo() {
     else if (key === "interactividad") done = interactividadActividades.every((a) => isActividadCompletada(modulo.slug, a.id));
     else if (key === "practica" && practicaActividad) done = isActividadCompletada(modulo.slug, practicaActividad.id);
     else if (key === "evaluacion" && evaluacionActividad) done = isActividadCompletada(modulo.slug, evaluacionActividad.id);
+    else if (key === "proyecto" && proyectoActividad) done = isActividadCompletada(modulo.slug, proyectoActividad.id);
     else if (key === "introduccion") done = true;
     return { key, label: STAGE_LABELS[key as ActividadTipo | "introduccion"], done };
   });
@@ -279,6 +283,28 @@ export function AcademiaModulo() {
                     La evaluación de {modulo.titulo} se publicará próximamente.
                   </p>
                 </div>
+              )}
+              {proyectoActividad && isActividadCompletada(modulo.slug, evaluacionActividad.id) && (
+                <div className="flex justify-end">
+                  <Button onClick={() => setActiveStage("proyecto")}>Continuar al proyecto final</Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeStage === "proyecto" && proyectoActividad && (
+            <div className="flex flex-col gap-6">
+              {isActividadCompletada(modulo.slug, proyectoActividad.id) ? (
+                <div className="flex flex-col items-center gap-3 rounded-2xl border border-gold-500/30 bg-gold-500/10 px-6 py-14 text-center">
+                  <CheckCircle2 size={28} className="text-gold-400" />
+                  <p className="max-w-md text-sm text-white/75">Ya enviaste tu proyecto final de {modulo.titulo} para revisión.</p>
+                </div>
+              ) : (
+                <ProyectoFinal
+                  moduloTitulo={modulo.titulo}
+                  prompt={modulo.proyectoPrompt ?? ""}
+                  onComplete={() => completarActividad(modulo.slug, proyectoActividad.id)}
+                />
               )}
             </div>
           )}

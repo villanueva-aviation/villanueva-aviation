@@ -381,7 +381,7 @@ export const MODULE_TERMS: Record<string, TermPair[]> = {
 // ---------- Quizzes (práctica: 5, evaluación: 10) ----------
 
 function split(all: QuizPregunta[]) {
-  return { practica: all.slice(0, 5), evaluacion: all.slice(5, 15) };
+  return { practica: all.slice(0, 5), evaluacion: all.slice(5) };
 }
 
 const QUIZ_METEOROLOGIA: QuizPregunta[] = [
@@ -418,6 +418,8 @@ const QUIZ_NAVEGACION: QuizPregunta[] = [
   { id: "nav-q13", pregunta: "Si estás en el radial 090 de un VOR y quieres volar TO la estación, tu curso debe ser aproximadamente:", opciones: ["090°", "180°", "270°", "360°"], correcta: 2 },
   { id: "nav-q14", pregunta: "El ángulo de intercepción recomendado para interceptar un radial es de:", opciones: ["10°", "30°", "60°", "90°"], correcta: 1 },
   { id: "nav-q15", pregunta: "Un minuto de latitud medido verticalmente en una carta equivale aproximadamente a:", opciones: ["Una milla náutica", "Una milla terrestre", "Diez millas náuticas", "No equivale a nada útil"], correcta: 0 },
+  { id: "nav-q16", pregunta: "Usas fijación cruzada con dos VOR: el radial A lo trazaste correctamente, pero el radial B lo leíste con 10° de error. ¿Qué le pasa a tu posición fijada en la carta?", opciones: ["No se ve afectada, un solo radial con error no importa", "Se desplaza a lo largo del radial B, tanto más lejos del punto real cuanto mayor sea tu distancia a esa estación", "El error se cancela automáticamente entre los dos radiales", "Solo afecta si ambos radiales tienen error simultáneamente"], correcta: 1 },
+  { id: "nav-q17", pregunta: "Vuelas sin DME y necesitas confirmar tu distancia a un aeropuerto. Comparando la navegación por estima (dead reckoning) contra una fijación cruzada con dos VOR, ¿cuál te da mayor precisión y por qué?", opciones: ["Estima, porque no depende de señales externas que puedan fallar", "Fijación cruzada, porque ubica tu posición real con dos referencias externas en vez de acumular el error de tiempo y viento estimado", "Ambas tienen exactamente la misma precisión", "Ninguna es confiable si no tienes DME a bordo"], correcta: 1 },
 ];
 
 const QUIZ_CARTOGRAFIA: QuizPregunta[] = [
