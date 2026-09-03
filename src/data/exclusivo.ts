@@ -1,6 +1,6 @@
 export interface ContenidoExclusivo {
   id: string;
-  tipo: "Video" | "Guía" | "Procedimiento" | "Checklist" | "Examen" | "Agenda";
+  tipo: "Video" | "Guía" | "Procedimiento" | "Checklist" | "Examen" | "Agenda" | "Audio";
   titulo: string;
   descripcion: string;
   duracion: string;
@@ -85,5 +85,23 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     duracion: "40 min",
     imagen: "/images/msfs-volaris-climb.jpg",
     interactivoHref: "/premium/simulacro-vuelo",
+  },
+  {
+    id: "audio-atc-rodaje",
+    tipo: "Audio",
+    titulo: "Fraseología ATC: rodaje y despegue",
+    descripcion: "Audio de práctica con llamadas reales de rodaje, autorización y despegue para escuchar en cualquier momento.",
+    duracion: "5 situaciones",
+    imagen: "/images/msfs-volaris-climb.jpg",
+    interactivoHref: "/premium/audio-rodaje-despegue",
+  },
+  {
+    id: "audio-atc-emergencias",
+    tipo: "Audio",
+    titulo: "Fraseología ATC: emergencias y aproximación",
+    descripcion: "Audio de práctica con llamadas de aproximación, tránsito y procedimientos de emergencia.",
+    duracion: "5 situaciones",
+    imagen: "/images/msfs-sunset-wing.jpg",
+    interactivoHref: "/premium/audio-emergencias-aproximacion",
   },
 ];

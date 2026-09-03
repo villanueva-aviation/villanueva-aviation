@@ -19,7 +19,6 @@ export const CATEGORIAS_DESCARGAS = [
   "Guías",
   "Plantillas",
   "Formularios oficiales",
-  "Audio ATC",
 ] as const;
 
 export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
@@ -105,25 +104,5 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     fecha: "2026-07-05",
     imagen: "/images/msfs-xbvla-farmland.jpg",
     interactivoHref: "/peso-y-balance",
-  },
-  {
-    id: "audio-atc-rodaje",
-    categoria: "Audio ATC",
-    nombre: "Fraseología ATC: rodaje y despegue",
-    descripcion: "Audio de práctica con llamadas reales de rodaje, autorización y despegue para escuchar en cualquier momento.",
-    version: "v1.0",
-    fecha: "2026-07-12",
-    imagen: "/images/msfs-volaris-climb.jpg",
-    interactivoHref: "/audio-rodaje-despegue",
-  },
-  {
-    id: "audio-atc-emergencias",
-    categoria: "Audio ATC",
-    nombre: "Fraseología ATC: emergencias y aproximación",
-    descripcion: "Audio de práctica con llamadas de aproximación, tránsito y procedimientos de emergencia.",
-    version: "v1.0",
-    fecha: "2026-07-12",
-    imagen: "/images/msfs-sunset-wing.jpg",
-    interactivoHref: "/audio-emergencias-aproximacion",
   },
 ];

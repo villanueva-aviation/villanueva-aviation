@@ -16,13 +16,13 @@ export function AudioPhraseologyPage({
 }) {
   return (
     <div>
-      <PageHero eyebrow="Audio ATC" title={titulo} description={descripcion}>
+      <PageHero eyebrow="Contenido de cadetes · Premium" title={titulo} description={descripcion}>
         <Link
-          to={ROUTES.descargas}
+          to={ROUTES.contenidoExclusivo}
           className="inline-flex items-center gap-2 text-sm font-medium text-white/70 transition-colors hover:text-gold-400"
         >
           <ArrowLeft size={15} />
-          Volver a Descargas
+          Volver a Contenido Exclusivo
         </Link>
       </PageHero>
 

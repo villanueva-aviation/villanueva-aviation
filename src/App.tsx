@@ -100,8 +100,22 @@ function App() {
               <Route path={ROUTES.planVuelo} element={<PlanDeVuelo />} />
               <Route path={ROUTES.bitacoraVuelo} element={<BitacoraVuelo />} />
               <Route path={ROUTES.pesoBalance} element={<PesoBalance />} />
-              <Route path={ROUTES.audioRodajeDespegue} element={<AudioRodajeDespegue />} />
-              <Route path={ROUTES.audioEmergenciasAproximacion} element={<AudioEmergenciasAproximacion />} />
+              <Route
+                path={ROUTES.audioRodajeDespegue}
+                element={
+                  <ProtectedRoute>
+                    <AudioRodajeDespegue />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.audioEmergenciasAproximacion}
+                element={
+                  <ProtectedRoute>
+                    <AudioEmergenciasAproximacion />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path={ROUTES.checklistPremiumC172}
                 element={
