@@ -46,8 +46,12 @@ function TableroCircuito({
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
         <rect x="44" y="35" width="12" height="38" className="fill-white/10" />
         <line x1="50" y1="39" x2="50" y2="69" className="stroke-white/20" strokeWidth="0.6" strokeDasharray="2.5 2.5" />
-        <polyline points="50,35 50,15 19,15 19,73 50,73 50,92" fill="none" className="stroke-white/20" strokeWidth="1" />
-        <line x1="50" y1="92" x2="50" y2="35" className="stroke-white/10" strokeWidth="1" strokeDasharray="2 2" />
+        <path
+          d="M 50 35 L 50 19 Q 50 15 46 15 L 23 15 Q 19 15 19 19 L 19 69 Q 19 73 23 73 L 46 73 Q 50 73 50 77 L 50 92"
+          fill="none"
+          className="stroke-white/20"
+          strokeWidth="1"
+        />
       </svg>
       {TRAMOS_CIRCUITO.map((tramo) => {
         const esActivo = tramo.id === tramoActivoId;
