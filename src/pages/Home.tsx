@@ -76,7 +76,7 @@ export function Home() {
             className="animate-fade-up mt-8 max-w-5xl font-display text-5xl font-extrabold uppercase leading-[0.95] tracking-tight text-white sm:text-7xl md:text-8xl"
             style={{ animationDelay: "80ms" }}
           >
-            Tu camino a <span className="text-shine">piloto</span> comienza aquí
+            Tu camino a <span className="text-shine">piloto</span>, sin pagar por avión real
           </h1>
 
           <p
@@ -97,6 +97,13 @@ export function Home() {
               Unirse a Discord
             </Button>
           </div>
+
+          <p
+            className="animate-fade-up mt-5 text-xs font-medium uppercase tracking-wide text-white/40"
+            style={{ animationDelay: "300ms" }}
+          >
+            Gratis para empezar — crea tu cuenta de cadete en menos de un minuto
+          </p>
         </div>
 
         <div className="absolute inset-x-0 bottom-8 z-10 flex justify-center px-6">
@@ -213,6 +220,12 @@ export function Home() {
               </Reveal>
             ))}
           </div>
+          <Reveal delay={360} className="mt-14 flex justify-center">
+            <Button to={ROUTES.academia} variant="primary" className="group">
+              Comenzar formación
+              <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Button>
+          </Reveal>
         </Container>
       </section>
 
