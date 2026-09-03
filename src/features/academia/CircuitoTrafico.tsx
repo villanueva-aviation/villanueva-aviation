@@ -116,13 +116,20 @@ function TableroCircuito({
     setPosiciones(posicionesIniciales());
   }
 
+  const codigoPosiciones = TRAMOS_CIRCUITO.map(
+    (t) => `${t.id}: { xPct: ${posiciones[t.id].xPct}, yPct: ${posiciones[t.id].yPct} }`,
+  ).join("\n");
+
   function copiarCodigo() {
-    const codigo = TRAMOS_CIRCUITO.map(
-      (t) => `${t.id}: { xPct: ${posiciones[t.id].xPct}, yPct: ${posiciones[t.id].yPct} }`,
-    ).join("\n");
-    navigator.clipboard.writeText(codigo);
-    setCopiado(true);
-    setTimeout(() => setCopiado(false), 1500);
+    navigator.clipboard
+      .writeText(codigoPosiciones)
+      .then(() => {
+        setCopiado(true);
+        setTimeout(() => setCopiado(false), 1500);
+      })
+      .catch(() => {
+        // El navegador bloqueó el portapapeles — el texto de abajo se puede seleccionar y copiar a mano.
+      });
   }
 
   return (
@@ -209,6 +216,12 @@ function TableroCircuito({
           </motion.div>
         )}
       </div>
+
+      {editable && (
+        <pre className="mt-3 max-h-40 overflow-auto rounded-lg border border-white/10 bg-white/[0.02] p-3 text-[11px] text-white/60 select-text">
+          {codigoPosiciones}
+        </pre>
+      )}
     </div>
   );
 }
