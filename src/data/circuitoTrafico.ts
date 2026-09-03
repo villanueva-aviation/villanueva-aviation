@@ -62,7 +62,7 @@ export const TRAMOS_CIRCUITO: TramoCircuito[] = [
     nombre: "Final",
     nombreIngles: "Final",
     xPct: 50,
-    yPct: 73,
+    yPct: 92,
     queHace: "Alineado con el eje de pista, en descenso estabilizado hacia el punto de aterrizaje, confirmas autorización de aterrizaje antes de cruzar el umbral.",
     reporteRadio: "Torre, XB-VLA, final pista 20.",
   },

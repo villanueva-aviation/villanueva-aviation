@@ -1,7 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, ChevronLeft, ChevronRight, Plane, XCircle } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, XCircle } from "lucide-react";
 import { SITUACIONES_CIRCUITO, TRAMOS_CIRCUITO, type SituacionCircuito } from "../../data/circuitoTrafico";
+
+/** Silueta simple de avión, apuntando hacia arriba por defecto (0°) para que ROTACION_TRAMO sea exacta. */
+function IconAvionCircuito({ size = 20, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M12 2 L15 11 L22 15 L22 17 L15 15 L15 19 L18 21 L18 22.5 L12 21 L6 22.5 L6 21 L9 19 L9 15 L2 17 L2 15 L9 11 Z" />
+    </svg>
+  );
+}
 
 function elegirSituacionAleatoria(excluirId?: string): SituacionCircuito {
   const opciones = excluirId
@@ -33,19 +42,26 @@ function TableroCircuito({
   const tramoAvion = tramoActivoId ? TRAMOS_CIRCUITO.find((t) => t.id === tramoActivoId) : undefined;
 
   return (
-    <div className="relative aspect-[5/4] w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-950">
+    <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-950">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
         <rect x="44" y="35" width="12" height="38" className="fill-white/10" />
-        <polyline points="50,35 50,15 19,15 19,73 50,73" fill="none" className="stroke-white/20" strokeWidth="1" />
-        <line x1="50" y1="73" x2="50" y2="35" className="stroke-white/10" strokeWidth="1" strokeDasharray="2 2" />
+        <polyline points="50,35 50,15 19,15 19,73 50,73 50,92" fill="none" className="stroke-white/20" strokeWidth="1" />
+        <line x1="50" y1="92" x2="50" y2="35" className="stroke-white/10" strokeWidth="1" strokeDasharray="2 2" />
       </svg>
       {tramoAvion && (
         <motion.div
-          className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 text-gold-400"
-          animate={{ left: `${tramoAvion.xPct}%`, top: `${tramoAvion.yPct}%`, rotate: ROTACION_TRAMO[tramoAvion.id] ?? 0 }}
+          className="pointer-events-none absolute text-white"
+          initial={false}
+          animate={{
+            left: `${tramoAvion.xPct}%`,
+            top: `${tramoAvion.yPct}%`,
+            x: "-50%",
+            y: "-50%",
+            rotate: ROTACION_TRAMO[tramoAvion.id] ?? 0,
+          }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
         >
-          <Plane size={18} />
+          <IconAvionCircuito size={20} className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]" />
         </motion.div>
       )}
       {TRAMOS_CIRCUITO.map((tramo) => {
