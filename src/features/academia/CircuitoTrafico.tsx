@@ -10,39 +10,6 @@ function posicionesIniciales(): PosicionesTablero {
   return Object.fromEntries(TRAMOS_CIRCUITO.map((t) => [t.id, { xPct: t.xPct, yPct: t.yPct }]));
 }
 
-/** Construye el trazo del circuito con esquinas redondeadas a partir de las posiciones actuales de los 5 tramos. */
-function construirPathCircuito(pos: PosicionesTablero): string {
-  const r = 8;
-  const p1 = pos["viento-en-cara"];
-  const p2 = pos["viento-cruzado"];
-  const p3 = pos["viento-en-cola"];
-  const p4 = pos["base"];
-  const p5 = pos["final"];
-  const bend = { xPct: p5.xPct, yPct: p4.yPct };
-  const puntos = [p1, p2, p3, p4, bend, p5];
-
-  const signo = (a: number, b: number) => (b > a ? 1 : b < a ? -1 : 0);
-  const partes: string[] = [`M ${p1.xPct} ${p1.yPct}`];
-
-  for (let i = 1; i < puntos.length; i++) {
-    const anterior = puntos[i - 1];
-    const actual = puntos[i];
-    const siguiente = puntos[i + 1];
-    if (siguiente) {
-      const dx1 = signo(anterior.xPct, actual.xPct);
-      const dy1 = signo(anterior.yPct, actual.yPct);
-      const dx2 = signo(actual.xPct, siguiente.xPct);
-      const dy2 = signo(actual.yPct, siguiente.yPct);
-      const entrada = { xPct: actual.xPct - dx1 * r, yPct: actual.yPct - dy1 * r };
-      const salida = { xPct: actual.xPct + dx2 * r, yPct: actual.yPct + dy2 * r };
-      partes.push(`L ${entrada.xPct} ${entrada.yPct}`, `Q ${actual.xPct} ${actual.yPct} ${salida.xPct} ${salida.yPct}`);
-    } else {
-      partes.push(`L ${actual.xPct} ${actual.yPct}`);
-    }
-  }
-  return partes.join(" ");
-}
-
 /** Silueta simple de avión, apuntando hacia arriba por defecto (0°) para que ROTACION_TRAMO sea exacta. */
 function IconAvionCircuito({ size = 20, className }: { size?: number; className?: string }) {
   return (
@@ -61,10 +28,10 @@ function elegirSituacionAleatoria(excluirId?: string): SituacionCircuito {
 
 /** Rumbo del avión durante cada tramo, en grados, hacia el siguiente punto del circuito. */
 const ROTACION_TRAMO: Record<string, number> = {
-  "viento-en-cara": 0,
-  "viento-cruzado": -90,
-  "viento-en-cola": 180,
-  base: 90,
+  "viento-en-cara": 30,
+  "viento-cruzado": -45,
+  "viento-en-cola": -135,
+  base: 135,
   final: 90,
 };
 
@@ -88,7 +55,6 @@ function TableroCircuito({
   const [copiado, setCopiado] = useState(false);
 
   const tramoAvion = tramoActivoId ? TRAMOS_CIRCUITO.find((t) => t.id === tramoActivoId) : undefined;
-  const path = construirPathCircuito(posiciones);
 
   function actualizarDesdePuntero(id: string, clientX: number, clientY: number) {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -151,12 +117,22 @@ function TableroCircuito({
         ref={containerRef}
         onPointerMove={handlePointerMove}
         onPointerUp={() => setDraggingId(null)}
-        className="relative aspect-square w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-950 select-none"
+        className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-950 select-none"
       >
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-          <rect x="48" y="76" width="19" height="12" className="fill-white/10" />
-          <line x1="51" y1="82" x2="64" y2="82" className="stroke-white/20" strokeWidth="0.6" strokeDasharray="2.5 2.5" />
-          <path d={path} fill="none" className="stroke-white/20" strokeWidth="1" />
+          <rect
+            x="15"
+            y="20"
+            width="70"
+            height="60"
+            rx="10"
+            ry="10"
+            fill="none"
+            className="stroke-white/25"
+            strokeWidth="1.5"
+          />
+          <rect x="38" y="74" width="24" height="12" className="fill-white/15" />
+          <line x1="41" y1="80" x2="59" y2="80" className="stroke-white/25" strokeWidth="0.6" strokeDasharray="2.5 2.5" />
         </svg>
         {TRAMOS_CIRCUITO.map((tramo) => {
           const pos = posiciones[tramo.id];
