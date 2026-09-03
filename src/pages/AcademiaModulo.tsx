@@ -147,7 +147,8 @@ export function AcademiaModulo() {
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/65">{modulo.resumen}</p>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50">
                 Esta sección te guiará a través de una experiencia estructurada: lección teórica
-                {interactividadActividades.length > 0 ? ", ejercicios interactivos" : ""}, práctica y evaluación final.
+                {interactividadActividades.length > 0 ? ", ejercicios interactivos" : ""}, práctica y evaluación final
+                {proyectoActividad ? ", más un proyecto final que debes enviar a revisión para marcar el módulo como completado" : ""}.
               </p>
               <Button className="mt-6" onClick={() => setActiveStage("leccion")}>
                 Comenzar lección
@@ -285,7 +286,10 @@ export function AcademiaModulo() {
                 </div>
               )}
               {proyectoActividad && isActividadCompletada(modulo.slug, evaluacionActividad.id) && (
-                <div className="flex justify-end">
+                <div className="flex flex-col items-end gap-2">
+                  <p className="text-xs text-white/45">
+                    Este módulo se marca como completado solo después de enviar el proyecto final.
+                  </p>
                   <Button onClick={() => setActiveStage("proyecto")}>Continuar al proyecto final</Button>
                 </div>
               )}
