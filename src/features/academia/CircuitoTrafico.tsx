@@ -56,10 +56,28 @@ export interface PuntoTablero {
 }
 
 export interface RutaAvion {
+  /** Posición de la parada de la que parte, para repartir el tiempo de vuelo según la distancia real de cada tramo. */
+  origen: PuntoTablero;
   /** Puntos intermedios (esquina) por los que pasa el avión antes de llegar a tramoActivoId. */
   puntos: PuntoTablero[];
   /** Rumbo del que parte, para que gire suavemente hacia el rumbo de la parada destino durante el vuelo. */
   rotacionOrigen: number;
+}
+
+function distancia(a: PuntoTablero, b: PuntoTablero): number {
+  return Math.hypot(b.xPct - a.xPct, b.yPct - a.yPct);
+}
+
+/** Reparte el tiempo de la animación entre los tramos según su distancia real, para que la velocidad se sienta pareja. */
+function tiemposVuelo(ruta: RutaAvion, destino: PuntoTablero): number[] {
+  const puntos = [ruta.origen, ...ruta.puntos, destino];
+  const distancias = puntos.slice(1).map((p, i) => distancia(puntos[i], p));
+  const total = distancias.reduce((a, b) => a + b, 0) || 1;
+  let acumulado = 0;
+  return distancias.map((d) => {
+    acumulado += d;
+    return acumulado / total;
+  });
 }
 
 function TableroCircuito({
@@ -214,7 +232,11 @@ function TableroCircuito({
                 ? [rutaAvion.rotacionOrigen, ROTACION_TRAMO[tramoAvion.id] ?? 0]
                 : (ROTACION_TRAMO[tramoAvion.id] ?? 0),
             }}
-            transition={{ duration: rutaAvion ? 0.9 : 0.6, ease: "easeInOut" }}
+            transition={{
+              duration: rutaAvion ? 1.1 : 0.6,
+              ease: "easeInOut",
+              times: rutaAvion ? tiemposVuelo(rutaAvion, posiciones[tramoAvion.id]) : undefined,
+            }}
           >
             <IconAvionCircuito size={36} className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" />
           </motion.div>
@@ -272,13 +294,18 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
       onComplete?.();
       return;
     }
-    setRutaAvion({ puntos: [ESQUINAS_SEGMENTO[paradaActiva]], rotacionOrigen: ROTACION_TRAMO[tramoActivo.id] ?? 0 });
+    setRutaAvion({
+      origen: { xPct: tramoActivo.xPct, yPct: tramoActivo.yPct },
+      puntos: [ESQUINAS_SEGMENTO[paradaActiva]],
+      rotacionOrigen: ROTACION_TRAMO[tramoActivo.id] ?? 0,
+    });
     setParadaActiva((p) => p + 1);
   }
 
   function anteriorParada() {
     if (paradaActiva <= 1) return;
     setRutaAvion({
+      origen: { xPct: tramoActivo.xPct, yPct: tramoActivo.yPct },
       puntos: [ESQUINAS_SEGMENTO[paradaActiva - 1]],
       rotacionOrigen: ROTACION_TRAMO[tramoActivo.id] ?? 0,
     });
