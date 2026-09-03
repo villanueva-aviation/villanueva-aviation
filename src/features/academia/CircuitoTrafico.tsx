@@ -35,13 +35,29 @@ const ROTACION_TRAMO: Record<string, number> = {
   final: 90,
 };
 
+/** Esquina del rectángulo por la que pasa el avión entre la parada N y la N+1 (índice = N). */
+const ESQUINAS_SEGMENTO: Record<number, { xPct: number; yPct: number }> = {
+  1: { xPct: 85, yPct: 80 },
+  2: { xPct: 85, yPct: 20 },
+  3: { xPct: 15, yPct: 20 },
+  4: { xPct: 15, yPct: 80 },
+};
+
+export interface PuntoTablero {
+  xPct: number;
+  yPct: number;
+}
+
 function TableroCircuito({
   tramoActivoId,
+  rutaAvion,
   tramoCorrectoId,
   tramoIncorrectoId,
   onClickTramo,
 }: {
   tramoActivoId?: string;
+  /** Puntos intermedios (esquina + destino) por los que debe pasar el avión para llegar a tramoActivoId. */
+  rutaAvion?: PuntoTablero[];
   tramoCorrectoId?: string;
   tramoIncorrectoId?: string;
   onClickTramo?: (id: string) => void;
@@ -136,10 +152,8 @@ function TableroCircuito({
         </svg>
         {TRAMOS_CIRCUITO.map((tramo) => {
           const pos = posiciones[tramo.id];
-          const esActivo = tramo.id === tramoActivoId;
           const esCorrecto = tramo.id === tramoCorrectoId;
           const esIncorrecto = tramo.id === tramoIncorrectoId;
-          const rotacion = ROTACION_TRAMO[tramo.id] ?? 0;
           return (
             <button
               key={tramo.id}
@@ -150,23 +164,18 @@ function TableroCircuito({
               className={`absolute ${editable ? "cursor-grab active:cursor-grabbing" : "disabled:cursor-default"}`}
               style={{ left: `${pos.xPct}%`, top: `${pos.yPct}%`, transform: "translate(-50%, -50%)" }}
             >
-              {(esActivo || esCorrecto) && (
-                <span className="absolute inset-0 -m-2 animate-ping rounded-full bg-gold-500/50" />
-              )}
-              <span className="relative inline-block" style={{ transform: `rotate(${rotacion}deg)` }}>
-                <IconAvionCircuito
-                  size={18}
-                  className={`drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] transition-colors duration-200 ${
-                    esCorrecto
-                      ? "text-emerald-400"
-                      : esIncorrecto
-                        ? "text-red-400"
-                        : editable || onClickTramo
-                          ? "text-white/35 hover:text-white/60"
-                          : "text-white/35"
-                  }`}
-                />
-              </span>
+              {esCorrecto && <span className="absolute inset-0 -m-2 animate-ping rounded-full bg-gold-500/50" />}
+              <span
+                className={`block h-2.5 w-2.5 rounded-full border border-navy-950 transition-colors duration-200 ${
+                  esCorrecto
+                    ? "bg-emerald-400"
+                    : esIncorrecto
+                      ? "bg-red-400"
+                      : editable || onClickTramo
+                        ? "bg-white/30 hover:bg-white/50"
+                        : "bg-white/30"
+                }`}
+              />
               {editable && (
                 <span className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap rounded bg-navy-950 px-1.5 py-0.5 text-[10px] text-gold-400">
                   {pos.xPct}%, {pos.yPct}%
@@ -180,15 +189,19 @@ function TableroCircuito({
             className="pointer-events-none absolute z-10 text-gold-400"
             initial={false}
             animate={{
-              left: `${posiciones[tramoAvion.id].xPct}%`,
-              top: `${posiciones[tramoAvion.id].yPct}%`,
+              left: rutaAvion
+                ? [...rutaAvion.map((p) => `${p.xPct}%`), `${posiciones[tramoAvion.id].xPct}%`]
+                : `${posiciones[tramoAvion.id].xPct}%`,
+              top: rutaAvion
+                ? [...rutaAvion.map((p) => `${p.yPct}%`), `${posiciones[tramoAvion.id].yPct}%`]
+                : `${posiciones[tramoAvion.id].yPct}%`,
               x: "-50%",
               y: "-50%",
               rotate: ROTACION_TRAMO[tramoAvion.id] ?? 0,
             }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
+            transition={{ duration: rutaAvion ? 0.9 : 0.6, ease: "easeInOut" }}
           >
-            <IconAvionCircuito size={26} className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" />
+            <IconAvionCircuito size={36} className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" />
           </motion.div>
         )}
       </div>
@@ -206,6 +219,7 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
   const [modo, setModo] = useState<"aprende" | "prueba">("aprende");
 
   const [paradaActiva, setParadaActiva] = useState(1);
+  const [rutaAvion, setRutaAvion] = useState<PuntoTablero[] | undefined>(undefined);
   const tramoActivo = TRAMOS_CIRCUITO.find((t) => t.numero === paradaActiva)!;
 
   const [situacionActual, setSituacionActual] = useState<SituacionCircuito>(() => elegirSituacionAleatoria());
@@ -229,6 +243,7 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
       autoAvanzarRef.current = null;
     }
     setModo(nuevo);
+    setRutaAvion(undefined);
     if (nuevo === "prueba") {
       setSituacionActual(elegirSituacionAleatoria());
       setTramoElegidoId(null);
@@ -242,11 +257,14 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
       onComplete?.();
       return;
     }
+    setRutaAvion([ESQUINAS_SEGMENTO[paradaActiva]]);
     setParadaActiva((p) => p + 1);
   }
 
   function anteriorParada() {
-    setParadaActiva((p) => Math.max(1, p - 1));
+    if (paradaActiva <= 1) return;
+    setRutaAvion([ESQUINAS_SEGMENTO[paradaActiva - 1]]);
+    setParadaActiva((p) => p - 1);
   }
 
   function elegirTramo(id: string) {
@@ -288,6 +306,7 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
 
       <TableroCircuito
         tramoActivoId={modo === "aprende" ? tramoActivo.id : undefined}
+        rutaAvion={modo === "aprende" ? rutaAvion : undefined}
         tramoCorrectoId={modo === "prueba" && tramoElegidoId !== null ? situacionActual.tramoCorrectoId : undefined}
         tramoIncorrectoId={modo === "prueba" && respondioIncorrecto ? (tramoElegidoId ?? undefined) : undefined}
         onClickTramo={modo === "prueba" ? elegirTramo : undefined}
