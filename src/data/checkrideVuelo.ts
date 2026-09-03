@@ -48,4 +48,22 @@ export const CHECKRIDE_VUELO: ExplorerTema[] = [
     texto:
       "Vuelo de un tramo de ruta planeado previamente, manteniendo rumbo y tiempo calculados. Tolerancias típicas: altitud ±200 pies, rumbo ±15°, identificación correcta de checkpoints dentro de un margen razonable de tiempo.",
   },
+  {
+    id: "curso-rectangular",
+    titulo: "Curso rectangular (rectangular course)",
+    texto:
+      "Vuelo alrededor de un terreno rectangular (como un campo) manteniendo una distancia constante de los bordes, ajustando la inclinación en cada lado para compensar la deriva del viento. Tolerancias típicas: altitud ±100 pies, velocidad ±10 nudos, distancia visualmente constante al terreno sin describir un óvalo irregular. El error más común es no anticipar la corrección de viento antes de llegar a cada esquina.",
+  },
+  {
+    id: "ochos-carreteras",
+    titulo: "Ochos sobre carreteras (S-turns)",
+    texto:
+      "Vuelo en forma de 'S' cruzando perpendicularmente una carretera o línea recta en tierra, manteniendo radios de giro iguales a ambos lados pese al viento — mayor inclinación con viento en cola, menor con viento de frente. Tolerancias típicas: altitud ±100 pies, velocidad ±10 nudos, radios simétricos y cruces perpendiculares a la referencia. Se evalúa la división de atención entre pilotaje y referencia visual en tierra.",
+  },
+  {
+    id: "virajes-alrededor-punto",
+    titulo: "Virajes alrededor de un punto (turns around a point)",
+    texto:
+      "Vuelo en círculo alrededor de un punto fijo en tierra, manteniendo un radio constante y ajustando la inclinación según la posición relativa al viento — mayor inclinación con viento en cola, menor contra el viento. Tolerancias típicas: altitud ±100 pies, velocidad ±10 nudos, radio visualmente constante durante las 2 vueltas completas.",
+  },
 ];

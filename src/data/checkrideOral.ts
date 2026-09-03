@@ -96,4 +96,44 @@ export const CHECKRIDE_ORAL: PhraseologyCard[] = [
       { descripcion: "Patrón estándar (virajes a la izquierda) salvo indicación contraria", palabrasClave: ["patrón estándar", "patron estandar", "virajes a la izquierda"] },
     ],
   },
+  {
+    situacion: "Maniobras básicas por instrumentos — ¿Cómo mantendrías vuelo recto y nivelado únicamente por instrumentos, sin referencia visual externa?",
+    callout:
+      "Usando el horizonte artificial como referencia primaria de actitud, cruzando constantemente con el altímetro, el velocímetro y el coordinador de viraje para detectar cualquier tendencia de alabeo o guiñada — un escaneo instrumental continuo, nunca fijando la vista en un solo instrumento.",
+    elementos: [
+      { descripcion: "Horizonte artificial como referencia primaria de actitud", palabrasClave: ["horizonte artificial", "actitud"] },
+      { descripcion: "Escaneo instrumental continuo (altímetro, velocímetro, coordinador de viraje)", palabrasClave: ["escaneo", "altímetro", "altimetro", "coordinador de viraje"] },
+      { descripcion: "Nunca fijar la vista en un solo instrumento", palabrasClave: ["nunca fijar", "un solo instrumento"] },
+    ],
+  },
+  {
+    situacion: "Maniobras básicas por instrumentos — Durante un ascenso a velocidad constante por instrumentos, ¿qué instrumentos usas para mantener la velocidad exacta y cómo?",
+    callout:
+      "Ajustas la actitud de cabeceo con el horizonte artificial mientras monitoreas el velocímetro: si la velocidad baja, bajas ligeramente la nariz; si sube, la subes — manteniendo la potencia constante durante todo el ascenso.",
+    elementos: [
+      { descripcion: "El horizonte artificial ajusta el cabeceo", palabrasClave: ["horizonte artificial", "cabeceo"] },
+      { descripcion: "El velocímetro indica si corregir la nariz arriba o abajo", palabrasClave: ["velocímetro", "velocimetro"] },
+      { descripcion: "Potencia constante durante todo el ascenso", palabrasClave: ["potencia constante"] },
+    ],
+  },
+  {
+    situacion: "Maniobras básicas por instrumentos — ¿Cómo reconoces y recuperas de una actitud inusual con la nariz baja y el velocímetro aumentando rápido, solo por instrumentos?",
+    callout:
+      "Reduces potencia, nivelas las alas con el horizonte artificial (o el coordinador de viraje si el horizonte falló), y luego levantas suavemente la nariz para regresar a vuelo nivelado — en ese orden: potencia, alas niveladas, cabeceo.",
+    elementos: [
+      { descripcion: "Reducir potencia primero", palabrasClave: ["reducir potencia", "potencia"] },
+      { descripcion: "Nivelar las alas antes de corregir el cabeceo", palabrasClave: ["nivelar", "alas"] },
+      { descripcion: "Recuperar suavemente sin sobre-corregir", palabrasClave: ["suavemente", "sin sobre-corregir", "sobrecorregir"] },
+    ],
+  },
+  {
+    situacion: "Maniobras básicas por instrumentos — ¿Cómo ejecutas un viraje a un rumbo específico manteniendo altitud, solo por instrumentos?",
+    callout:
+      "Inclinas suavemente con el horizonte artificial o el coordinador de viraje, monitoreas el indicador de rumbo para anticipar la salida del viraje, y ajustas el elevador con referencia al altímetro para no perder ni ganar altitud durante el viraje.",
+    elementos: [
+      { descripcion: "Inclinación suave con horizonte artificial o coordinador de viraje", palabrasClave: ["inclinación", "inclinacion", "coordinador de viraje"] },
+      { descripcion: "Anticipar la salida del viraje con el indicador de rumbo", palabrasClave: ["indicador de rumbo", "anticipar"] },
+      { descripcion: "Ajustar el elevador con el altímetro para mantener altitud", palabrasClave: ["altímetro", "altimetro", "mantener altitud"] },
+    ],
+  },
 ];
