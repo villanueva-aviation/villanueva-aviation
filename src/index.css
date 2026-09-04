@@ -26,9 +26,7 @@
 }
 
 html,
-body,
-#root {
-  height: 100%;
+body {
   width: 100%;
   overflow-x: hidden;
 }
@@ -142,7 +140,7 @@ body {
 }
 
 .animate-fade-up {
-  animation: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes result-in {

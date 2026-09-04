@@ -31,9 +31,9 @@ export function TrackerLine({ stages, compact = false }: { stages: TrackerStage[
         const Icon = ICONS[stage.status];
         const isLast = i === stages.length - 1;
         return (
-          <div key={stage.id} className="flex flex-1 sm:flex-col">
+          <div key={stage.id} className="flex items-start gap-4 sm:flex-1 sm:flex-col sm:items-center sm:gap-0">
             <div className="flex flex-col items-center sm:w-full">
-              <div className="flex w-full items-center">
+              <div className="flex sm:w-full sm:items-center">
                 <div
                   className={`flex shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-300 ${RING_CLASSES[stage.status]} ${
                     compact ? "h-9 w-9" : "h-12 w-12"
@@ -49,15 +49,15 @@ export function TrackerLine({ stages, compact = false }: { stages: TrackerStage[
                   />
                 )}
               </div>
-              <p
-                className={`mt-3 text-center font-display text-xs font-semibold uppercase tracking-wide sm:text-sm ${LABEL_CLASSES[stage.status]}`}
-              >
-                {stage.label}
-              </p>
+              {!isLast && (
+                <div className={`h-8 w-[2px] sm:hidden ${stage.status === "completado" ? "bg-gold-500/60" : "bg-white/10"}`} />
+              )}
             </div>
-            {!isLast && (
-              <div className={`ml-6 h-8 w-[2px] sm:hidden ${stage.status === "completado" ? "bg-gold-500/60" : "bg-white/10"}`} />
-            )}
+            <p
+              className={`pt-2 text-left font-display text-xs font-semibold uppercase tracking-wide sm:mt-3 sm:pt-0 sm:text-center sm:text-sm ${LABEL_CLASSES[stage.status]}`}
+            >
+              {stage.label}
+            </p>
           </div>
         );
       })}

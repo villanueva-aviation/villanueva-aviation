@@ -2,7 +2,6 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
-import { LiveBar } from "./components/layout/LiveBar";
 import { AuthProvider } from "./features/auth/AuthContext";
 import { ProtectedRoute } from "./features/auth/ProtectedRoute";
 import { ProgressProvider } from "./features/progress/ProgressContext";
@@ -171,7 +170,6 @@ function App() {
             </Routes>
           </main>
           <Footer />
-          <LiveBar />
         </div>
       </ProgressProvider>
     </AuthProvider>

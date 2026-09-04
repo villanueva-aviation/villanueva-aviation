@@ -1,21 +1,19 @@
-import { ArrowRight, Gauge, MessageCircle, PlayCircle, ShieldCheck, Sparkles, Target } from "lucide-react";
+import { ArrowRight, Gauge, MessageCircle, PlayCircle, ShieldCheck } from "lucide-react";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
 import { SectionHeading } from "../components/ui/SectionHeading";
 import { FeatureCard } from "../components/ui/FeatureCard";
-import { ProgressBar } from "../components/ui/ProgressBar";
 import { Reveal } from "../components/ui/Reveal";
 import { TrackerLine, type TrackerStage } from "../components/tracker/TrackerLine";
-import { ACADEMIA_MODULOS } from "../data/academia";
 import { DISCORD_URL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 
 const RUTA_DEMO: TrackerStage[] = [
-  { id: "fundamentos", label: "Fundamentos", status: "en-progreso" },
-  { id: "conocimientos", label: "Conocimientos", status: "bloqueado" },
-  { id: "simulacion", label: "Simulación", status: "bloqueado" },
-  { id: "operacion", label: "Operación", status: "bloqueado" },
-  { id: "evaluacion", label: "Evaluación", status: "bloqueado" },
+  { id: "fundamentos", label: "Fundamentos", status: "bloqueado" },
+  { id: "teoria", label: "Teoría y meteorología", status: "bloqueado" },
+  { id: "simulacion", label: "Simulación práctica", status: "bloqueado" },
+  { id: "operacion", label: "Operación y procedimientos", status: "bloqueado" },
+  { id: "evaluacion", label: "Evaluación final", status: "bloqueado" },
 ];
 
 const POR_QUE_SIMULACION = [
@@ -23,24 +21,6 @@ const POR_QUE_SIMULACION = [
     icon: ShieldCheck,
     titulo: "Practica sin riesgo",
     descripcion: "Comete errores y aprende de ellos en un entorno controlado, antes de subir a una aeronave real.",
-  },
-  {
-    icon: Gauge,
-    titulo: "Repite hasta dominar",
-    descripcion: "Repite maniobras y procedimientos las veces que necesites, a tu propio ritmo.",
-  },
-  {
-    icon: Target,
-    titulo: "Enfócate en lo esencial",
-    descripcion: "Llega a tu escuela de vuelo con una base sólida y aprovecha mejor cada hora de instrucción real.",
-  },
-];
-
-const BENEFICIOS = [
-  {
-    icon: Sparkles,
-    titulo: "Aprendizaje estructurado",
-    descripcion: "Módulos progresivos con lecciones, ejercicios interactivos y evaluaciones.",
   },
   {
     icon: PlayCircle,
@@ -68,26 +48,26 @@ export function Home() {
         </div>
 
         <div className="relative z-10 flex flex-col items-center px-6 text-center">
-          <span className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-gold-500/30 bg-gold-500/10 px-4 py-1.5 font-display text-xs font-semibold uppercase tracking-[0.25em] text-gold-400">
+          <span className="animate-fade-up inline-flex items-center gap-1.5 rounded-full border border-gold-500/30 bg-gold-500/10 px-3 py-1 font-display text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-400 sm:gap-2 sm:px-4 sm:py-1.5 sm:text-xs sm:tracking-[0.25em]">
             Academia aeronáutica digital
           </span>
 
           <h1
-            className="animate-fade-up mt-8 max-w-5xl font-display text-5xl font-extrabold uppercase leading-[0.95] tracking-tight text-white sm:text-7xl md:text-8xl"
-            style={{ animationDelay: "80ms" }}
+            className="animate-fade-up mt-2 max-w-5xl font-display text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-white sm:mt-8 sm:text-5xl md:text-7xl lg:text-8xl"
+            style={{ animationDelay: "50ms" }}
           >
             Tu camino a <span className="text-shine">piloto</span>, sin pagar por avión real
           </h1>
 
           <p
-            className="animate-fade-up mt-7 max-w-2xl text-base leading-relaxed text-white/70 md:text-lg"
-            style={{ animationDelay: "160ms" }}
+            className="animate-fade-up mt-4 max-w-2xl text-sm leading-relaxed text-white/70 sm:mt-7 sm:text-base md:text-lg"
+            style={{ animationDelay: "100ms" }}
           >
             Te dijeron que ser piloto era caro, lejano y complicado. Aquí empiezas a construir la base
             real —teoría y simulación— antes de pisar una escuela de vuelo.
           </p>
 
-          <div className="animate-fade-up mt-10 flex flex-col items-center gap-4 sm:flex-row" style={{ animationDelay: "240ms" }}>
+          <div className="animate-fade-up mt-6 flex flex-col items-center gap-3 sm:mt-10 sm:flex-row sm:gap-4" style={{ animationDelay: "150ms" }}>
             <Button to={ROUTES.academia} variant="primary" className="group">
               Comenzar formación
               <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -99,15 +79,22 @@ export function Home() {
           </div>
 
           <p
-            className="animate-fade-up mt-5 text-xs font-medium uppercase tracking-wide text-white/40"
-            style={{ animationDelay: "300ms" }}
+            className="animate-fade-up mt-4 text-sm font-medium tracking-wide text-white/70 sm:mt-5"
+            style={{ animationDelay: "190ms" }}
           >
-            Gratis para empezar — crea tu cuenta de cadete en menos de un minuto
+            <span className="font-display font-semibold uppercase tracking-wider text-gold-400">Gratis para empezar</span>
+            {" "}— crea tu cuenta de cadete en menos de un minuto
           </p>
+
+          <div className="mt-8 flex justify-center sm:hidden">
+            <span className="inline-flex max-w-md items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-center font-sans text-[10px] font-normal text-white/70">
+              Aeronave XB-VLA · captura real de simulador — Villanueva Aviation
+            </span>
+          </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-8 z-10 flex justify-center px-6">
-          <span className="inline-flex max-w-md items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-1.5 text-center font-sans text-xs font-light text-white/50">
+        <div className="absolute inset-x-0 bottom-8 z-10 hidden justify-center px-6 sm:flex">
+          <span className="inline-flex max-w-md items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-1.5 text-center font-sans text-xs font-normal text-white/70">
             Aeronave XB-VLA · captura real de simulador — Villanueva Aviation
           </span>
         </div>
@@ -140,7 +127,7 @@ export function Home() {
       <section className="relative overflow-hidden border-t border-white/10 py-20 md:py-28">
         <Container>
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[0.85fr_1.15fr]">
-            <Reveal className="relative mx-auto aspect-[2/3] w-full max-w-sm overflow-hidden rounded-3xl border border-gold-500/20 shadow-2xl">
+            <Reveal className="relative mx-auto aspect-[2/3] w-full max-w-sm overflow-hidden rounded-3xl border border-gold-500/20 shadow-[0_0_32px_rgba(212,175,55,0.18)]">
               <img
                 src="/images/founder-erik-poster.jpg"
                 alt="Erik Villanueva, fundador de Villanueva Aviation"
@@ -197,33 +184,9 @@ export function Home() {
               </Reveal>
             ))}
           </div>
-        </Container>
-      </section>
-
-      {/* BENEFICIOS */}
-      <section className="py-20 md:py-28">
-        <Container>
-          <Reveal className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-            <SectionHeading
-              eyebrow="Beneficios"
-              title="Todo lo que necesitas para empezar bien"
-              description="Una experiencia diseñada para que tu formación se sienta estructurada y medible."
-            />
-            <Button to={ROUTES.academia} variant="ghost" className="px-0">
-              Ver módulos <ArrowRight size={16} />
-            </Button>
-          </Reveal>
-          <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {BENEFICIOS.map((f, i) => (
-              <Reveal key={f.titulo} delay={i * 120}>
-                <FeatureCard icon={f.icon} title={f.titulo} description={f.descripcion} />
-              </Reveal>
-            ))}
-          </div>
           <Reveal delay={360} className="mt-14 flex justify-center">
-            <Button to={ROUTES.academia} variant="primary" className="group">
-              Comenzar formación
-              <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+            <Button to={ROUTES.academia} variant="ghost">
+              Ver los 13 módulos <ArrowRight size={16} />
             </Button>
           </Reveal>
         </Container>
@@ -240,55 +203,15 @@ export function Home() {
             <SectionHeading
               eyebrow="Ruta de formación"
               title="Un camino claro, de principio a fin"
-              description="Fundamentos, conocimientos teóricos, simulación, operación y evaluación final."
+              description="Un resumen de tus 13 módulos, de Fundamentos a la evaluación final."
               align="center"
             />
           </Reveal>
-          <Reveal delay={150} className="mx-auto mt-14 max-w-4xl rounded-3xl border border-white/10 bg-white/[0.02] p-8 md:p-12">
+          <Reveal delay={150} className="relative mx-auto mt-14 max-w-4xl rounded-3xl border border-white/10 bg-white/[0.02] p-8 md:p-12">
+            <span className="absolute right-6 top-6 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-display text-[10px] font-semibold uppercase tracking-[0.15em] text-white/40">
+              Vista de ejemplo
+            </span>
             <TrackerLine stages={RUTA_DEMO} />
-          </Reveal>
-        </Container>
-      </section>
-
-      {/* VISTA PREVIA DE LA PLATAFORMA */}
-      <section className="border-t border-white/10 bg-navy-900/40 py-24 md:py-32">
-        <Container>
-          <Reveal>
-            <SectionHeading
-              eyebrow="Vista previa"
-              title="Tu cabina de entrenamiento personal"
-              description="Así se ve tu progreso una vez que inicias tu formación como cadete."
-              align="center"
-            />
-          </Reveal>
-          <Reveal delay={150} className="mx-auto mt-14 max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-navy-900 shadow-2xl">
-            <div className="flex items-center gap-1.5 border-b border-white/10 bg-navy-950/60 px-4 py-3">
-              <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-            </div>
-            <div className="bg-radar bg-grid p-6 md:p-10">
-              <span className="inline-flex rounded-full border border-gold-500/40 bg-gold-500/10 px-3 py-1 font-display text-xs font-semibold text-gold-400">
-                Cadete · Nivel 2
-              </span>
-              <p className="mt-4 text-sm text-white/60">Progreso general de formación</p>
-              <div className="mt-2 max-w-sm">
-                <ProgressBar value={64} />
-              </div>
-              <p className="mt-2 text-xs text-white/40">64%</p>
-
-              <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {ACADEMIA_MODULOS.slice(0, 4).map((m, i) => (
-                  <div key={m.slug} className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                    <m.icon size={16} className="text-gold-400" />
-                    <p className="mt-2 text-xs font-medium text-white/80">{m.titulo}</p>
-                    <div className="mt-2">
-                      <ProgressBar value={[100, 100, 40, 0][i]} size="sm" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </Reveal>
         </Container>
       </section>

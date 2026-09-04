@@ -92,7 +92,7 @@ export function Navbar() {
     <>
       <header
         className={`sticky top-0 z-40 border-b transition-colors duration-300 ${
-          scrolled ? "border-gold-500/15 bg-navy-950/85 backdrop-blur-lg" : "border-white/5 bg-navy-950/30 backdrop-blur-sm"
+          scrolled ? "border-gold-500/15 bg-navy-950 backdrop-blur-lg" : "border-white/5 bg-navy-950/30 backdrop-blur-sm"
         }`}
       >
         <div className="bg-grid pointer-events-none absolute inset-0 opacity-40" />
