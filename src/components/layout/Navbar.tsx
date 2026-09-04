@@ -43,27 +43,29 @@ function ProfileControl() {
       >
         {initial}
       </button>
-      {open && (
-        <div className="absolute right-0 top-12 w-48 rounded-xl border border-white/10 bg-navy-900/95 p-1.5 shadow-xl backdrop-blur-lg">
-          <Link
-            to={ROUTES.perfil}
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
-          >
-            <User size={14} /> Mi perfil
-          </Link>
-          <button
-            onClick={() => {
-              logout();
-              setOpen(false);
-              navigate(ROUTES.home);
-            }}
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-white/60 transition-colors hover:bg-white/5 hover:text-red-400"
-          >
-            <LogOut size={14} /> Cerrar sesión
-          </button>
-        </div>
-      )}
+      <div
+        className={`absolute right-0 top-12 w-48 origin-top-right rounded-xl border border-white/10 bg-navy-900/95 p-1.5 shadow-xl backdrop-blur-lg transition-[opacity,transform] duration-150 ease-out ${
+          open ? "opacity-100 scale-100" : "pointer-events-none opacity-0 scale-95"
+        }`}
+      >
+        <Link
+          to={ROUTES.perfil}
+          onClick={() => setOpen(false)}
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+        >
+          <User size={14} /> Mi perfil
+        </Link>
+        <button
+          onClick={() => {
+            logout();
+            setOpen(false);
+            navigate(ROUTES.home);
+          }}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-white/60 transition-colors hover:bg-white/5 hover:text-red-400"
+        >
+          <LogOut size={14} /> Cerrar sesión
+        </button>
+      </div>
     </div>
   );
 }
