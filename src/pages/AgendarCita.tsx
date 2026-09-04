@@ -201,7 +201,11 @@ export function AgendarCita() {
               </label>
 
               {error && <p className="text-sm text-red-400">{error}</p>}
-              {status === "sent" && <p className="text-sm text-gold-400">Solicitud enviada — te contactaremos para confirmar.</p>}
+              {status === "sent" && (
+                <p className="animate-result-in text-sm text-gold-400">
+                  Solicitud enviada — te contactaremos para confirmar.
+                </p>
+              )}
 
               <Button type="submit" variant="primary" className="mt-2 w-full" disabled={status === "sending"}>
                 <CalendarClock size={16} /> {status === "sending" ? "Enviando..." : "Enviar solicitud"}
