@@ -50,11 +50,11 @@ function FaseCard({ fase }: { fase: ChecklistFase }) {
               }`}
             >
               <span
-                className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors duration-150 ease-out ${
                   isChecked ? "border-gold-500 bg-gold-500 text-navy-950" : "border-white/30"
                 }`}
               >
-                {isChecked && <Check size={11} strokeWidth={3} />}
+                {isChecked && <Check size={11} strokeWidth={3} className="animate-check-in" />}
               </span>
               {item.texto}
             </button>
