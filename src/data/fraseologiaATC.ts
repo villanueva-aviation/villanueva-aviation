@@ -7,7 +7,7 @@ export const FRASEOLOGIA_RODAJE_DESPEGUE: PhraseologyCard[] = [
     audioUrl: "/audio/fraseologia/rodaje-1.mp3",
     elementos: [
       { descripcion: "A quién llamas (Torre)", palabrasClave: ["torre"] },
-      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
+      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra"] },
       { descripcion: "Qué solicitas (información ATIS)", palabrasClave: ["información alfa", "informacion alfa", "solicito información", "solicito informacion"] },
     ],
   },
@@ -17,7 +17,7 @@ export const FRASEOLOGIA_RODAJE_DESPEGUE: PhraseologyCard[] = [
     audioUrl: "/audio/fraseologia/rodaje-2.mp3",
     elementos: [
       { descripcion: "A quién llamas", palabrasClave: ["torre"] },
-      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
+      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra"] },
       { descripcion: "Tu posición", palabrasClave: ["plataforma", "aviación general", "aviacion general"] },
       { descripcion: "Qué necesitas (rodaje)", palabrasClave: ["rodaje"] },
       { descripcion: "Confirmas información recibida", palabrasClave: ["información alfa", "informacion alfa"] },
@@ -30,7 +30,7 @@ export const FRASEOLOGIA_RODAJE_DESPEGUE: PhraseologyCard[] = [
     elementos: [
       { descripcion: "Repites la ruta exacta", palabrasClave: ["calle alfa", "pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
       { descripcion: "Repites el punto de espera (hold short)", palabrasClave: ["corto de pista 02", "corto de pista cero dos", "mantenga corto"] },
-      { descripcion: "Dices tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
+      { descripcion: "Dices tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra"] },
     ],
   },
   {
@@ -39,7 +39,7 @@ export const FRASEOLOGIA_RODAJE_DESPEGUE: PhraseologyCard[] = [
     audioUrl: "/audio/fraseologia/rodaje-4.mp3",
     elementos: [
       { descripcion: "A quién llamas", palabrasClave: ["torre"] },
-      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
+      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra"] },
       { descripcion: "Qué solicitas", palabrasClave: ["listo para despegue"] },
       { descripcion: "Pista", palabrasClave: ["pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
     ],
@@ -51,7 +51,7 @@ export const FRASEOLOGIA_RODAJE_DESPEGUE: PhraseologyCard[] = [
     elementos: [
       { descripcion: "Repites la instrucción exacta", palabrasClave: ["autorizado a despegar"] },
       { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
-      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
+      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra"] },
     ],
   },
 ];
@@ -65,7 +65,7 @@ export const FRASEOLOGIA_EMERGENCIAS_APROXIMACION: PhraseologyCard[] = [
       { descripcion: "Repites rumbo", palabrasClave: ["rumbo 180", "rumbo uno ochenta", "vire rumbo"] },
       { descripcion: "Repites altitud", palabrasClave: ["cinco mil pies", "5000 pies", "mantenga cinco mil"] },
       { descripcion: "Confirmas que entendiste la secuencia", palabrasClave: ["vectores", "secuencia visual", "espere vectores"] },
-      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
+      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra"] },
     ],
   },
   {
@@ -74,7 +74,7 @@ export const FRASEOLOGIA_EMERGENCIAS_APROXIMACION: PhraseologyCard[] = [
     audioUrl: "/audio/fraseologia/emergencia-2.mp3",
     elementos: [
       { descripcion: "Confirmas que ves el tráfico", palabrasClave: ["tráfico a la vista", "trafico a la vista"] },
-      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
+      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra"] },
     ],
   },
   {
@@ -84,7 +84,7 @@ export const FRASEOLOGIA_EMERGENCIAS_APROXIMACION: PhraseologyCard[] = [
     elementos: [
       { descripcion: "Repites la instrucción exacta", palabrasClave: ["autorizado a aterrizar"] },
       { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
-      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
+      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra"] },
     ],
   },
   {
@@ -93,7 +93,7 @@ export const FRASEOLOGIA_EMERGENCIAS_APROXIMACION: PhraseologyCard[] = [
     audioUrl: "/audio/fraseologia/emergencia-4.mp3",
     elementos: [
       { descripcion: "PAN-PAN repetido 3 veces", palabrasClave: ["pan-pan", "pan pan"] },
-      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
+      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra"] },
       { descripcion: "Naturaleza de la urgencia", palabrasClave: ["malestar médico", "malestar medico", "pasajero con malestar"] },
       { descripcion: "Posición y altitud", palabrasClave: ["millas al sur", "cinco mil pies"] },
       { descripcion: "Almas a bordo", palabrasClave: ["almas a bordo"] },
@@ -105,7 +105,7 @@ export const FRASEOLOGIA_EMERGENCIAS_APROXIMACION: PhraseologyCard[] = [
     audioUrl: "/audio/fraseologia/emergencia-5.mp3",
     elementos: [
       { descripcion: "MAYDAY repetido 3 veces", palabrasClave: ["mayday"] },
-      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
+      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra"] },
       { descripcion: "Naturaleza de la emergencia", palabrasClave: ["falla de motor"] },
       { descripcion: "Posición y altitud", palabrasClave: ["millas al norte", "tres mil pies"] },
       { descripcion: "Almas a bordo", palabrasClave: ["almas a bordo"] },
