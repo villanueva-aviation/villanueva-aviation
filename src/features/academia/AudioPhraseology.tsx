@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, ChevronRight, Mic, Volume2, X } from "lucide-react";
+import { Check, ChevronRight, Mic, RotateCcw, Volume2, X } from "lucide-react";
 import { evaluarRespuesta, type EvaluationResult } from "./phraseologyEvaluator";
 import { useSpeechRecognition } from "./useSpeechRecognition";
 
@@ -25,7 +25,7 @@ const DEFAULT_CARDS: PhraseologyCard[] = [
       { descripcion: "A quién llamas (Torre)", palabrasClave: ["torre"] },
       {
         descripcion: "Tu identificación (XB-VLA)",
-        palabrasClave: ["xb vla", "xb-vla", "equis be uve ele a", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra", "extre"],
+        palabrasClave: ["xb vla", "xb-vla", "equis be uve ele a", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra", "extre", "extray"],
       },
       { descripcion: "Tu posición", palabrasClave: ["plataforma", "aviación general", "aviacion general"] },
       { descripcion: "Qué necesitas (rodaje)", palabrasClave: ["rodaje", "solicito rodaje"] },
@@ -37,7 +37,7 @@ const DEFAULT_CARDS: PhraseologyCard[] = [
     audioUrl: "/audio/fraseologia/academia-2.mp3",
     elementos: [
       { descripcion: "A quién llamas (tráfico en la frecuencia)", palabrasClave: ["tráfico", "trafico"] },
-      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra", "extre"] },
+      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra", "extre", "extray"] },
       { descripcion: "Posición y altitud", palabrasClave: ["millas", "norte"] },
       { descripcion: "Tu intención", palabrasClave: ["circuito de tráfico", "circuito de trafico", "entrar al circuito"] },
     ],
@@ -49,7 +49,7 @@ const DEFAULT_CARDS: PhraseologyCard[] = [
     elementos: [
       { descripcion: "Repites la instrucción exacta", palabrasClave: ["autorizado a despegar", "autorizado despegar"] },
       { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
-      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra", "extre"] },
+      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra", "extre", "extray"] },
     ],
   },
 ];
@@ -73,6 +73,7 @@ export function AudioPhraseology({
   };
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [finished, setFinished] = useState(false);
   const [supported] = useState(() => typeof window !== "undefined" && "speechSynthesis" in window);
   const [vozEspanolDisponible, setVozEspanolDisponible] = useState<boolean | null>(null);
   const card = cards[index];
@@ -125,6 +126,7 @@ export function AudioPhraseology({
 
   function next() {
     if (index + 1 >= cards.length) {
+      setFinished(true);
       onComplete?.();
       return;
     }
@@ -134,9 +136,34 @@ export function AudioPhraseology({
     speech.reset();
   }
 
+  function reiniciar() {
+    setIndex(0);
+    setRevealed(false);
+    setResultado(null);
+    setFinished(false);
+    speech.reset();
+  }
+
   function handleStart() {
     setResultado(null);
     speech.start();
+  }
+
+  if (finished) {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-center md:p-8">
+        <p className="font-display text-lg font-semibold text-white">¡Práctica completada!</p>
+        <p className="mt-2 text-sm text-white/60">
+          Repasaste las {cards.length} situaciones de esta práctica.
+        </p>
+        <button
+          onClick={reiniciar}
+          className="mt-5 inline-flex items-center gap-2 rounded-full border border-gold-500/40 bg-gold-500/10 px-4 py-2 text-sm font-semibold text-gold-400 transition-colors hover:bg-gold-500/20"
+        >
+          <RotateCcw size={16} /> Repasar de nuevo
+        </button>
+      </div>
+    );
   }
 
   return (
