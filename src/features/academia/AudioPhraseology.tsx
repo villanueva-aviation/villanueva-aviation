@@ -25,7 +25,7 @@ const DEFAULT_CARDS: PhraseologyCard[] = [
       { descripcion: "A quién llamas (Torre)", palabrasClave: ["torre"] },
       {
         descripcion: "Tu identificación (XB-VLA)",
-        palabrasClave: ["xb vla", "xb-vla", "equis be uve ele a", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo"],
+        palabrasClave: ["xb vla", "xb-vla", "equis be uve ele a", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme"],
       },
       { descripcion: "Tu posición", palabrasClave: ["plataforma", "aviación general", "aviacion general"] },
       { descripcion: "Qué necesitas (rodaje)", palabrasClave: ["rodaje", "solicito rodaje"] },
@@ -37,7 +37,7 @@ const DEFAULT_CARDS: PhraseologyCard[] = [
     audioUrl: "/audio/fraseologia/academia-2.mp3",
     elementos: [
       { descripcion: "A quién llamas (tráfico en la frecuencia)", palabrasClave: ["tráfico", "trafico"] },
-      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo"] },
+      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme"] },
       { descripcion: "Posición y altitud", palabrasClave: ["millas", "norte"] },
       { descripcion: "Tu intención", palabrasClave: ["circuito de tráfico", "circuito de trafico", "entrar al circuito"] },
     ],
@@ -49,7 +49,7 @@ const DEFAULT_CARDS: PhraseologyCard[] = [
     elementos: [
       { descripcion: "Repites la instrucción exacta", palabrasClave: ["autorizado a despegar", "autorizado despegar"] },
       { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte"] },
-      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo"] },
+      { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme"] },
     ],
   },
 ];
