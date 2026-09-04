@@ -25,7 +25,7 @@ function ProfileControl() {
     return (
       <Link
         to={ROUTES.ingresar}
-        className="hidden rounded-full border border-white/25 px-4 py-2 font-display text-xs font-semibold text-white/85 transition-colors duration-200 hover:border-gold-500/50 hover:text-gold-400 lg:inline-flex"
+        className="hidden rounded-full border border-white/25 px-5 py-2.5 font-display text-sm font-semibold text-white/85 transition-colors duration-200 hover:border-gold-500/50 hover:text-gold-400 lg:inline-flex"
       >
         Iniciar sesión
       </Link>
@@ -38,13 +38,13 @@ function ProfileControl() {
     <div className="relative hidden lg:block" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-gold-500/40 bg-gold-500/10 font-display text-sm font-semibold text-gold-400 transition-colors hover:bg-gold-500/20"
+        className="flex h-11 w-11 items-center justify-center rounded-full border border-gold-500/40 bg-gold-500/10 font-display text-base font-semibold text-gold-400 transition-colors hover:bg-gold-500/20"
         aria-label="Perfil"
       >
         {initial}
       </button>
       <div
-        className={`absolute right-0 top-12 w-48 origin-top-right rounded-xl border border-white/10 bg-navy-900/95 p-1.5 shadow-xl backdrop-blur-lg transition-[opacity,transform] duration-150 ease-out ${
+        className={`absolute right-0 top-14 w-48 origin-top-right rounded-xl border border-white/10 bg-navy-900/95 p-1.5 shadow-xl backdrop-blur-lg transition-[opacity,transform] duration-150 ease-out ${
           open ? "opacity-100 scale-100" : "pointer-events-none opacity-0 scale-95"
         }`}
       >
@@ -106,12 +106,12 @@ export function Navbar() {
           <nav className="hidden items-center xl:flex">
             {NAV_LINKS.map((link, i) => (
               <div key={link.to} className="flex items-center">
-                {i > 0 && <span className="mx-1 h-4 w-px bg-white/10" />}
+                {i > 0 && <span className="mx-1.5 h-5 w-px bg-white/10" />}
                 <NavLink
                   to={link.to}
                   end={link.to === "/"}
                   className={({ isActive }) =>
-                    `group relative flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-2 font-sans text-[13px] font-light transition-all duration-200 ${
+                    `group relative flex items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2.5 font-sans text-[15px] font-light transition-all duration-200 ${
                       isActive
                         ? "border-gold-500/40 bg-gold-500/10 text-gold-400 shadow-[0_0_16px_rgba(212,175,55,0.25)]"
                         : "border-transparent text-white/70 hover:border-white/10 hover:bg-white/5 hover:text-white"
@@ -127,7 +127,7 @@ export function Navbar() {
                         </span>
                       )}
                       <link.icon
-                        size={15}
+                        size={17}
                         strokeWidth={1.75}
                         className={
                           isActive
