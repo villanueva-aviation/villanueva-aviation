@@ -13,7 +13,7 @@ export function Logo({ onClick, className = "" }: { onClick?: () => void; classN
         <img
           src="/images/logo-full.png"
           alt="Villanueva Aviation"
-          className="h-14 w-auto sm:h-16 md:h-20 lg:h-24"
+          className="h-28 w-auto sm:h-36 md:h-44 lg:h-52"
         />
       </span>
     </Link>
