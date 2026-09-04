@@ -28,7 +28,7 @@ export const FRASEOLOGIA_RODAJE_DESPEGUE: PhraseologyCard[] = [
     callout: "XB-VLA, ruede a pista 20 por calle Alfa, mantenga corto de pista 02.",
     audioUrl: "/audio/fraseologia/rodaje-3.mp3",
     elementos: [
-      { descripcion: "Repites la ruta exacta", palabrasClave: ["calle alfa", "pista 20", "pista veinte"] },
+      { descripcion: "Repites la ruta exacta", palabrasClave: ["calle alfa", "pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
       { descripcion: "Repites el punto de espera (hold short)", palabrasClave: ["corto de pista 02", "corto de pista cero dos", "mantenga corto"] },
       { descripcion: "Dices tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
     ],
@@ -41,7 +41,7 @@ export const FRASEOLOGIA_RODAJE_DESPEGUE: PhraseologyCard[] = [
       { descripcion: "A quién llamas", palabrasClave: ["torre"] },
       { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
       { descripcion: "Qué solicitas", palabrasClave: ["listo para despegue"] },
-      { descripcion: "Pista", palabrasClave: ["pista 20", "pista veinte"] },
+      { descripcion: "Pista", palabrasClave: ["pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
     ],
   },
   {
@@ -50,7 +50,7 @@ export const FRASEOLOGIA_RODAJE_DESPEGUE: PhraseologyCard[] = [
     audioUrl: "/audio/fraseologia/rodaje-5.mp3",
     elementos: [
       { descripcion: "Repites la instrucción exacta", palabrasClave: ["autorizado a despegar"] },
-      { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte"] },
+      { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
       { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
     ],
   },
@@ -83,7 +83,7 @@ export const FRASEOLOGIA_EMERGENCIAS_APROXIMACION: PhraseologyCard[] = [
     audioUrl: "/audio/fraseologia/emergencia-3.mp3",
     elementos: [
       { descripcion: "Repites la instrucción exacta", palabrasClave: ["autorizado a aterrizar"] },
-      { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte"] },
+      { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
       { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
     ],
   },

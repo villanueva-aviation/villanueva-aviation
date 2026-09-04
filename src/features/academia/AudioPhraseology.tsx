@@ -48,7 +48,7 @@ const DEFAULT_CARDS: PhraseologyCard[] = [
     audioUrl: "/audio/fraseologia/academia-3.mp3",
     elementos: [
       { descripcion: "Repites la instrucción exacta", palabrasClave: ["autorizado a despegar", "autorizado despegar"] },
-      { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte"] },
+      { descripcion: "Confirmas la pista", palabrasClave: ["pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
       { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel"] },
     ],
   },
