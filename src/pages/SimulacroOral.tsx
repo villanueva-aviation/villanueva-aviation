@@ -28,6 +28,7 @@ export function SimulacroOral() {
           cards={CHECKRIDE_ORAL}
           labels={{
             unidad: "Pregunta",
+            unidadPlural: "preguntas",
             escuchar: "Escuchar respuesta modelo",
             mostrar: "Mostrar respuesta modelo",
             siguiente: "Siguiente pregunta",

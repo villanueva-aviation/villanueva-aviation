@@ -61,10 +61,18 @@ export function AudioPhraseology({
 }: {
   cards?: PhraseologyCard[];
   onComplete?: () => void;
-  labels?: { unidad?: string; escuchar?: string; mostrar?: string; siguiente?: string; terminar?: string };
+  labels?: {
+    unidad?: string;
+    unidadPlural?: string;
+    escuchar?: string;
+    mostrar?: string;
+    siguiente?: string;
+    terminar?: string;
+  };
 }) {
   const L = {
     unidad: "Situación",
+    unidadPlural: "situaciones",
     escuchar: "Escuchar fraseología correcta",
     mostrar: "Mostrar texto y elementos clave",
     siguiente: "Siguiente situación",
@@ -154,7 +162,7 @@ export function AudioPhraseology({
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-center md:p-8">
         <p className="font-display text-lg font-semibold text-white">¡Práctica completada!</p>
         <p className="mt-2 text-sm text-white/60">
-          Repasaste las {cards.length} situaciones de esta práctica.
+          Repasaste las {cards.length} {L.unidadPlural} de esta práctica.
         </p>
         <button
           onClick={reiniciar}
