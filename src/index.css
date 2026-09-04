@@ -225,6 +225,21 @@ body {
   }
 }
 
+.card-hover {
+  transition:
+    transform 250ms ease-out,
+    border-color 250ms ease,
+    background-color 250ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card-hover:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--color-gold-500) 40%, transparent);
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+}
+
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
