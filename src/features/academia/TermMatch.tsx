@@ -79,7 +79,7 @@ export function TermMatch({ pairs, onComplete }: { pairs: TermPair[]; onComplete
                 matched.has(p.id)
                   ? "border-gold-500/40 bg-gold-500/10 text-gold-400/70"
                   : wrongPair === p.id
-                    ? "border-red-500/60 bg-red-500/10 text-white"
+                    ? "animate-shake border-red-500/60 bg-red-500/10 text-white"
                     : "border-white/10 bg-white/[0.02] text-white/70 hover:border-gold-500/30"
               }`}
             >
