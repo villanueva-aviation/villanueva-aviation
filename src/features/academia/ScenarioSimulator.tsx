@@ -81,7 +81,7 @@ export function ScenarioSimulator({
   if (node.outcome) {
     const { correct, feedback } = node.outcome;
     return (
-      <div className="flex flex-col items-center rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-10 text-center">
+      <div className="animate-result-in flex flex-col items-center rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-10 text-center">
         <div
           className={`flex h-14 w-14 items-center justify-center rounded-full border-2 ${
             correct ? "border-gold-500 bg-gold-500/10 text-gold-400" : "border-red-500/50 bg-red-500/10 text-red-400"

@@ -381,7 +381,7 @@ export const MODULE_TERMS: Record<string, TermPair[]> = {
 // ---------- Quizzes (práctica: 5, evaluación: 10) ----------
 
 function split(all: QuizPregunta[]) {
-  return { practica: all.slice(0, 5), evaluacion: all.slice(5, 15) };
+  return { practica: all.slice(0, 5), evaluacion: all.slice(5) };
 }
 
 const QUIZ_METEOROLOGIA: QuizPregunta[] = [
@@ -400,6 +400,8 @@ const QUIZ_METEOROLOGIA: QuizPregunta[] = [
   { id: "met-q13", pregunta: "¿Qué sistema alerta a los controladores sobre wind shear de bajo nivel?", opciones: ["LLWAS", "METAR", "NOTAM", "TAF"], correcta: 0 },
   { id: "met-q14", pregunta: "El hielo de carburador puede ocurrir:", opciones: ["Solo bajo cero", "Incluso con temperaturas exteriores positivas", "Solo en vuelo IFR", "Nunca en motores de pistón"], correcta: 1 },
   { id: "met-q15", pregunta: "¿Qué código de cobertura indica cielo despejado?", opciones: ["SKC/CLR", "BKN", "OVC", "SCT"], correcta: 0 },
+  { id: "met-q16", pregunta: "Comparando un METAR con 'BKN008' y visibilidad 3SM contra otro con 'SCT025' y visibilidad 10SM, ¿cuál representa mayor riesgo para un vuelo VFR por debajo de 3,000 ft AGL en espacio no controlado?", opciones: ["El segundo, porque SCT indica más nubes que BKN", "El primero, porque nubes rotas a solo 800 ft probablemente incumplan el mínimo de separación vertical VFR", "Ambos son igual de seguros para volar", "Ninguno afecta la decisión de volar VFR"], correcta: 1 },
+  { id: "met-q17", pregunta: "Un frente frío se acerca rápido y, el mismo día, un frente cálido se acerca lento por otra dirección. ¿Cuál exige una decisión de vuelo más urgente y por qué?", opciones: ["El cálido, porque siempre trae peor clima que el frío", "El frío, porque su avance rápido puede traer clima violento con poco margen de tiempo para decidir antes de que llegue", "Ninguno afecta la planificación del vuelo", "Se decide igual sin importar qué tipo de frente sea"], correcta: 1 },
 ];
 
 const QUIZ_NAVEGACION: QuizPregunta[] = [
@@ -418,6 +420,8 @@ const QUIZ_NAVEGACION: QuizPregunta[] = [
   { id: "nav-q13", pregunta: "Si estás en el radial 090 de un VOR y quieres volar TO la estación, tu curso debe ser aproximadamente:", opciones: ["090°", "180°", "270°", "360°"], correcta: 2 },
   { id: "nav-q14", pregunta: "El ángulo de intercepción recomendado para interceptar un radial es de:", opciones: ["10°", "30°", "60°", "90°"], correcta: 1 },
   { id: "nav-q15", pregunta: "Un minuto de latitud medido verticalmente en una carta equivale aproximadamente a:", opciones: ["Una milla náutica", "Una milla terrestre", "Diez millas náuticas", "No equivale a nada útil"], correcta: 0 },
+  { id: "nav-q16", pregunta: "Usas fijación cruzada con dos VOR: el radial A lo trazaste correctamente, pero el radial B lo leíste con 10° de error. ¿Qué le pasa a tu posición fijada en la carta?", opciones: ["No se ve afectada, un solo radial con error no importa", "Se desplaza a lo largo del radial B, tanto más lejos del punto real cuanto mayor sea tu distancia a esa estación", "El error se cancela automáticamente entre los dos radiales", "Solo afecta si ambos radiales tienen error simultáneamente"], correcta: 1 },
+  { id: "nav-q17", pregunta: "Vuelas sin DME y necesitas confirmar tu distancia a un aeropuerto. Comparando la navegación por estima (dead reckoning) contra una fijación cruzada con dos VOR, ¿cuál te da mayor precisión y por qué?", opciones: ["Estima, porque no depende de señales externas que puedan fallar", "Fijación cruzada, porque ubica tu posición real con dos referencias externas en vez de acumular el error de tiempo y viento estimado", "Ambas tienen exactamente la misma precisión", "Ninguna es confiable si no tienes DME a bordo"], correcta: 1 },
 ];
 
 const QUIZ_CARTOGRAFIA: QuizPregunta[] = [
@@ -436,6 +440,8 @@ const QUIZ_CARTOGRAFIA: QuizPregunta[] = [
   { id: "cart-q13", pregunta: "Antes de acercarte a espacio aéreo controlado, debes identificar en la carta:", opciones: ["El precio del combustible local", "Qué frecuencia contactar y en qué punto de tu ruta", "El color del avión permitido", "Nada en particular"], correcta: 1 },
   { id: "cart-q14", pregunta: "¿Con qué símbolo se marcan los Puntos de Notificación VFR en la carta?", opciones: ["Un círculo azul relleno", "Una estrella o triángulo magenta", "Una línea roja punteada", "Un cuadrado verde"], correcta: 1 },
   { id: "cart-q15", pregunta: "Las Cartas de Área Terminal (TAC) se usan principalmente para:", opciones: ["Vuelo oceánico", "Zonas de espacio aéreo denso alrededor de grandes ciudades", "Solo aterrizajes de emergencia", "Rutas de alta altitud exclusivamente"], correcta: 1 },
+  { id: "cart-q16", pregunta: "Tu ruta cruza primero una zona con MEF de 4,500 ft y luego otra con MEF de 6,800 ft. Si mantienes una sola altitud de crucero de 5,000 ft en toda la ruta, ¿qué tramo representa un riesgo?", opciones: ["Ninguno, 5,000 ft siempre es seguro en cualquier cuadrante", "El segundo tramo, porque 5,000 ft queda por debajo del MEF de 6,800 ft de esa zona", "El primer tramo, porque el MEF es un límite máximo, no mínimo", "Debes descender antes de llegar al segundo tramo"], correcta: 1 },
+  { id: "cart-q17", pregunta: "Comparando un aeropuerto marcado en magenta contra uno en azul en la carta, si tu ruta pasa cerca de ambos, ¿qué diferencia en tus comunicaciones debes anticipar?", opciones: ["Ninguna, el color no tiene relación con las comunicaciones", "El azul (con torre) probablemente exige contacto por radio antes de acercarte; el magenta (sin torre) usa CTAF sin autorización obligatoria", "El magenta siempre requiere autorización explícita de control", "Ambos son operacionalmente idénticos"], correcta: 1 },
 ];
 
 const QUIZ_COMUNICACIONES: QuizPregunta[] = [
@@ -454,6 +460,8 @@ const QUIZ_COMUNICACIONES: QuizPregunta[] = [
   { id: "com-q13", pregunta: "Al acercarte a un destino en espacio aéreo controlado, usualmente contactas primero a:", opciones: ["Torre", "Aproximación", "CTAF", "Ninguna estación"], correcta: 1 },
   { id: "com-q14", pregunta: "'Roger' significa:", opciones: ["Voy a cumplir la instrucción", "Recibido, entendido, sin implicar que cumplirás", "Repita el mensaje", "Autorizado a proceder"], correcta: 1 },
   { id: "com-q15", pregunta: "La disciplina de radio existe principalmente para:", opciones: ["Sonar profesional", "Prevenir errores y malentendidos que históricamente causan incidentes", "Llenar tiempo en la frecuencia", "Impresionar a otros pilotos"], correcta: 1 },
+  { id: "com-q16", pregunta: "Comparando 'Wilco' con 'Roger' en respuesta a una instrucción de ATC, ¿en qué situación responder solo 'Roger' podría generar un malentendido peligroso?", opciones: ["Nunca genera problema, son sinónimos exactos", "Si ATC da una instrucción que requiere una acción (como mantener una altitud) y respondes 'Roger', dejas ambigüedad sobre si vas a cumplirla", "'Roger' siempre implica más autoridad que 'Wilco'", "'Wilco' solo se usa en emergencias"], correcta: 1 },
+  { id: "com-q17", pregunta: "Dos aeronaves llaman a la torre casi al mismo tiempo y sus transmisiones se traslapan (stepping on). Comparando transmitir de inmediato de nuevo contra esperar unos segundos, ¿cuál es la práctica correcta y por qué?", opciones: ["Transmitir de inmediato para no perder el turno", "Esperar y confirmar que la frecuencia esté libre, ya que retransmitir de inmediato puede volver a bloquearla con otra transmisión", "Ambas opciones son igual de válidas", "Cambiar de frecuencia sin avisar a nadie"], correcta: 1 },
 ];
 
 const QUIZ_INSTRUMENTOS: QuizPregunta[] = [
@@ -472,6 +480,8 @@ const QUIZ_INSTRUMENTOS: QuizPregunta[] = [
   { id: "ins-q13", pregunta: "El DME calcula la distancia mediante:", opciones: ["El consumo de combustible", "El tiempo que tarda la señal en ir y regresar", "La velocidad del viento", "El ángulo de la aguja del ADF"], correcta: 1 },
   { id: "ins-q14", pregunta: "IAS, CAS y TAS se diferencian en que:", opciones: ["Son exactamente lo mismo", "TAS es la velocidad verdadera, ajustada por la densidad del aire a tu altitud", "CAS solo se usa en tierra", "IAS es siempre mayor que TAS"], correcta: 1 },
   { id: "ins-q15", pregunta: "¿Qué error puede sufrir un giróscopo mecánico como el del horizonte artificial?", opciones: ["Precesión", "Oxidación", "Sobrecarga eléctrica", "Ninguno, es infalible"], correcta: 0 },
+  { id: "ins-q16", pregunta: "Comparando el retraso del VSI (6-9 segundos) contra el horizonte artificial (prácticamente instantáneo), ¿por qué al corregir una actitud debes confiar primero en el horizonte artificial?", opciones: ["Porque el VSI nunca funciona correctamente", "Porque el VSI reacciona con retraso a los cambios de actitud; corregir basado solo en él produce sobre-corrección, mientras el horizonte muestra la actitud real de inmediato", "Porque el horizonte artificial mide presión estática", "No hay diferencia práctica entre ambos instrumentos"], correcta: 1 },
+  { id: "ins-q17", pregunta: "Tu horizonte artificial falla por una bomba de vacío dañada, pero el coordinador de viraje (eléctrico) sigue funcionando. ¿Qué combinación de instrumentos usarías y por qué es más confiable que uno solo?", opciones: ["Solo el altímetro, ignorando los demás instrumentos", "Coordinador de viraje + altímetro + compás, porque juntos dan tasa de giro, tendencia de altitud y rumbo, compensando la pérdida del giróscopo de vacío", "Ninguna combinación sirve sin el horizonte artificial", "Solo el velocímetro es suficiente para mantener control"], correcta: 1 },
 ];
 
 const QUIZ_RENDIMIENTO: QuizPregunta[] = [
@@ -490,6 +500,8 @@ const QUIZ_RENDIMIENTO: QuizPregunta[] = [
   { id: "ren-q13", pregunta: "La velocidad de rotación se abrevia:", opciones: ["Vr", "Vx", "Va", "Vs0"], correcta: 0 },
   { id: "ren-q14", pregunta: "El componente de viento cruzado es mayor cuando el ángulo del viento respecto a la pista se acerca a:", opciones: ["0°", "45°", "90°", "180°"], correcta: 2 },
   { id: "ren-q15", pregunta: "La altitud de densidad afecta principalmente:", opciones: ["Solo la temperatura de cabina", "El rendimiento real del motor y las alas", "El color del combustible", "Nada relevante para el despegue"], correcta: 1 },
+  { id: "ren-q16", pregunta: "Dos despegues con el mismo peso: uno a nivel del mar en día fresco, otro en Toluca (8,466 ft) en día caluroso. ¿Cuál requiere mayor distancia de pista y qué dos factores se combinan para causarlo?", opciones: ["El de nivel del mar, porque hay más oxígeno disponible ahí", "El de Toluca, porque la alta elevación y la alta temperatura se combinan para aumentar la altitud de densidad, reduciendo el rendimiento del motor y las alas", "Ambos requieren exactamente la misma distancia", "La temperatura no afecta el rendimiento de despegue"], correcta: 1 },
+  { id: "ren-q17", pregunta: "Comparando un aterrizaje con viento de cola de 10 nudos contra uno con viento en calma, ¿qué cambia y por qué NO deberías simplemente volar más lento para compensar?", opciones: ["No cambia nada, el viento de cola no afecta aterrizajes", "La distancia de frenado aumenta 20-30% por la mayor velocidad de tierra; volar más lento con viento de cola aumenta el riesgo de pérdida antes de tocar tierra", "Siempre debes aterrizar más rápido con viento de cola sin excepción", "El viento de cola reduce la distancia de aterrizaje"], correcta: 1 },
 ];
 
 const QUIZ_OPERACION: QuizPregunta[] = [
@@ -508,6 +520,8 @@ const QUIZ_OPERACION: QuizPregunta[] = [
   { id: "op-q13", pregunta: "Existen checklists:", opciones: ["Solo de emergencia", "Normales, Anormales y de Emergencia", "Solo normales", "No existen categorías"], correcta: 1 },
   { id: "op-q14", pregunta: "Durante la carrera de despegue, si algo se ve mal en los instrumentos del motor:", opciones: ["Continuar siempre el despegue", "Aún hay pista disponible para abortar", "Ignorarlo y revisar después", "Aumentar potencia al máximo"], correcta: 1 },
   { id: "op-q15", pregunta: "Después de aterrizar y estacionar, el procedimiento de apagado incluye:", opciones: ["Mezcla a corte y magnetos apagados", "Dejar el motor encendido", "Solo cerrar la puerta", "Nada en particular"], correcta: 0 },
+  { id: "op-q16", pregunta: "Durante el arranque, en un caso la presión de aceite no sube en los primeros segundos; en otro, sube normal pero las RPM son inestables. ¿Cuál exige apagar de inmediato y cuál permite observar brevemente?", opciones: ["Ambas exigen apagar de inmediato sin excepción", "La falta de presión de aceite exige apagar de inmediato por riesgo de daño al motor; unas RPM inestables pueden observarse unos segundos antes de decidir", "Ninguna de las dos requiere acción inmediata", "Las RPM inestables siempre son más graves que la falta de presión de aceite"], correcta: 1 },
+  { id: "op-q17", pregunta: "Comparando una aproximación estabilizada contra una inestable a 200 pies de altura, ¿qué decisión corresponde a cada una y por qué la indecisión es el mayor riesgo en la segunda?", opciones: ["Continuar el aterrizaje en ambos casos por igual", "Si está estabilizada, continuar; si está inestable, ejecutar un go-around sin dudar — dudar mientras se acerca el suelo reduce el margen para corregir o abortar con seguridad", "Siempre abortar sin importar la estabilización", "La estabilización no afecta la decisión de aterrizar"], correcta: 1 },
 ];
 
 const QUIZ_ESPACIOS: QuizPregunta[] = [
@@ -526,6 +540,8 @@ const QUIZ_ESPACIOS: QuizPregunta[] = [
   { id: "esp-q13", pregunta: "El espacio Clase E puede comenzar en superficie, a 700 pies AGL o a:", opciones: ["1,200 pies AGL", "5,000 pies AGL", "18,000 pies", "No tiene otra opción"], correcta: 0 },
   { id: "esp-q14", pregunta: "La única regla de separación en espacio Clase G es:", opciones: ["Autorización de control", "'Ve y evita'", "Contacto obligatorio por radio", "No existe ninguna regla"], correcta: 1 },
   { id: "esp-q15", pregunta: "Antes de asumir que una Restringida puede cruzarse libremente fuera de horario, debes:", opciones: ["Nada, simplemente cruzar", "Verificar los NOTAMs vigentes", "Pedir permiso a otro piloto", "Esperar la noche"], correcta: 1 },
+  { id: "esp-q16", pregunta: "Tu ruta cruza primero espacio Clase C y luego Clase D fuera del horario de la torre (que revierte a E/G). ¿En cuál tramo necesitas contacto bidireccional establecido antes de entrar y en cuál no?", opciones: ["En ambos tramos necesitas autorización explícita", "En el tramo Clase C necesitas contacto bidireccional establecido antes de entrar; en el tramo ahora E/G no se requiere autorización", "En ninguno se requiere contacto por radio", "Solo el tramo Clase D requiere autorización explícita"], correcta: 1 },
+  { id: "esp-q17", pregunta: "Comparando un Área Restringida activa fuera de su horario publicado contra una Prohibida en cualquier momento, ¿qué verificación previa es indispensable antes de asumir que la Restringida está libre para cruzar?", opciones: ["Ninguna, si no está en horario siempre está libre", "Verificar los NOTAMs vigentes, ya que el horario publicado puede cambiar o extenderse; una Prohibida nunca es cruzable para civiles", "Preguntar a otro piloto en la frecuencia", "Ambas siempre están disponibles para cruzar libremente"], correcta: 1 },
 ];
 
 const QUIZ_REGLAMENTACION: QuizPregunta[] = [
@@ -544,6 +560,8 @@ const QUIZ_REGLAMENTACION: QuizPregunta[] = [
   { id: "reg-q13", pregunta: "El vuelo IFR requiere mantener competencia (currency) mediante:", opciones: ["Nada adicional a la licencia", "Un mínimo de aproximaciones y procedimientos practicados recientemente", "Solo volar una vez al año", "Un examen médico mensual"], correcta: 1 },
   { id: "reg-q14", pregunta: "Para VFR nocturno o vuelo IFR, la reserva mínima común de combustible aumenta a:", opciones: ["15 minutos", "45 minutos", "3 horas", "No cambia respecto al VFR diurno"], correcta: 1 },
   { id: "reg-q15", pregunta: "Si el pronóstico no alcanza los mínimos IFR publicados de destino, la regulación exige:", opciones: ["Volar de todas formas", "Planificar un alterno adecuado", "Cancelar toda la temporada de vuelos", "Ninguna acción especial"], correcta: 1 },
+  { id: "reg-q16", pregunta: "Comparando la reserva VFR diurna (30 min) contra la nocturna (45 min), si tu ETA de un vuelo nocturno planeado al límite se recorre 20 minutos por viento en contra, ¿qué debiste haber hecho al planear?", opciones: ["Nada, la reserva mínima siempre alcanza sin importar el retraso", "Agregar un margen adicional de combustible más allá del mínimo legal, anticipando retrasos, sobre todo de noche donde el margen ya es más ajustado", "Volar más rápido para compensar automáticamente el retraso", "El retraso no afecta los requisitos de combustible"], correcta: 1 },
+  { id: "reg-q17", pregunta: "Comparando la progresión Alumno → PPL → CPL, si un cadete quiere volar de noche con pasajeros antes de tener 40 horas totales, ¿qué le falta y por qué importa el orden de los requisitos?", opciones: ["Nada, puede llevar pasajeros sin licencia si tiene suficiente experiencia", "Le falta completar el PPL (que exige aproximadamente 40 horas), ya que llevar pasajeros requiere una licencia vigente, no solo horas acumuladas como alumno", "Solo necesita aprobar el examen médico", "El orden de los requisitos no importa en la práctica"], correcta: 1 },
 ];
 
 const QUIZ_IFR: QuizPregunta[] = [
@@ -562,6 +580,8 @@ const QUIZ_IFR: QuizPregunta[] = [
   { id: "ifr-q13", pregunta: "Las Aerovías Victor se definen por:", opciones: ["Coordenadas GPS únicamente", "Radiales VOR, hasta FL180", "Rutas Jet sobre FL450", "No tienen definición estándar"], correcta: 1 },
   { id: "ifr-q14", pregunta: "¿Qué nivel de aproximación RNAV ofrece los mínimos más bajos, comparables a un ILS CAT I?", opciones: ["LNAV", "LNAV/VNAV", "LPV", "VOR Approach"], correcta: 2 },
   { id: "ifr-q15", pregunta: "En un holding, la entrada donde te alejas en ángulo antes de virar hacia el fix se llama:", opciones: ["Directa", "Paralela", "Teardrop", "No existe ese tipo de entrada"], correcta: 2 },
+  { id: "ifr-q16", pregunta: "Comparando una aproximación ILS (con DA) contra una VOR (con MDA), si llegas a tu altitud mínima sin referencias visuales en ambos casos, ¿qué diferencia hay en cuánto tiempo puedes permanecer en esa altitud antes de decidir?", opciones: ["Ninguna diferencia, ambas son idénticas en este aspecto", "En la DA debes iniciar la aproximación frustrada de inmediato al alcanzarla; en la MDA puedes continuar nivelado brevemente hasta el punto de aproximación frustrada, buscando referencias", "La MDA siempre exige acción inmediata y la DA no", "Puedes descender por debajo de cualquiera de las dos sin problema"], correcta: 1 },
+  { id: "ifr-q17", pregunta: "Comparando una SID con una STAR, si ATC te cambia de pista antes del despegue después de asignarte una SID, ¿qué parte de tu briefing original ya no es válida?", opciones: ["Nada cambia, las SID son iguales sin importar la pista", "La ruta y las restricciones de altitud de la SID pueden cambiar según la pista de salida; debes revisar la nueva SID asignada antes de rodar", "Solo el código squawk cambia con la pista", "El cambio de pista nunca afecta el procedimiento de salida"], correcta: 1 },
 ];
 
 const QUIZ_FUNDAMENTOS: QuizPregunta[] = [
@@ -580,16 +600,60 @@ const QUIZ_FUNDAMENTOS: QuizPregunta[] = [
   { id: "fun-q13", pregunta: "Además del timón de dirección, los pedales controlan en tierra:", opciones: ["La potencia del motor", "El frenado diferencial y la dirección de la rueda de nariz", "Los flaps", "El horizonte artificial"], correcta: 1 },
   { id: "fun-q14", pregunta: "¿Qué instrumento muestra la actitud respecto al horizonte real?", opciones: ["Altímetro", "Horizonte artificial (Attitude Indicator)", "Indicador de rumbo", "Variómetro"], correcta: 1 },
   { id: "fun-q15", pregunta: "Volar es, en esencia:", opciones: ["Un truco de velocidad pura", "Un equilibrio dinámico de fuerzas", "Un efecto exclusivo del motor", "Un fenómeno sin explicación física"], correcta: 1 },
+  { id: "fun-q16", pregunta: "Comparando dos aviones idénticos a la misma velocidad, uno con mayor ángulo de ataque que el otro, ¿cuál genera más sustentación y qué riesgo aumenta si ese ángulo sigue creciendo?", opciones: ["El de menor ángulo, y el riesgo es quedarse sin combustible", "El de mayor ángulo genera más sustentación hasta el ángulo crítico, después del cual el ala entra en pérdida", "Ambos generan exactamente la misma sustentación siempre", "El ángulo de ataque no afecta la sustentación generada"], correcta: 1 },
+  { id: "fun-q17", pregunta: "En un viraje, si aplicas solo alerón sin nada de timón, ¿qué efecto secundario no deseado aparece y por qué se usa el timón para corregirlo?", opciones: ["Ninguno, los alerones son suficientes por sí solos", "Aparece guiñada adversa porque el alerón que sube genera más resistencia que el que baja; el timón la compensa", "El avión pierde toda su sustentación de inmediato", "El motor se apaga automáticamente al virar"], correcta: 1 },
+];
+
+const QUIZ_AERODINAMICA: QuizPregunta[] = [
+  { id: "aero-q1", pregunta: "Para generar la misma sustentación a menor velocidad, el ala necesita:", opciones: ["Un ángulo de ataque mayor", "Un ángulo de ataque menor", "La velocidad no se relaciona con el ángulo de ataque", "Solo depende de la potencia del motor"], correcta: 0 },
+  { id: "aero-q2", pregunta: "El factor de carga aproximado en un viraje coordinado con 60° de inclinación es:", opciones: ["1G", "1.4G", "2G", "4G"], correcta: 2 },
+  { id: "aero-q3", pregunta: "¿Qué es la pérdida aerodinámica (stall)?", opciones: ["Cuando el motor se apaga en vuelo", "Cuando el flujo de aire se separa del ala al superar el ángulo crítico de ataque", "Cuando el avión vuela demasiado rápido", "Cuando falla el tren de aterrizaje"], correcta: 1 },
+  { id: "aero-q4", pregunta: "La velocidad de pérdida aumenta cuando:", opciones: ["Disminuye el peso de la aeronave", "Aumenta el factor de carga, como en un viraje pronunciado", "Se extienden completamente los flaps", "El avión vuela en línea recta y nivelada"], correcta: 1 },
+  { id: "aero-q5", pregunta: "El efecto suelo (ground effect) ocurre:", opciones: ["Solo durante el vuelo de crucero a gran altitud", "Cerca del suelo, reduciendo la resistencia inducida del ala", "Únicamente con el tren de aterrizaje retraído", "Nunca afecta el rendimiento del avión"], correcta: 1 },
+  { id: "aero-q6", pregunta: "La resistencia inducida es mayor cuando:", opciones: ["El avión vuela a muy alta velocidad", "El ángulo de ataque es alto, como a baja velocidad", "Los flaps están completamente retraídos", "El avión está en picada pronunciada"], correcta: 1 },
+  { id: "aero-q7", pregunta: "El P-factor (precesión asimétrica de la hélice), en un motor de giro horario visto desde la cabina, tiende a guiñar el avión hacia:", opciones: ["La izquierda, en ángulos de ataque altos y alta potencia", "La derecha, sin importar la potencia aplicada", "Ninguna dirección, no tiene efecto direccional", "Solo afecta a motores turbohélice"], correcta: 0 },
+  { id: "aero-q8", pregunta: "Las 'tendencias de giro a la izquierda' en un avión de hélice de un motor combinan:", opciones: ["Únicamente el P-factor", "Torque, precesión giroscópica, P-factor y el flujo espiral de la hélice", "Solo el flujo espiral de la hélice", "Ninguna tendencia relevante en aviones modernos"], correcta: 1 },
+  { id: "aero-q9", pregunta: "Una barrena (spin) ocurre cuando:", opciones: ["El avión vuela a velocidad excesiva", "Una pérdida asimétrica hace que un ala se pierda antes que la otra, entrando en rotación autosostenida", "Se extienden los flaps en crucero", "El motor pierde potencia de forma gradual"], correcta: 1 },
+  { id: "aero-q10", pregunta: "Al aumentar el ángulo de ataque, el centro de presión en un perfil convencional tiende a:", opciones: ["Moverse hacia adelante", "Moverse hacia atrás", "Permanecer siempre fijo", "Desaparecer por completo"], correcta: 0 },
+  { id: "aero-q11", pregunta: "Los slots y slats en el borde de ataque del ala sirven para:", opciones: ["Aumentar la resistencia sin ningún beneficio", "Retrasar la separación del flujo de aire, permitiendo mayor ángulo de ataque antes de la pérdida", "Reducir la sustentación generada por el ala", "Cumplir una función únicamente estética"], correcta: 1 },
+  { id: "aero-q12", pregunta: "La velocidad de maniobra (Va) representa:", opciones: ["La velocidad máxima estructural del avión", "La velocidad por debajo de la cual el avión entra en pérdida antes de sufrir daño estructural ante una ráfaga o maniobra brusca", "La velocidad mínima de control direccional", "La velocidad óptima de crucero"], correcta: 1 },
+  { id: "aero-q13", pregunta: "Un ala con mayor alargamiento (aspect ratio) generalmente tiene:", opciones: ["Menor resistencia inducida y mejor eficiencia en planeo", "Mayor resistencia inducida en todos los casos", "Menor sustentación total generada", "Ninguna ventaja aerodinámica relevante"], correcta: 0 },
+  { id: "aero-q14", pregunta: "Durante un despegue con viento cruzado, ¿qué tendencia direccional se suma a las tendencias de giro a la izquierda normales?", opciones: ["Ninguna, el viento cruzado no afecta la dirección en tierra", "El viento cruzado empuja la cola y el avión tiende a virar hacia el viento (weathervaning)", "El avión siempre vira en dirección contraria al viento", "Solo afecta la dirección una vez en el aire"], correcta: 1 },
+  { id: "aero-q15", pregunta: "El trim (compensador) del elevador sirve para:", opciones: ["Aumentar la potencia disponible del motor", "Reducir la fuerza que el piloto debe sostener en el control para mantener una actitud deseada", "Controlar la guiñada del avión", "Retraer el tren de aterrizaje"], correcta: 1 },
+  { id: "aero-q16", pregunta: "Comparando un ala de mayor alargamiento (aspect ratio) contra una de menor alargamiento, a la misma velocidad y ángulo de ataque, ¿cuál tiene menor resistencia inducida y por qué eso mejora el planeo?", opciones: ["La de menor alargamiento, porque genera menos sustentación total", "La de mayor alargamiento, porque distribuye mejor el flujo cerca de las puntas, reduciendo los vórtices y la resistencia inducida", "Ambas tienen exactamente la misma resistencia inducida", "El alargamiento no tiene relación con la resistencia inducida"], correcta: 1 },
+  { id: "aero-q17", pregunta: "Comparando un despegue a alta potencia y ángulo de ataque alto contra un crucero nivelado a potencia reducida, ¿en cuál las tendencias de giro a la izquierda (P-factor, torque, precesión, flujo espiral) son más pronunciadas?", opciones: ["En crucero, porque la velocidad es mayor", "En el despegue, porque la combinación de alta potencia y alto ángulo de ataque intensifica el P-factor, el torque y el flujo espiral simultáneamente", "Son idénticas en ambos casos, sin diferencia", "Las tendencias de giro a la izquierda no dependen de la potencia ni el ángulo de ataque"], correcta: 1 },
+];
+
+const QUIZ_VFR: QuizPregunta[] = [
+  { id: "vfr-q1", pregunta: "En espacio aéreo controlado por debajo de 10,000 ft MSL, el mínimo de visibilidad VFR es:", opciones: ["1 milla", "3 millas", "5 millas", "No existe un mínimo definido"], correcta: 1 },
+  { id: "vfr-q2", pregunta: "Los mínimos de separación de nubes en espacio controlado por debajo de 10,000 ft son:", opciones: ["Libre de nubes en todo momento", "500 ft por debajo, 1,000 ft por encima y 2,000 ft de separación horizontal", "100 ft en cualquier dirección", "No se requiere separación de nubes"], correcta: 1 },
+  { id: "vfr-q3", pregunta: "En espacio no controlado (Clase G) de día, por debajo de 1,200 ft AGL, el mínimo es:", opciones: ["1 milla de visibilidad y libre de nubes", "5 millas de visibilidad siempre", "10 millas de visibilidad", "No hay ningún mínimo en Clase G"], correcta: 0 },
+  { id: "vfr-q4", pregunta: "La altura estándar del tramo de 'viento en cola' (downwind) en un patrón de tráfico es típicamente:", opciones: ["500 ft AGL", "1,000 ft AGL", "3,000 ft AGL", "No existe una altura estándar"], correcta: 1 },
+  { id: "vfr-q5", pregunta: "El patrón de tráfico estándar utiliza virajes hacia:", opciones: ["La derecha siempre, sin excepción", "La izquierda, salvo que se indique lo contrario", "Alternando en cada vuelta al patrón", "Depende únicamente de la dirección del viento"], correcta: 1 },
+  { id: "vfr-q6", pregunta: "El tramo 'base' del patrón de tráfico es:", opciones: ["Paralelo a la pista, en dirección de aterrizaje", "Perpendicular a la pista, justo antes de virar a 'final'", "El primer tramo después del despegue", "Lo mismo que el tramo 'final'"], correcta: 1 },
+  { id: "vfr-q7", pregunta: "Al entrar a un patrón de tráfico no controlado, la entrada recomendada es:", opciones: ["Directa a 'final' sin anunciarse", "A 45° hacia el tramo de viento en cola, integrándose al circuito establecido", "Siempre desde el tramo de base", "Cualquier ángulo, sin necesidad de comunicar"], correcta: 1 },
+  { id: "vfr-q8", pregunta: "Si el techo de nubes reportado es de solo 900 ft AGL, ¿generalmente puedes operar con seguridad en el patrón de tráfico?", opciones: ["No, un techo tan bajo rara vez deja margen suficiente para un patrón seguro", "Sí, sin ninguna restricción", "Solo si es de noche", "Solo con autorización verbal de otro piloto"], correcta: 0 },
+  { id: "vfr-q9", pregunta: "El reporte de posición 'entrando en viento en cola' se hace generalmente:", opciones: ["Después de haber aterrizado", "Al establecerte en el tramo de viento en cola, antes de virar a base", "Solo si el aeropuerto tiene torre", "Nunca es necesario reportarlo"], correcta: 1 },
+  { id: "vfr-q10", pregunta: "Antes de un vuelo VFR, además de verificar los mínimos meteorológicos, debes revisar:", opciones: ["Únicamente el color del avión", "NOTAMs vigentes, combustible con reserva adecuada, y peso y balance", "Nada adicional si el clima está despejado", "Solo la hora programada de salida"], correcta: 1 },
+  { id: "vfr-q11", pregunta: "Comparando los mínimos VFR en espacio controlado contra los de Clase G por debajo de 1,200 ft AGL de día, ¿cuál es más permisivo y por qué existe esa diferencia?", opciones: ["El controlado es más permisivo porque hay menos tráfico", "Clase G es más permisivo porque tiene menor densidad de tráfico y ATC no gestiona la separación ahí", "Ambos tienen exactamente los mismos mínimos", "No existe ninguna diferencia real entre ambos espacios"], correcta: 1 },
+  { id: "vfr-q12", pregunta: "Entras a 'viento en cola' mientras otro avión reporta estar en 'final' del mismo patrón. ¿Qué debes hacer?", opciones: ["Acelerar para intentar aterrizar antes que él", "Ceder el paso y ajustar tu posición en el patrón para mantener separación segura", "Ignorarlo, tú ya estás dentro del patrón establecido", "Abandonar el aeropuerto y desviarte a otro sin evaluar la situación"], correcta: 1 },
+  { id: "vfr-q13", pregunta: "El tramo 'final' del patrón de tráfico es:", opciones: ["El primer tramo después del despegue", "El tramo alineado con la pista, justo antes de aterrizar", "Lo mismo que el tramo de 'viento en cola'", "Un tramo opcional que puede omitirse"], correcta: 1 },
+  { id: "vfr-q14", pregunta: "Un 'go-around' desde el patrón de tráfico se ejecuta cuando:", opciones: ["En cada aproximación, sin excepción", "La aproximación no está estabilizada o la pista no está despejada para aterrizar con seguridad", "Únicamente si lo indica la torre", "Nunca es necesario en aeropuertos no controlados"], correcta: 1 },
+  { id: "vfr-q15", pregunta: "¿Qué diferencia principal hay entre los mínimos meteorológicos VFR de día y de noche?", opciones: ["No existe ninguna diferencia entre ambos", "Los mínimos nocturnos suelen ser más estrictos, porque la referencia visual del horizonte y el terreno es más limitada", "Los mínimos diurnos son siempre más estrictos que los nocturnos", "De noche no se requiere ningún mínimo meteorológico"], correcta: 1 },
+  { id: "vfr-q16", pregunta: "Comparando volar en espacio Clase G por debajo de 1,200 ft AGL de día contra hacerlo de noche en el mismo espacio, ¿qué cambia en los mínimos y por qué?", opciones: ["No cambia nada entre el día y la noche", "De noche los mínimos son más exigentes, porque la referencia visual del horizonte y el terreno es mucho más limitada", "De día los mínimos son más estrictos que de noche", "De noche no se permite volar VFR bajo ninguna circunstancia"], correcta: 1 },
+  { id: "vfr-q17", pregunta: "Comparando una entrada directa a 'final' sin anunciarte contra una entrada estándar a 45° hacia el viento en cola, ¿por qué la segunda reduce el riesgo de colisión en un aeropuerto sin torre?", opciones: ["Ambas son igual de seguras, es solo preferencia personal", "La entrada a 45° te integra en la secuencia visible del patrón donde otros pilotos ya esperan verte, mientras una entrada directa puede sorprender a quien ya está en el circuito", "La entrada directa a final siempre es preferible por ser más rápida", "El ángulo de entrada no afecta el riesgo de colisión"], correcta: 1 },
 ];
 
 export const MODULE_PRACTICA: Record<string, QuizPregunta[]> = {
   fundamentos: split(QUIZ_FUNDAMENTOS).practica,
   meteorologia: split(QUIZ_METEOROLOGIA).practica,
+  aerodinamica: split(QUIZ_AERODINAMICA).practica,
   navegacion: split(QUIZ_NAVEGACION).practica,
   cartografia: split(QUIZ_CARTOGRAFIA).practica,
   comunicaciones: split(QUIZ_COMUNICACIONES).practica,
   instrumentos: split(QUIZ_INSTRUMENTOS).practica,
   rendimiento: split(QUIZ_RENDIMIENTO).practica,
+  vfr: split(QUIZ_VFR).practica,
   operacion: split(QUIZ_OPERACION).practica,
   "espacios-aereos": split(QUIZ_ESPACIOS).practica,
   reglamentacion: split(QUIZ_REGLAMENTACION).practica,
@@ -599,11 +663,13 @@ export const MODULE_PRACTICA: Record<string, QuizPregunta[]> = {
 export const MODULE_EVALUACION: Record<string, QuizPregunta[]> = {
   fundamentos: split(QUIZ_FUNDAMENTOS).evaluacion,
   meteorologia: split(QUIZ_METEOROLOGIA).evaluacion,
+  aerodinamica: split(QUIZ_AERODINAMICA).evaluacion,
   navegacion: split(QUIZ_NAVEGACION).evaluacion,
   cartografia: split(QUIZ_CARTOGRAFIA).evaluacion,
   comunicaciones: split(QUIZ_COMUNICACIONES).evaluacion,
   instrumentos: split(QUIZ_INSTRUMENTOS).evaluacion,
   rendimiento: split(QUIZ_RENDIMIENTO).evaluacion,
+  vfr: split(QUIZ_VFR).evaluacion,
   operacion: split(QUIZ_OPERACION).evaluacion,
   "espacios-aereos": split(QUIZ_ESPACIOS).evaluacion,
   reglamentacion: split(QUIZ_REGLAMENTACION).evaluacion,

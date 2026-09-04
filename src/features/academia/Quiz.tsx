@@ -50,7 +50,7 @@ export function Quiz({
 
   if (finished) {
     return (
-      <div className="flex flex-col items-center rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-12 text-center">
+      <div className="animate-result-in flex flex-col items-center rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-12 text-center">
         <div
           className={`flex h-16 w-16 items-center justify-center rounded-full border-2 ${
             passed ? "border-gold-500 bg-gold-500/10 text-gold-400" : "border-red-500/50 bg-red-500/10 text-red-400"

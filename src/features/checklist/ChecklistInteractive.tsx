@@ -43,18 +43,18 @@ function FaseCard({ fase }: { fase: ChecklistFase }) {
             <button
               key={item.id}
               onClick={() => toggle(item.id)}
-              className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-all duration-150 ${
+              className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-[border-color,background-color,color] duration-150 ${
                 isChecked
                   ? "border-gold-500/40 bg-gold-500/10 text-white/50 line-through decoration-gold-500/50"
-                  : "border-white/10 bg-white/[0.02] text-white/80 hover:border-gold-500/30"
+                  : "border-white/10 bg-white/[0.02] text-white/80 [@media(hover:hover)_and_(pointer:fine)]:hover:border-gold-500/30"
               }`}
             >
               <span
-                className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors duration-150 ease-out ${
                   isChecked ? "border-gold-500 bg-gold-500 text-navy-950" : "border-white/30"
                 }`}
               >
-                {isChecked && <Check size={11} strokeWidth={3} />}
+                {isChecked && <Check size={11} strokeWidth={3} className="animate-check-in" />}
               </span>
               {item.texto}
             </button>

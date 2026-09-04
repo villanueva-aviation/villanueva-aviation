@@ -44,12 +44,12 @@ export function Academia() {
 
             const card = (
               <div
-                className={`group flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-300 ${
-                  bloqueado ? "opacity-60" : "hover:-translate-y-1 hover:border-gold-500/40 hover:bg-white/[0.06]"
+                className={`group flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6 ${
+                  bloqueado ? "opacity-60" : "card-hover"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-500/10 text-gold-400 transition-colors duration-300 group-hover:bg-gold-500/20">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-500/10 text-gold-400 transition-colors duration-300 [@media(hover:hover)_and_(pointer:fine)]:group-hover:bg-gold-500/20">
                     {bloqueado ? <Lock size={20} strokeWidth={1.75} /> : <modulo.icon size={22} strokeWidth={1.75} />}
                   </div>
                   <div className="flex flex-col items-end gap-1.5">
@@ -70,7 +70,7 @@ export function Academia() {
                 {!bloqueado && (
                   <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-gold-400">
                     Ver módulo
-                    <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+                    <ArrowRight size={14} className="transition-transform duration-200 [@media(hover:hover)_and_(pointer:fine)]:group-hover:translate-x-0.5" />
                   </span>
                 )}
               </div>

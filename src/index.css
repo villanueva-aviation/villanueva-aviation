@@ -26,9 +26,7 @@
 }
 
 html,
-body,
-#root {
-  height: 100%;
+body {
   width: 100%;
   overflow-x: hidden;
 }
@@ -142,7 +140,102 @@ body {
 }
 
 .animate-fade-up {
-  animation: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes result-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes result-in-reduced {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-result-in {
+  animation: result-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-result-in {
+    animation-name: result-in-reduced;
+    animation-duration: 150ms;
+  }
+}
+
+@keyframes check-in {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-check-in {
+  animation: check-in 120ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-check-in {
+    animation-duration: 1ms;
+  }
+}
+
+@keyframes shake-x {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-shake {
+  animation: shake-x 220ms ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-shake {
+    animation: none;
+  }
+}
+
+.card-hover {
+  transition:
+    transform 250ms ease-out,
+    border-color 250ms ease,
+    background-color 250ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card-hover:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--color-gold-500) 40%, transparent);
+    background-color: rgba(255, 255, 255, 0.06);
+  }
 }
 
 @keyframes shimmer {

@@ -9,11 +9,11 @@ export function Logo({ onClick, className = "" }: { onClick?: () => void; classN
       className={`group relative inline-flex items-center ${className}`}
     >
       <span className="pointer-events-none absolute -inset-4 rounded-full bg-gold-500/25 blur-2xl transition-opacity duration-300 group-hover:opacity-80" />
-      <span className="relative inline-flex items-center rounded-2xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.45)] ring-1 ring-gold-500/30 transition-transform duration-300 group-hover:scale-[1.03] px-4 py-2.5 sm:px-5 sm:py-3">
+      <span className="relative inline-flex items-center transition-transform duration-300 group-hover:scale-[1.03]">
         <img
-          src="/images/logo-mark.png"
+          src="/images/logo-full.png"
           alt="Villanueva Aviation"
-          className="h-14 w-auto sm:h-16 md:h-20 lg:h-24"
+          className="h-16 w-auto sm:h-20 md:h-24 lg:h-28"
         />
       </span>
     </Link>

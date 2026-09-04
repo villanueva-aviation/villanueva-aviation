@@ -3,20 +3,20 @@ import { Link, type LinkProps } from "react-router-dom";
 
 type Variant = "primary" | "secondary" | "ghost";
 
+const HOVER = "[@media(hover:hover)_and_(pointer:fine)]:hover" as const;
+
 const VARIANT_CLASSES: Record<Variant, string> = {
-  primary:
-    "bg-gold-500 text-navy-950 hover:bg-gold-400 shadow-[0_0_20px_rgba(212,175,55,0.35)] hover:shadow-[0_0_32px_rgba(212,175,55,0.55)] hover:scale-[1.03] active:scale-[0.97]",
-  secondary:
-    "bg-transparent text-white border border-white/30 hover:bg-white/10 hover:border-gold-500/50 hover:shadow-[0_0_20px_rgba(212,175,55,0.18)] hover:scale-[1.03] active:scale-[0.97]",
-  ghost: "bg-transparent text-gold-400 hover:text-gold-300",
+  primary: `bg-gold-500 text-navy-950 ${HOVER}:bg-gold-400 shadow-[0_0_20px_rgba(212,175,55,0.35)] ${HOVER}:shadow-[0_0_32px_rgba(212,175,55,0.55)] ${HOVER}:scale-[1.03] active:scale-[0.97]`,
+  secondary: `bg-transparent text-white border border-white/30 ${HOVER}:bg-white/10 ${HOVER}:border-gold-500/50 ${HOVER}:shadow-[0_0_20px_rgba(212,175,55,0.18)] ${HOVER}:scale-[1.03] active:scale-[0.97]`,
+  ghost: `bg-transparent text-gold-400 ${HOVER}:text-gold-300`,
 };
 
 const BASE_CLASSES =
-  "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-sm font-semibold font-display tracking-wide transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none disabled:hover:scale-100";
+  "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-sm font-semibold font-display tracking-wide transition-[transform,background-color,border-color,box-shadow,color] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] disabled:opacity-50 disabled:pointer-events-none disabled:hover:scale-100";
 
 function Shimmer() {
   return (
-    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
+    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 ease-out [@media(hover:hover)_and_(pointer:fine)]:group-hover:translate-x-full" />
   );
 }
 
