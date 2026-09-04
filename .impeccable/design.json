@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-03T00:00:00.000Z",
+  "title": "Design System: Villanueva Aviation",
+  "extensions": {
+    "colorMeta": {
+      "gold-insignia": {
+        "role": "primary",
+        "displayName": "Dorado de Insignia",
+        "canonical": "#d4af37",
+        "tonalRamp": ["#5e4d17", "#8a7122", "#b3922c", "#d4af37", "#e8c766", "#f0d78c", "#f7e6b3", "#fbf0d6"]
+      },
+      "navy-cabin": {
+        "role": "neutral",
+        "displayName": "Navy de Cabina",
+        "canonical": "#060e1a",
+        "tonalRamp": ["#060e1a", "#0b1d34", "#102847", "#16345c", "#1d4573", "#2c5a91", "#6b8fc0", "#b9cbe8"]
+      },
+      "navy-surface": {
+        "role": "neutral",
+        "displayName": "Navy de Superficie",
+        "canonical": "#0b1d34"
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Sora", "purpose": "All headings, eyebrow labels, buttons, and numeric emphasis." },
+      "body": { "displayName": "Inter", "purpose": "Paragraph copy and anything meant to be read at length." }
+    },
+    "shadows": [
+      { "name": "insignia-glow-resting", "value": "0 0 20px rgba(212,175,55,0.35)", "purpose": "Primary button at rest." },
+      { "name": "insignia-glow-hover", "value": "0 0 32px rgba(212,175,55,0.55)", "purpose": "Primary button on hover." },
+      { "name": "insignia-glow-secondary", "value": "0 0 20px rgba(212,175,55,0.18)", "purpose": "Secondary/outline button glow, quieter than primary." }
+    ],
+    "motion": [
+      { "name": "ease-out-default", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Default entrance easing (fade-up, hero, result reveals)." },
+      { "name": "ease-mobile-menu", "value": "cubic-bezier(0.76, 0, 0.24, 1)", "purpose": "Mobile menu open/close and its staggered link entrance only." },
+      { "name": "duration-press", "value": "160ms", "purpose": "Button press/hover feedback." },
+      { "name": "duration-reveal", "value": "300ms", "purpose": "Result/outcome screen entrance (quiz, scenario, success states)." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main call-to-action button; gold fill, navy text, resting glow.",
+      "html": "<button class=\"ds-btn-primary\">Comenzar formación</button>",
+      "css": ".ds-btn-primary { background: #d4af37; color: #060e1a; border: none; border-radius: 9999px; padding: 12px 24px; font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; letter-spacing: 0.01em; box-shadow: 0 0 20px rgba(212,175,55,0.35); transition: transform 160ms cubic-bezier(0.23,1,0.32,1), background-color 160ms ease, box-shadow 160ms ease; } @media (hover:hover) and (pointer:fine) { .ds-btn-primary:hover { background: #e8c766; box-shadow: 0 0 32px rgba(212,175,55,0.55); transform: scale(1.03); } } .ds-btn-primary:active { transform: scale(0.97); } .ds-btn-primary:focus-visible { outline: 2px solid #f0d78c; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outline button for a lower-emphasis second action alongside a primary CTA.",
+      "html": "<button class=\"ds-btn-secondary\">Unirse a Discord</button>",
+      "css": ".ds-btn-secondary { background: transparent; color: #ffffff; border: 1px solid rgba(255,255,255,0.3); border-radius: 9999px; padding: 12px 24px; font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; transition: transform 160ms cubic-bezier(0.23,1,0.32,1), border-color 160ms ease, box-shadow 160ms ease; } @media (hover:hover) and (pointer:fine) { .ds-btn-secondary:hover { border-color: rgba(212,175,55,0.5); box-shadow: 0 0 20px rgba(212,175,55,0.18); transform: scale(1.03); } } .ds-btn-secondary:active { transform: scale(0.97); }"
+    },
+    {
+      "name": "Module Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The recurring content card — used for Academia modules, feature blurbs, and content grids.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-icon\">✈</div><h3 class=\"ds-card-title\">Meteorología</h3><p class=\"ds-card-body\">Interpretación de condiciones meteorológicas aplicadas a la operación de vuelo.</p></div>",
+      "css": ".ds-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; transition: transform 250ms ease-out, border-color 250ms ease, background-color 250ms ease; } @media (hover:hover) and (pointer:fine) { .ds-card:hover { transform: translateY(-4px); border-color: rgba(212,175,55,0.4); background: rgba(255,255,255,0.06); } } .ds-card-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(212,175,55,0.1); color: #e8c766; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 20px; } .ds-card-title { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 18px; color: #ffffff; margin: 0 0 8px; } .ds-card-body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.6); margin: 0; }"
+    },
+    {
+      "name": "Gold Badge",
+      "kind": "chip",
+      "refersTo": "badge-gold",
+      "description": "Small status pill — gold for default/pending, also exists in green/red/neutral tones.",
+      "html": "<span class=\"ds-badge-gold\">Pendiente</span>",
+      "css": ".ds-badge-gold { display: inline-flex; align-items: center; border-radius: 9999px; border: 1px solid rgba(212,175,55,0.3); background: rgba(212,175,55,0.15); color: #e8c766; padding: 4px 12px; font-family: 'Sora', sans-serif; font-weight: 500; font-size: 12px; letter-spacing: 0.02em; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Standard text input used across forms (agenda, project submission).",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"tu@correo.com\" />",
+      "css": ".ds-input { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 10px 16px; color: #ffffff; font-family: 'Inter', sans-serif; font-size: 14px; transition: border-color 200ms ease; } .ds-input::placeholder { color: rgba(255,255,255,0.3); } .ds-input:focus { outline: none; border-color: rgba(212,175,55,0.5); }"
+    },
+    {
+      "name": "Active Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Pill-shaped nav link with the active-state glow and pulsing indicator dot.",
+      "html": "<a class=\"ds-navlink ds-navlink--active\"><span class=\"ds-navlink-dot\"></span>Inicio</a>",
+      "css": ".ds-navlink { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; border-radius: 9999px; border: 1px solid transparent; padding: 10px 16px; font-family: 'Inter', sans-serif; font-weight: 300; font-size: 14px; color: rgba(255,255,255,0.7); transition: all 200ms ease; } @media (hover:hover) and (pointer:fine) { .ds-navlink:hover { border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #ffffff; } } .ds-navlink--active { border-color: rgba(212,175,55,0.4); background: rgba(212,175,55,0.1); color: #e8c766; box-shadow: 0 0 16px rgba(212,175,55,0.25); } .ds-navlink-dot { width: 6px; height: 6px; border-radius: 9999px; background: #e8c766; }"
+    },
+    {
+      "name": "Progress Bar",
+      "kind": "custom",
+      "refersTo": "progress-bar",
+      "description": "Gold-gradient progress indicator used throughout Academia for module/checklist/quiz progress.",
+      "html": "<div class=\"ds-progress\"><div class=\"ds-progress-fill\" style=\"width: 64%\"></div></div>",
+      "css": ".ds-progress { width: 100%; height: 10px; border-radius: 9999px; background: rgba(255,255,255,0.1); overflow: hidden; } .ds-progress-fill { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, #b3922c, #d4af37, #e8c766); transition: width 700ms ease-out; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Flight Briefing Room",
+    "overview": "Villanueva Aviation reads like the debrief room before a training flight: serious, procedural, and unhurried. The room is dark navy — the color of a cabin at night — and gold appears the way rank insignia and instrument backlighting do: sparingly, and only where it means something (a call to action, an active state, a value worth noticing). Nothing in this system performs for attention; it earns trust by staying composed. This is explicitly not a casual community space — the product exists to feel like a training cockpit, never like a forum or a chat app.\n\nSurfaces stay flat until a cadet interacts with them. Depth is never faked with drop shadows; instead, a warm gold glow signals \"this is active\" or \"this is where you act next.\" Typography does the same job with restraint: a bold, geometric display face (Sora) for structure and command, and a quieter body face (Inter) for the actual reading. Text itself carries hierarchy through opacity, not new colors — a deliberate ladder of whites fading from confident to quiet.",
+    "keyCharacteristics": [
+      "Dark-navy cabin as the constant ground; gold as an insignia, not a wash",
+      "Flat by default; glow (not shadow) is the only depth signal, and only on interaction",
+      "Generous rounding on anything clickable — pills for actions, soft corners for containers",
+      "A single opacity ladder of white carries the entire text hierarchy",
+      "Serious and procedural in tone — a cockpit, never a forum"
+    ],
+    "rules": [
+      { "name": "The Insignia Rule", "body": "Gold covers no more than ~10% of any given screen — its rarity is what makes it read as significant.", "section": "colors" },
+      { "name": "The One Ladder Rule", "body": "Every text hierarchy decision is an opacity choice on white, never a new hue.", "section": "colors" },
+      { "name": "The One Voice Rule", "body": "Only one typeface carries structure (Sora) and only one carries reading (Inter). A third face has never been introduced and shouldn't be.", "section": "typography" },
+      { "name": "The Glow-Not-Shadow Rule", "body": "Depth is never implied with a dark drop shadow. When something needs to feel raised or active, it gets warmer (a gold glow), not darker.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep gold under ~10% of any screen — it reads as significant because it's rare (The Insignia Rule).",
+      "Do use the white-opacity ladder (white → /40) for every text-hierarchy decision instead of introducing a new color.",
+      "Do use full rounding on anything clickable-as-an-action, and reserve 16px/12px rounding for containers and nested fields respectively.",
+      "Do signal \"active\" or \"raised\" with a warmer gold glow, never a darker drop shadow.",
+      "Do gate hover-only effects behind @media (hover: hover) and (pointer: fine) so touch devices don't get a \"stuck\" hover state."
+    ],
+    "donts": [
+      "Don't add traditional drop shadows for depth or elevation — this system has none at rest.",
+      "Don't let gold dominate a screen or use it decoratively outside CTAs, active states, and labels.",
+      "Don't introduce a third typeface, or mix Sora and Inter within the same text element.",
+      "Don't let the product feel like a casual community space (Discord, a forum) — the tone is a training cockpit: composed, procedural, serious.",
+      "Don't use transition-all on interactive elements; name the exact properties that change."
+    ]
+  }
+}
