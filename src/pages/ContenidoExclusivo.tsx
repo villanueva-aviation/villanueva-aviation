@@ -16,7 +16,7 @@ export function ContenidoExclusivo() {
       <PageHero
         eyebrow="Contenido Exclusivo"
         title="La biblioteca privada de la Academia"
-        description="Clases especiales, guías avanzadas y procedimientos disponibles únicamente para cadetes de Villanueva Aviation."
+        description="Checklists premium, simulacros de checkride y revisión personal del fundador, disponibles únicamente para cadetes de Villanueva Aviation."
       />
 
       <Container className="py-16 md:py-24">
