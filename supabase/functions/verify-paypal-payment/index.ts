@@ -41,7 +41,11 @@ async function obtenerTokenPayPal(): Promise<string> {
     },
     body: "grant_type=client_credentials",
   });
-  if (!res.ok) throw new Error("No se pudo autenticar con PayPal");
+  if (!res.ok) {
+    const cuerpo = await res.text();
+    console.error("PayPal OAuth token falló", res.status, cuerpo, "API_BASE=", PAYPAL_API_BASE, "CLIENT_ID_len=", PAYPAL_CLIENT_ID?.length);
+    throw new Error(`No se pudo autenticar con PayPal (${res.status}): ${cuerpo}`);
+  }
   const data = await res.json();
   return data.access_token;
 }
