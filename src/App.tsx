@@ -4,6 +4,7 @@ import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { AuthProvider } from "./features/auth/AuthContext";
 import { ProtectedRoute } from "./features/auth/ProtectedRoute";
+import { PremiumRoute } from "./features/payments/PremiumRoute";
 import { ProgressProvider } from "./features/progress/ProgressContext";
 import { ROUTES } from "./lib/routes";
 import { Home } from "./pages/Home";
@@ -102,57 +103,57 @@ function App() {
               <Route
                 path={ROUTES.audioRodajeDespegue}
                 element={
-                  <ProtectedRoute>
+                  <PremiumRoute>
                     <AudioRodajeDespegue />
-                  </ProtectedRoute>
+                  </PremiumRoute>
                 }
               />
               <Route
                 path={ROUTES.audioEmergenciasAproximacion}
                 element={
-                  <ProtectedRoute>
+                  <PremiumRoute>
                     <AudioEmergenciasAproximacion />
-                  </ProtectedRoute>
+                  </PremiumRoute>
                 }
               />
               <Route
                 path={ROUTES.checklistPremiumC172}
                 element={
-                  <ProtectedRoute>
+                  <PremiumRoute>
                     <ChecklistPremiumC172 />
-                  </ProtectedRoute>
+                  </PremiumRoute>
                 }
               />
               <Route
                 path={ROUTES.checklistPremiumC152}
                 element={
-                  <ProtectedRoute>
+                  <PremiumRoute>
                     <ChecklistPremiumC152 />
-                  </ProtectedRoute>
+                  </PremiumRoute>
                 }
               />
               <Route
                 path={ROUTES.simulacroOral}
                 element={
-                  <ProtectedRoute>
+                  <PremiumRoute>
                     <SimulacroOral />
-                  </ProtectedRoute>
+                  </PremiumRoute>
                 }
               />
               <Route
                 path={ROUTES.simulacroVuelo}
                 element={
-                  <ProtectedRoute>
+                  <PremiumRoute>
                     <SimulacroVuelo />
-                  </ProtectedRoute>
+                  </PremiumRoute>
                 }
               />
               <Route
                 path={ROUTES.agendarCita}
                 element={
-                  <ProtectedRoute>
+                  <PremiumRoute>
                     <AgendarCita />
-                  </ProtectedRoute>
+                  </PremiumRoute>
                 }
               />
               <Route path={ROUTES.guiaVFR} element={<GuiaVFR />} />
