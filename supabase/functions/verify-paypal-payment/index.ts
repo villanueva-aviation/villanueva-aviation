@@ -65,19 +65,26 @@ Deno.serve(async (req) => {
     );
 
     const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError || !userData.user) return jsonResponse({ ok: false, motivo: "No autorizado" }, 401);
+    if (userError || !userData.user) {
+      console.error("auth.getUser falló:", userError?.message);
+      return jsonResponse({ ok: false, motivo: "No autorizado" }, 401);
+    }
     const user = userData.user;
 
     const { orderId } = await req.json();
     if (!orderId || typeof orderId !== "string") {
       return jsonResponse({ ok: false, motivo: "Falta orderId" }, 400);
     }
+    console.log("Verificando orden PayPal", orderId, "para", user.email);
 
     const accessToken = await obtenerTokenPayPal();
     const orderRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (!orderRes.ok) return jsonResponse({ ok: false, motivo: "Orden de PayPal no encontrada" }, 400);
+    if (!orderRes.ok) {
+      console.error("PayPal orders API respondió", orderRes.status, await orderRes.text());
+      return jsonResponse({ ok: false, motivo: "Orden de PayPal no encontrada" }, 400);
+    }
     const order = await orderRes.json();
 
     const unidad = order?.purchase_units?.[0];
@@ -86,6 +93,7 @@ Deno.serve(async (req) => {
     const completado = order?.status === "COMPLETED";
 
     if (!completado || moneda !== "USD" || Number(monto) < Number(PRECIO_ESPERADO)) {
+      console.error("Orden inválida:", { estado: order?.status, monto, moneda, esperado: PRECIO_ESPERADO });
       return jsonResponse({ ok: false, motivo: "Orden inválida o incompleta" }, 400);
     }
 
@@ -111,11 +119,14 @@ Deno.serve(async (req) => {
     );
 
     if (upsertError) {
+      console.error("Falló el upsert en pagos:", upsertError.message);
       return jsonResponse({ ok: false, motivo: upsertError.message }, 500);
     }
 
+    console.log("Pago confirmado y guardado para", user.email);
     return jsonResponse({ ok: true }, 200);
   } catch (err) {
+    console.error("Error no manejado en verify-paypal-payment:", err);
     return jsonResponse({ ok: false, motivo: String(err) }, 500);
   }
 });
