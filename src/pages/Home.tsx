@@ -56,7 +56,7 @@ export function Home() {
             className="animate-fade-up mt-2 max-w-5xl font-display text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-white sm:mt-8 sm:text-5xl md:text-7xl lg:text-8xl"
             style={{ animationDelay: "50ms" }}
           >
-            Tu camino a <span className="text-shine">piloto</span>, sin pagar por avión real
+            Tu camino a <span className="text-shine">piloto</span>, antes de pagar por avión real
           </h1>
 
           <p
