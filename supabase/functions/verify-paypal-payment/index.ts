@@ -10,6 +10,22 @@
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
+// Las Edge Functions de Supabase no agregan headers CORS por defecto -- sin
+// esto, el navegador bloquea la petición (preflight OPTIONS) antes de que
+// llegue aquí, y el cliente nunca ve la respuesta real.
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+function jsonResponse(body: unknown, status: number) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+  });
+}
+
 const PAYPAL_API_BASE = Deno.env.get("PAYPAL_API_BASE")!;
 const PAYPAL_CLIENT_ID = Deno.env.get("PAYPAL_CLIENT_ID")!;
 const PAYPAL_CLIENT_SECRET = Deno.env.get("PAYPAL_CLIENT_SECRET")!;
@@ -31,13 +47,16 @@ async function obtenerTokenPayPal(): Promise<string> {
 }
 
 Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  }
   if (req.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
+    return jsonResponse({ ok: false, motivo: "Method not allowed" }, 405);
   }
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) return new Response("No autorizado", { status: 401 });
+    if (!authHeader) return jsonResponse({ ok: false, motivo: "No autorizado" }, 401);
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -46,19 +65,19 @@ Deno.serve(async (req) => {
     );
 
     const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError || !userData.user) return new Response("No autorizado", { status: 401 });
+    if (userError || !userData.user) return jsonResponse({ ok: false, motivo: "No autorizado" }, 401);
     const user = userData.user;
 
     const { orderId } = await req.json();
     if (!orderId || typeof orderId !== "string") {
-      return new Response("Falta orderId", { status: 400 });
+      return jsonResponse({ ok: false, motivo: "Falta orderId" }, 400);
     }
 
     const accessToken = await obtenerTokenPayPal();
     const orderRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (!orderRes.ok) return new Response("Orden de PayPal no encontrada", { status: 400 });
+    if (!orderRes.ok) return jsonResponse({ ok: false, motivo: "Orden de PayPal no encontrada" }, 400);
     const order = await orderRes.json();
 
     const unidad = order?.purchase_units?.[0];
@@ -67,10 +86,7 @@ Deno.serve(async (req) => {
     const completado = order?.status === "COMPLETED";
 
     if (!completado || moneda !== "USD" || Number(monto) < Number(PRECIO_ESPERADO)) {
-      return new Response(JSON.stringify({ ok: false, motivo: "Orden inválida o incompleta" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+      return jsonResponse({ ok: false, motivo: "Orden inválida o incompleta" }, 400);
     }
 
     // service_role: escribe sin pasar por RLS -- por eso esta verificación vive
@@ -95,20 +111,11 @@ Deno.serve(async (req) => {
     );
 
     if (upsertError) {
-      return new Response(JSON.stringify({ ok: false, motivo: upsertError.message }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
+      return jsonResponse({ ok: false, motivo: upsertError.message }, 500);
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse({ ok: true }, 200);
   } catch (err) {
-    return new Response(JSON.stringify({ ok: false, motivo: String(err) }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse({ ok: false, motivo: String(err) }, 500);
   }
 });
