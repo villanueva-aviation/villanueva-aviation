@@ -190,7 +190,7 @@ export function Evaluaciones() {
                     rows={3}
                     value={form.comentarios}
                     onChange={(e) => setForm((f) => ({ ...f, comentarios: e.target.value }))}
-                    placeholder="Detalles adicionales para tu instructor"
+                    placeholder="Detalles adicionales para tu revisión"
                     className="rounded-xl border border-white/15 bg-white/[0.05] px-4 py-2.5 text-white placeholder:text-white/30 outline-none focus:border-gold-500/50"
                   />
                 </label>

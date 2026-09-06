@@ -76,7 +76,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     nivel: "Básico",
     imagenLeccion: "/images/infografia-metar-rmk.jpg",
     proyectoPrompt:
-      "Consigue el METAR y TAF reales de un aeropuerto de hoy y escribe el briefing de 'go/no-go' que le darías a tu instructor: decodifica el reporte, identifica cualquier riesgo (viento, nubes, visibilidad, fenómenos) y justifica tu decisión de volar o no. Envíalo para revisión.",
+      "Consigue el METAR y TAF reales de un aeropuerto de hoy y escribe el briefing de 'go/no-go' que darías antes de un vuelo real: decodifica el reporte, identifica cualquier riesgo (viento, nubes, visibilidad, fenómenos) y justifica tu decisión de volar o no. Envíalo para revisión.",
     actividades: [
       ...leccionesDeTemas("meteorologia"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
@@ -111,7 +111,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: Compass,
     nivel: "Intermedio",
     proyectoPrompt:
-      "Planifica de cero una ruta VFR real entre dos aeropuertos que elijas (sin usar ninguna plantilla): traza los checkpoints, calcula el rumbo magnético y la distancia de cada tramo, estima el tiempo y el combustible necesarios considerando un viento hipotético, y define tu aeropuerto alterno. Envía tu plan completo para que un instructor lo revise.",
+      "Planifica de cero una ruta VFR real entre dos aeropuertos que elijas (sin usar ninguna plantilla): traza los checkpoints, calcula el rumbo magnético y la distancia de cada tramo, estima el tiempo y el combustible necesarios considerando un viento hipotético, y define tu aeropuerto alterno. Envía tu plan completo para que lo revisemos.",
     actividades: [
       ...leccionesDeTemas("navegacion"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },

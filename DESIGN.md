@@ -1,6 +1,6 @@
 ---
 name: Villanueva Aviation
-description: Digital ground-school academy for aspiring pilots — theory, simulation, and real instructor feedback before flight school.
+description: Digital ground-school academy for aspiring pilots — theory, simulation, and personal founder feedback before flight school.
 colors:
   navy-cabin: "#060e1a"
   navy-surface: "#0b1d34"

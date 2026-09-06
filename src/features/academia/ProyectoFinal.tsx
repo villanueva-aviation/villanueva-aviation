@@ -63,8 +63,8 @@ export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFina
       <div className="animate-result-in flex flex-col items-center gap-3 rounded-2xl border border-gold-500/30 bg-gold-500/10 px-6 py-14 text-center">
         <CheckCircle2 size={28} className="text-gold-400" />
         <p className="max-w-md text-sm text-white/75">
-          Tu proyecto fue enviado para revisión. Un instructor lo evaluará y podrás dar seguimiento desde{" "}
-          <span className="text-gold-400">Contenido Exclusivo → Agenda con instructor</span>.
+          Tu proyecto fue enviado para revisión. El fundador lo revisará personalmente y podrás dar seguimiento desde{" "}
+          <span className="text-gold-400">Contenido Exclusivo → Agenda con el fundador</span>.
         </p>
       </div>
     );

@@ -104,8 +104,8 @@ export function AgendarCita() {
     <div>
       <PageHero
         eyebrow="Contenido de cadetes"
-        title="Agenda tu sesión con un instructor"
-        description="Solicita una hora de revisión de un tema específico, o agenda un día para tu examen práctico."
+        title="Agenda tu sesión con el fundador"
+        description="Solicita una hora de revisión de un tema específico con el fundador, o agenda un simulacro de examen práctico."
       >
         <Link
           to={ROUTES.contenidoExclusivo}
@@ -138,7 +138,7 @@ export function AgendarCita() {
                     : "border-white/15 bg-white/[0.02] text-white/60 hover:border-white/30 hover:text-white"
                 }`}
               >
-                Examen práctico
+                Simulacro de examen práctico
               </button>
             </div>
 
@@ -221,7 +221,7 @@ export function AgendarCita() {
                 <div key={r.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-sm font-medium text-white">
-                      {r.tipo === "revision" ? `Revisión: ${r.tema || "tema general"}` : "Examen práctico"}
+                      {r.tipo === "revision" ? `Revisión: ${r.tema || "tema general"}` : "Simulacro de examen práctico"}
                     </span>
                     <Badge tone={ESTADO_TONE[r.estado] ?? "neutral"}>{r.estado}</Badge>
                   </div>

@@ -30,7 +30,7 @@ export function Comunidad() {
       <PageHero
         eyebrow="Comunidad"
         title="La formación continúa fuera del aula"
-        description="Discord es nuestro espacio complementario de comunidad: resuelve dudas, comparte vuelos, participa en eventos y recibe soporte entre cadetes e instructores."
+        description="Discord es nuestro espacio complementario de comunidad: resuelve dudas, comparte vuelos, participa en eventos y recibe soporte entre cadetes."
       >
         <Button href={DISCORD_URL} variant="primary">
           <MessageCircle size={16} />
