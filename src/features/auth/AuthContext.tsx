@@ -3,6 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabaseClient";
 
 interface CadetUser {
+  id: string;
   nombre: string;
   email: string;
 }
@@ -21,10 +22,10 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 function toCadetUser(session: Session | null): CadetUser | null {
   const email = session?.user?.email;
-  if (!email) return null;
-  const fullName = session?.user?.user_metadata?.full_name || session?.user?.user_metadata?.name;
+  if (!email || !session?.user?.id) return null;
+  const fullName = session.user.user_metadata?.full_name || session.user.user_metadata?.name;
   const nombre = fullName || email.split("@")[0].charAt(0).toUpperCase() + email.split("@")[0].slice(1);
-  return { nombre, email };
+  return { id: session.user.id, nombre, email };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

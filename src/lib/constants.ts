@@ -7,16 +7,9 @@ export const SITE = {
 
 export const DISCORD_URL = "https://discord.gg/Q7fmGsFbg";
 
-// PLACEHOLDER: actualizar con la fecha real de la próxima clase en vivo / webinar.
-export const NEXT_LIVE_EVENT = {
-  title: "Clase en vivo: Fundamentos de Aviación",
-  date: (() => {
-    const d = new Date();
-    d.setDate(d.getDate() + ((2 - d.getDay() + 7) % 7 || 7));
-    d.setHours(20, 0, 0, 0);
-    return d;
-  })(),
-};
+// Pago único para desbloquear Contenido Exclusivo. Debe coincidir con
+// PRECIO_CONTENIDO_EXCLUSIVO en la Edge Function verify-paypal-payment.
+export const PRECIO_CONTENIDO_EXCLUSIVO = "49.00";
 
 // PLACEHOLDER: reemplazar con la dirección de contacto oficial cuando esté disponible.
 export const CONTACT_EMAIL = "contacto@villanuevaaviation.placeholder";
