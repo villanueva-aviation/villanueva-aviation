@@ -1,17 +1,22 @@
 import { Link, NavLink } from "react-router-dom";
-import { LogOut, User } from "lucide-react";
+import { CalendarClock, ClipboardCheck, LogOut, User } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { DISCORD_URL } from "../../lib/constants";
 import { useAuth } from "../../features/auth/AuthContext";
+import type { usePendientesFundador } from "../../features/admin/usePendientesFundador";
 import { Logo } from "./Logo";
+import { CountBadge } from "../ui/CountBadge";
 
 export function MobileMenu({
   open,
   onClose,
+  esFundador,
+  vuelosPendientes,
+  reservasPendientes,
 }: {
   open: boolean;
   onClose: () => void;
-}) {
+} & ReturnType<typeof usePendientesFundador>) {
   const { isAuthenticated, user, logout } = useAuth();
 
   return (
@@ -88,25 +93,47 @@ export function MobileMenu({
           }}
         >
           {isAuthenticated ? (
-            <div className="flex items-center gap-3">
-              <Link
-                to={ROUTES.perfil}
-                onClick={onClose}
-                className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 py-3 font-display text-sm font-semibold text-white"
-              >
-                <User size={15} /> Mi perfil {user ? `— ${user.nombre}` : ""}
-              </Link>
-              <button
-                onClick={() => {
-                  logout();
-                  onClose();
-                }}
-                aria-label="Cerrar sesión"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white/70"
-              >
-                <LogOut size={16} />
-              </button>
-            </div>
+            <>
+              <div className="flex items-center gap-3">
+                <Link
+                  to={ROUTES.perfil}
+                  onClick={onClose}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/20 py-3 font-display text-sm font-semibold text-white"
+                >
+                  <User size={15} /> Mi perfil {user ? `— ${user.nombre}` : ""}
+                </Link>
+                <button
+                  onClick={() => {
+                    logout();
+                    onClose();
+                  }}
+                  aria-label="Cerrar sesión"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white/70"
+                >
+                  <LogOut size={16} />
+                </button>
+              </div>
+              {esFundador && (
+                <Link
+                  to={ROUTES.adminVuelosPractica}
+                  onClick={onClose}
+                  className="flex items-center gap-2 rounded-full border border-gold-500/25 bg-gold-500/[0.06] py-3 px-4 font-display text-sm font-semibold text-white/85"
+                >
+                  <ClipboardCheck size={15} /> Vuelos por confirmar
+                  <CountBadge count={vuelosPendientes} />
+                </Link>
+              )}
+              {esFundador && (
+                <Link
+                  to={ROUTES.adminReservas}
+                  onClick={onClose}
+                  className="flex items-center gap-2 rounded-full border border-gold-500/25 bg-gold-500/[0.06] py-3 px-4 font-display text-sm font-semibold text-white/85"
+                >
+                  <CalendarClock size={15} /> Agenda y proyectos
+                  <CountBadge count={reservasPendientes} />
+                </Link>
+              )}
+            </>
           ) : (
             <Link
               to={ROUTES.ingresar}

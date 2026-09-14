@@ -3,31 +3,22 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { CalendarClock, ClipboardCheck, LogOut, User } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { useAuth } from "../../features/auth/AuthContext";
-import { FOUNDER_EMAIL } from "../../lib/constants";
-import { contarVuelosPendientes } from "../../features/practica/vuelosPractica";
-import { contarReservasPendientes } from "../../features/admin/reservas";
+import { usePendientesFundador } from "../../features/admin/usePendientesFundador";
+import { CountBadge } from "../ui/CountBadge";
 import { Logo } from "./Logo";
 import { HamburgerButton } from "./HamburgerButton";
 import { MobileMenu } from "./MobileMenu";
 
-function CountBadge({ count }: { count: number }) {
-  if (count === 0) return null;
-  return (
-    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-gold-500 px-1.5 text-[11px] font-bold text-navy-950">
-      {count}
-    </span>
-  );
-}
-
-function ProfileControl() {
+function ProfileControl({
+  esFundador,
+  vuelosPendientes,
+  reservasPendientes,
+  totalPendientes,
+}: ReturnType<typeof usePendientesFundador>) {
   const { isAuthenticated, user, logout } = useAuth();
   const [open, setOpen] = useState(false);
-  const [vuelosPendientes, setVuelosPendientes] = useState(0);
-  const [reservasPendientes, setReservasPendientes] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const esFundador = user?.email === FOUNDER_EMAIL;
-  const totalPendientes = vuelosPendientes + reservasPendientes;
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -36,12 +27,6 @@ function ProfileControl() {
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
-
-  useEffect(() => {
-    if (!esFundador) return;
-    contarVuelosPendientes().then(setVuelosPendientes);
-    contarReservasPendientes().then(setReservasPendientes);
-  }, [esFundador]);
 
   if (!isAuthenticated) {
     return (
@@ -120,6 +105,7 @@ function ProfileControl() {
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pendientes = usePendientesFundador();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -191,13 +177,13 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <ProfileControl />
+            <ProfileControl {...pendientes} />
             <HamburgerButton open={open} onClick={() => setOpen((v) => !v)} />
           </div>
         </div>
       </header>
 
-      <MobileMenu open={open} onClose={() => setOpen(false)} />
+      <MobileMenu open={open} onClose={() => setOpen(false)} {...pendientes} />
     </>
   );
 }
