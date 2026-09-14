@@ -3,6 +3,7 @@ import { Suspense, lazy, useEffect } from "react";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { PageLoader } from "./components/layout/PageLoader";
+import { ErrorBoundary } from "./components/layout/ErrorBoundary";
 import { AuthProvider } from "./features/auth/AuthContext";
 import { ProtectedRoute } from "./features/auth/ProtectedRoute";
 import { PremiumRoute } from "./features/payments/PremiumRoute";
@@ -49,6 +50,159 @@ function ScrollToTop() {
   return null;
 }
 
+function RoutedContent() {
+  const { pathname } = useLocation();
+  return (
+    <ErrorBoundary key={pathname}>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path={ROUTES.home} element={<Home />} />
+          <Route
+            path={ROUTES.academia}
+            element={
+              <ProtectedRoute>
+                <Academia />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/academia/:slug"
+            element={
+              <ProtectedRoute>
+                <AcademiaModulo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.miFormacion}
+            element={
+              <ProtectedRoute>
+                <MiFormacion />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.tracker}
+            element={
+              <ProtectedRoute>
+                <Tracker />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.evaluaciones}
+            element={
+              <ProtectedRoute>
+                <Evaluaciones />
+              </ProtectedRoute>
+            }
+          />
+          <Route path={ROUTES.contenidoExclusivo} element={<ContenidoExclusivo />} />
+          <Route path={ROUTES.descargas} element={<Descargas />} />
+          <Route path={ROUTES.checklistC172} element={<ChecklistC172 />} />
+          <Route path={ROUTES.checklistC152} element={<ChecklistC152 />} />
+          <Route path={ROUTES.planVuelo} element={<PlanDeVuelo />} />
+          <Route path={ROUTES.bitacoraVuelo} element={<BitacoraVuelo />} />
+          <Route path={ROUTES.pesoBalance} element={<PesoBalance />} />
+          <Route
+            path={ROUTES.audioRodajeDespegue}
+            element={
+              <PremiumRoute>
+                <AudioRodajeDespegue />
+              </PremiumRoute>
+            }
+          />
+          <Route
+            path={ROUTES.audioEmergenciasAproximacion}
+            element={
+              <PremiumRoute>
+                <AudioEmergenciasAproximacion />
+              </PremiumRoute>
+            }
+          />
+          <Route
+            path={ROUTES.checklistPremiumC172}
+            element={
+              <PremiumRoute>
+                <ChecklistPremiumC172 />
+              </PremiumRoute>
+            }
+          />
+          <Route
+            path={ROUTES.checklistPremiumC152}
+            element={
+              <PremiumRoute>
+                <ChecklistPremiumC152 />
+              </PremiumRoute>
+            }
+          />
+          <Route
+            path={ROUTES.simulacroOral}
+            element={
+              <PremiumRoute>
+                <SimulacroOral />
+              </PremiumRoute>
+            }
+          />
+          <Route
+            path={ROUTES.simulacroVuelo}
+            element={
+              <PremiumRoute>
+                <SimulacroVuelo />
+              </PremiumRoute>
+            }
+          />
+          <Route
+            path={ROUTES.practicaVuelo}
+            element={
+              <PremiumRoute>
+                <PracticaVuelo />
+              </PremiumRoute>
+            }
+          />
+          <Route
+            path={ROUTES.agendarCita}
+            element={
+              <PremiumRoute>
+                <AgendarCita />
+              </PremiumRoute>
+            }
+          />
+          <Route path={ROUTES.guiaVFR} element={<GuiaVFR />} />
+          <Route path={ROUTES.comunidad} element={<Comunidad />} />
+          <Route
+            path={ROUTES.perfil}
+            element={
+              <ProtectedRoute>
+                <Perfil />
+              </ProtectedRoute>
+            }
+          />
+          <Route path={ROUTES.ingresar} element={<Ingresar />} />
+          <Route path={ROUTES.legal} element={<Legal />} />
+          <Route
+            path={ROUTES.adminVuelosPractica}
+            element={
+              <ProtectedRoute>
+                <AdminVuelosPractica />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.adminReservas}
+            element={
+              <ProtectedRoute>
+                <AdminReservas />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -57,151 +211,7 @@ function App() {
           <ScrollToTop />
           <Navbar />
           <main className="flex-1">
-            <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path={ROUTES.home} element={<Home />} />
-              <Route
-                path={ROUTES.academia}
-                element={
-                  <ProtectedRoute>
-                    <Academia />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/academia/:slug"
-                element={
-                  <ProtectedRoute>
-                    <AcademiaModulo />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.miFormacion}
-                element={
-                  <ProtectedRoute>
-                    <MiFormacion />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.tracker}
-                element={
-                  <ProtectedRoute>
-                    <Tracker />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.evaluaciones}
-                element={
-                  <ProtectedRoute>
-                    <Evaluaciones />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path={ROUTES.contenidoExclusivo} element={<ContenidoExclusivo />} />
-              <Route path={ROUTES.descargas} element={<Descargas />} />
-              <Route path={ROUTES.checklistC172} element={<ChecklistC172 />} />
-              <Route path={ROUTES.checklistC152} element={<ChecklistC152 />} />
-              <Route path={ROUTES.planVuelo} element={<PlanDeVuelo />} />
-              <Route path={ROUTES.bitacoraVuelo} element={<BitacoraVuelo />} />
-              <Route path={ROUTES.pesoBalance} element={<PesoBalance />} />
-              <Route
-                path={ROUTES.audioRodajeDespegue}
-                element={
-                  <PremiumRoute>
-                    <AudioRodajeDespegue />
-                  </PremiumRoute>
-                }
-              />
-              <Route
-                path={ROUTES.audioEmergenciasAproximacion}
-                element={
-                  <PremiumRoute>
-                    <AudioEmergenciasAproximacion />
-                  </PremiumRoute>
-                }
-              />
-              <Route
-                path={ROUTES.checklistPremiumC172}
-                element={
-                  <PremiumRoute>
-                    <ChecklistPremiumC172 />
-                  </PremiumRoute>
-                }
-              />
-              <Route
-                path={ROUTES.checklistPremiumC152}
-                element={
-                  <PremiumRoute>
-                    <ChecklistPremiumC152 />
-                  </PremiumRoute>
-                }
-              />
-              <Route
-                path={ROUTES.simulacroOral}
-                element={
-                  <PremiumRoute>
-                    <SimulacroOral />
-                  </PremiumRoute>
-                }
-              />
-              <Route
-                path={ROUTES.simulacroVuelo}
-                element={
-                  <PremiumRoute>
-                    <SimulacroVuelo />
-                  </PremiumRoute>
-                }
-              />
-              <Route
-                path={ROUTES.practicaVuelo}
-                element={
-                  <PremiumRoute>
-                    <PracticaVuelo />
-                  </PremiumRoute>
-                }
-              />
-              <Route
-                path={ROUTES.agendarCita}
-                element={
-                  <PremiumRoute>
-                    <AgendarCita />
-                  </PremiumRoute>
-                }
-              />
-              <Route path={ROUTES.guiaVFR} element={<GuiaVFR />} />
-              <Route path={ROUTES.comunidad} element={<Comunidad />} />
-              <Route
-                path={ROUTES.perfil}
-                element={
-                  <ProtectedRoute>
-                    <Perfil />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path={ROUTES.ingresar} element={<Ingresar />} />
-              <Route path={ROUTES.legal} element={<Legal />} />
-              <Route
-                path={ROUTES.adminVuelosPractica}
-                element={
-                  <ProtectedRoute>
-                    <AdminVuelosPractica />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.adminReservas}
-                element={
-                  <ProtectedRoute>
-                    <AdminReservas />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            </Suspense>
+            <RoutedContent />
           </main>
           <Footer />
         </div>
