@@ -3,6 +3,7 @@ import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Tema } from "../../data/moduleContent";
 import { ProgressBar } from "../../components/ui/ProgressBar";
 import { Button } from "../../components/ui/Button";
+import { Carousel } from "../../components/ui/Carousel";
 
 export function LessonFlow({
   temas,
@@ -38,14 +39,13 @@ export function LessonFlow({
         <h3 className="font-display text-lg font-semibold text-white">{tema.titulo}</h3>
         {completada && <Check size={20} className="shrink-0 text-gold-400" />}
       </div>
-      <p className="mt-3 text-sm leading-relaxed text-white/65">{tema.texto}</p>
-      {tema.imagenes && tema.imagenes.length > 0 && (
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {tema.imagenes.map((src) => (
-            <div key={src} className="overflow-hidden rounded-xl border border-white/10">
-              <img src={src} alt={tema.titulo} className="w-full" />
-            </div>
-          ))}
+      <p className="mt-3 text-justify text-sm leading-relaxed text-white/65 [text-justify:inter-word]">{tema.texto}</p>
+      {tema.imagenes && tema.imagenes.length >= 2 && (
+        <Carousel key={tema.id} images={tema.imagenes} alt={tema.titulo} />
+      )}
+      {tema.imagenes && tema.imagenes.length === 1 && (
+        <div className="mt-4 flex items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/20">
+          <img src={tema.imagenes[0]} alt={tema.titulo} className="mx-auto max-h-[440px] w-auto" />
         </div>
       )}
 

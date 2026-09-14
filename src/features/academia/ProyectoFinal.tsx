@@ -10,20 +10,14 @@ interface ProyectoFinalProps {
   onComplete: () => void;
 }
 
-const CAMPOS = [
-  { key: "resumen", label: "Ruta y objetivo", placeholder: "Ej. MMGL → MMZO, vuelo de entrenamiento VFR diurno" },
-  { key: "checkpoints", label: "Checkpoints, rumbos y distancias por tramo", placeholder: "Describe cada tramo: checkpoint, rumbo magnético, distancia..." },
-  { key: "tiempos", label: "Tiempos y combustible estimados", placeholder: "Tiempo por tramo, tiempo total, combustible requerido + reserva..." },
-  { key: "alterno", label: "Alterno y consideraciones adicionales", placeholder: "Aeropuerto alterno elegido y por qué, notas de espacio aéreo, etc." },
-] as const;
-
 export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFinalProps) {
   const { user } = useAuth();
-  const [valores, setValores] = useState<Record<string, string>>({});
+  const [respuesta, setRespuesta] = useState("");
+  const [notas, setNotas] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
-  const completo = CAMPOS.every((c) => (valores[c.key] ?? "").trim().length > 0);
+  const completo = respuesta.trim().length > 0;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -38,7 +32,7 @@ export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFina
       return;
     }
 
-    const comentarios = CAMPOS.map((c) => `${c.label}:\n${valores[c.key] ?? ""}`).join("\n\n");
+    const comentarios = notas.trim() ? `${respuesta}\n\nNotas adicionales:\n${notas}` : respuesta;
 
     const { error: insertError } = await supabase.from("reservas").insert({
       user_id: userId,
@@ -76,18 +70,27 @@ export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFina
         <p className="text-sm leading-relaxed text-white/75">{prompt}</p>
       </div>
 
-      {CAMPOS.map((campo) => (
-        <label key={campo.key} className="flex flex-col gap-1.5 text-sm text-white/70">
-          {campo.label}
-          <textarea
-            value={valores[campo.key] ?? ""}
-            onChange={(e) => setValores((v) => ({ ...v, [campo.key]: e.target.value }))}
-            placeholder={campo.placeholder}
-            rows={3}
-            className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-white placeholder:text-white/30 outline-none transition-colors focus:border-gold-500/50"
-          />
-        </label>
-      ))}
+      <label className="flex flex-col gap-1.5 text-sm text-white/70">
+        Tu respuesta
+        <textarea
+          value={respuesta}
+          onChange={(e) => setRespuesta(e.target.value)}
+          placeholder="Desarrolla aquí lo que te pide el enunciado de arriba..."
+          rows={8}
+          className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-white placeholder:text-white/30 outline-none transition-colors focus:border-gold-500/50"
+        />
+      </label>
+
+      <label className="flex flex-col gap-1.5 text-sm text-white/70">
+        Notas adicionales <span className="text-white/40">(opcional)</span>
+        <textarea
+          value={notas}
+          onChange={(e) => setNotas(e.target.value)}
+          placeholder="Dudas, supuestos que hiciste, o cualquier contexto extra para quien lo revise..."
+          rows={3}
+          className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-white placeholder:text-white/30 outline-none transition-colors focus:border-gold-500/50"
+        />
+      </label>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 

@@ -1,6 +1,6 @@
 export interface ContenidoExclusivo {
   id: string;
-  tipo: "Checklist" | "Examen" | "Agenda" | "Audio";
+  tipo: "Checklist" | "Examen" | "Agenda" | "Audio" | "Práctica";
   titulo: string;
   descripcion: string;
   duracion: string;
@@ -15,7 +15,7 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     titulo: "Checklist Premium — Cessna 172",
     descripcion: "Checklist completo, flujos de memoria para emergencias y V-speeds de referencia, todo en un solo lugar.",
     duracion: "3 secciones",
-    imagen: "/images/msfs-xbvla-farmland.jpg",
+    imagen: "/images/exclusivo-checklist-c172.jpg",
     interactivoHref: "/premium/checklist-c172",
   },
   {
@@ -24,7 +24,7 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     titulo: "Checklist Premium — Cessna 152",
     descripcion: "Versión análoga a la del C172: checklist completo, flujos de memoria y V-speeds propias del C152.",
     duracion: "3 secciones",
-    imagen: "/images/msfs-aeromexico-clouds.jpg",
+    imagen: "/images/exclusivo-checklist-c152.jpg",
     interactivoHref: "/premium/checklist-c152",
   },
   {
@@ -33,7 +33,7 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     titulo: "Agenda tu sesión con el fundador",
     descripcion: "Solicita una hora de revisión de un tema específico con el fundador, o agenda un simulacro de examen práctico.",
     duracion: "A tu ritmo",
-    imagen: "/images/msfs-sunset-wing.jpg",
+    imagen: "/images/exclusivo-agenda.jpg",
     interactivoHref: "/agendar-cita",
   },
   {
@@ -42,7 +42,7 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     titulo: "Simulacro de examen oral PPL",
     descripcion: "Preguntas reales de examinador con retroalimentación grabada, al nivel de exigencia de un checkride.",
     duracion: "50 min",
-    imagen: "/images/msfs-sunset-wing.jpg",
+    imagen: "/images/exclusivo-checkride-oral.jpg",
     interactivoHref: "/premium/simulacro-oral",
   },
   {
@@ -51,7 +51,7 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     titulo: "Simulacro de checkride: maniobras en vuelo",
     descripcion: "Estándares de tolerancia por maniobra para autoevaluar tus vuelos de práctica antes del examen.",
     duracion: "40 min",
-    imagen: "/images/msfs-volaris-climb.jpg",
+    imagen: "/images/exclusivo-checkride-vuelo.jpg",
     interactivoHref: "/premium/simulacro-vuelo",
   },
   {
@@ -60,8 +60,17 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     titulo: "Fraseología ATC: rodaje y despegue",
     descripcion: "Audio de práctica con llamadas reales de rodaje, autorización y despegue para escuchar en cualquier momento.",
     duracion: "5 situaciones",
-    imagen: "/images/msfs-volaris-climb.jpg",
+    imagen: "/images/exclusivo-audio-rodaje.jpg",
     interactivoHref: "/premium/audio-rodaje-despegue",
+  },
+  {
+    id: "practica-vuelo",
+    tipo: "Práctica",
+    titulo: "Práctica de vuelo — progresión de maniobras",
+    descripcion: "La secuencia real de maniobras que practicarás con tu instructor, del vuelo de familiarización a las tomas y despegues.",
+    duracion: "12 maniobras",
+    imagen: "/images/msfs-xbvla-farmland.jpg",
+    interactivoHref: "/premium/practica-de-vuelo",
   },
   {
     id: "audio-atc-emergencias",
@@ -69,7 +78,7 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     titulo: "Fraseología ATC: emergencias y aproximación",
     descripcion: "Audio de práctica con llamadas de aproximación, tránsito y procedimientos de emergencia.",
     duracion: "5 situaciones",
-    imagen: "/images/msfs-sunset-wing.jpg",
+    imagen: "/images/exclusivo-audio-emergencias.jpg",
     interactivoHref: "/premium/audio-emergencias-aproximacion",
   },
 ];

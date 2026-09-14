@@ -17,7 +17,6 @@ import { ContenidoExclusivo } from "./pages/ContenidoExclusivo";
 import { Descargas } from "./pages/Descargas";
 import { ChecklistC172 } from "./pages/ChecklistC172";
 import { ChecklistC152 } from "./pages/ChecklistC152";
-import { ResumenMeteorologia } from "./pages/ResumenMeteorologia";
 import { PlanDeVuelo } from "./pages/PlanDeVuelo";
 import { BitacoraVuelo } from "./pages/BitacoraVuelo";
 import { PesoBalance } from "./pages/PesoBalance";
@@ -27,10 +26,14 @@ import { ChecklistPremiumC172 } from "./pages/ChecklistPremiumC172";
 import { ChecklistPremiumC152 } from "./pages/ChecklistPremiumC152";
 import { SimulacroOral } from "./pages/SimulacroOral";
 import { SimulacroVuelo } from "./pages/SimulacroVuelo";
+import { PracticaVuelo } from "./pages/PracticaVuelo";
 import { AgendarCita } from "./pages/AgendarCita";
 import { GuiaVFR } from "./pages/GuiaVFR";
 import { Comunidad } from "./pages/Comunidad";
 import { Perfil } from "./pages/Perfil";
+import { AdminVuelosPractica } from "./pages/AdminVuelosPractica";
+import { AdminReservas } from "./pages/AdminReservas";
+import { Legal } from "./pages/Legal";
 import { Ingresar } from "./pages/Ingresar";
 import { NotFound } from "./pages/NotFound";
 
@@ -96,7 +99,6 @@ function App() {
               <Route path={ROUTES.descargas} element={<Descargas />} />
               <Route path={ROUTES.checklistC172} element={<ChecklistC172 />} />
               <Route path={ROUTES.checklistC152} element={<ChecklistC152 />} />
-              <Route path={ROUTES.resumenMeteorologia} element={<ResumenMeteorologia />} />
               <Route path={ROUTES.planVuelo} element={<PlanDeVuelo />} />
               <Route path={ROUTES.bitacoraVuelo} element={<BitacoraVuelo />} />
               <Route path={ROUTES.pesoBalance} element={<PesoBalance />} />
@@ -149,6 +151,14 @@ function App() {
                 }
               />
               <Route
+                path={ROUTES.practicaVuelo}
+                element={
+                  <PremiumRoute>
+                    <PracticaVuelo />
+                  </PremiumRoute>
+                }
+              />
+              <Route
                 path={ROUTES.agendarCita}
                 element={
                   <PremiumRoute>
@@ -167,6 +177,23 @@ function App() {
                 }
               />
               <Route path={ROUTES.ingresar} element={<Ingresar />} />
+              <Route path={ROUTES.legal} element={<Legal />} />
+              <Route
+                path={ROUTES.adminVuelosPractica}
+                element={
+                  <ProtectedRoute>
+                    <AdminVuelosPractica />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.adminReservas}
+                element={
+                  <ProtectedRoute>
+                    <AdminReservas />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>

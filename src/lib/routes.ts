@@ -11,7 +11,6 @@ export const ROUTES = {
   descargas: "/descargas",
   checklistC172: "/checklist-c172",
   checklistC152: "/checklist-c152",
-  resumenMeteorologia: "/resumen-meteorologia",
   planVuelo: "/plan-de-vuelo",
   bitacoraVuelo: "/bitacora-de-vuelo",
   pesoBalance: "/peso-y-balance",
@@ -21,10 +20,14 @@ export const ROUTES = {
   checklistPremiumC152: "/premium/checklist-c152",
   simulacroOral: "/premium/simulacro-oral",
   simulacroVuelo: "/premium/simulacro-vuelo",
+  practicaVuelo: "/premium/practica-de-vuelo",
   agendarCita: "/agendar-cita",
   guiaVFR: "/guia-vfr",
   comunidad: "/comunidad",
   perfil: "/perfil",
+  adminVuelosPractica: "/admin/vuelos-practica",
+  adminReservas: "/admin/agenda-y-proyectos",
+  legal: "/legal",
   ingresar: "/ingresar",
 } as const;
 

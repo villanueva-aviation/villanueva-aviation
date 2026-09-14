@@ -6,7 +6,7 @@
 //   PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_API_BASE
 //     - sandbox:  https://api-m.sandbox.paypal.com
 //     - producción: https://api-m.paypal.com
-//   PRECIO_CONTENIDO_EXCLUSIVO (ej. "49.00")
+//   PRECIO_CONTENIDO_EXCLUSIVO (ej. "29.00")
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -29,7 +29,7 @@ function jsonResponse(body: unknown, status: number) {
 const PAYPAL_API_BASE = Deno.env.get("PAYPAL_API_BASE")!;
 const PAYPAL_CLIENT_ID = Deno.env.get("PAYPAL_CLIENT_ID")!;
 const PAYPAL_CLIENT_SECRET = Deno.env.get("PAYPAL_CLIENT_SECRET")!;
-const PRECIO_ESPERADO = Deno.env.get("PRECIO_CONTENIDO_EXCLUSIVO") ?? "49.00";
+const PRECIO_ESPERADO = Deno.env.get("PRECIO_CONTENIDO_EXCLUSIVO") ?? "29.00";
 
 async function obtenerTokenPayPal(): Promise<string> {
   const credenciales = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`);

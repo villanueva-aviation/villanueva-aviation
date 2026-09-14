@@ -7,9 +7,12 @@ export const SITE = {
 
 export const DISCORD_URL = "https://discord.gg/Q7fmGsFbg";
 
+// Cuenta del fundador — decide qué correo ve el panel de confirmación de vuelos.
+// Debe coincidir con la policy "fundador" en supabase/migrations/0002_vuelos_practica.sql.
+export const FOUNDER_EMAIL = "villanuevaaviation@gmail.com";
+
 // Pago único para desbloquear Contenido Exclusivo. Debe coincidir con
 // PRECIO_CONTENIDO_EXCLUSIVO en la Edge Function verify-paypal-payment.
-export const PRECIO_CONTENIDO_EXCLUSIVO = "49.00";
+export const PRECIO_CONTENIDO_EXCLUSIVO = "29.00";
 
-// PLACEHOLDER: reemplazar con la dirección de contacto oficial cuando esté disponible.
-export const CONTACT_EMAIL = "contacto@villanuevaaviation.placeholder";
+export const CONTACT_EMAIL = "villanuevaaviation@gmail.com";

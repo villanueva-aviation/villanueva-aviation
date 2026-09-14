@@ -1,7 +1,7 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { MessageCircle } from "lucide-react";
-import { NAV_LINKS } from "../../lib/routes";
-import { DISCORD_URL, SITE } from "../../lib/constants";
+import { NAV_LINKS, ROUTES } from "../../lib/routes";
+import { CONTACT_EMAIL, DISCORD_URL, SITE } from "../../lib/constants";
 import { Logo } from "./Logo";
 
 export function Footer() {
@@ -19,6 +19,12 @@ export function Footer() {
             <p className="mt-4 text-sm leading-relaxed text-white/55">
               {SITE.description}
             </p>
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="mt-3 block text-sm text-white/50 transition-colors hover:text-gold-400"
+            >
+              {CONTACT_EMAIL}
+            </a>
             <a
               href={DISCORD_URL}
               target="_blank"
@@ -65,7 +71,12 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} {SITE.name}. Todos los derechos reservados.</p>
-          <p>Comunidad independiente de aviación. No afiliada a ninguna aerolínea real.</p>
+          <div className="flex items-center gap-4">
+            <p>Comunidad independiente de aviación. No afiliada a ninguna aerolínea real.</p>
+            <Link to={ROUTES.legal} className="shrink-0 transition-colors hover:text-gold-400">
+              Legal
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

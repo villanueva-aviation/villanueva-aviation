@@ -1,4 +1,4 @@
-import { ArrowRight, Award, BookCheck, ClipboardCheck, Gauge, Timer } from "lucide-react";
+import { ArrowRight, Award, BookCheck, ClipboardCheck, Gauge, Plane, Timer } from "lucide-react";
 import { CadetTabs } from "../components/layout/CadetTabs";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
@@ -9,6 +9,7 @@ import { useProgress } from "../features/progress/ProgressContext";
 import { useAuth } from "../features/auth/AuthContext";
 import { ACADEMIA_MODULOS } from "../data/academia";
 import { contarExamenesAprobados } from "../data/evaluaciones";
+import { useHorasVueloConfirmadas } from "../features/practica/vuelosPractica";
 import { ROUTES } from "../lib/routes";
 
 export function MiFormacion() {
@@ -25,6 +26,7 @@ export function MiFormacion() {
 
   const leccionesCompletadas = modulos.reduce((sum, m) => sum + m.completadasCount, 0);
   const examenesAprobados = contarExamenesAprobados(examenResultado);
+  const horasVueloConfirmadas = useHorasVueloConfirmadas();
 
   return (
     <div>
@@ -99,6 +101,9 @@ export function MiFormacion() {
             </Reveal>
             <Reveal delay={240}>
               <StatTile icon={Timer} label="Horas de simulador" value={`${horasSimulador}h`} />
+            </Reveal>
+            <Reveal delay={320} className="col-span-2">
+              <StatTile icon={Plane} label="Horas de vuelo confirmadas" value={`${horasVueloConfirmadas}h`} />
             </Reveal>
           </div>
         </div>

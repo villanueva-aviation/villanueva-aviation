@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { LogOut, User } from "lucide-react";
+import { CalendarClock, ClipboardCheck, LogOut, User } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { useAuth } from "../../features/auth/AuthContext";
+import { FOUNDER_EMAIL } from "../../lib/constants";
 import { Logo } from "./Logo";
 import { HamburgerButton } from "./HamburgerButton";
 import { MobileMenu } from "./MobileMenu";
@@ -55,6 +56,24 @@ function ProfileControl() {
         >
           <User size={14} /> Mi perfil
         </Link>
+        {user?.email === FOUNDER_EMAIL && (
+          <Link
+            to={ROUTES.adminVuelosPractica}
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            <ClipboardCheck size={14} /> Vuelos por confirmar
+          </Link>
+        )}
+        {user?.email === FOUNDER_EMAIL && (
+          <Link
+            to={ROUTES.adminReservas}
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            <CalendarClock size={14} /> Agenda y proyectos
+          </Link>
+        )}
         <button
           onClick={() => {
             logout();

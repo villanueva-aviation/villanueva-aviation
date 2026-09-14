@@ -1,4 +1,4 @@
-import { Award, BadgeCheck, Gauge, Lock, Timer } from "lucide-react";
+import { Award, BadgeCheck, Gauge, Lock, Plane, Timer } from "lucide-react";
 import { CadetTabs } from "../components/layout/CadetTabs";
 import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
@@ -8,11 +8,13 @@ import { Reveal } from "../components/ui/Reveal";
 import { useAuth } from "../features/auth/AuthContext";
 import { useProgress } from "../features/progress/ProgressContext";
 import { contarExamenesAprobados } from "../data/evaluaciones";
+import { useHorasVueloConfirmadas } from "../features/practica/vuelosPractica";
 
 export function Perfil() {
   const { user } = useAuth();
   const { nivel, xp, horasSimulador, progresoGeneralPct, logros, certificados, examenResultado } = useProgress();
   const examenesAprobados = contarExamenesAprobados(examenResultado);
+  const horasVueloConfirmadas = useHorasVueloConfirmadas();
 
   return (
     <div>
@@ -36,7 +38,7 @@ export function Perfil() {
       <CadetTabs />
 
       <Container className="py-14 md:py-20">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           <Reveal delay={0}>
             <StatTile icon={Gauge} label="Progreso general" value={`${progresoGeneralPct}%`} />
           </Reveal>
@@ -48,6 +50,9 @@ export function Perfil() {
           </Reveal>
           <Reveal delay={240}>
             <StatTile icon={Award} label="XP acumulados" value={String(xp)} />
+          </Reveal>
+          <Reveal delay={320}>
+            <StatTile icon={Plane} label="Horas de vuelo confirmadas" value={`${horasVueloConfirmadas}h`} />
           </Reveal>
         </div>
 

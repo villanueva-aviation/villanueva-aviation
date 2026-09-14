@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Lock, Sparkles } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
@@ -15,6 +15,9 @@ import {
   MODULE_SLIDERS,
 } from "../data/moduleContent";
 import { ROUTES } from "../lib/routes";
+import { CONTENIDO_EXCLUSIVO } from "../data/exclusivo";
+import { useAuth } from "../features/auth/AuthContext";
+import { usePremiumAccess } from "../features/payments/usePremiumAccess";
 import { useProgress } from "../features/progress/ProgressContext";
 import { ModuleStepper, type StepperStage } from "../features/academia/ModuleStepper";
 import { AirplaneDiagram } from "../features/academia/AirplaneDiagram";
@@ -39,6 +42,49 @@ const INTERACTIVIDAD_INTRO: Record<InteractividadTipo, string> = {
   circuito: "Recorre el circuito de tráfico paso a paso, luego pon a prueba tu ubicación.",
 };
 
+// Sugerencia de Contenido Exclusivo más relacionada con cada módulo, mostrada al completarlo.
+const MODULO_EXCLUSIVO_SUGERIDO: Record<string, string> = {
+  comunicaciones: "audio-atc-rodaje",
+  vfr: "checkride-vuelo",
+  reglamentacion: "checkride-oral",
+  "espacios-aereos": "checkride-oral",
+  ifr: "checkride-oral",
+  instrumentos: "checklist-premium-c172",
+  rendimiento: "checklist-premium-c172",
+  operacion: "checklist-premium-c172",
+};
+
+function ModuloCompletadoBanner({ slug }: { slug: string }) {
+  const { isAuthenticated } = useAuth();
+  const { hasAccess, loading } = usePremiumAccess();
+  const item =
+    CONTENIDO_EXCLUSIVO.find((i) => i.id === MODULO_EXCLUSIVO_SUGERIDO[slug]) ??
+    CONTENIDO_EXCLUSIVO.find((i) => i.id === "agendar-cita");
+  if (loading || !item) return null;
+  const puedeAbrir = isAuthenticated && hasAccess;
+
+  return (
+    <Reveal className="mt-8 flex flex-col items-start justify-between gap-4 rounded-2xl border border-gold-500/25 bg-gold-500/[0.06] p-5 sm:flex-row sm:items-center">
+      <div className="flex items-start gap-3">
+        <Sparkles size={18} className="mt-0.5 shrink-0 text-gold-400" />
+        <div>
+          <p className="font-display text-sm font-semibold text-white">¡Módulo completado! Sigue practicando</p>
+          <p className="mt-1 text-sm text-white/60">
+            {puedeAbrir ? item.titulo : `${item.titulo} te espera en Contenido Exclusivo.`}
+          </p>
+        </div>
+      </div>
+      <Link
+        to={puedeAbrir && item.interactivoHref ? item.interactivoHref : ROUTES.contenidoExclusivo}
+        className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gold-500 px-4 py-2 text-xs font-semibold text-navy-950 transition-transform duration-200 hover:scale-[1.03]"
+      >
+        {puedeAbrir ? "Abrir" : "Ver en Contenido Exclusivo"}
+        <ArrowRight size={13} />
+      </Link>
+    </Reveal>
+  );
+}
+
 const STAGE_LABELS: Record<ActividadTipo | "introduccion", string> = {
   introduccion: "Introducción",
   leccion: "Lección",
@@ -61,7 +107,7 @@ function InteractividadWidget({
     case "dragdrop":
       return <DragDropLabels onComplete={onComplete} />;
     case "escenario": {
-      const scenario = MODULE_SCENARIOS[modulo.slug];
+      const scenario = MODULE_SCENARIOS[actividad.scenarioId ?? modulo.slug];
       return scenario ? <ScenarioSimulator tree={scenario.tree} startId={scenario.startId} /> : <ScenarioSimulator />;
     }
     case "slider": {
@@ -109,6 +155,10 @@ export function AcademiaModulo() {
   const practicaPreguntas = MODULE_PRACTICA[modulo.slug];
   const evaluacionPreguntas = MODULE_EVALUACION[modulo.slug];
 
+  const leccionDone = leccionActividades.length === 0 || leccionActividades.every((a) => isActividadCompletada(modulo.slug, a.id));
+  const interactividadDone =
+    interactividadActividades.length === 0 || interactividadActividades.every((a) => isActividadCompletada(modulo.slug, a.id));
+
   const stages: StepperStage[] = stageKeys.map((key) => {
     let done = false;
     if (key === "leccion") done = leccionActividades.every((a) => isActividadCompletada(modulo.slug, a.id));
@@ -139,6 +189,8 @@ export function AcademiaModulo() {
 
       <Container className="py-12 md:py-16">
         <ModuleStepper stages={stages} activeKey={activeStage} onSelect={setActiveStage} />
+
+        {progreso.estado === "completado" && <ModuloCompletadoBanner slug={modulo.slug} />}
 
         <Reveal key={activeStage} className="mt-10">
           {activeStage === "introduccion" && (
@@ -197,8 +249,12 @@ export function AcademiaModulo() {
                   );
                 })
               )}
-              <div className="flex justify-end">
+              <div className="flex items-center justify-end gap-3">
+                {!leccionDone && (
+                  <p className="text-xs text-white/45">Completa todas las lecciones para continuar.</p>
+                )}
                 <Button
+                  disabled={!leccionDone}
                   onClick={() =>
                     setActiveStage(interactividadActividades.length > 0 ? "interactividad" : practicaActividad ? "practica" : "evaluacion")
                   }
@@ -239,8 +295,13 @@ export function AcademiaModulo() {
                   </div>
                 );
               })}
-              <div className="flex justify-end">
-                <Button onClick={() => setActiveStage("practica")}>Continuar a práctica</Button>
+              <div className="flex items-center justify-end gap-3">
+                {!interactividadDone && (
+                  <p className="text-xs text-white/45">Completa el ejercicio interactivo para continuar.</p>
+                )}
+                <Button disabled={!interactividadDone} onClick={() => setActiveStage("practica")}>
+                  Continuar a práctica
+                </Button>
               </div>
             </div>
           )}

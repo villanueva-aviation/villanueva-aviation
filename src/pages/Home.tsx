@@ -56,7 +56,7 @@ export function Home() {
             className="animate-fade-up mt-2 max-w-5xl font-display text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-white sm:mt-8 sm:text-5xl md:text-7xl lg:text-8xl"
             style={{ animationDelay: "50ms" }}
           >
-            Tu camino a <span className="text-shine">piloto</span>, antes de pagar por avión real
+            Tu camino para ser <span className="text-shine">piloto</span>, antes de subirte al avión real
           </h1>
 
           <p
@@ -82,8 +82,8 @@ export function Home() {
             className="animate-fade-up mt-4 text-sm font-medium tracking-wide text-white/70 sm:mt-5"
             style={{ animationDelay: "190ms" }}
           >
-            <span className="font-display font-semibold uppercase tracking-wider text-gold-400">Gratis para empezar</span>
-            {" "}— crea tu cuenta de cadete en menos de un minuto
+            <span className="font-display font-semibold uppercase tracking-wider text-gold-400">Crear tu cuenta es gratis</span>
+            {" "}— empieza a aprender en menos de un minuto
           </p>
 
           <div className="mt-8 flex justify-center sm:hidden">

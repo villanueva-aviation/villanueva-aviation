@@ -1,0 +1,74 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="800" height="500" fill="#0b1d34"/>
+  <text x="40" y="48" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#e8c766">LUCES DE LA AERONAVE</text>
+  <text x="40" y="78" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#7d8aa3">Posición, anticolisión y aterrizaje — para qué sirve cada una</text>
+
+  <!-- Box 1: Posicion -->
+  <rect x="40" y="105" width="165" height="235" rx="10" fill="#102847" stroke="#3a5a89" stroke-width="1.5"/>
+  <line x1="80" y1="155" x2="165" y2="155" stroke="#cadcfc" stroke-width="2"/>
+  <circle cx="80" cy="155" r="9" fill="#e04b4b"/>
+  <circle cx="165" cy="155" r="9" fill="#4bbf73"/>
+  <circle cx="122" cy="182" r="7" fill="#ffffff"/>
+  <text x="122" y="215" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">Posición</text>
+  <text x="122" y="238" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#b9c4d8" text-anchor="middle">
+    <tspan x="122" dy="0">Roja izquierda, verde</tspan>
+    <tspan x="122" dy="16">derecha, blanca en cola</tspan>
+    <tspan x="122" dy="16">— indican de qué lado</tspan>
+    <tspan x="122" dy="16">vas de noche</tspan>
+  </text>
+
+  <!-- Box 2: Baliza / beacon -->
+  <rect x="220" y="105" width="165" height="235" rx="10" fill="#102847" stroke="#3a5a89" stroke-width="1.5"/>
+  <circle cx="302" cy="168" r="10" fill="#e04b4b"/>
+  <g stroke="#e04b4b" stroke-width="2.5">
+    <line x1="302" y1="140" x2="302" y2="150"/>
+    <line x1="330" y1="168" x2="320" y2="168"/>
+    <line x1="274" y1="168" x2="284" y2="168"/>
+    <line x1="322" y1="146" x2="314" y2="154"/>
+    <line x1="282" y1="146" x2="290" y2="154"/>
+  </g>
+  <text x="302" y="215" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">Anticolisión</text>
+  <text x="302" y="238" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#b9c4d8" text-anchor="middle">
+    <tspan x="302" dy="0">Baliza roja rotativa:</tspan>
+    <tspan x="302" dy="16">se enciende con el</tspan>
+    <tspan x="302" dy="16">motor — nunca te</tspan>
+    <tspan x="302" dy="16">acerques con ella activa</tspan>
+  </text>
+
+  <!-- Box 3: Strobes -->
+  <rect x="400" y="105" width="165" height="235" rx="10" fill="#102847" stroke="#3a5a89" stroke-width="1.5"/>
+  <g fill="#ffffff">
+    <path d="M482,145 L488,163 L506,163 L491,174 L497,192 L482,181 L467,192 L473,174 L458,163 L476,163 Z"/>
+  </g>
+  <text x="482" y="215" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">Estroboscópicas</text>
+  <text x="482" y="238" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#b9c4d8" text-anchor="middle">
+    <tspan x="482" dy="0">Destellos blancos de</tspan>
+    <tspan x="482" dy="16">alta intensidad — apaga</tspan>
+    <tspan x="482" dy="16">dentro de nubes, el</tspan>
+    <tspan x="482" dy="16">reflejo desorienta</tspan>
+  </text>
+
+  <!-- Box 4: Aterrizaje / rodaje -->
+  <rect x="580" y="105" width="180" height="235" rx="10" fill="#102847" stroke="#3a5a89" stroke-width="1.5"/>
+  <polygon points="670,145 650,180 690,180" fill="#e8c766"/>
+  <g stroke="#e8c766" stroke-width="2" opacity="0.7">
+    <line x1="655" y1="180" x2="645" y2="200"/>
+    <line x1="670" y1="184" x2="670" y2="204"/>
+    <line x1="685" y1="180" x2="695" y2="200"/>
+  </g>
+  <text x="670" y="222" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">Aterrizaje / Rodaje</text>
+  <text x="670" y="245" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#b9c4d8" text-anchor="middle">
+    <tspan x="670" dy="0">Mejoran tu visibilidad</tspan>
+    <tspan x="670" dy="16">ante otros y tu visión</tspan>
+    <tspan x="670" dy="16">de la pista o</tspan>
+    <tspan x="670" dy="16">plataforma</tspan>
+  </text>
+
+  <!-- Caption -->
+  <text x="400" y="380" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#cadcfc" text-anchor="middle">
+    <tspan x="400" dy="0">Las luces de posición son obligatorias desde 30 min después de la puesta del sol</tspan>
+    <tspan x="400" dy="22">hasta 30 min antes de su salida — la anticolisión, siempre que el motor esté encendido.</tspan>
+  </text>
+
+  <text x="760" y="475" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" fill="#e8c766" text-anchor="end">VILLANUEVA AVIATION</text>
+</svg>
