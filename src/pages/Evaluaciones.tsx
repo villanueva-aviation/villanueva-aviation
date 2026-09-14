@@ -32,7 +32,7 @@ function ExamenTeoricoIcon({ estado }: { estado: string }) {
 }
 
 export function Evaluaciones() {
-  const { examenResultado } = useProgress();
+  const { examenResultado, loading: progresoLoading } = useProgress();
   const [tab, setTab] = useState<"teoricas" | "practicas">("teoricas");
   const [practicas, setPracticas] = useState<EvaluacionPractica[]>(() =>
     readStorage(STORAGE_KEY, EVALUACIONES_PRACTICAS_INICIALES),
@@ -57,6 +57,8 @@ export function Evaluaciones() {
     setShowForm(false);
     setForm({ tipo: "", aeronave: "", aeropuerto: "", fechaHorario: "", comentarios: "" });
   }
+
+  if (progresoLoading) return null;
 
   return (
     <div>

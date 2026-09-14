@@ -4,15 +4,30 @@ import { CalendarClock, ClipboardCheck, LogOut, User } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { useAuth } from "../../features/auth/AuthContext";
 import { FOUNDER_EMAIL } from "../../lib/constants";
+import { contarVuelosPendientes } from "../../features/practica/vuelosPractica";
+import { contarReservasPendientes } from "../../features/admin/reservas";
 import { Logo } from "./Logo";
 import { HamburgerButton } from "./HamburgerButton";
 import { MobileMenu } from "./MobileMenu";
 
+function CountBadge({ count }: { count: number }) {
+  if (count === 0) return null;
+  return (
+    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-gold-500 px-1.5 text-[11px] font-bold text-navy-950">
+      {count}
+    </span>
+  );
+}
+
 function ProfileControl() {
   const { isAuthenticated, user, logout } = useAuth();
   const [open, setOpen] = useState(false);
+  const [vuelosPendientes, setVuelosPendientes] = useState(0);
+  const [reservasPendientes, setReservasPendientes] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const esFundador = user?.email === FOUNDER_EMAIL;
+  const totalPendientes = vuelosPendientes + reservasPendientes;
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -21,6 +36,12 @@ function ProfileControl() {
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
+
+  useEffect(() => {
+    if (!esFundador) return;
+    contarVuelosPendientes().then(setVuelosPendientes);
+    contarReservasPendientes().then(setReservasPendientes);
+  }, [esFundador]);
 
   if (!isAuthenticated) {
     return (
@@ -39,10 +60,15 @@ function ProfileControl() {
     <div className="relative hidden lg:block" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex h-10 w-10 items-center justify-center rounded-full border border-gold-500/40 bg-gold-500/10 font-display text-sm font-semibold text-gold-400 transition-colors hover:bg-gold-500/20"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full border border-gold-500/40 bg-gold-500/10 font-display text-sm font-semibold text-gold-400 transition-colors hover:bg-gold-500/20"
         aria-label="Perfil"
       >
         {initial}
+        {esFundador && totalPendientes > 0 && (
+          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold-500 px-1 text-[10px] font-bold text-navy-950">
+            {totalPendientes}
+          </span>
+        )}
       </button>
       <div
         className={`absolute right-0 top-12 w-48 origin-top-right rounded-xl border border-white/10 bg-navy-900/95 p-1.5 shadow-xl backdrop-blur-lg transition-[opacity,transform] duration-150 ease-out ${
@@ -56,22 +82,24 @@ function ProfileControl() {
         >
           <User size={14} /> Mi perfil
         </Link>
-        {user?.email === FOUNDER_EMAIL && (
+        {esFundador && (
           <Link
             to={ROUTES.adminVuelosPractica}
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
           >
             <ClipboardCheck size={14} /> Vuelos por confirmar
+            <CountBadge count={vuelosPendientes} />
           </Link>
         )}
-        {user?.email === FOUNDER_EMAIL && (
+        {esFundador && (
           <Link
             to={ROUTES.adminReservas}
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
           >
             <CalendarClock size={14} /> Agenda y proyectos
+            <CountBadge count={reservasPendientes} />
           </Link>
         )}
         <button

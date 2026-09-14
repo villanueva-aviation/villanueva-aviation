@@ -14,8 +14,17 @@ import { ROUTES } from "../lib/routes";
 
 export function MiFormacion() {
   const { user } = useAuth();
-  const { modulos, moduloProgreso, moduloActualSlug, progresoGeneralPct, nivel, xp, horasSimulador, examenResultado } =
-    useProgress();
+  const {
+    modulos,
+    moduloProgreso,
+    moduloActualSlug,
+    progresoGeneralPct,
+    nivel,
+    xp,
+    horasSimulador,
+    examenResultado,
+    loading,
+  } = useProgress();
 
   const moduloActual = ACADEMIA_MODULOS.find((m) => m.slug === moduloActualSlug) ?? ACADEMIA_MODULOS[0];
   const progresoActual = moduloProgreso(moduloActual.slug);
@@ -27,6 +36,8 @@ export function MiFormacion() {
   const leccionesCompletadas = modulos.reduce((sum, m) => sum + m.completadasCount, 0);
   const examenesAprobados = contarExamenesAprobados(examenResultado);
   const horasVueloConfirmadas = useHorasVueloConfirmadas();
+
+  if (loading) return null;
 
   return (
     <div>

@@ -74,6 +74,14 @@ export async function fetchPendientes(): Promise<VueloPractica[]> {
   return (data as VueloPractica[]) ?? [];
 }
 
+export async function contarVuelosPendientes(): Promise<number> {
+  const { count } = await supabase
+    .from("vuelos_practica")
+    .select("id", { count: "exact", head: true })
+    .eq("estado", "pendiente");
+  return count ?? 0;
+}
+
 export async function confirmarVuelo(id: string) {
   return supabase
     .from("vuelos_practica")

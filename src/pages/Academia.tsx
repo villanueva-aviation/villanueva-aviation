@@ -24,7 +24,9 @@ const ESTADO_TONE: Record<ModuloEstado, "gold" | "green" | "neutral"> = {
 };
 
 export function Academia() {
-  const { moduloProgreso } = useProgress();
+  const { moduloProgreso, loading } = useProgress();
+
+  if (loading) return null;
 
   return (
     <div>

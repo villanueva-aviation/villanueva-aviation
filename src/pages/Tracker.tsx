@@ -11,9 +11,11 @@ import { buildFormationStages } from "../features/progress/stages";
 import { ACADEMIA_MODULOS } from "../data/academia";
 
 export function Tracker() {
-  const { modulos, isActividadCompletada } = useProgress();
+  const { modulos, isActividadCompletada, loading } = useProgress();
   const [expanded, setExpanded] = useState<string | null>(ACADEMIA_MODULOS[0].slug);
   const stages = buildFormationStages(modulos);
+
+  if (loading) return null;
 
   return (
     <div>

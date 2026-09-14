@@ -131,7 +131,7 @@ function InteractividadWidget({
 export function AcademiaModulo() {
   const { slug } = useParams<{ slug: string }>();
   const modulo = ACADEMIA_MODULOS.find((m) => m.slug === slug);
-  const { isActividadCompletada, completarActividad, registrarExamen, moduloProgreso } = useProgress();
+  const { isActividadCompletada, completarActividad, registrarExamen, moduloProgreso, loading: progresoLoading } = useProgress();
 
   const stageKeys = useMemo(() => {
     if (!modulo) return [];
@@ -143,6 +143,7 @@ export function AcademiaModulo() {
   const [activeStage, setActiveStage] = useState<string>("introduccion");
 
   if (!modulo) return <Navigate to={ROUTES.academia} replace />;
+  if (progresoLoading) return null;
 
   const progreso = moduloProgreso(modulo.slug);
   const leccionActividades = modulo.actividades.filter((a) => a.tipo === "leccion");

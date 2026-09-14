@@ -12,9 +12,12 @@ import { useHorasVueloConfirmadas } from "../features/practica/vuelosPractica";
 
 export function Perfil() {
   const { user } = useAuth();
-  const { nivel, xp, horasSimulador, progresoGeneralPct, logros, certificados, examenResultado } = useProgress();
+  const { nivel, xp, horasSimulador, progresoGeneralPct, logros, certificados, examenResultado, loading } =
+    useProgress();
   const examenesAprobados = contarExamenesAprobados(examenResultado);
   const horasVueloConfirmadas = useHorasVueloConfirmadas();
+
+  if (loading) return null;
 
   return (
     <div>

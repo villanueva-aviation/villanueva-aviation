@@ -23,3 +23,11 @@ export async function fetchTodasReservas(): Promise<Reserva[]> {
 export async function actualizarEstadoReserva(id: string, estado: string) {
   return supabase.from("reservas").update({ estado }).eq("id", id);
 }
+
+export async function contarReservasPendientes(): Promise<number> {
+  const { count } = await supabase
+    .from("reservas")
+    .select("id", { count: "exact", head: true })
+    .eq("estado", "pendiente");
+  return count ?? 0;
+}

@@ -1,19 +1,15 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { ACADEMIA_MODULOS } from "../../data/academia";
 import { CADETE_BASE, CERTIFICADOS_BASE, LOGROS_BASE, type Certificado, type Logro } from "../../data/cadete";
-import { readStorage, writeStorage } from "../../lib/storage";
+import { readStorage } from "../../lib/storage";
+import { useAuth } from "../auth/AuthContext";
+import { fetchProgresoRemoto, guardarProgresoRemoto, type ProgresoRemoto, type QuizResult } from "./academiaProgresoRemoto";
 
 export type ModuloEstado = "bloqueado" | "disponible" | "en-progreso" | "completado";
 
-interface QuizResult {
-  score: number;
-  passed: boolean;
-}
+type ProgressState = ProgresoRemoto;
 
-interface ProgressState {
-  completadas: Record<string, string[]>;
-  examenes: Record<string, QuizResult>;
-}
+const ESTADO_VACIO: ProgressState = { completadas: {}, examenes: {} };
 
 interface ModuloProgreso {
   slug: string;
@@ -37,11 +33,12 @@ interface ProgressContextValue {
   moduloActualSlug: string;
   logros: Logro[];
   certificados: Certificado[];
+  loading: boolean;
 }
 
 const ProgressContext = createContext<ProgressContextValue | null>(null);
 
-const STORAGE_KEY = "cadet-progress";
+const LEGACY_STORAGE_KEY = "cadet-progress";
 
 function estadoDeModulo(index: number, completadasCount: number, total: number, moduloAnteriorCompletado: boolean): ModuloEstado {
   if (index > 0 && !moduloAnteriorCompletado) return "bloqueado";
@@ -51,13 +48,47 @@ function estadoDeModulo(index: number, completadasCount: number, total: number, 
 }
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<ProgressState>(() =>
-    readStorage(STORAGE_KEY, { completadas: {}, examenes: {} } as ProgressState),
-  );
+  const { user, loading: authLoading } = useAuth();
+  const [state, setState] = useState<ProgressState>(ESTADO_VACIO);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      setState(ESTADO_VACIO);
+      setLoading(false);
+      return;
+    }
+
+    let cancelado = false;
+    setLoading(true);
+
+    fetchProgresoRemoto(user.id).then(async (remoto) => {
+      if (cancelado) return;
+      if (remoto) {
+        setState(remoto);
+        setLoading(false);
+        return;
+      }
+      // Sin fila remota todavía: si hay progreso legado en este navegador
+      // (de antes de que esto viviera en Supabase), lo migramos una sola vez.
+      const legado = readStorage<ProgressState | null>(LEGACY_STORAGE_KEY, null);
+      const inicial = legado ?? ESTADO_VACIO;
+      if (legado) await guardarProgresoRemoto(user.id, legado);
+      if (!cancelado) {
+        setState(inicial);
+        setLoading(false);
+      }
+    });
+
+    return () => {
+      cancelado = true;
+    };
+  }, [user, authLoading]);
 
   const persist = (next: ProgressState) => {
     setState(next);
-    writeStorage(STORAGE_KEY, next);
+    if (user) guardarProgresoRemoto(user.id, next);
   };
 
   const value = useMemo<ProgressContextValue>(() => {
@@ -141,9 +172,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       moduloActualSlug: moduloActual.slug,
       logros,
       certificados,
+      loading,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  }, [state, loading]);
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;
 }
