@@ -1,41 +1,45 @@
 import { Route, Routes, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
+import { PageLoader } from "./components/layout/PageLoader";
 import { AuthProvider } from "./features/auth/AuthContext";
 import { ProtectedRoute } from "./features/auth/ProtectedRoute";
 import { PremiumRoute } from "./features/payments/PremiumRoute";
 import { ProgressProvider } from "./features/progress/ProgressContext";
 import { ROUTES } from "./lib/routes";
 import { Home } from "./pages/Home";
-import { Academia } from "./pages/Academia";
-import { AcademiaModulo } from "./pages/AcademiaModulo";
-import { MiFormacion } from "./pages/MiFormacion";
-import { Tracker } from "./pages/Tracker";
-import { Evaluaciones } from "./pages/Evaluaciones";
-import { ContenidoExclusivo } from "./pages/ContenidoExclusivo";
-import { Descargas } from "./pages/Descargas";
-import { ChecklistC172 } from "./pages/ChecklistC172";
-import { ChecklistC152 } from "./pages/ChecklistC152";
-import { PlanDeVuelo } from "./pages/PlanDeVuelo";
-import { BitacoraVuelo } from "./pages/BitacoraVuelo";
-import { PesoBalance } from "./pages/PesoBalance";
-import { AudioRodajeDespegue } from "./pages/AudioRodajeDespegue";
-import { AudioEmergenciasAproximacion } from "./pages/AudioEmergenciasAproximacion";
-import { ChecklistPremiumC172 } from "./pages/ChecklistPremiumC172";
-import { ChecklistPremiumC152 } from "./pages/ChecklistPremiumC152";
-import { SimulacroOral } from "./pages/SimulacroOral";
-import { SimulacroVuelo } from "./pages/SimulacroVuelo";
-import { PracticaVuelo } from "./pages/PracticaVuelo";
-import { AgendarCita } from "./pages/AgendarCita";
-import { GuiaVFR } from "./pages/GuiaVFR";
-import { Comunidad } from "./pages/Comunidad";
-import { Perfil } from "./pages/Perfil";
-import { AdminVuelosPractica } from "./pages/AdminVuelosPractica";
-import { AdminReservas } from "./pages/AdminReservas";
-import { Legal } from "./pages/Legal";
-import { Ingresar } from "./pages/Ingresar";
-import { NotFound } from "./pages/NotFound";
+
+const Academia = lazy(() => import("./pages/Academia").then((m) => ({ default: m.Academia })));
+const AcademiaModulo = lazy(() => import("./pages/AcademiaModulo").then((m) => ({ default: m.AcademiaModulo })));
+const MiFormacion = lazy(() => import("./pages/MiFormacion").then((m) => ({ default: m.MiFormacion })));
+const Tracker = lazy(() => import("./pages/Tracker").then((m) => ({ default: m.Tracker })));
+const Evaluaciones = lazy(() => import("./pages/Evaluaciones").then((m) => ({ default: m.Evaluaciones })));
+const ContenidoExclusivo = lazy(() => import("./pages/ContenidoExclusivo").then((m) => ({ default: m.ContenidoExclusivo })));
+const Descargas = lazy(() => import("./pages/Descargas").then((m) => ({ default: m.Descargas })));
+const ChecklistC172 = lazy(() => import("./pages/ChecklistC172").then((m) => ({ default: m.ChecklistC172 })));
+const ChecklistC152 = lazy(() => import("./pages/ChecklistC152").then((m) => ({ default: m.ChecklistC152 })));
+const PlanDeVuelo = lazy(() => import("./pages/PlanDeVuelo").then((m) => ({ default: m.PlanDeVuelo })));
+const BitacoraVuelo = lazy(() => import("./pages/BitacoraVuelo").then((m) => ({ default: m.BitacoraVuelo })));
+const PesoBalance = lazy(() => import("./pages/PesoBalance").then((m) => ({ default: m.PesoBalance })));
+const AudioRodajeDespegue = lazy(() => import("./pages/AudioRodajeDespegue").then((m) => ({ default: m.AudioRodajeDespegue })));
+const AudioEmergenciasAproximacion = lazy(() =>
+  import("./pages/AudioEmergenciasAproximacion").then((m) => ({ default: m.AudioEmergenciasAproximacion })),
+);
+const ChecklistPremiumC172 = lazy(() => import("./pages/ChecklistPremiumC172").then((m) => ({ default: m.ChecklistPremiumC172 })));
+const ChecklistPremiumC152 = lazy(() => import("./pages/ChecklistPremiumC152").then((m) => ({ default: m.ChecklistPremiumC152 })));
+const SimulacroOral = lazy(() => import("./pages/SimulacroOral").then((m) => ({ default: m.SimulacroOral })));
+const SimulacroVuelo = lazy(() => import("./pages/SimulacroVuelo").then((m) => ({ default: m.SimulacroVuelo })));
+const PracticaVuelo = lazy(() => import("./pages/PracticaVuelo").then((m) => ({ default: m.PracticaVuelo })));
+const AgendarCita = lazy(() => import("./pages/AgendarCita").then((m) => ({ default: m.AgendarCita })));
+const GuiaVFR = lazy(() => import("./pages/GuiaVFR").then((m) => ({ default: m.GuiaVFR })));
+const Comunidad = lazy(() => import("./pages/Comunidad").then((m) => ({ default: m.Comunidad })));
+const Perfil = lazy(() => import("./pages/Perfil").then((m) => ({ default: m.Perfil })));
+const AdminVuelosPractica = lazy(() => import("./pages/AdminVuelosPractica").then((m) => ({ default: m.AdminVuelosPractica })));
+const AdminReservas = lazy(() => import("./pages/AdminReservas").then((m) => ({ default: m.AdminReservas })));
+const Legal = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Legal })));
+const Ingresar = lazy(() => import("./pages/Ingresar").then((m) => ({ default: m.Ingresar })));
+const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m.NotFound })));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -53,6 +57,7 @@ function App() {
           <ScrollToTop />
           <Navbar />
           <main className="flex-1">
+            <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path={ROUTES.home} element={<Home />} />
               <Route
@@ -196,6 +201,7 @@ function App() {
               />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
           </main>
           <Footer />
         </div>
