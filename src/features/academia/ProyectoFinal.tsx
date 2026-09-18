@@ -1,4 +1,4 @@
-import { useEffect, useState, type ClipboardEvent, type DragEvent, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ClipboardEvent, type DragEvent, type FormEvent } from "react";
 import { Send, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { supabase } from "../../lib/supabaseClient";
@@ -22,6 +22,14 @@ export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFina
 
   const completo = respuesta.trim().length > 0;
   const [pegoBloqueado, setPegoBloqueado] = useState(false);
+  const inicioEscrituraRef = useRef<number | null>(null);
+
+  function handleRespuestaChange(valor: string) {
+    if (inicioEscrituraRef.current === null && valor.trim().length > 0) {
+      inicioEscrituraRef.current = Date.now();
+    }
+    setRespuesta(valor);
+  }
 
   function bloquearPegado(e: ClipboardEvent<HTMLTextAreaElement> | DragEvent<HTMLTextAreaElement>) {
     e.preventDefault();
@@ -53,6 +61,9 @@ export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFina
     }
 
     const comentarios = notas.trim() ? `${respuesta}\n\nNotas adicionales:\n${notas}` : respuesta;
+    const tiempoEscrituraSegundos = inicioEscrituraRef.current
+      ? Math.round((Date.now() - inicioEscrituraRef.current) / 1000)
+      : null;
 
     const { error: insertError } = await supabase.from("reservas").insert({
       user_id: userId,
@@ -60,6 +71,7 @@ export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFina
       tipo: "revision",
       tema,
       comentarios,
+      tiempo_escritura_segundos: tiempoEscrituraSegundos,
     });
 
     if (insertError) {
@@ -80,6 +92,7 @@ export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFina
       comentarios,
       estado: "pendiente",
       motivo_revision: null,
+      tiempo_escritura_segundos: tiempoEscrituraSegundos,
       created_at: new Date().toISOString(),
     });
   }
@@ -130,7 +143,7 @@ export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFina
         Tu respuesta <span className="text-white/40">(escríbela con tus propias palabras — no se puede pegar texto)</span>
         <textarea
           value={respuesta}
-          onChange={(e) => setRespuesta(e.target.value)}
+          onChange={(e) => handleRespuestaChange(e.target.value)}
           onPaste={bloquearPegado}
           onDrop={bloquearPegado}
           placeholder="Desarrolla aquí lo que te pide el enunciado de arriba..."

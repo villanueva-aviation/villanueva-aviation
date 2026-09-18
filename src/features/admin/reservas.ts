@@ -11,11 +11,12 @@ export interface Reserva {
   comentarios: string | null;
   estado: string;
   motivo_revision: string | null;
+  tiempo_escritura_segundos: number | null;
   created_at: string;
 }
 
 const COLUMNS =
-  "id, user_id, email, tipo, tema, fecha_preferida, horario_preferido, comentarios, estado, motivo_revision, created_at";
+  "id, user_id, email, tipo, tema, fecha_preferida, horario_preferido, comentarios, estado, motivo_revision, tiempo_escritura_segundos, created_at";
 
 export async function fetchTodasReservas(): Promise<Reserva[]> {
   const { data } = await supabase.from("reservas").select(COLUMNS).order("created_at", { ascending: false });

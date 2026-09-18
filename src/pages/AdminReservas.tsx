@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { ClipboardList, FileText, GraduationCap } from "lucide-react";
+import { ClipboardList, FileText, GraduationCap, Timer } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
@@ -21,6 +21,15 @@ const ESTADO_TONE: Record<string, "gold" | "green" | "red" | "neutral"> = {
 
 function esProyectoFinal(r: Reserva) {
   return r.tema?.startsWith("Proyecto final") ?? false;
+}
+
+const SOSPECHOSAMENTE_RAPIDO_SEGUNDOS = 90;
+
+function formatTiempoEscritura(segundos: number) {
+  if (segundos < 60) return `${segundos} seg`;
+  const min = Math.floor(segundos / 60);
+  const seg = segundos % 60;
+  return `${min} min ${seg} seg`;
 }
 
 export function AdminReservas() {
@@ -106,6 +115,20 @@ export function AdminReservas() {
                           {r.tipo === "examen" ? "Simulacro de examen práctico" : r.tema || "Revisión de tema"}
                         </p>
                         <Badge tone={ESTADO_TONE[r.estado] ?? "neutral"}>{r.estado}</Badge>
+                        {proyecto && r.tiempo_escritura_segundos != null && (
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${
+                              r.tiempo_escritura_segundos < SOSPECHOSAMENTE_RAPIDO_SEGUNDOS
+                                ? "border-red-500/30 bg-red-500/10 text-red-300"
+                                : "border-white/15 bg-white/[0.03] text-white/50"
+                            }`}
+                            title="Tiempo entre la primera tecla escrita y el envío"
+                          >
+                            <Timer size={11} />
+                            {formatTiempoEscritura(r.tiempo_escritura_segundos)}
+                            {r.tiempo_escritura_segundos < SOSPECHOSAMENTE_RAPIDO_SEGUNDOS && " · muy rápido"}
+                          </span>
+                        )}
                       </div>
                       <p className="mt-1 text-xs text-white/55">
                         {r.email} · {new Date(r.created_at).toLocaleDateString("es-MX")}
