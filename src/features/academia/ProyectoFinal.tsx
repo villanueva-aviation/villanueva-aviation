@@ -96,14 +96,21 @@ export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFina
       </label>
 
       <label className="flex flex-col gap-1.5 text-sm text-white/70">
-        Notas adicionales <span className="text-white/40">(opcional)</span>
+        Notas adicionales <span className="text-white/40">(opcional, tampoco se puede pegar texto)</span>
         <textarea
           value={notas}
           onChange={(e) => setNotas(e.target.value)}
+          onPaste={bloquearPegado}
+          onDrop={bloquearPegado}
           placeholder="Dudas, supuestos que hiciste, o cualquier contexto extra para quien lo revise..."
           rows={3}
           className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-white placeholder:text-white/30 outline-none transition-colors focus:border-gold-500/50"
         />
+        {pegoBloqueado && (
+          <span className="text-xs text-red-400">
+            No se puede pegar texto aquí — escribe tu respuesta directamente.
+          </span>
+        )}
       </label>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
