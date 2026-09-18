@@ -9,6 +9,7 @@ import { useAuth } from "../features/auth/AuthContext";
 import { useProgress } from "../features/progress/ProgressContext";
 import { contarExamenesAprobados } from "../data/evaluaciones";
 import { useHorasVueloConfirmadas } from "../features/practica/vuelosPractica";
+import { useRango } from "../features/progress/rango";
 
 export function Perfil() {
   const { user } = useAuth();
@@ -16,6 +17,7 @@ export function Perfil() {
     useProgress();
   const examenesAprobados = contarExamenesAprobados(examenResultado);
   const horasVueloConfirmadas = useHorasVueloConfirmadas();
+  const rango = useRango();
 
   if (loading) return null;
 
@@ -31,7 +33,7 @@ export function Perfil() {
               <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">{user?.nombre ?? "Cadete"}</h1>
               <p className="text-sm text-white/50">{user?.email ?? "cadete@villanuevaaviation.com"}</p>
               <span className="mt-2 inline-flex rounded-full border border-gold-500/40 bg-gold-500/10 px-3 py-1 font-display text-xs font-semibold text-gold-400">
-                Cadete · Nivel {nivel}
+                {rango} · Nivel {nivel}
               </span>
             </div>
           </div>

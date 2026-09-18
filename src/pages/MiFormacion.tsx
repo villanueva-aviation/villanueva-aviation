@@ -10,6 +10,7 @@ import { useAuth } from "../features/auth/AuthContext";
 import { ACADEMIA_MODULOS } from "../data/academia";
 import { contarExamenesAprobados } from "../data/evaluaciones";
 import { useHorasVueloConfirmadas } from "../features/practica/vuelosPractica";
+import { useRango } from "../features/progress/rango";
 import { ROUTES } from "../lib/routes";
 
 export function MiFormacion() {
@@ -25,6 +26,7 @@ export function MiFormacion() {
     examenResultado,
     loading,
   } = useProgress();
+  const rango = useRango();
 
   const moduloActual = ACADEMIA_MODULOS.find((m) => m.slug === moduloActualSlug) ?? ACADEMIA_MODULOS[0];
   const progresoActual = moduloProgreso(moduloActual.slug);
@@ -55,7 +57,7 @@ export function MiFormacion() {
 
           <div className="mt-8 flex items-center gap-3">
             <span className="rounded-full border border-gold-500/40 bg-gold-500/10 px-4 py-1.5 font-display text-sm font-semibold text-gold-400">
-              Cadete · Nivel {nivel}
+              {rango} · Nivel {nivel}
             </span>
             <span className="text-sm text-white/50">{xp} XP acumulados</span>
           </div>
