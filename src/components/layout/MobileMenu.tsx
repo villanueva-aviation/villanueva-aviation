@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { CalendarClock, ClipboardCheck, LogOut, User } from "lucide-react";
+import { CalendarClock, ClipboardCheck, LogOut, MessageSquareText, User } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { DISCORD_URL } from "../../lib/constants";
 import { useAuth } from "../../features/auth/AuthContext";
@@ -131,6 +131,15 @@ export function MobileMenu({
                 >
                   <CalendarClock size={15} /> Agenda y proyectos
                   <CountBadge count={reservasPendientes} />
+                </Link>
+              )}
+              {esFundador && (
+                <Link
+                  to={ROUTES.adminFeedback}
+                  onClick={onClose}
+                  className="flex items-center gap-2 rounded-full border border-gold-500/25 bg-gold-500/[0.06] py-3 px-4 font-display text-sm font-semibold text-white/85"
+                >
+                  <MessageSquareText size={15} /> Experiencia de cadetes
                 </Link>
               )}
             </>

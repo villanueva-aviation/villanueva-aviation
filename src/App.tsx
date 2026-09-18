@@ -38,6 +38,8 @@ const Comunidad = lazy(() => import("./pages/Comunidad").then((m) => ({ default:
 const Perfil = lazy(() => import("./pages/Perfil").then((m) => ({ default: m.Perfil })));
 const AdminVuelosPractica = lazy(() => import("./pages/AdminVuelosPractica").then((m) => ({ default: m.AdminVuelosPractica })));
 const AdminReservas = lazy(() => import("./pages/AdminReservas").then((m) => ({ default: m.AdminReservas })));
+const AdminFeedback = lazy(() => import("./pages/AdminFeedback").then((m) => ({ default: m.AdminFeedback })));
+const Feedback = lazy(() => import("./pages/Feedback").then((m) => ({ default: m.Feedback })));
 const Legal = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Legal })));
 const Ingresar = lazy(() => import("./pages/Ingresar").then((m) => ({ default: m.Ingresar })));
 const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m.NotFound })));
@@ -193,6 +195,22 @@ function RoutedContent() {
             element={
               <ProtectedRoute>
                 <AdminReservas />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.adminFeedback}
+            element={
+              <ProtectedRoute>
+                <AdminFeedback />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.feedback}
+            element={
+              <ProtectedRoute>
+                <Feedback />
               </ProtectedRoute>
             }
           />

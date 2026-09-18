@@ -27,6 +27,8 @@ export const ROUTES = {
   perfil: "/perfil",
   adminVuelosPractica: "/admin/vuelos-practica",
   adminReservas: "/admin/agenda-y-proyectos",
+  adminFeedback: "/admin/feedback",
+  feedback: "/comparte-tu-experiencia",
   legal: "/legal",
   ingresar: "/ingresar",
 } as const;

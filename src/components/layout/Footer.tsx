@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, MessageSquareText } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { CONTACT_EMAIL, DISCORD_URL, SITE } from "../../lib/constants";
 import { Logo } from "./Logo";
@@ -34,6 +34,13 @@ export function Footer() {
               <MessageCircle size={16} />
               Únete a nuestro Discord
             </a>
+            <Link
+              to={ROUTES.feedback}
+              className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:border-gold-500/50 hover:text-gold-400"
+            >
+              <MessageSquareText size={16} />
+              Comparte tu experiencia
+            </Link>
           </div>
 
           <nav className="grid grid-cols-2 gap-2 sm:grid-cols-3">

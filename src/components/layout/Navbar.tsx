@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { CalendarClock, ClipboardCheck, LogOut, User } from "lucide-react";
+import { CalendarClock, ClipboardCheck, LogOut, MessageSquareText, User } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { useAuth } from "../../features/auth/AuthContext";
 import { usePendientesFundador } from "../../features/admin/usePendientesFundador";
@@ -85,6 +85,15 @@ function ProfileControl({
           >
             <CalendarClock size={14} /> Agenda y proyectos
             <CountBadge count={reservasPendientes} />
+          </Link>
+        )}
+        {esFundador && (
+          <Link
+            to={ROUTES.adminFeedback}
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            <MessageSquareText size={14} /> Experiencia de cadetes
           </Link>
         )}
         <button
