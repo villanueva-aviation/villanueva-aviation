@@ -6,17 +6,35 @@ import { Container } from "../components/ui/Container";
 import { useAuth } from "../features/auth/AuthContext";
 import { FOUNDER_EMAIL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
+import { ACADEMIA_MODULOS } from "../data/academia";
 import { fetchTodoFeedback, type Feedback } from "../features/feedback/feedback";
+import { fetchTodoModuloFeedback, type ModuloFeedbackRow } from "../features/feedback/moduloFeedback";
+
+function tituloModulo(slug: string) {
+  return ACADEMIA_MODULOS.find((m) => m.slug === slug)?.titulo ?? slug;
+}
+
+function Estrellas({ n }: { n: number }) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <Star key={i} size={13} className={i <= n ? "fill-gold-400 text-gold-400" : "text-white/15"} />
+      ))}
+    </div>
+  );
+}
 
 export function AdminFeedback() {
   const { user, loading: authLoading } = useAuth();
   const [feedback, setFeedback] = useState<Feedback[]>([]);
+  const [moduloFeedback, setModuloFeedback] = useState<ModuloFeedbackRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (authLoading || user?.email !== FOUNDER_EMAIL) return;
-    fetchTodoFeedback().then((data) => {
-      setFeedback(data);
+    Promise.all([fetchTodoFeedback(), fetchTodoModuloFeedback()]).then(([general, porModulo]) => {
+      setFeedback(general);
+      setModuloFeedback(porModulo);
       setLoading(false);
     });
   }, [authLoading, user]);
@@ -70,6 +88,27 @@ export function AdminFeedback() {
                 <p className="mt-1.5 whitespace-pre-wrap rounded-lg bg-white/[0.03] p-3 text-xs text-white/70">
                   {f.que_mejorarias}
                 </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <h2 className="mb-4 mt-14 font-display text-lg font-semibold text-white">Calificaciones por módulo</h2>
+        {!loading && moduloFeedback.length === 0 ? (
+          <p className="text-sm text-white/55">Todavía no hay calificaciones por módulo.</p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {moduloFeedback.map((f) => (
+              <div key={f.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-medium text-white">{tituloModulo(f.modulo_slug)}</p>
+                  <div className="flex items-center gap-2">
+                    <Estrellas n={f.calificacion} />
+                    <p className="text-xs text-white/45">{new Date(f.created_at).toLocaleDateString("es-MX")}</p>
+                  </div>
+                </div>
+                <p className="mt-1 text-xs text-white/40">{f.email}</p>
+                {f.comentario && <p className="mt-1.5 text-xs text-white/65">{f.comentario}</p>}
               </div>
             ))}
           </div>

@@ -30,6 +30,7 @@ import { TermMatch } from "../features/academia/TermMatch";
 import { LessonFlow } from "../features/academia/LessonFlow";
 import { Quiz } from "../features/academia/Quiz";
 import { ProyectoFinal } from "../features/academia/ProyectoFinal";
+import { ModuloFeedback } from "../features/academia/ModuloFeedback";
 import { Reveal } from "../components/ui/Reveal";
 
 const INTERACTIVIDAD_INTRO: Record<InteractividadTipo, string> = {
@@ -191,7 +192,12 @@ export function AcademiaModulo() {
       <Container className="py-12 md:py-16">
         <ModuleStepper stages={stages} activeKey={activeStage} onSelect={setActiveStage} />
 
-        {progreso.estado === "completado" && <ModuloCompletadoBanner slug={modulo.slug} />}
+        {progreso.estado === "completado" && (
+          <>
+            <ModuloCompletadoBanner slug={modulo.slug} />
+            <ModuloFeedback slug={modulo.slug} moduloTitulo={modulo.titulo} />
+          </>
+        )}
 
         <Reveal key={activeStage} className="mt-10">
           {activeStage === "introduccion" && (
