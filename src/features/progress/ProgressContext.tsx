@@ -20,6 +20,14 @@ interface ModuloProgreso {
   totalActividades: number;
 }
 
+export interface TemaDebil {
+  slug: string;
+  titulo: string;
+  score: number;
+}
+
+const UMBRAL_REFUERZO = 75;
+
 interface ProgressContextValue {
   modulos: ModuloProgreso[];
   moduloProgreso: (slug: string) => ModuloProgreso;
@@ -28,6 +36,7 @@ interface ProgressContextValue {
   registrarExamen: (slug: string, actividadId: string, score: number, passed: boolean) => void;
   examenResultado: (slug: string) => QuizResult | null;
   progresoGeneralPct: number;
+  temasDebiles: TemaDebil[];
   xp: number;
   nivel: number;
   horasSimulador: number;
@@ -116,6 +125,15 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
     const moduloActual = modulos.find((m) => m.estado === "en-progreso" || m.estado === "disponible") ?? modulos[modulos.length - 1];
 
+    const temasDebiles: TemaDebil[] = Object.entries(state.examenes)
+      .map(([slug, r]) => ({
+        slug,
+        titulo: ACADEMIA_MODULOS.find((m) => m.slug === slug)?.titulo ?? slug,
+        score: r.score,
+      }))
+      .filter((t) => t.score < UMBRAL_REFUERZO)
+      .sort((a, b) => a.score - b.score);
+
     const meteorologiaCompletada = modulos.find((m) => m.slug === "meteorologia")?.estado === "completado";
     const comunicacionesCompletada = modulos.find((m) => m.slug === "comunicaciones")?.estado === "completado";
     const vfrCompletado = modulos.find((m) => m.slug === "vfr")?.estado === "completado";
@@ -167,6 +185,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       },
       examenResultado: (slug: string) => state.examenes[slug] ?? null,
       progresoGeneralPct,
+      temasDebiles,
       xp,
       nivel,
       horasSimulador: CADETE_BASE.horasSimulador,

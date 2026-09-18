@@ -1,4 +1,4 @@
-import { ArrowRight, Award, BookCheck, ClipboardCheck, Gauge, Plane, Timer } from "lucide-react";
+import { ArrowRight, Award, BookCheck, ClipboardCheck, Gauge, Plane, Target, Timer } from "lucide-react";
 import { CadetTabs } from "../components/layout/CadetTabs";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
@@ -20,6 +20,7 @@ export function MiFormacion() {
     moduloProgreso,
     moduloActualSlug,
     progresoGeneralPct,
+    temasDebiles,
     nivel,
     xp,
     horasSimulador,
@@ -139,6 +140,39 @@ export function MiFormacion() {
             })}
           </div>
         </Reveal>
+
+        {temasDebiles.length > 0 && (
+          <Reveal className="mt-6 rounded-2xl border border-gold-500/25 bg-gold-500/[0.05] p-6 md:p-8">
+            <div className="flex items-center gap-3">
+              <Target size={18} className="text-gold-400" />
+              <h3 className="font-display text-lg font-semibold text-white">Temas para reforzar</h3>
+            </div>
+            <p className="mt-2 text-sm text-white/60">
+              Según tus resultados de examen, estos módulos te vendría bien repasar con más profundidad. Puedes
+              agendar una sesión de asesoría personalizada sobre cualquiera de ellos.
+            </p>
+            <div className="mt-5 flex flex-col gap-3">
+              {temasDebiles.map((t) => (
+                <div
+                  key={t.slug}
+                  className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-white">{t.titulo}</p>
+                    <p className="text-xs text-white/50">Tu examen: {t.score}%</p>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    to={`${ROUTES.agendarCita}?tema=${encodeURIComponent(t.titulo)}`}
+                    className="shrink-0"
+                  >
+                    Agendar asesoría
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        )}
       </Container>
     </div>
   );

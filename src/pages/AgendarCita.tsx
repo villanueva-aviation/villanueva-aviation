@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, CalendarClock } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
@@ -29,8 +29,9 @@ const ESTADO_TONE: Record<string, "gold" | "green" | "neutral"> = {
 
 export function AgendarCita() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [tipo, setTipo] = useState<"revision" | "examen">("revision");
-  const [tema, setTema] = useState("");
+  const [tema, setTema] = useState(searchParams.get("tema") ?? "");
   const [fecha, setFecha] = useState("");
   const [horario, setHorario] = useState("");
   const [comentarios, setComentarios] = useState("");
