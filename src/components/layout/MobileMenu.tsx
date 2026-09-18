@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { CalendarClock, ClipboardCheck, GraduationCap, LogOut, MessageSquareText, User } from "lucide-react";
+import { CalendarClock, ClipboardCheck, GraduationCap, LogOut, MessageSquareText, User, Users } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { DISCORD_URL } from "../../lib/constants";
 import { useAuth } from "../../features/auth/AuthContext";
@@ -151,6 +151,15 @@ export function MobileMenu({
                 >
                   <GraduationCap size={15} /> Graduados de teoría
                   <CountBadge count={graduadosPendientes} />
+                </Link>
+              )}
+              {esFundador && (
+                <Link
+                  to={ROUTES.adminCadetes}
+                  onClick={onClose}
+                  className="flex items-center gap-2 rounded-full border border-gold-500/25 bg-gold-500/[0.06] py-3 px-4 font-display text-sm font-semibold text-white/85"
+                >
+                  <Users size={15} /> Cadetes registrados
                 </Link>
               )}
             </>

@@ -29,6 +29,7 @@ export const ROUTES = {
   adminReservas: "/admin/agenda-y-proyectos",
   adminFeedback: "/admin/feedback",
   adminGraduados: "/admin/graduados",
+  adminCadetes: "/admin/cadetes",
   feedback: "/comparte-tu-experiencia",
   legal: "/legal",
   ingresar: "/ingresar",

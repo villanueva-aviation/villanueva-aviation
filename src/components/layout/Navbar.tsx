@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { CalendarClock, ClipboardCheck, GraduationCap, LogOut, MessageSquareText, User } from "lucide-react";
+import { CalendarClock, ClipboardCheck, GraduationCap, LogOut, MessageSquareText, User, Users } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { useAuth } from "../../features/auth/AuthContext";
 import { usePendientesFundador } from "../../features/admin/usePendientesFundador";
@@ -105,6 +105,15 @@ function ProfileControl({
           >
             <GraduationCap size={14} /> Graduados de teoría
             <CountBadge count={graduadosPendientes} />
+          </Link>
+        )}
+        {esFundador && (
+          <Link
+            to={ROUTES.adminCadetes}
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            <Users size={14} /> Cadetes registrados
           </Link>
         )}
         <button
