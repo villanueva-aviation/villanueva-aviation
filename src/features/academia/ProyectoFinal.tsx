@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type ClipboardEvent, type DragEvent, type FormEvent } from "react";
 import { Send, CheckCircle2 } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { supabase } from "../../lib/supabaseClient";
@@ -18,6 +18,13 @@ export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFina
   const [error, setError] = useState<string | null>(null);
 
   const completo = respuesta.trim().length > 0;
+  const [pegoBloqueado, setPegoBloqueado] = useState(false);
+
+  function bloquearPegado(e: ClipboardEvent<HTMLTextAreaElement> | DragEvent<HTMLTextAreaElement>) {
+    e.preventDefault();
+    setPegoBloqueado(true);
+    setTimeout(() => setPegoBloqueado(false), 3000);
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -71,14 +78,21 @@ export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFina
       </div>
 
       <label className="flex flex-col gap-1.5 text-sm text-white/70">
-        Tu respuesta
+        Tu respuesta <span className="text-white/40">(escríbela con tus propias palabras — no se puede pegar texto)</span>
         <textarea
           value={respuesta}
           onChange={(e) => setRespuesta(e.target.value)}
+          onPaste={bloquearPegado}
+          onDrop={bloquearPegado}
           placeholder="Desarrolla aquí lo que te pide el enunciado de arriba..."
           rows={8}
           className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-white placeholder:text-white/30 outline-none transition-colors focus:border-gold-500/50"
         />
+        {pegoBloqueado && (
+          <span className="text-xs text-red-400">
+            No se puede pegar texto aquí — escribe tu respuesta directamente.
+          </span>
+        )}
       </label>
 
       <label className="flex flex-col gap-1.5 text-sm text-white/70">
