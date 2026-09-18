@@ -28,6 +28,7 @@ export const ROUTES = {
   adminVuelosPractica: "/admin/vuelos-practica",
   adminReservas: "/admin/agenda-y-proyectos",
   adminFeedback: "/admin/feedback",
+  adminGraduados: "/admin/graduados",
   feedback: "/comparte-tu-experiencia",
   legal: "/legal",
   ingresar: "/ingresar",

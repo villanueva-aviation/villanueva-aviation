@@ -4,6 +4,7 @@ import { CADETE_BASE, CERTIFICADOS_BASE, LOGROS_BASE, type Certificado, type Log
 import { readStorage } from "../../lib/storage";
 import { useAuth } from "../auth/AuthContext";
 import { fetchProgresoRemoto, guardarProgresoRemoto, type ProgresoRemoto, type QuizResult } from "./academiaProgresoRemoto";
+import { marcarGraduacionTeoria } from "./graduacionTeoria";
 
 export type ModuloEstado = "bloqueado" | "disponible" | "en-progreso" | "completado";
 
@@ -176,6 +177,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, loading]);
+
+  useEffect(() => {
+    if (!loading && user && value.progresoGeneralPct === 100) {
+      marcarGraduacionTeoria(user.id, user.email);
+    }
+  }, [loading, user, value.progresoGeneralPct]);
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;
 }
