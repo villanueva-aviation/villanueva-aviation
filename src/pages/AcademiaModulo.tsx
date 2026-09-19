@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, CheckCircle2, Lock, Sparkles } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
@@ -31,6 +31,7 @@ import { LessonFlow } from "../features/academia/LessonFlow";
 import { Quiz } from "../features/academia/Quiz";
 import { ProyectoFinal } from "../features/academia/ProyectoFinal";
 import { ModuloFeedback } from "../features/academia/ModuloFeedback";
+import { useBloqueoPorProyecto, type BloqueoProyecto } from "../features/academia/useBloqueoPorProyecto";
 import { Reveal } from "../components/ui/Reveal";
 
 const INTERACTIVIDAD_INTRO: Record<InteractividadTipo, string> = {
@@ -83,6 +84,30 @@ function ModuloCompletadoBanner({ slug }: { slug: string }) {
         <ArrowRight size={13} />
       </Link>
     </Reveal>
+  );
+}
+
+const ETAPAS_BLOQUEABLES = ["interactividad", "practica", "evaluacion", "proyecto"];
+
+function EtapaBloqueada({ bloqueo }: { bloqueo: BloqueoProyecto }) {
+  const rechazada = bloqueo.motivo === "rechazada";
+  return (
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-gold-500/25 bg-gold-500/[0.06] px-6 py-14 text-center">
+      <Lock size={22} className="text-gold-400" />
+      <p className="max-w-md text-sm font-medium text-white">
+        {rechazada
+          ? `El proyecto final de ${bloqueo.moduloPrevioTitulo} necesita correcciones`
+          : `Primero envía el proyecto final de ${bloqueo.moduloPrevioTitulo}`}
+      </p>
+      {rechazada && bloqueo.motivoRechazo && <p className="max-w-md text-sm text-white/65">{bloqueo.motivoRechazo}</p>}
+      <p className="max-w-md text-xs text-white/50">
+        Las lecciones siguen abiertas. Los ejercicios, la práctica, la evaluación y el proyecto de este módulo se
+        desbloquean cuando el proyecto anterior esté enviado y sin correcciones pendientes.
+      </p>
+      <Button to={`${ROUTES.academiaModulo(bloqueo.moduloPrevioSlug)}?etapa=proyecto`} className="mt-2">
+        {rechazada ? "Corregir mi proyecto" : "Ir al proyecto"}
+      </Button>
+    </div>
   );
 }
 
@@ -141,7 +166,12 @@ export function AcademiaModulo() {
     return ["introduccion", ...order.filter((t) => tipos.has(t))];
   }, [modulo]);
 
-  const [activeStage, setActiveStage] = useState<string>("introduccion");
+  const [searchParams] = useSearchParams();
+  const etapaInicial = searchParams.get("etapa");
+  const [activeStage, setActiveStage] = useState<string>(
+    etapaInicial && stageKeys.includes(etapaInicial) ? etapaInicial : "introduccion",
+  );
+  const bloqueo = useBloqueoPorProyecto(slug);
 
   if (!modulo) return <Navigate to={ROUTES.academia} replace />;
   if (progresoLoading) return null;
@@ -169,8 +199,16 @@ export function AcademiaModulo() {
     else if (key === "evaluacion" && evaluacionActividad) done = isActividadCompletada(modulo.slug, evaluacionActividad.id);
     else if (key === "proyecto" && proyectoActividad) done = isActividadCompletada(modulo.slug, proyectoActividad.id);
     else if (key === "introduccion") done = true;
-    return { key, label: STAGE_LABELS[key as ActividadTipo | "introduccion"], done };
+    return {
+      key,
+      label: STAGE_LABELS[key as ActividadTipo | "introduccion"],
+      done,
+      locked: !!bloqueo && ETAPAS_BLOQUEABLES.includes(key),
+    };
   });
+
+  // Mientras carga el estado del proyecto previo, las etapas bloqueables no se muestran (evita parpadeo).
+  const mostrarEtapa = !ETAPAS_BLOQUEABLES.includes(activeStage) || bloqueo === null;
 
   return (
     <div>
@@ -200,6 +238,8 @@ export function AcademiaModulo() {
         )}
 
         <Reveal key={activeStage} className="mt-10">
+          {!mostrarEtapa && bloqueo && <EtapaBloqueada bloqueo={bloqueo} />}
+
           {activeStage === "introduccion" && (
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
               <h2 className="font-display text-xl font-semibold text-white">Bienvenido al módulo</h2>
@@ -272,7 +312,7 @@ export function AcademiaModulo() {
             </div>
           )}
 
-          {activeStage === "interactividad" && interactividadActividades.length > 0 && (
+          {mostrarEtapa && activeStage === "interactividad" && interactividadActividades.length > 0 && (
             <div className="flex flex-col gap-6">
               {interactividadActividades.map((actividad) => {
                 const completada = isActividadCompletada(modulo.slug, actividad.id);
@@ -313,7 +353,7 @@ export function AcademiaModulo() {
             </div>
           )}
 
-          {activeStage === "practica" && practicaActividad && (
+          {mostrarEtapa && activeStage === "practica" && practicaActividad && (
             <div className="flex flex-col gap-6">
               {practicaPreguntas ? (
                 <Quiz
@@ -337,7 +377,7 @@ export function AcademiaModulo() {
             </div>
           )}
 
-          {activeStage === "evaluacion" && evaluacionActividad && (
+          {mostrarEtapa && activeStage === "evaluacion" && evaluacionActividad && (
             <div className="flex flex-col gap-6">
               {evaluacionPreguntas ? (
                 <Quiz
@@ -364,7 +404,7 @@ export function AcademiaModulo() {
             </div>
           )}
 
-          {activeStage === "proyecto" && proyectoActividad && (
+          {mostrarEtapa && activeStage === "proyecto" && proyectoActividad && (
             <div className="flex flex-col gap-6">
               {isActividadCompletada(modulo.slug, proyectoActividad.id) ? (
                 <div className="flex flex-col items-center gap-3 rounded-2xl border border-gold-500/30 bg-gold-500/10 px-6 py-14 text-center">

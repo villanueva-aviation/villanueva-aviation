@@ -3,7 +3,7 @@ import { Send, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { supabase } from "../../lib/supabaseClient";
 import { useAuth } from "../auth/AuthContext";
-import { fetchMisReservasPorTema, type Reserva } from "../admin/reservas";
+import { fetchMisReservasPorTema, temaProyectoFinal, type Reserva } from "../admin/reservas";
 
 interface ProyectoFinalProps {
   moduloTitulo: string;
@@ -13,7 +13,7 @@ interface ProyectoFinalProps {
 
 export function ProyectoFinal({ moduloTitulo, prompt, onComplete }: ProyectoFinalProps) {
   const { user } = useAuth();
-  const tema = `Proyecto final — ${moduloTitulo}`;
+  const tema = temaProyectoFinal(moduloTitulo);
   const [respuesta, setRespuesta] = useState("");
   const [notas, setNotas] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");

@@ -6,7 +6,7 @@ import { useAuth } from "../auth/AuthContext";
 import { fetchProgresoRemoto, guardarProgresoRemoto, type ProgresoRemoto, type QuizResult } from "./academiaProgresoRemoto";
 import { marcarGraduacionTeoria } from "./graduacionTeoria";
 
-export type ModuloEstado = "bloqueado" | "disponible" | "en-progreso" | "completado";
+export type ModuloEstado = "disponible" | "en-progreso" | "completado";
 
 type ProgressState = ProgresoRemoto;
 
@@ -50,8 +50,7 @@ const ProgressContext = createContext<ProgressContextValue | null>(null);
 
 const LEGACY_STORAGE_KEY = "cadet-progress";
 
-function estadoDeModulo(index: number, completadasCount: number, total: number, moduloAnteriorCompletado: boolean): ModuloEstado {
-  if (index > 0 && !moduloAnteriorCompletado) return "bloqueado";
+function estadoDeModulo(completadasCount: number, total: number): ModuloEstado {
   if (completadasCount === 0) return "disponible";
   if (completadasCount >= total) return "completado";
   return "en-progreso";
@@ -102,12 +101,10 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   };
 
   const value = useMemo<ProgressContextValue>(() => {
-    let completadoAnterior = true;
-    const modulos: ModuloProgreso[] = ACADEMIA_MODULOS.map((modulo, index) => {
+    const modulos: ModuloProgreso[] = ACADEMIA_MODULOS.map((modulo) => {
       const completadas = state.completadas[modulo.slug] ?? [];
       const total = modulo.actividades.length;
-      const estado = estadoDeModulo(index, completadas.length, total, completadoAnterior);
-      completadoAnterior = estado === "completado";
+      const estado = estadoDeModulo(completadas.length, total);
       return {
         slug: modulo.slug,
         estado,

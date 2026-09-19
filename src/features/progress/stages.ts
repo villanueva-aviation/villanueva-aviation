@@ -2,7 +2,7 @@ import type { TrackerStage } from "../../components/tracker/TrackerLine";
 import type { ModuloEstado } from "./ProgressContext";
 
 function estadoDe(slug: string, modulos: { slug: string; estado: ModuloEstado }[]) {
-  return modulos.find((m) => m.slug === slug)?.estado ?? "bloqueado";
+  return modulos.find((m) => m.slug === slug)?.estado ?? "disponible";
 }
 
 export function buildFormationStages(modulos: { slug: string; estado: ModuloEstado }[]): TrackerStage[] {
@@ -27,7 +27,7 @@ export function buildFormationStages(modulos: { slug: string; estado: ModuloEsta
   const evaluacionCompleto = fundamentosCompleto && conocimientosCompleto && vfrCompleto && ifrCompleto;
 
   return [
-    { id: "fundamentos", label: "Fundamentos", status: toStatus(fundamentosCompleto, fundamentos !== "bloqueado", true) },
+    { id: "fundamentos", label: "Fundamentos", status: toStatus(fundamentosCompleto, true, true) },
     { id: "conocimientos", label: "Conocimientos", status: toStatus(conocimientosCompleto, conocimientosIniciado, fundamentosCompleto) },
     { id: "simulacion", label: "Simulación", status: toStatus(vfrCompleto, vfr === "en-progreso", conocimientosCompleto) },
     { id: "operacion", label: "Operación", status: toStatus(ifrCompleto, ifr === "en-progreso", vfrCompleto) },

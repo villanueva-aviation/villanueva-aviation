@@ -31,6 +31,8 @@ export async function rechazarReserva(id: string, motivo: string) {
   return supabase.from("reservas").update({ estado: "rechazada", motivo_revision: motivo }).eq("id", id);
 }
 
+export const temaProyectoFinal = (moduloTitulo: string) => `Proyecto final — ${moduloTitulo}`;
+
 /** Reservas propias (cadete) que coinciden con un tema exacto, más recientes primero. RLS ya limita a las del usuario actual. */
 export async function fetchMisReservasPorTema(tema: string): Promise<Reserva[]> {
   const { data } = await supabase
