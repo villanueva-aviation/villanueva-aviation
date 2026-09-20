@@ -63,6 +63,16 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     archivoHref: "/downloads/guia-hsi.pdf",
   },
   {
+    id: "guia-metar-taf",
+    categoria: "Guías",
+    nombre: "Guía de METAR y TAF — Cómo leer el tiempo aeronáutico",
+    descripcion: "Cada grupo del METAR y el TAF explicado con ejemplos, viento cruzado, altitud de densidad, categorías de vuelo y ejercicios con respuestas.",
+    version: "v1.0",
+    fecha: "2026-09-20",
+    imagen: "/images/descargas-guia-metar-taf.jpg",
+    archivoHref: "/downloads/guia-metar-taf.pdf",
+  },
+  {
     id: "plantilla-plan-vuelo",
     categoria: "Plantillas",
     nombre: "Plantilla de plan de vuelo",
