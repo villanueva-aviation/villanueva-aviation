@@ -1,0 +1,21 @@
+name: Noticias de aviación (Discord)
+
+on:
+  schedule:
+    - cron: "0 18 * * *" # 18:00 UTC = 12:00 p. m. en Jalisco
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node automation/discord/noticias.mjs
+        env:
+          DISCORD_WEBHOOK_NOTICIAS: ${{ secrets.DISCORD_WEBHOOK_NOTICIAS }}
