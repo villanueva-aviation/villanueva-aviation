@@ -53,6 +53,16 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     archivoHref: "/downloads/guia-planificacion-vfr.pdf",
   },
   {
+    id: "guia-hsi",
+    categoria: "Guías",
+    nombre: "Guía del HSI — Vuelo, aproximación y esperas",
+    descripcion: "Uso del HSI desde la planeación hasta la aproximación, con los patrones de espera y sus tres entradas: directa, paralela y de gota.",
+    version: "v1.0",
+    fecha: "2026-09-20",
+    imagen: "/images/descargas-guia-hsi.jpg",
+    archivoHref: "/downloads/guia-hsi.pdf",
+  },
+  {
     id: "plantilla-plan-vuelo",
     categoria: "Plantillas",
     nombre: "Plantilla de plan de vuelo",
