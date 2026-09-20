@@ -5,7 +5,7 @@ export const SITE = {
     "Academia aeronáutica digital enfocada en educación teórica y simulación de vuelo para futuros pilotos: fundamentos, meteorología, aerodinámica, navegación, VFR e IFR.",
 } as const;
 
-export const DISCORD_URL = "https://discord.gg/Q7fmGsFbg";
+export const DISCORD_URL = "https://discord.gg/A952wXcqDW";
 
 // Cuenta del fundador — decide qué correo ve el panel de confirmación de vuelos.
 // Debe coincidir con la policy "fundador" en supabase/migrations/0002_vuelos_practica.sql.
