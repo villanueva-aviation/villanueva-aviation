@@ -4,7 +4,7 @@ const FUENTES = [
   { nombre: "Aviacionline", url: "https://www.aviacionline.com/rss.xml", max: 2, solo: "/espanol/" },
   { nombre: "AVweb", url: "https://www.avweb.com/feed/", max: 1 },
 ];
-const VENTANA_H = 26; // el cron corre cada 24 h; 2 h de margen contra retrasos
+const VENTANA_H = 24; // igual al intervalo del cron: sin traslape no hay repetidos (ponytail: un retraso del cron puede omitir una nota)
 const OMITIR = /violad|abuso|sexual|asesin|suicid|\brape|\bkill|murder/i; // titulares sensibles no van al canal
 
 const decodificar = (s) =>
