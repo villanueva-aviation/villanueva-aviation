@@ -9,6 +9,7 @@ import {
   textoViento, textoVisibilidad, visibilidadSM,
   type Categoria, type Metar, type PeriodoTaf, type Taf,
 } from "../lib/clima";
+import { categoriaPeriodo, etiquetaPeriodo, horaZ, pies, resumenPeriodo } from "../lib/climaTexto";
 
 const AEROPUERTOS = [
   ["MMGL", "Guadalajara"], ["MMMX", "Ciudad de México"], ["MMMY", "Monterrey"], ["MMUN", "Cancún"],
@@ -31,20 +32,11 @@ type Estado =
   | { tipo: "error"; mensaje: string }
   | { tipo: "listo"; metar: Metar | null; taf: Taf | null; icao: string };
 
-const minuscula = (t: string) => t.charAt(0).toLowerCase() + t.slice(1); // solo la primera letra: "SM" y "kt" se quedan como están
-const pies = (n: number) => `${Math.round(n).toLocaleString("es-MX")} ft`;
-
 function haceCuanto(segundos: number) {
   const min = Math.max(0, Math.round((Date.now() / 1000 - segundos) / 60));
   if (min < 60) return `hace ${min} min`;
   const h = Math.floor(min / 60);
   return `hace ${h} h ${min % 60} min`;
-}
-
-function horaZ(ts: number) {
-  const d = new Date(ts * 1000);
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${p(d.getUTCDate())}/${p(d.getUTCHours())}${p(d.getUTCMinutes())}Z`;
 }
 
 function horaLocal(ts: number) {
@@ -82,22 +74,14 @@ function ChipCategoria({ cat }: { cat: Categoria | null }) {
   );
 }
 
-const ETIQUETA_CAMBIO: Record<string, string> = { FM: "Desde", BECMG: "Cambio gradual", TEMPO: "Temporal", PROB: "Probabilidad" };
-
 function FilaTaf({ p }: { p: PeriodoTaf }) {
-  const etiqueta = p.fcstChange === null ? "Pronóstico base" : (ETIQUETA_CAMBIO[p.fcstChange] ?? p.fcstChange);
-  const partes: string[] = [];
-  if (p.wspd !== null) partes.push(`Viento ${minuscula(textoViento(p.wdir, p.wspd, p.wgst))}`);
-  if (p.visib !== null) partes.push(`Visibilidad ${minuscula(textoVisibilidad(p.visib))}`);
-  partes.push(...fenomenos(p.wxString));
-  partes.push(...p.clouds.map(textoNube));
-  const cat = p.clouds.length || p.visib !== null ? categoriaVuelo(techoFt(p.clouds), visibilidadSM(p.visib)) : null;
+  const partes = resumenPeriodo(p);
+  const cat = categoriaPeriodo(p);
   return (
     <li className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <span className="font-display text-sm font-semibold text-gold-400">
-          {etiqueta}
-          {p.fcstChange === "PROB" && p.probability ? ` ${p.probability} %` : ""}
+          {etiquetaPeriodo(p)}
         </span>
         <span className="font-mono text-xs text-white/60">{horaZ(p.timeFrom)} a {horaZ(p.timeTo)}</span>
         <span className="text-xs text-white/40">

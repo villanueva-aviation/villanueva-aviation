@@ -40,6 +40,7 @@ export interface PeriodoTaf {
 
 export interface Taf {
   icaoId: string;
+  name?: string;
   rawTAF: string;
   validTimeFrom: number;
   validTimeTo: number;
