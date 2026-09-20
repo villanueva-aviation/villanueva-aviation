@@ -8,6 +8,10 @@ interface Env {
   DISCORD_PUBLIC_KEY?: string;
 }
 
+// Clave pública de la aplicación "Villanueva Aviation Bot". No es secreta (Discord la muestra en el portal
+// solo para verificar firmas); la variable de entorno DISCORD_PUBLIC_KEY, si existe, tiene prioridad.
+const CLAVE_PUBLICA = "7e4d249cd56c011cac6a15aa34e38514bf91c30daf2a23f78affa0d4f100e236";
+
 const json = (cuerpo: unknown, status = 200) =>
   new Response(JSON.stringify(cuerpo), { status, headers: { "content-type": "application/json; charset=utf-8" } });
 
@@ -25,14 +29,12 @@ async function consultar<T>(tipo: "metar" | "taf", icao: string): Promise<T | nu
 }
 
 export const onRequestPost = async ({ request, env }: { request: Request; env: Env }) => {
-  if (!env.DISCORD_PUBLIC_KEY) return new Response("Falta DISCORD_PUBLIC_KEY", { status: 500 });
-
   const cuerpo = await request.text();
   const firmada = await firmaValida(
     cuerpo,
     request.headers.get("x-signature-ed25519"),
     request.headers.get("x-signature-timestamp"),
-    env.DISCORD_PUBLIC_KEY,
+    env.DISCORD_PUBLIC_KEY ?? CLAVE_PUBLICA,
   );
   if (!firmada) return new Response("Firma inválida", { status: 401 });
 
