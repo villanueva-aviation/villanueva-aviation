@@ -79,6 +79,11 @@ export function Legal() {
                 pagos y tus vuelos de práctica sí se guardan de forma centralizada y están ligados a tu cuenta.
               </p>
               <p>
+                Si te suscribes a nuestros avisos desde el sitio, guardamos únicamente tu correo (y desde qué
+                sección lo dejaste) para escribirte sobre clases, eventos y guías nuevas. Puedes pedir que te
+                quitemos de la lista en cualquier momento escribiendo al correo de contacto.
+              </p>
+              <p>
                 Los pagos de Contenido Exclusivo se procesan directamente por PayPal — nosotros nunca vemos ni
                 almacenamos los datos de tu tarjeta o cuenta bancaria, solo la confirmación de que el pago se
                 completó.

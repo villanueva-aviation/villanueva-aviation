@@ -5,6 +5,7 @@ import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { CATEGORIAS_DESCARGAS, RECURSOS_DESCARGAS } from "../data/descargas";
 import { Reveal } from "../components/ui/Reveal";
+import { SuscribirseForm } from "../features/newsletter/SuscribirseForm";
 
 export function Descargas() {
   const [categoria, setCategoria] = useState<string>("Todos");
@@ -20,6 +21,9 @@ export function Descargas() {
       />
 
       <Container className="py-16 md:py-24">
+        <div className="mb-10 rounded-2xl border border-gold-500/25 bg-gold-500/[0.04] p-6">
+          <SuscribirseForm origen="descargas" titulo="¿Quieres enterarte cuando publiquemos una guía nueva?" />
+        </div>
         <div className="flex flex-wrap gap-2">
           {["Todos", ...CATEGORIAS_DESCARGAS].map((cat) => (
             <button

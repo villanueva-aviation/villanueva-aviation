@@ -3,6 +3,7 @@ import { MessageCircle, MessageSquareText } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { CONTACT_EMAIL, DISCORD_URL, SITE } from "../../lib/constants";
 import { Logo } from "./Logo";
+import { SuscribirseForm } from "../../features/newsletter/SuscribirseForm";
 
 export function Footer() {
   return (
@@ -41,6 +42,9 @@ export function Footer() {
               <MessageSquareText size={16} />
               Comparte tu experiencia
             </Link>
+            <div className="mt-6">
+              <SuscribirseForm origen="footer" titulo="Recibe avisos de clases y guías nuevas" />
+            </div>
           </div>
 
           <nav className="grid grid-cols-2 gap-2 sm:grid-cols-3">
