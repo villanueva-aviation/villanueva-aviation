@@ -12,6 +12,7 @@ export const ROUTES = {
   checklistC172: "/checklist-c172",
   checklistC152: "/checklist-c152",
   planVuelo: "/plan-de-vuelo",
+  briefing: "/briefing",
   bitacoraVuelo: "/bitacora-de-vuelo",
   pesoBalance: "/peso-y-balance",
   audioRodajeDespegue: "/premium/audio-rodaje-despegue",

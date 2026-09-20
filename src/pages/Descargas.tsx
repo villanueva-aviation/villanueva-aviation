@@ -64,7 +64,7 @@ export function Descargas() {
                     <ListChecks size={15} /> Ver versión interactiva
                   </Link>
                 )}
-                {r.archivoHref ? (
+                {r.soloInteractivo ? null : r.archivoHref ? (
                   <a
                     href={r.archivoHref}
                     download

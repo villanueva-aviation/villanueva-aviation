@@ -10,12 +10,15 @@ export interface RecursoDescarga {
   interactivoHref?: string;
   /** Ruta al archivo descargable en public/, cuando ya está disponible. */
   archivoHref?: string;
+  /** Herramienta en línea sin archivo descargable: oculta el botón de descarga. */
+  soloInteractivo?: boolean;
 }
 
 export const CATEGORIAS_DESCARGAS = [
   "SimHub Dashboards",
   "Checklists",
   "Guías",
+  "Herramientas",
   "Plantillas",
   "Formularios oficiales",
 ] as const;
@@ -71,6 +74,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     fecha: "2026-09-20",
     imagen: "/images/descargas-guia-metar-taf.jpg",
     archivoHref: "/downloads/guia-metar-taf.pdf",
+  },
+  {
+    id: "briefing-piloto",
+    categoria: "Herramientas",
+    nombre: "Briefing del piloto — METAR y TAF en español",
+    descripcion: "Consulta el clima de tu aeropuerto decodificado: categoría de vuelo, viento cruzado por pista, altitud de densidad y pronóstico por horas.",
+    version: "v1.0",
+    fecha: "2026-09-20",
+    imagen: "/images/descargas-briefing-piloto.jpg",
+    interactivoHref: "/briefing",
+    soloInteractivo: true,
   },
   {
     id: "plantilla-plan-vuelo",
