@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ACADEMIA_MODULOS } from "../../data/academia";
-import { FOUNDER_EMAIL } from "../../lib/constants";
+import { ACADEMIA_DESBLOQUEADA } from "../../lib/constants";
 import { useAuth } from "../auth/AuthContext";
 import { fetchMisReservasPorTema, temaProyectoFinal } from "../admin/reservas";
 
@@ -26,7 +26,7 @@ export function useBloqueoPorProyecto(slug: string | undefined): BloqueoProyecto
     const previo = index > 0 ? ACADEMIA_MODULOS[index - 1] : null;
     const previoTieneProyecto = previo?.actividades.some((a) => a.tipo === "proyecto");
 
-    if (!previo || !previoTieneProyecto || user?.email === FOUNDER_EMAIL) {
+    if (!previo || !previoTieneProyecto || ACADEMIA_DESBLOQUEADA.includes(user?.email?.toLowerCase() ?? "")) {
       setBloqueo(null);
       return;
     }
