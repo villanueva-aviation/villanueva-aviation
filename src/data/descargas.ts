@@ -88,6 +88,16 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     soloInteractivo: true,
   },
   {
+    id: "guia-comunicaciones-vfr",
+    categoria: "Guías",
+    nombre: "Comunicaciones VFR — Español | English",
+    descripcion: "Fraseología VFR bilingüe en dos columnas, desde que enciendes el motor hasta que estacionas: rodaje, salida, ruta, espacio aéreo controlado, circuito, aterrizaje, emergencias y ejercicios con respuestas.",
+    version: "v1.0",
+    fecha: "2026-09-20",
+    imagen: "/images/descargas-guia-comunicaciones-vfr.jpg",
+    archivoHref: "/downloads/guia-comunicaciones-vfr.pdf",
+  },
+  {
     id: "guia-controles",
     categoria: "Guías",
     nombre: "Configura tus controles en MSFS",
