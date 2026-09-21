@@ -30,6 +30,8 @@ const AudioEmergenciasAproximacion = lazy(() =>
   import("./pages/AudioEmergenciasAproximacion").then((m) => ({ default: m.AudioEmergenciasAproximacion })),
 );
 const ChecklistPremiumC172 = lazy(() => import("./pages/ChecklistPremiumC172").then((m) => ({ default: m.ChecklistPremiumC172 })));
+const ChecklistAvion = lazy(() => import("./pages/ChecklistAvion").then((m) => ({ default: m.ChecklistAvion })));
+const ChecklistPremiumAvion = lazy(() => import("./pages/ChecklistPremiumAvion").then((m) => ({ default: m.ChecklistPremiumAvion })));
 const ChecklistPremiumC152 = lazy(() => import("./pages/ChecklistPremiumC152").then((m) => ({ default: m.ChecklistPremiumC152 })));
 const SimulacroOral = lazy(() => import("./pages/SimulacroOral").then((m) => ({ default: m.SimulacroOral })));
 const SimulacroVuelo = lazy(() => import("./pages/SimulacroVuelo").then((m) => ({ default: m.SimulacroVuelo })));
@@ -107,6 +109,7 @@ function RoutedContent() {
           <Route path={ROUTES.descargas} element={<Descargas />} />
           <Route path={ROUTES.checklistC172} element={<ChecklistC172 />} />
           <Route path={ROUTES.checklistC152} element={<ChecklistC152 />} />
+          <Route path="/checklist/:avion" element={<ChecklistAvion />} />
           <Route path={ROUTES.planVuelo} element={<PlanDeVuelo />} />
           <Route path={ROUTES.briefing} element={<BriefingPiloto />} />
           <Route path={ROUTES.rutas} element={<RutasMexico />} />
@@ -133,6 +136,14 @@ function RoutedContent() {
             element={
               <PremiumRoute>
                 <ChecklistPremiumC172 />
+              </PremiumRoute>
+            }
+          />
+          <Route
+            path="/premium/checklist/:avion"
+            element={
+              <PremiumRoute>
+                <ChecklistPremiumAvion />
               </PremiumRoute>
             }
           />

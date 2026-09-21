@@ -13,10 +13,12 @@ export function AircraftChecklistPage({
   titulo,
   normal,
   emergencia,
+  descripcion = "Toca cada punto para marcarlo conforme lo verificas. Checklist estándar de referencia (motor a carburador, panel clásico) — ajústala a tu aeronave y procedimientos específicos.",
 }: {
   titulo: string;
   normal: ChecklistFase[];
   emergencia: ChecklistFase[];
+  descripcion?: string;
 }) {
   const [modo, setModo] = useState<Modo>("normal");
 
@@ -25,7 +27,7 @@ export function AircraftChecklistPage({
       <PageHero
         eyebrow="Checklist interactivo"
         title={titulo}
-        description="Toca cada punto para marcarlo conforme lo verificas. Checklist estándar de referencia (motor a carburador, panel clásico) — ajústala a tu aeronave y procedimientos específicos."
+        description={descripcion}
       >
         <Link
           to={ROUTES.descargas}

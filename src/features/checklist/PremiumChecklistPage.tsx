@@ -15,19 +15,21 @@ export function PremiumChecklistPage({
   emergencia,
   flujos,
   vspeeds,
+  descripcion = "Checklist completo, flujos de memoria para emergencias y V-speeds de referencia — todo en un solo lugar.",
 }: {
   titulo: string;
   normal: ChecklistFase[];
   emergencia: ChecklistFase[];
   flujos: Flujo[];
   vspeeds: VSpeed[];
+  descripcion?: string;
 }) {
   return (
     <div>
       <PageHero
         eyebrow="Contenido de cadetes · Premium"
         title={titulo}
-        description="Checklist completo, flujos de memoria para emergencias y V-speeds de referencia — todo en un solo lugar."
+        description={descripcion}
       >
         <Link
           to={ROUTES.contenidoExclusivo}

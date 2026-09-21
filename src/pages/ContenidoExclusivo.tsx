@@ -17,7 +17,7 @@ const numExamenes = CONTENIDO_EXCLUSIVO.filter((i) => i.tipo === "Examen").lengt
 const numAudios = CONTENIDO_EXCLUSIVO.filter((i) => i.tipo === "Audio").length;
 
 const STATS = [
-  { icon: ClipboardCheck, valor: numChecklists, label: "Checklists premium", detalle: "C172 y C152" },
+  { icon: ClipboardCheck, valor: numChecklists, label: "Checklists premium", detalle: "6 aviones" },
   { icon: Award, valor: numExamenes, label: "Simulacros de checkride", detalle: "Oral y en vuelo" },
   { icon: Radio, valor: numAudios, label: "Sets de audio ATC", detalle: "Situaciones reales" },
   { icon: ListChecks, valor: "12", label: "Maniobras de práctica", detalle: "De familiarización a TyD" },
