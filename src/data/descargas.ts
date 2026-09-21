@@ -98,6 +98,16 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     archivoHref: "/downloads/guia-comunicaciones-vfr.pdf",
   },
   {
+    id: "guia-comunicaciones-ifr",
+    categoria: "Guías",
+    nombre: "Comunicaciones IFR — Español | English",
+    descripcion: "Fraseología IFR bilingüe en dos columnas: regla CRAFT, autorización, salida, ruta, llegada, aproximación por instrumentos, esperas, emergencias, falla de comunicaciones y ejercicios con respuestas.",
+    version: "v1.0",
+    fecha: "2026-09-20",
+    imagen: "/images/descargas-guia-comunicaciones-ifr.jpg",
+    archivoHref: "/downloads/guia-comunicaciones-ifr.pdf",
+  },
+  {
     id: "guia-controles",
     categoria: "Guías",
     nombre: "Configura tus controles en MSFS",

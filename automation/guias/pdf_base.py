@@ -144,3 +144,49 @@ def insignia(c, x, y, n, r=0.27 * cm):
     c.drawCentredString(x, y - 3, str(n))
 
 
+# ---------- tablas bilingües (español | English) ----------
+ANCHO = W - 3.6 * cm
+BLUEBG = colors.HexColor("#E8EEFA")
+who_p = ParagraphStyle("whop", parent=cell, fontName="Helvetica-Bold", textColor=NAVY, fontSize=8.2)
+who_c = ParagraphStyle("whoc", parent=cell, fontName="Helvetica-Bold", textColor=BLUE, fontSize=8.2)
+en_style = ParagraphStyle("en", parent=cell, textColor=colors.HexColor("#374151"))
+
+
+def dialogo(filas, cab=("", "Español", "English")):
+    """filas: (quien, español, inglés); quien = 'P' piloto, 'C' control."""
+    datos = [[Paragraph(c, cellh) for c in cab]]
+    for q, es, en in filas:
+        datos.append([
+            Paragraph("Piloto<br/>Pilot" if q == "P" else "Control<br/>ATC", who_p if q == "P" else who_c),
+            Paragraph(es, cell), Paragraph(en, en_style),
+        ])
+    t = Table(datos, colWidths=[1.7 * cm, (ANCHO - 1.7 * cm) / 2, (ANCHO - 1.7 * cm) / 2], repeatRows=1)
+    est = [
+        ("BACKGROUND", (0, 0), (-1, 0), NAVY), ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LINEBELOW", (0, 0), (-1, -1), 0.4, colors.HexColor("#D5D9E0")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 6), ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+    ]
+    for i, (q, _, _) in enumerate(filas, start=1):
+        if q == "C":
+            est.append(("BACKGROUND", (0, i), (-1, i), BLUEBG))
+    t.setStyle(TableStyle(est))
+    return t
+
+
+def bi(filas, cab=("Español", "English")):
+    """Tabla de dos columnas ES | EN."""
+    datos = [[Paragraph(c, cellh) for c in cab]]
+    for es, en in filas:
+        datos.append([Paragraph(es, cell), Paragraph(en, en_style)])
+    t = Table(datos, colWidths=[ANCHO / 2] * 2, repeatRows=1)
+    est = [
+        ("BACKGROUND", (0, 0), (-1, 0), NAVY), ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LINEBELOW", (0, 0), (-1, -1), 0.4, colors.HexColor("#D5D9E0")),
+        ("LEFTPADDING", (0, 0), (-1, -1), 6), ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+        ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+    ]
+    for r in range(2, len(datos), 2):
+        est.append(("BACKGROUND", (0, r), (-1, r), LIGHT))
+    t.setStyle(TableStyle(est))
+    return t
