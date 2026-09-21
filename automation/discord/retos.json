@@ -1,0 +1,14 @@
+[
+  { "titulo": "Amanecer sobre Guadalajara", "texto": "Despega de MMGL al amanecer con un Cessna 172 y vuela una vuelta VFR sobre la ciudad. Comparte una captura de la luz sobre el valle.", "extra": "Consulta el clima antes de salir: {SITIO}/briefing?icao=MMGL" },
+  { "titulo": "Ruta de la semana: Guadalajara – Puerto Vallarta", "texto": "Vuela MMGL → MMPR siguiendo la ruta del Paquete 1 y cuida el nivel semicircular. Comparte tu perfil de vuelo o una captura de la aproximación.", "extra": "Ruta y plan .pln: {SITIO}/rutas" },
+  { "titulo": "Aterrizaje suave", "texto": "Elige cualquier aeropuerto mexicano y busca tu aterrizaje más suave. Muestra la captura del régimen de descenso al tocar pista.", "extra": "" },
+  { "titulo": "Viento cruzado", "texto": "Busca un METAR con viento cruzado de 10 kt o más y aterriza con él. Cuéntanos qué técnica usaste: cangrejo, ala baja o combinada.", "extra": "Calcula el componente en {SITIO}/briefing" },
+  { "titulo": "Ruta de la semana: Ciudad de México – Querétaro", "texto": "Vuela MMMX → MMQT con el plan del Paquete 1. Revisa el perfil de terreno antes de salir y comparte tu vuelo.", "extra": "Ruta y plan .pln: {SITIO}/rutas" },
+  { "titulo": "Vuelo nocturno", "texto": "Haz un circuito nocturno en un aeropuerto con luces de pista. Comparte la captura de la aproximación con las luces de pista y de aproximación.", "extra": "" },
+  { "titulo": "Sin GPS", "texto": "Vuela una ruta corta solo con carta, brújula y reloj: pilotaje y estima. Comparte cuánto te desviaste al llegar.", "extra": "Guía de planificación: {SITIO}/guia-vfr" },
+  { "titulo": "Ruta de la semana: Cancún – Cozumel", "texto": "Vuela MMUN → MMCZ siguiendo la costa con el plan del Paquete 1. Comparte la mejor vista del mar que encuentres.", "extra": "Ruta y plan .pln: {SITIO}/rutas" },
+  { "titulo": "Fraseología completa", "texto": "Haz un vuelo completo con ATC (IVAO, VATSIM o ATC del simulador) usando fraseología correcta desde rodaje hasta aterrizaje. Cuéntanos qué frase te costó más trabajo.", "extra": "" },
+  { "titulo": "Aeropuerto difícil", "texto": "Aterriza en un aeropuerto de altura o con terreno alrededor, como Toluca (MMTO) o Guadalajara con viento. Cuéntanos qué cuidaste en la aproximación.", "extra": "Revisa la altitud de densidad en {SITIO}/briefing" },
+  { "titulo": "Ruta de la semana: La Paz – Los Cabos", "texto": "Vuela MMLP → MMSD con el plan del Paquete 1 (o al revés) y comparte tu captura del desierto de Baja California Sur.", "extra": "Ruta y plan .pln: {SITIO}/rutas" },
+  { "titulo": "Emergencia simulada", "texto": "Practica una falla de motor en crucero: elige campo, configura, checklist y comunica MAYDAY con la fraseología. Comparte cómo te fue.", "extra": "Checklist C172: {SITIO}/checklist-c172" }
+]

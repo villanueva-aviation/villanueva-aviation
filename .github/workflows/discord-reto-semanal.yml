@@ -1,0 +1,21 @@
+name: Reto de la semana (Discord)
+
+on:
+  schedule:
+    - cron: "0 16 * * 1" # lunes 16:00 UTC = 10:00 a. m. en Jalisco
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node automation/discord/reto.mjs
+        env:
+          DISCORD_WEBHOOK_RETO: ${{ secrets.DISCORD_WEBHOOK_RETO }}
