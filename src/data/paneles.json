@@ -1,0 +1,113 @@
+{
+  "elige": [
+    { "quiero": "Ver los instrumentos del avión en una segunda pantalla", "usa": "Ventanas flotantes de MSFS (integradas) o Air Manager" },
+    { "quiero": "Un dashboard con RPM, temperaturas y combustible en una tablet o celular", "usa": "SimHub" },
+    { "quiero": "Un mapa de navegación en otra pantalla", "usa": "Little Navmap" },
+    { "quiero": "Conectar interruptores, luces y perillas físicos (Arduino)", "usa": "MobiFlight" },
+    { "quiero": "Instrumentos que se ven y se mueven como los reales en una tablet", "usa": "Air Manager" }
+  ],
+  "herramientas": [
+    {
+      "id": "ventanas",
+      "nombre": "Ventanas flotantes de MSFS",
+      "costo": "Incluido en el simulador",
+      "intro": "MSFS permite sacar un instrumento o pantalla de la cabina a una ventana aparte, que puedes arrastrar a un segundo monitor. Es lo primero que conviene probar: no instala nada.",
+      "requisitos": ["Segundo monitor conectado a la misma PC", "MSFS en modo ventana o pantalla completa sin bordes"],
+      "pasos": [
+        "Revisa en Opciones → Controles cómo se llama la acción de sacar un instrumento en ventana y qué tecla tiene asignada (suele ser una tecla Alt con clic).",
+        "Con el avión listo, haz esa acción sobre el instrumento o pantalla que quieres sacar.",
+        "Arrastra la ventana al segundo monitor y ajusta su tamaño.",
+        "Guarda la disposición si tu versión lo permite, o repítela al inicio de cada vuelo."
+      ],
+      "consejos": [
+        "Empieza por la pantalla principal de vuelo o el mapa: son las que más se aprovechan.",
+        "Si la ventana baja mucho el rendimiento, cierra otras y reduce su tamaño."
+      ]
+    },
+    {
+      "id": "simhub",
+      "nombre": "SimHub",
+      "costo": "Gratis, con funciones opcionales de pago",
+      "intro": "Lee los datos del simulador (RPM, temperaturas, combustible, velocidades) y los muestra en dashboards que puedes ver en una tablet, un celular o una segunda pantalla. También maneja hardware sencillo.",
+      "requisitos": ["PC con Windows y MSFS", "Una tablet, celular o segunda pantalla en la misma red Wi-Fi", "Permitir SimHub en el firewall de Windows"],
+      "pasos": [
+        "Instala SimHub y ábrelo con MSFS en marcha; en los ajustes del juego, elige MSFS como simulador.",
+        "En la sección de dashboards, elige una plantilla o crea la tuya (el editor se llama Dash Studio).",
+        "Activa el servidor web del dashboard: SimHub muestra una dirección de tu red (normalmente termina en :8888).",
+        "Abre esa dirección en el navegador de la tablet o el celular, en la misma red Wi-Fi.",
+        "Ajusta las medidas del dashboard a la pantalla del dispositivo y guarda."
+      ],
+      "consejos": [
+        "Usa Wi-Fi de 5 GHz si puedes: es más estable que 2.4 GHz.",
+        "Descarga dashboards solo de fuentes confiables y respáldalos antes de modificarlos."
+      ]
+    },
+    {
+      "id": "mobiflight",
+      "nombre": "MobiFlight",
+      "costo": "Gratis y de código abierto",
+      "intro": "Conecta hardware que armas tú (placas Arduino con interruptores, botones, perillas y luces) con las funciones del avión. Es la opción para construir un panel físico.",
+      "requisitos": ["MSFS y su módulo de MobiFlight", "Una placa compatible (por ejemplo, Arduino Mega) y los componentes", "Ganas de armar y probar"],
+      "pasos": [
+        "Instala MobiFlight Connector y deja que instale su módulo para MSFS.",
+        "Conecta tu placa por USB y cárgala con el firmware desde la propia aplicación.",
+        "Configura cada entrada (interruptor) y cada salida (luz) con el asistente de configuración.",
+        "Busca la función del avión en la base de datos de la comunidad (HubHop) y asígnala.",
+        "Prueba en tierra con un avión sencillo antes de montar todo en una caja."
+      ],
+      "consejos": [
+        "Empieza con un solo interruptor y una luz: luego amplías el panel.",
+        "Un mismo panel puede necesitar configuración distinta para cada avión."
+      ]
+    },
+    {
+      "id": "airmanager",
+      "nombre": "Air Manager",
+      "costo": "De pago",
+      "intro": "Muestra instrumentos que parecen reales en una tablet o en otra PC, con una biblioteca de relojes y paneles listos para instalar. Es la vía más vistosa para una segunda pantalla.",
+      "requisitos": ["PC con Windows y MSFS", "Tablet u otra pantalla en la misma red", "La aplicación en la PC y el cliente en el dispositivo"],
+      "pasos": [
+        "Instala Air Manager en la PC y conéctalo a MSFS con su conexión al simulador.",
+        "Elige o descarga un panel de la biblioteca (por ejemplo, uno de Cessna).",
+        "Abre el cliente en la tablet, o una segunda ventana en otra pantalla, y vincula el panel.",
+        "Ajusta el tamaño y la posición de cada instrumento."
+      ],
+      "consejos": [
+        "Empieza con un panel completo de un solo avión y personalízalo después.",
+        "Los paneles de la biblioteca los hace la comunidad: revisa su compatibilidad con tu versión de MSFS."
+      ]
+    },
+    {
+      "id": "navmap",
+      "nombre": "Little Navmap",
+      "costo": "Gratis",
+      "intro": "Un mapa de navegación en otra pantalla, con tu posición, la ruta, los aeropuertos y las cartas. Se conecta al simulador y te deja planear el vuelo fuera de él.",
+      "requisitos": ["PC con Windows y MSFS", "Segundo monitor, tablet o portátil en la misma red"],
+      "pasos": [
+        "Instala Little Navmap y actualiza su base de datos de navegación desde tu instalación de MSFS.",
+        "Conecta el mapa al simulador con la opción de conexión del programa.",
+        "Carga o crea tu plan de vuelo; puedes exportarlo a MSFS o abrir los .pln de las Rutas de México.",
+        "Coloca el mapa en el segundo monitor o en una tablet con acceso remoto."
+      ],
+      "consejos": [
+        "Es la mejor opción para ver dónde estás cuando vuelas VFR sin GPS.",
+        "Recuerda: para simulación y formación, no sustituye las cartas oficiales."
+      ]
+    }
+  ],
+  "c172": [
+    { "dato": "Velocidad, altitud y rumbo", "porque": "Los tres instrumentos básicos; siempre a la vista" },
+    { "dato": "RPM del motor", "porque": "Es tu medida de potencia con hélice de paso fijo" },
+    { "dato": "Presión y temperatura de aceite", "porque": "Detectan un problema del motor antes que nada" },
+    { "dato": "Combustible en cada tanque", "porque": "Para el balance y el plan de combustible" },
+    { "dato": "Voltios y amperes", "porque": "Alertan de una falla de alternador o batería" },
+    { "dato": "Flaps y trim", "porque": "Confirman la configuración en despegue y aterrizaje" }
+  ],
+  "errores": [
+    "Querer usar varias herramientas a la vez: cada una consume rendimiento. Empieza con una.",
+    "Dispositivos en redes distintas: la tablet no ve la dirección del dashboard. Deben estar en la misma red.",
+    "Firewall de Windows bloqueando la herramienta: permítela cuando lo pida la primera vez.",
+    "Montar el hardware antes de probar el software: verifica cada entrada y salida en pantalla primero.",
+    "Descargar paneles o dashboards de sitios desconocidos: usa fuentes confiables y guarda copia de lo tuyo."
+  ]
+}

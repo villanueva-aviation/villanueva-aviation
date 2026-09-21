@@ -119,6 +119,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     soloInteractivo: true,
   },
   {
+    id: "guia-paneles",
+    categoria: "Guías",
+    nombre: "Paneles y dashboards para MSFS",
+    descripcion: "Qué herramienta usar (ventanas de MSFS, SimHub, MobiFlight, Air Manager, Little Navmap) para ver instrumentos, datos y mapa en una segunda pantalla o tablet, con pasos y un ejemplo para el Cessna 172.",
+    version: "v1.0",
+    fecha: "2026-09-20",
+    imagen: "/images/descargas-simhub-c172.jpg",
+    interactivoHref: "/paneles",
+    soloInteractivo: true,
+  },
+  {
     id: "rutas-mexico",
     categoria: "Rutas",
     nombre: "Rutas de México — Paquetes 1 y 2",
