@@ -1,0 +1,78 @@
+{
+  "pasos": [
+    "Conecta el mando antes de abrir el simulador y revisa en Windows (Configurar controladores de juego USB) que cada eje se mueve limpio y regresa al centro.",
+    "En MSFS: Opciones → Controles → Opciones de controles, y elige el icono de tu dispositivo.",
+    "Crea un perfil nuevo (Guardar como) antes de tocar nada, para no perder el original ni mezclar aviones.",
+    "Busca cada función por nombre en el cuadro de búsqueda (en inglés: Ailerons, Elevator, Rudder, Throttle, Flaps, Trim, Gear). Asigna primero los ejes y luego los botones.",
+    "Ajusta zona muerta y sensibilidad de cada eje (recomendaciones abajo) y prueba en tierra con un avión sencillo, como el Cessna 172, antes de volar.",
+    "Guarda un perfil por tipo de avión (pistón, turbohélice, jet) si tus palancas lo necesitan."
+  ],
+  "ajustes": [
+    { "eje": "Alerones y elevador", "zona": "3–5 % en un joystick usado, 0–2 % si es nuevo", "sens": "Lineal; suaviza el centro si el avión se siente nervioso" },
+    { "eje": "Timón (giro del joystick o pedales)", "zona": "5–8 % con giro de mango; 2–3 % con pedales", "sens": "Suave cerca del centro para evitar que corrija sin querer" },
+    { "eje": "Acelerador, mezcla y hélice", "zona": "0–1 %", "sens": "Lineal; recorrido completo de 0 a 100 %" },
+    { "eje": "Frenos de puntas de pedal", "zona": "0–2 %", "sens": "Lineal; un pedal por lado" }
+  ],
+  "equipos": [
+    {
+      "id": "joystick",
+      "nombre": "Joystick y palanca de gases",
+      "modelos": "Thrustmaster T.16000M / T.Flight Hotas, Logitech Extreme 3D Pro y similares",
+      "intro": "Un joystick con giro de mango y una palanca de gases aparte o un control deslizante en la base. Es la forma más barata de tener ejes reales; casi todo lo demás se pasa a botones.",
+      "ejes": [
+        { "control": "Inclinación izquierda-derecha", "funcion": "Alerones" },
+        { "control": "Inclinación adelante-atrás", "funcion": "Elevador (adelante = morro abajo)" },
+        { "control": "Giro del mango (o pedales aparte)", "funcion": "Timón de dirección" },
+        { "control": "Control deslizante o palanca de gases", "funcion": "Acelerador (0 % en el tope de atrás)" },
+        { "control": "Palanca o rueda extra (si existe)", "funcion": "Mezcla o hélice, según el avión" }
+      ],
+      "botones": [
+        { "control": "Sombrero (hat) arriba y abajo", "funcion": "Trim de elevador arriba y abajo" },
+        { "control": "Sombrero izquierda y derecha", "funcion": "Trim de timón, o vista izquierda y derecha" },
+        { "control": "Dos botones del mango", "funcion": "Flaps: subir y bajar por posición" },
+        { "control": "Gatillo", "funcion": "Freno (mantener) o tomar de radio, según prefieras" },
+        { "control": "Botón lateral", "funcion": "Tren de aterrizaje, o luces de aterrizaje" },
+        { "control": "Botón lateral libre", "funcion": "Pausa" }
+      ],
+      "consejos": [
+        "Con giro de mango no sientes el timón como con pedales: apóyate en el trim de timón y no corrijas a tirones.",
+        "Si el mango giratorio se siente inestable, sube la zona muerta del timón antes de tocar la sensibilidad.",
+        "Para turbohélices y jets, deja una palanca dedicada a la mezcla o a la reversa y asigna el resto por botón."
+      ]
+    },
+    {
+      "id": "yoke",
+      "nombre": "Yoke y quadrante",
+      "modelos": "Honeycomb Alpha + Bravo, Logitech Flight Yoke System y similares",
+      "intro": "Un yoke con columna y un quadrante con varias palancas. Es lo más cercano a la cabina de un avión ligero, y aprovecha las palancas separadas de acelerador, hélice y mezcla.",
+      "ejes": [
+        { "control": "Giro del volante", "funcion": "Alerones" },
+        { "control": "Empujar y jalar la columna", "funcion": "Elevador (empujar = morro abajo)" },
+        { "control": "Palanca 1 del quadrante", "funcion": "Acelerador" },
+        { "control": "Palanca 2 del quadrante", "funcion": "Hélice (RPM)" },
+        { "control": "Palanca 3 del quadrante", "funcion": "Mezcla" },
+        { "control": "Pedales (aparte)", "funcion": "Timón de dirección y frenos de puntas" }
+      ],
+      "botones": [
+        { "control": "Rueda o botones de trim", "funcion": "Trim de elevador" },
+        { "control": "Palanca de flaps (Bravo) o botones", "funcion": "Flaps por posición" },
+        { "control": "Palanca de tren (Bravo)", "funcion": "Tren de aterrizaje arriba y abajo" },
+        { "control": "Interruptor de magnetos (Alpha)", "funcion": "Magnetos: OFF, IZQ, DER, AMBOS y arranque" },
+        { "control": "Interruptores de batería y alternador (Alpha)", "funcion": "Batería y alternador (master)" },
+        { "control": "Botones de piloto automático (Bravo)", "funcion": "HDG, NAV, APR, ALT, VS, IAS y AP" }
+      ],
+      "consejos": [
+        "Crea un perfil por avión: el mismo quadrante sirve para mezcla en un pistón y para condición y hélice en un turbohélice.",
+        "Los interruptores de magnetos y de master solo funcionan en aviones que los tienen; en el resto asígnalos a algo útil.",
+        "Con el Bravo, el interruptor de trim por rueda es más fino que los botones: úsalo para no sobrecorregir en aproximación."
+      ]
+    }
+  ],
+  "errores": [
+    "Asignar el mismo botón en dos dispositivos o dejar la asignación del teclado activa: el simulador hace las dos cosas a la vez.",
+    "Olvidar la zona muerta: el avión se va solo de lado porque el centro del joystick no da exactamente cero.",
+    "Configurar todo con el avión en el aire: hazlo en tierra y guarda el perfil antes de volar.",
+    "Calibrar dentro del simulador un eje que Windows ya calibró: si algo se comporta raro, empieza por revisar en Windows.",
+    "No guardar perfiles por tipo de avión: las palancas de un turbohélice no sirven igual en un pistón."
+  ]
+}

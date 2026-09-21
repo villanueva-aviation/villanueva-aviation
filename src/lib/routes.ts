@@ -15,6 +15,7 @@ export const ROUTES = {
   planVuelo: "/plan-de-vuelo",
   briefing: "/briefing",
   rutas: "/rutas",
+  controles: "/controles",
   bitacoraVuelo: "/bitacora-de-vuelo",
   pesoBalance: "/peso-y-balance",
   audioRodajeDespegue: "/premium/audio-rodaje-despegue",

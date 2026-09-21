@@ -88,6 +88,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     soloInteractivo: true,
   },
   {
+    id: "guia-controles",
+    categoria: "Guías",
+    nombre: "Configura tus controles en MSFS",
+    descripcion: "Asignación recomendada de ejes y botones para joystick y para yoke con quadrante, con zona muerta y sensibilidad para que el avión no se vaya solo.",
+    version: "v1.0",
+    fecha: "2026-09-20",
+    imagen: "/images/descargas-briefing-piloto.jpg",
+    interactivoHref: "/controles",
+    soloInteractivo: true,
+  },
+  {
     id: "rutas-mexico",
     categoria: "Rutas",
     nombre: "Rutas de México — Paquetes 1 y 2",

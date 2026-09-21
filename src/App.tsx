@@ -30,6 +30,7 @@ const AudioEmergenciasAproximacion = lazy(() =>
   import("./pages/AudioEmergenciasAproximacion").then((m) => ({ default: m.AudioEmergenciasAproximacion })),
 );
 const ChecklistPremiumC172 = lazy(() => import("./pages/ChecklistPremiumC172").then((m) => ({ default: m.ChecklistPremiumC172 })));
+const Controles = lazy(() => import("./pages/Controles").then((m) => ({ default: m.Controles })));
 const ChecklistAvion = lazy(() => import("./pages/ChecklistAvion").then((m) => ({ default: m.ChecklistAvion })));
 const ChecklistPremiumAvion = lazy(() => import("./pages/ChecklistPremiumAvion").then((m) => ({ default: m.ChecklistPremiumAvion })));
 const ChecklistPremiumC152 = lazy(() => import("./pages/ChecklistPremiumC152").then((m) => ({ default: m.ChecklistPremiumC152 })));
@@ -113,6 +114,7 @@ function RoutedContent() {
           <Route path={ROUTES.planVuelo} element={<PlanDeVuelo />} />
           <Route path={ROUTES.briefing} element={<BriefingPiloto />} />
           <Route path={ROUTES.rutas} element={<RutasMexico />} />
+          <Route path={ROUTES.controles} element={<Controles />} />
           <Route path={ROUTES.bitacoraVuelo} element={<BitacoraVuelo />} />
           <Route path={ROUTES.pesoBalance} element={<PesoBalance />} />
           <Route
