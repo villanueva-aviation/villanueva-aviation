@@ -22,6 +22,7 @@ const ChecklistC172 = lazy(() => import("./pages/ChecklistC172").then((m) => ({ 
 const ChecklistC152 = lazy(() => import("./pages/ChecklistC152").then((m) => ({ default: m.ChecklistC152 })));
 const PlanDeVuelo = lazy(() => import("./pages/PlanDeVuelo").then((m) => ({ default: m.PlanDeVuelo })));
 const BriefingPiloto = lazy(() => import("./pages/BriefingPiloto").then((m) => ({ default: m.BriefingPiloto })));
+const RutasMexico = lazy(() => import("./pages/RutasMexico").then((m) => ({ default: m.RutasMexico })));
 const BitacoraVuelo = lazy(() => import("./pages/BitacoraVuelo").then((m) => ({ default: m.BitacoraVuelo })));
 const PesoBalance = lazy(() => import("./pages/PesoBalance").then((m) => ({ default: m.PesoBalance })));
 const AudioRodajeDespegue = lazy(() => import("./pages/AudioRodajeDespegue").then((m) => ({ default: m.AudioRodajeDespegue })));
@@ -108,6 +109,7 @@ function RoutedContent() {
           <Route path={ROUTES.checklistC152} element={<ChecklistC152 />} />
           <Route path={ROUTES.planVuelo} element={<PlanDeVuelo />} />
           <Route path={ROUTES.briefing} element={<BriefingPiloto />} />
+          <Route path={ROUTES.rutas} element={<RutasMexico />} />
           <Route path={ROUTES.bitacoraVuelo} element={<BitacoraVuelo />} />
           <Route path={ROUTES.pesoBalance} element={<PesoBalance />} />
           <Route

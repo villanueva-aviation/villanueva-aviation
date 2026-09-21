@@ -1,0 +1,1602 @@
+{
+ "generado": "2026-09-20",
+ "modeloMagnetico": "WMM-2025",
+ "aeropuertos": {
+  "MMGL": {
+   "icao": "MMGL",
+   "iata": "GDL",
+   "nombre": "Guadalajara",
+   "lat": 20.5197,
+   "lon": -103.3059,
+   "elevFt": 5023,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "11/29",
+     "largoFt": 13123,
+     "anchoFt": 197,
+     "superficie": "H"
+    },
+    {
+     "id": "02/20",
+     "largoFt": 5906,
+     "anchoFt": 98,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "ATIS",
+     "mhz": "132.8"
+    },
+    {
+     "tipo": "TWR",
+     "mhz": "118.1"
+    }
+   ]
+  },
+  "MMPR": {
+   "icao": "MMPR",
+   "iata": "PVR",
+   "nombre": "Puerto Vallarta",
+   "lat": 20.6813,
+   "lon": -105.2522,
+   "elevFt": 20,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "04/22",
+     "largoFt": 10187,
+     "anchoFt": 148,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "TWR",
+     "mhz": "118.5"
+    }
+   ]
+  },
+  "MMZO": {
+   "icao": "MMZO",
+   "iata": "ZLO",
+   "nombre": "Manzanillo",
+   "lat": 19.1455,
+   "lon": -104.5603,
+   "elevFt": 36,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "10/28",
+     "largoFt": 7238,
+     "anchoFt": 148,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "TWR",
+     "mhz": "118.7"
+    }
+   ]
+  },
+  "MMAS": {
+   "icao": "MMAS",
+   "iata": "AGU",
+   "nombre": "Aguascalientes",
+   "lat": 21.7017,
+   "lon": -102.318,
+   "elevFt": 6122,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "18/36",
+     "largoFt": 9862,
+     "anchoFt": 148,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "TWR",
+     "mhz": "118.6"
+    }
+   ]
+  },
+  "MMLO": {
+   "icao": "MMLO",
+   "iata": "BJX",
+   "nombre": "Del Bajío (Guanajuato)",
+   "lat": 20.9923,
+   "lon": -101.4799,
+   "elevFt": 5922,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "13/31",
+     "largoFt": 11483,
+     "anchoFt": 148,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "ATIS",
+     "mhz": "128.4"
+    },
+    {
+     "tipo": "TWR",
+     "mhz": "118.35"
+    }
+   ]
+  },
+  "MMMX": {
+   "icao": "MMMX",
+   "iata": "MEX",
+   "nombre": "Ciudad de México",
+   "lat": 19.4355,
+   "lon": -99.0749,
+   "elevFt": 7297,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "05R/23L",
+     "largoFt": 13074,
+     "anchoFt": 148,
+     "superficie": "H"
+    },
+    {
+     "id": "05L/23R",
+     "largoFt": 13002,
+     "anchoFt": 148,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "ATIS",
+     "mhz": "127.65"
+    },
+    {
+     "tipo": "TWR",
+     "mhz": "118.55"
+    }
+   ]
+  },
+  "MMQT": {
+   "icao": "MMQT",
+   "iata": "QRO",
+   "nombre": "Querétaro",
+   "lat": 20.6173,
+   "lon": -100.1839,
+   "elevFt": 6263,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "09/27",
+     "largoFt": 11483,
+     "anchoFt": 148,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "TWR",
+     "mhz": "118.95"
+    }
+   ]
+  },
+  "MMAA": {
+   "icao": "MMAA",
+   "iata": "ACA",
+   "nombre": "Acapulco",
+   "lat": 16.7561,
+   "lon": -99.7506,
+   "elevFt": 16,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "10/28",
+     "largoFt": 10827,
+     "anchoFt": 148,
+     "superficie": "H"
+    },
+    {
+     "id": "06/24",
+     "largoFt": 5577,
+     "anchoFt": 115,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "ATIS",
+     "mhz": "122.3"
+    },
+    {
+     "tipo": "TWR",
+     "mhz": "118.5"
+    }
+   ]
+  },
+  "MMUN": {
+   "icao": "MMUN",
+   "iata": "CUN",
+   "nombre": "Cancún",
+   "lat": 21.0402,
+   "lon": -86.8716,
+   "elevFt": 43,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "12R/30L",
+     "largoFt": 11483,
+     "anchoFt": 197,
+     "superficie": "H"
+    },
+    {
+     "id": "12L/30R",
+     "largoFt": 9186,
+     "anchoFt": 148,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "TWR",
+     "mhz": "118.6"
+    }
+   ]
+  },
+  "MMCZ": {
+   "icao": "MMCZ",
+   "iata": "CZM",
+   "nombre": "Cozumel",
+   "lat": 20.515,
+   "lon": -86.9291,
+   "elevFt": 23,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "05/23",
+     "largoFt": 10377,
+     "anchoFt": 148,
+     "superficie": "H"
+    },
+    {
+     "id": "12/30",
+     "largoFt": 8858,
+     "anchoFt": 148,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "TWR",
+     "mhz": "118.0"
+    }
+   ]
+  },
+  "MMSD": {
+   "icao": "MMSD",
+   "iata": "SJD",
+   "nombre": "Los Cabos",
+   "lat": 23.1497,
+   "lon": -109.7204,
+   "elevFt": 351,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "16/34",
+     "largoFt": 9842,
+     "anchoFt": 148,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "ATIS",
+     "mhz": "127.6"
+    },
+    {
+     "tipo": "TWR",
+     "mhz": "118.9"
+    }
+   ]
+  },
+  "MMLP": {
+   "icao": "MMLP",
+   "iata": "LAP",
+   "nombre": "La Paz",
+   "lat": 24.0729,
+   "lon": -110.3624,
+   "elevFt": 52,
+   "torre": true,
+   "pistas": [
+    {
+     "id": "18/36",
+     "largoFt": 8202,
+     "anchoFt": 148,
+     "superficie": "H"
+    }
+   ],
+   "frecuencias": [
+    {
+     "tipo": "ATIS",
+     "mhz": "127.9"
+    },
+    {
+     "tipo": "TWR",
+     "mhz": "118.1"
+    }
+   ]
+  }
+ },
+ "rutas": [
+  {
+   "id": "mmgl-mmpr",
+   "region": "Occidente",
+   "origen": "MMGL",
+   "destino": "MMPR",
+   "distanciaNm": 110,
+   "rumboVerdaderoIni": 275,
+   "rumboVerdaderoFin": 275,
+   "variacionMagnetica": 5.8,
+   "rumboMagneticoIni": 270,
+   "tiempoMin100kt": 66,
+   "tiempoMin140kt": 47,
+   "terrenoMaxFt": 8442,
+   "terrenoMaxKmDesdeSalidaNm": 74,
+   "sobreAguaPct": 3,
+   "nivelMinimoFt": 10400,
+   "nivelSugeridoFt": 10500,
+   "advertencias": [
+    "Nivel sobre 10,000 ft: piensa en el oxígeno y en el rendimiento de tu avión (techo de servicio)."
+   ],
+   "perfil": [
+    [
+     0.0,
+     5226
+    ],
+    [
+     3.0,
+     5338
+    ],
+    [
+     5.9,
+     5472
+    ],
+    [
+     8.9,
+     5453
+    ],
+    [
+     11.9,
+     6440
+    ],
+    [
+     14.8,
+     6017
+    ],
+    [
+     17.8,
+     5715
+    ],
+    [
+     20.8,
+     5075
+    ],
+    [
+     23.7,
+     5161
+    ],
+    [
+     26.7,
+     4797
+    ],
+    [
+     29.7,
+     4232
+    ],
+    [
+     32.6,
+     4180
+    ],
+    [
+     35.6,
+     4236
+    ],
+    [
+     38.6,
+     4573
+    ],
+    [
+     41.6,
+     5161
+    ],
+    [
+     44.5,
+     6670
+    ],
+    [
+     47.5,
+     5528
+    ],
+    [
+     50.5,
+     5121
+    ],
+    [
+     53.4,
+     5879
+    ],
+    [
+     56.4,
+     5922
+    ],
+    [
+     59.4,
+     5394
+    ],
+    [
+     62.3,
+     4911
+    ],
+    [
+     65.3,
+     5253
+    ],
+    [
+     68.3,
+     5820
+    ],
+    [
+     71.2,
+     6962
+    ],
+    [
+     74.2,
+     8442
+    ],
+    [
+     77.2,
+     7566
+    ],
+    [
+     80.1,
+     7490
+    ],
+    [
+     83.1,
+     6486
+    ],
+    [
+     86.1,
+     8012
+    ],
+    [
+     89.0,
+     5089
+    ],
+    [
+     92.0,
+     4754
+    ],
+    [
+     95.0,
+     5620
+    ],
+    [
+     97.9,
+     3235
+    ],
+    [
+     100.9,
+     1955
+    ],
+    [
+     103.9,
+     2060
+    ],
+    [
+     106.8,
+     866
+    ],
+    [
+     109.8,
+     95
+    ]
+   ],
+   "plan": "/downloads/rutas/mmgl-mmpr.pln"
+  },
+  {
+   "id": "mmgl-mmzo",
+   "region": "Occidente",
+   "origen": "MMGL",
+   "destino": "MMZO",
+   "distanciaNm": 109,
+   "rumboVerdaderoIni": 221,
+   "rumboVerdaderoFin": 220,
+   "variacionMagnetica": 5.7,
+   "rumboMagneticoIni": 215,
+   "tiempoMin100kt": 65,
+   "tiempoMin140kt": 47,
+   "terrenoMaxFt": 9009,
+   "terrenoMaxKmDesdeSalidaNm": 12,
+   "sobreAguaPct": 3,
+   "nivelMinimoFt": 11000,
+   "nivelSugeridoFt": 12500,
+   "advertencias": [
+    "Nivel sobre 10,000 ft: piensa en el oxígeno y en el rendimiento de tu avión (techo de servicio)."
+   ],
+   "perfil": [
+    [
+     0.0,
+     5069
+    ],
+    [
+     2.9,
+     5449
+    ],
+    [
+     5.9,
+     6526
+    ],
+    [
+     8.8,
+     5804
+    ],
+    [
+     11.8,
+     9009
+    ],
+    [
+     14.7,
+     5249
+    ],
+    [
+     17.6,
+     5764
+    ],
+    [
+     20.6,
+     4734
+    ],
+    [
+     23.5,
+     4685
+    ],
+    [
+     26.5,
+     7083
+    ],
+    [
+     29.4,
+     7405
+    ],
+    [
+     32.3,
+     8228
+    ],
+    [
+     35.3,
+     8012
+    ],
+    [
+     38.2,
+     7917
+    ],
+    [
+     41.1,
+     7497
+    ],
+    [
+     44.1,
+     7569
+    ],
+    [
+     47.0,
+     6191
+    ],
+    [
+     50.0,
+     6749
+    ],
+    [
+     52.9,
+     4101
+    ],
+    [
+     55.8,
+     4839
+    ],
+    [
+     58.8,
+     3363
+    ],
+    [
+     61.7,
+     2913
+    ],
+    [
+     64.7,
+     4347
+    ],
+    [
+     67.6,
+     2808
+    ],
+    [
+     70.5,
+     5810
+    ],
+    [
+     73.5,
+     6637
+    ],
+    [
+     76.4,
+     7543
+    ],
+    [
+     79.4,
+     6188
+    ],
+    [
+     82.3,
+     4321
+    ],
+    [
+     85.2,
+     3734
+    ],
+    [
+     88.2,
+     2251
+    ],
+    [
+     91.1,
+     3117
+    ],
+    [
+     94.1,
+     3094
+    ],
+    [
+     97.0,
+     1916
+    ],
+    [
+     99.9,
+     1617
+    ],
+    [
+     102.9,
+     1171
+    ],
+    [
+     105.8,
+     322
+    ],
+    [
+     108.8,
+     223
+    ]
+   ],
+   "plan": "/downloads/rutas/mmgl-mmzo.pln"
+  },
+  {
+   "id": "mmgl-mmas",
+   "region": "Occidente",
+   "origen": "MMGL",
+   "destino": "MMAS",
+   "distanciaNm": 90,
+   "rumboVerdaderoIni": 38,
+   "rumboVerdaderoFin": 38,
+   "variacionMagnetica": 5.3,
+   "rumboMagneticoIni": 32,
+   "tiempoMin100kt": 54,
+   "tiempoMin140kt": 39,
+   "terrenoMaxFt": 7264,
+   "terrenoMaxKmDesdeSalidaNm": 30,
+   "sobreAguaPct": 0,
+   "nivelMinimoFt": 9300,
+   "nivelSugeridoFt": 9500,
+   "advertencias": [],
+   "perfil": [
+    [
+     0.0,
+     5066
+    ],
+    [
+     3.0,
+     5220
+    ],
+    [
+     6.0,
+     5171
+    ],
+    [
+     9.0,
+     5138
+    ],
+    [
+     12.0,
+     5285
+    ],
+    [
+     15.0,
+     5515
+    ],
+    [
+     18.0,
+     5449
+    ],
+    [
+     21.0,
+     5863
+    ],
+    [
+     24.0,
+     5853
+    ],
+    [
+     27.0,
+     5902
+    ],
+    [
+     30.0,
+     7264
+    ],
+    [
+     33.0,
+     6312
+    ],
+    [
+     36.0,
+     5784
+    ],
+    [
+     39.0,
+     5915
+    ],
+    [
+     42.0,
+     6096
+    ],
+    [
+     45.0,
+     6007
+    ],
+    [
+     48.0,
+     6565
+    ],
+    [
+     51.0,
+     6247
+    ],
+    [
+     54.0,
+     5879
+    ],
+    [
+     57.0,
+     5748
+    ],
+    [
+     60.0,
+     5925
+    ],
+    [
+     63.0,
+     5909
+    ],
+    [
+     66.0,
+     5738
+    ],
+    [
+     69.0,
+     6188
+    ],
+    [
+     72.0,
+     6063
+    ],
+    [
+     75.0,
+     6066
+    ],
+    [
+     78.0,
+     6125
+    ],
+    [
+     81.0,
+     5981
+    ],
+    [
+     84.0,
+     5994
+    ],
+    [
+     87.0,
+     6070
+    ],
+    [
+     90.0,
+     6555
+    ]
+   ],
+   "plan": "/downloads/rutas/mmgl-mmas.pln"
+  },
+  {
+   "id": "mmgl-mmlo",
+   "region": "Occidente",
+   "origen": "MMGL",
+   "destino": "MMLO",
+   "distanciaNm": 106,
+   "rumboVerdaderoIni": 74,
+   "rumboVerdaderoFin": 75,
+   "variacionMagnetica": 5.2,
+   "rumboMagneticoIni": 69,
+   "tiempoMin100kt": 64,
+   "tiempoMin140kt": 46,
+   "terrenoMaxFt": 7523,
+   "terrenoMaxKmDesdeSalidaNm": 44,
+   "sobreAguaPct": 0,
+   "nivelMinimoFt": 9500,
+   "nivelSugeridoFt": 11500,
+   "advertencias": [
+    "Nivel sobre 10,000 ft: piensa en el oxígeno y en el rendimiento de tu avión (techo de servicio)."
+   ],
+   "perfil": [
+    [
+     0.0,
+     5164
+    ],
+    [
+     3.0,
+     5384
+    ],
+    [
+     5.9,
+     5436
+    ],
+    [
+     8.9,
+     5591
+    ],
+    [
+     11.8,
+     5331
+    ],
+    [
+     14.8,
+     6394
+    ],
+    [
+     17.7,
+     5817
+    ],
+    [
+     20.7,
+     5932
+    ],
+    [
+     23.6,
+     6043
+    ],
+    [
+     26.6,
+     5948
+    ],
+    [
+     29.5,
+     6152
+    ],
+    [
+     32.5,
+     6263
+    ],
+    [
+     35.5,
+     6214
+    ],
+    [
+     38.4,
+     6289
+    ],
+    [
+     41.4,
+     6512
+    ],
+    [
+     44.3,
+     7523
+    ],
+    [
+     47.3,
+     6804
+    ],
+    [
+     50.2,
+     6722
+    ],
+    [
+     53.2,
+     6703
+    ],
+    [
+     56.1,
+     7326
+    ],
+    [
+     59.1,
+     7218
+    ],
+    [
+     62.1,
+     7208
+    ],
+    [
+     65.0,
+     7310
+    ],
+    [
+     68.0,
+     7375
+    ],
+    [
+     70.9,
+     7238
+    ],
+    [
+     73.9,
+     6729
+    ],
+    [
+     76.8,
+     6844
+    ],
+    [
+     79.8,
+     6562
+    ],
+    [
+     82.7,
+     6381
+    ],
+    [
+     85.7,
+     6686
+    ],
+    [
+     88.6,
+     6076
+    ],
+    [
+     91.6,
+     6096
+    ],
+    [
+     94.6,
+     5833
+    ],
+    [
+     97.5,
+     5873
+    ],
+    [
+     100.5,
+     5942
+    ],
+    [
+     103.4,
+     6053
+    ],
+    [
+     106.4,
+     6253
+    ]
+   ],
+   "plan": "/downloads/rutas/mmgl-mmlo.pln"
+  },
+  {
+   "id": "mmmx-mmqt",
+   "region": "Centro",
+   "origen": "MMMX",
+   "destino": "MMQT",
+   "distanciaNm": 95,
+   "rumboVerdaderoIni": 319,
+   "rumboVerdaderoFin": 318,
+   "variacionMagnetica": 4.1,
+   "rumboMagneticoIni": 315,
+   "tiempoMin100kt": 57,
+   "tiempoMin140kt": 41,
+   "terrenoMaxFt": 9600,
+   "terrenoMaxKmDesdeSalidaNm": 32,
+   "sobreAguaPct": 0,
+   "nivelMinimoFt": 11600,
+   "nivelSugeridoFt": 12500,
+   "advertencias": [
+    "Nivel sobre 10,000 ft: piensa en el oxígeno y en el rendimiento de tu avión (techo de servicio)."
+   ],
+   "perfil": [
+    [
+     0.0,
+     7333
+    ],
+    [
+     3.0,
+     7352
+    ],
+    [
+     5.9,
+     7858
+    ],
+    [
+     8.9,
+     8799
+    ],
+    [
+     11.8,
+     7887
+    ],
+    [
+     14.8,
+     8215
+    ],
+    [
+     17.7,
+     8117
+    ],
+    [
+     20.7,
+     8291
+    ],
+    [
+     23.6,
+     8688
+    ],
+    [
+     26.6,
+     8533
+    ],
+    [
+     29.6,
+     8320
+    ],
+    [
+     32.5,
+     9600
+    ],
+    [
+     35.5,
+     9101
+    ],
+    [
+     38.4,
+     8757
+    ],
+    [
+     41.4,
+     8684
+    ],
+    [
+     44.3,
+     8898
+    ],
+    [
+     47.3,
+     8842
+    ],
+    [
+     50.3,
+     8671
+    ],
+    [
+     53.2,
+     8875
+    ],
+    [
+     56.2,
+     8268
+    ],
+    [
+     59.1,
+     7943
+    ],
+    [
+     62.1,
+     7743
+    ],
+    [
+     65.0,
+     7480
+    ],
+    [
+     68.0,
+     7388
+    ],
+    [
+     70.9,
+     7359
+    ],
+    [
+     73.9,
+     7543
+    ],
+    [
+     76.9,
+     7096
+    ],
+    [
+     79.8,
+     6414
+    ],
+    [
+     82.8,
+     6788
+    ],
+    [
+     85.7,
+     7018
+    ],
+    [
+     88.7,
+     6572
+    ],
+    [
+     91.6,
+     6565
+    ],
+    [
+     94.6,
+     6637
+    ]
+   ],
+   "plan": "/downloads/rutas/mmmx-mmqt.pln"
+  },
+  {
+   "id": "mmmx-mmaa",
+   "region": "Centro",
+   "origen": "MMMX",
+   "destino": "MMAA",
+   "distanciaNm": 165,
+   "rumboVerdaderoIni": 194,
+   "rumboVerdaderoFin": 193,
+   "variacionMagnetica": 4.0,
+   "rumboMagneticoIni": 190,
+   "tiempoMin100kt": 99,
+   "tiempoMin140kt": 71,
+   "terrenoMaxFt": 10699,
+   "terrenoMaxKmDesdeSalidaNm": 18,
+   "sobreAguaPct": 4,
+   "nivelMinimoFt": 12700,
+   "nivelSugeridoFt": 14500,
+   "advertencias": [
+    "Nivel sobre 10,000 ft: piensa en el oxígeno y en el rendimiento de tu avión (techo de servicio)."
+   ],
+   "perfil": [
+    [
+     0.0,
+     7339
+    ],
+    [
+     3.0,
+     7356
+    ],
+    [
+     5.9,
+     8327
+    ],
+    [
+     8.9,
+     7644
+    ],
+    [
+     11.8,
+     8852
+    ],
+    [
+     14.8,
+     10052
+    ],
+    [
+     17.7,
+     10699
+    ],
+    [
+     20.7,
+     10210
+    ],
+    [
+     23.6,
+     9551
+    ],
+    [
+     26.6,
+     8209
+    ],
+    [
+     29.5,
+     6696
+    ],
+    [
+     32.5,
+     5600
+    ],
+    [
+     35.4,
+     5404
+    ],
+    [
+     38.4,
+     4465
+    ],
+    [
+     41.4,
+     3681
+    ],
+    [
+     44.3,
+     3432
+    ],
+    [
+     47.3,
+     3209
+    ],
+    [
+     50.2,
+     3235
+    ],
+    [
+     53.2,
+     3084
+    ],
+    [
+     56.1,
+     4259
+    ],
+    [
+     59.1,
+     5358
+    ],
+    [
+     62.0,
+     5751
+    ],
+    [
+     65.0,
+     6198
+    ],
+    [
+     67.9,
+     4646
+    ],
+    [
+     70.9,
+     3698
+    ],
+    [
+     73.9,
+     3799
+    ],
+    [
+     76.8,
+     3635
+    ],
+    [
+     79.8,
+     4751
+    ],
+    [
+     82.7,
+     5538
+    ],
+    [
+     85.7,
+     5125
+    ],
+    [
+     88.6,
+     2782
+    ],
+    [
+     91.6,
+     2654
+    ],
+    [
+     94.5,
+     3743
+    ],
+    [
+     97.5,
+     5617
+    ],
+    [
+     100.4,
+     5564
+    ],
+    [
+     103.4,
+     5728
+    ],
+    [
+     106.3,
+     5778
+    ],
+    [
+     109.3,
+     4613
+    ],
+    [
+     112.3,
+     5755
+    ],
+    [
+     115.2,
+     8274
+    ],
+    [
+     118.2,
+     7221
+    ],
+    [
+     121.1,
+     9183
+    ],
+    [
+     124.1,
+     6444
+    ],
+    [
+     127.0,
+     4360
+    ],
+    [
+     130.0,
+     4065
+    ],
+    [
+     132.9,
+     2238
+    ],
+    [
+     135.9,
+     2526
+    ],
+    [
+     138.8,
+     2497
+    ],
+    [
+     141.8,
+     3858
+    ],
+    [
+     144.8,
+     2828
+    ],
+    [
+     147.7,
+     2142
+    ],
+    [
+     150.7,
+     1217
+    ],
+    [
+     153.6,
+     919
+    ],
+    [
+     156.6,
+     443
+    ],
+    [
+     159.5,
+     243
+    ],
+    [
+     162.5,
+     505
+    ],
+    [
+     165.4,
+     13
+    ]
+   ],
+   "plan": "/downloads/rutas/mmmx-mmaa.pln"
+  },
+  {
+   "id": "mmun-mmcz",
+   "region": "Caribe",
+   "origen": "MMUN",
+   "destino": "MMCZ",
+   "distanciaNm": 32,
+   "rumboVerdaderoIni": 186,
+   "rumboVerdaderoFin": 186,
+   "variacionMagnetica": -2.7,
+   "rumboMagneticoIni": 189,
+   "tiempoMin100kt": 19,
+   "tiempoMin140kt": 14,
+   "terrenoMaxFt": 56,
+   "terrenoMaxKmDesdeSalidaNm": 3,
+   "sobreAguaPct": 83,
+   "nivelMinimoFt": 2100,
+   "nivelSugeridoFt": 4500,
+   "advertencias": [],
+   "perfil": [
+    [
+     0.0,
+     52
+    ],
+    [
+     2.9,
+     56
+    ],
+    [
+     5.8,
+     52
+    ],
+    [
+     8.6,
+     43
+    ],
+    [
+     11.5,
+     30
+    ],
+    [
+     14.4,
+     39
+    ],
+    [
+     17.3,
+     30
+    ],
+    [
+     20.2,
+     7
+    ],
+    [
+     23.1,
+     0
+    ],
+    [
+     25.9,
+     0
+    ],
+    [
+     28.8,
+     0
+    ],
+    [
+     31.7,
+     20
+    ]
+   ],
+   "plan": "/downloads/rutas/mmun-mmcz.pln"
+  },
+  {
+   "id": "mmsd-mmlp",
+   "region": "Baja California Sur",
+   "origen": "MMSD",
+   "destino": "MMLP",
+   "distanciaNm": 66,
+   "rumboVerdaderoIni": 328,
+   "rumboVerdaderoFin": 327,
+   "variacionMagnetica": 7.8,
+   "rumboMagneticoIni": 320,
+   "tiempoMin100kt": 39,
+   "tiempoMin140kt": 28,
+   "terrenoMaxFt": 5620,
+   "terrenoMaxKmDesdeSalidaNm": 21,
+   "sobreAguaPct": 0,
+   "nivelMinimoFt": 7600,
+   "nivelSugeridoFt": 8500,
+   "advertencias": [
+    "Cruza terreno mucho más alto que los dos aeropuertos: estudia el perfil y las cartas antes de volarla."
+   ],
+   "perfil": [
+    [
+     0.0,
+     1768
+    ],
+    [
+     3.0,
+     2047
+    ],
+    [
+     6.0,
+     4449
+    ],
+    [
+     9.0,
+     1506
+    ],
+    [
+     12.0,
+     4692
+    ],
+    [
+     14.9,
+     4170
+    ],
+    [
+     17.9,
+     2516
+    ],
+    [
+     20.9,
+     5620
+    ],
+    [
+     23.9,
+     5148
+    ],
+    [
+     26.9,
+     4734
+    ],
+    [
+     29.9,
+     5299
+    ],
+    [
+     32.9,
+     2969
+    ],
+    [
+     35.9,
+     2474
+    ],
+    [
+     38.8,
+     2093
+    ],
+    [
+     41.8,
+     1926
+    ],
+    [
+     44.8,
+     2149
+    ],
+    [
+     47.8,
+     2051
+    ],
+    [
+     50.8,
+     1762
+    ],
+    [
+     53.8,
+     2172
+    ],
+    [
+     56.8,
+     1237
+    ],
+    [
+     59.8,
+     997
+    ],
+    [
+     62.7,
+     545
+    ],
+    [
+     65.7,
+     318
+    ]
+   ],
+   "plan": "/downloads/rutas/mmsd-mmlp.pln"
+  }
+ ]
+}

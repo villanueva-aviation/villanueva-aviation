@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMGL to MMZO</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>12500.000</CruisingAlt>
+        <DepartureID>MMGL</DepartureID>
+        <DepartureLLA>N20° 31' 10.92",W103° 18' 21.24",+005023.00</DepartureLLA>
+        <DestinationID>MMZO</DestinationID>
+        <DestinationLLA>N19° 8' 43.80",W104° 33' 37.08",+000036.00</DestinationLLA>
+        <Descr>MMGL, MMZO</Descr>
+        <DepartureName>Guadalajara</DepartureName>
+        <DestinationName>Manzanillo</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMGL">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N20° 31' 10.92",W103° 18' 21.24",+005023.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMGL</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMZO">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N19° 8' 43.80",W104° 33' 37.08",+000036.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMZO</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>

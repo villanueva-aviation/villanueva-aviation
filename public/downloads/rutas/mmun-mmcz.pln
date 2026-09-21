@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMUN to MMCZ</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>4500.000</CruisingAlt>
+        <DepartureID>MMUN</DepartureID>
+        <DepartureLLA>N21° 2' 24.72",W86° 52' 17.76",+000043.00</DepartureLLA>
+        <DestinationID>MMCZ</DestinationID>
+        <DestinationLLA>N20° 30' 54.00",W86° 55' 44.76",+000023.00</DestinationLLA>
+        <Descr>MMUN, MMCZ</Descr>
+        <DepartureName>Cancún</DepartureName>
+        <DestinationName>Cozumel</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMUN">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N21° 2' 24.72",W86° 52' 17.76",+000043.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMUN</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMCZ">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N20° 30' 54.00",W86° 55' 44.76",+000023.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMCZ</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>

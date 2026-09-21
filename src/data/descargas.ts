@@ -19,6 +19,7 @@ export const CATEGORIAS_DESCARGAS = [
   "Checklists",
   "Guías",
   "Herramientas",
+  "Rutas",
   "Plantillas",
   "Formularios oficiales",
 ] as const;
@@ -84,6 +85,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     fecha: "2026-09-20",
     imagen: "/images/descargas-briefing-piloto.jpg",
     interactivoHref: "/briefing",
+    soloInteractivo: true,
+  },
+  {
+    id: "rutas-mexico",
+    categoria: "Rutas",
+    nombre: "Rutas de México — Paquete 1",
+    descripcion: "Ocho rutas VFR entre aeropuertos mexicanos con rumbos magnéticos, perfil de terreno, frecuencias y planes de vuelo (.pln) para MSFS.",
+    version: "v1.0",
+    fecha: "2026-09-20",
+    imagen: "/images/descargas-rutas-mexico.jpg",
+    interactivoHref: "/rutas",
     soloInteractivo: true,
   },
   {

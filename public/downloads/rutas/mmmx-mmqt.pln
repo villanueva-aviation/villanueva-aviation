@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMMX to MMQT</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>12500.000</CruisingAlt>
+        <DepartureID>MMMX</DepartureID>
+        <DepartureLLA>N19° 26' 7.80",W99° 4' 29.64",+007297.00</DepartureLLA>
+        <DestinationID>MMQT</DestinationID>
+        <DestinationLLA>N20° 37' 2.28",W100° 11' 2.04",+006263.00</DestinationLLA>
+        <Descr>MMMX, MMQT</Descr>
+        <DepartureName>Ciudad de México</DepartureName>
+        <DestinationName>Querétaro</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMMX">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N19° 26' 7.80",W99° 4' 29.64",+007297.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMMX</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMQT">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N20° 37' 2.28",W100° 11' 2.04",+006263.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMQT</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>

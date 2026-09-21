@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMSD to MMLP</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>8500.000</CruisingAlt>
+        <DepartureID>MMSD</DepartureID>
+        <DepartureLLA>N23° 8' 58.92",W109° 43' 13.44",+000351.00</DepartureLLA>
+        <DestinationID>MMLP</DestinationID>
+        <DestinationLLA>N24° 4' 22.44",W110° 21' 44.64",+000052.00</DestinationLLA>
+        <Descr>MMSD, MMLP</Descr>
+        <DepartureName>Los Cabos</DepartureName>
+        <DestinationName>La Paz</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMSD">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N23° 8' 58.92",W109° 43' 13.44",+000351.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMSD</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMLP">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N24° 4' 22.44",W110° 21' 44.64",+000052.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMLP</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>

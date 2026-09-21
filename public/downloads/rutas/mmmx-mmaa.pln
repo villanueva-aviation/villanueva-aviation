@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMMX to MMAA</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>14500.000</CruisingAlt>
+        <DepartureID>MMMX</DepartureID>
+        <DepartureLLA>N19° 26' 7.80",W99° 4' 29.64",+007297.00</DepartureLLA>
+        <DestinationID>MMAA</DestinationID>
+        <DestinationLLA>N16° 45' 21.96",W99° 45' 2.16",+000016.00</DestinationLLA>
+        <Descr>MMMX, MMAA</Descr>
+        <DepartureName>Ciudad de México</DepartureName>
+        <DestinationName>Acapulco</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMMX">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N19° 26' 7.80",W99° 4' 29.64",+007297.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMMX</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMAA">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N16° 45' 21.96",W99° 45' 2.16",+000016.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMAA</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>

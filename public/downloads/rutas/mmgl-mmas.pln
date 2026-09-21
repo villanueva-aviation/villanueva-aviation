@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMGL to MMAS</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>9500.000</CruisingAlt>
+        <DepartureID>MMGL</DepartureID>
+        <DepartureLLA>N20° 31' 10.92",W103° 18' 21.24",+005023.00</DepartureLLA>
+        <DestinationID>MMAS</DestinationID>
+        <DestinationLLA>N21° 42' 6.12",W102° 19' 4.80",+006122.00</DestinationLLA>
+        <Descr>MMGL, MMAS</Descr>
+        <DepartureName>Guadalajara</DepartureName>
+        <DestinationName>Aguascalientes</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMGL">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N20° 31' 10.92",W103° 18' 21.24",+005023.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMGL</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMAS">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N21° 42' 6.12",W102° 19' 4.80",+006122.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMAS</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>
