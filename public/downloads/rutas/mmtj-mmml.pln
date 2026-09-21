@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMTJ to MMML</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>7500.000</CruisingAlt>
+        <DepartureID>MMTJ</DepartureID>
+        <DepartureLLA>N32° 32' 29.04",W116° 58' 12.72",+000492.00</DepartureLLA>
+        <DestinationID>MMML</DestinationID>
+        <DestinationLLA>N32° 37' 50.52",W115° 14' 29.76",+000069.00</DestinationLLA>
+        <Descr>MMTJ, MMML</Descr>
+        <DepartureName>Tijuana</DepartureName>
+        <DestinationName>Mexicali</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMTJ">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N32° 32' 29.04",W116° 58' 12.72",+000492.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMTJ</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMML">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N32° 37' 50.52",W115° 14' 29.76",+000069.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMML</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>

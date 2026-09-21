@@ -34,6 +34,9 @@ NOMBRES = {
     "MMGL": "Guadalajara", "MMPR": "Puerto Vallarta", "MMZO": "Manzanillo", "MMAS": "Aguascalientes",
     "MMLO": "Del Bajío (Guanajuato)", "MMMX": "Ciudad de México", "MMQT": "Querétaro", "MMAA": "Acapulco",
     "MMUN": "Cancún", "MMCZ": "Cozumel", "MMSD": "Los Cabos", "MMLP": "La Paz",
+    "MMTJ": "Tijuana", "MMML": "Mexicali", "MMLT": "Loreto", "MMHO": "Hermosillo", "MMGM": "Guaymas",
+    "MMMZ": "Mazatlán", "MMDO": "Durango", "MMMY": "Monterrey", "MMRX": "Reynosa", "MMOX": "Oaxaca",
+    "MMPS": "Puerto Escondido", "MMMD": "Mérida", "MMCE": "Ciudad del Carmen",
 }
 
 RUTAS = [
@@ -45,6 +48,15 @@ RUTAS = [
     ("mmmx-mmaa", "Centro", "MMMX", "MMAA"),
     ("mmun-mmcz", "Caribe", "MMUN", "MMCZ"),
     ("mmsd-mmlp", "Baja California Sur", "MMSD", "MMLP"),
+    # Paquete 2
+    ("mmtj-mmml", "Baja California", "MMTJ", "MMML"),
+    ("mmlp-mmlt", "Baja California Sur", "MMLP", "MMLT"),
+    ("mmho-mmgm", "Noroeste", "MMHO", "MMGM"),
+    ("mmmz-mmdo", "Noroeste", "MMMZ", "MMDO"),
+    ("mmmy-mmrx", "Noreste", "MMMY", "MMRX"),
+    ("mmox-mmps", "Sur", "MMOX", "MMPS"),
+    ("mmmd-mmun", "Yucatán", "MMMD", "MMUN"),
+    ("mmmd-mmce", "Yucatán", "MMMD", "MMCE"),
 ]
 
 

@@ -90,9 +90,9 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
   {
     id: "rutas-mexico",
     categoria: "Rutas",
-    nombre: "Rutas de México — Paquete 1",
-    descripcion: "Ocho rutas VFR entre aeropuertos mexicanos con rumbos magnéticos, perfil de terreno, frecuencias y planes de vuelo (.pln) para MSFS.",
-    version: "v1.0",
+    nombre: "Rutas de México — Paquetes 1 y 2",
+    descripcion: "Dieciséis rutas VFR entre aeropuertos mexicanos con rumbos magnéticos, perfil de terreno, frecuencias y planes de vuelo (.pln) para MSFS.",
+    version: "v2.0",
     fecha: "2026-09-20",
     imagen: "/images/descargas-rutas-mexico.jpg",
     interactivoHref: "/rutas",

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMMZ to MMDO</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>11500.000</CruisingAlt>
+        <DepartureID>MMMZ</DepartureID>
+        <DepartureLLA>N23° 9' 41.40",W106° 15' 57.60",+000023.00</DepartureLLA>
+        <DestinationID>MMDO</DestinationID>
+        <DestinationLLA>N24° 7' 24.60",W104° 31' 48.00",+006112.00</DestinationLLA>
+        <Descr>MMMZ, MMDO</Descr>
+        <DepartureName>Mazatlán</DepartureName>
+        <DestinationName>Durango</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMMZ">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N23° 9' 41.40",W106° 15' 57.60",+000023.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMMZ</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMDO">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N24° 7' 24.60",W104° 31' 48.00",+006112.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMDO</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>

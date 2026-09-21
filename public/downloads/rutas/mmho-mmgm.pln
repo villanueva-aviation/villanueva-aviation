@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMHO to MMGM</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>5500.000</CruisingAlt>
+        <DepartureID>MMHO</DepartureID>
+        <DepartureLLA>N29° 5' 38.04",W111° 3' 5.40",+000610.00</DepartureLLA>
+        <DestinationID>MMGM</DestinationID>
+        <DestinationLLA>N27° 58' 8.76",W110° 55' 26.04",+000043.00</DestinationLLA>
+        <Descr>MMHO, MMGM</Descr>
+        <DepartureName>Hermosillo</DepartureName>
+        <DestinationName>Guaymas</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMHO">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N29° 5' 38.04",W111° 3' 5.40",+000610.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMHO</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMGM">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N27° 58' 8.76",W110° 55' 26.04",+000043.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMGM</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>

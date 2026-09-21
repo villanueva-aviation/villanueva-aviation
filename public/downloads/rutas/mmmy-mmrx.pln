@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMMY to MMRX</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>5500.000</CruisingAlt>
+        <DepartureID>MMMY</DepartureID>
+        <DepartureLLA>N25° 46' 43.68",W100° 6' 26.64",+001253.00</DepartureLLA>
+        <DestinationID>MMRX</DestinationID>
+        <DestinationLLA>N26° 0' 36.36",W98° 13' 44.40",+000148.00</DestinationLLA>
+        <Descr>MMMY, MMRX</Descr>
+        <DepartureName>Monterrey</DepartureName>
+        <DestinationName>Reynosa</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMMY">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N25° 46' 43.68",W100° 6' 26.64",+001253.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMMY</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMRX">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N26° 0' 36.36",W98° 13' 44.40",+000148.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMRX</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>

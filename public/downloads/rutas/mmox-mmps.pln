@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMOX to MMPS</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>10500.000</CruisingAlt>
+        <DepartureID>MMOX</DepartureID>
+        <DepartureLLA>N17° 0' 3.96",W96° 43' 30.72",+005013.00</DepartureLLA>
+        <DestinationID>MMPS</DestinationID>
+        <DestinationLLA>N15° 52' 37.56",W97° 5' 21.12",+000213.00</DestinationLLA>
+        <Descr>MMOX, MMPS</Descr>
+        <DepartureName>Oaxaca</DepartureName>
+        <DestinationName>Puerto Escondido</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMOX">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N17° 0' 3.96",W96° 43' 30.72",+005013.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMOX</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMPS">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N15° 52' 37.56",W97° 5' 21.12",+000213.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMPS</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>

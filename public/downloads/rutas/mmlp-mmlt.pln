@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMLP to MMLT</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>6500.000</CruisingAlt>
+        <DepartureID>MMLP</DepartureID>
+        <DepartureLLA>N24° 4' 22.44",W110° 21' 44.64",+000052.00</DepartureLLA>
+        <DestinationID>MMLT</DestinationID>
+        <DestinationLLA>N25° 59' 30.12",W111° 20' 54.96",+000013.00</DestinationLLA>
+        <Descr>MMLP, MMLT</Descr>
+        <DepartureName>La Paz</DepartureName>
+        <DestinationName>Loreto</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMLP">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N24° 4' 22.44",W110° 21' 44.64",+000052.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMLP</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMLT">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N25° 59' 30.12",W111° 20' 54.96",+000013.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMLT</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>

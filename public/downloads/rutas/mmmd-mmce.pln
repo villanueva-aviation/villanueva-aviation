@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>MMMD to MMCE</Title>
+        <FPType>VFR</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>4500.000</CruisingAlt>
+        <DepartureID>MMMD</DepartureID>
+        <DepartureLLA>N20° 55' 54.12",W89° 39' 27.00",+000033.00</DepartureLLA>
+        <DestinationID>MMCE</DestinationID>
+        <DestinationLLA>N18° 39' 3.96",W91° 47' 55.68",+000016.00</DestinationLLA>
+        <Descr>MMMD, MMCE</Descr>
+        <DepartureName>Mérida</DepartureName>
+        <DestinationName>Ciudad del Carmen</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>11</AppVersionMajor>
+            <AppVersionBuild>282174</AppVersionBuild>
+        </AppVersion>
+        <ATCWaypoint id="MMMD">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N20° 55' 54.12",W89° 39' 27.00",+000033.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMMD</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+        <ATCWaypoint id="MMCE">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>N18° 39' 3.96",W91° 47' 55.68",+000016.00</WorldPosition>
+            <ICAO>
+                <ICAOIdent>MMCE</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>
+    </FlightPlan.FlightPlan>
+</SimBase.Document>
