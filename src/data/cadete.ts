@@ -33,6 +33,6 @@ export const LOGROS_BASE: Logro[] = [
 
 export const CERTIFICADOS_BASE: Certificado[] = [
   { id: "fundamentos", titulo: "Certificado de Fundamentos de Aviación", fecha: null, obtenido: false },
-  { id: "vfr", titulo: "Certificado de Piloto VFR", fecha: null, obtenido: false },
+  { id: "vfr", titulo: "Certificado de la Academia: Módulo VFR", fecha: null, obtenido: false },
   { id: "ifr", titulo: "Certificado de Piloto IFR", fecha: null, obtenido: false },
 ];
