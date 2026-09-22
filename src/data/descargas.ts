@@ -21,7 +21,7 @@ export const CATEGORIAS_DESCARGAS = [
   "Herramientas",
   "Rutas",
   "Plantillas",
-  "Formularios oficiales",
+  "Formularios de práctica",
 ] as const;
 
 export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
@@ -208,9 +208,9 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
   },
   {
     id: "formulario-bitacora",
-    categoria: "Formularios oficiales",
+    categoria: "Formularios de práctica",
     nombre: "Bitácora de vuelo editable",
-    descripcion: "Bitácora de vuelo con el diseño de Villanueva Aviation — columnas estándar de la industria (PIC, día/noche, instrumentos, aterrizajes). Llénala en línea o descárgala en PDF.",
+    descripcion: "Bitácora de vuelo con el diseño de Villanueva Aviation — columnas estándar de la industria (PIC, día/noche, instrumentos, aterrizajes). Llénala en línea o descárgala en PDF. Es para práctica: no sustituye tu bitácora oficial.",
     version: "v2.2",
     fecha: "2026-09-13",
     imagen: "/images/msfs-aeromexico-clouds.jpg",
@@ -219,7 +219,7 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
   },
   {
     id: "formulario-peso-balance",
-    categoria: "Formularios oficiales",
+    categoria: "Formularios de práctica",
     nombre: "Hoja de peso y balance editable",
     descripcion: "Formato editable para calcular y documentar peso y balance antes de cada vuelo.",
     version: "v1.0",

@@ -149,11 +149,11 @@ export function ManiobrasChecklist() {
         <div>
           <h3 className="font-display text-base font-semibold text-white">Progresión de maniobras</h3>
           <p className="mt-1 text-sm text-white/55">
-            Registra cada maniobra con tu instructor — cuenta como horas confirmadas en tu perfil una vez que el fundador la revise.
+            Registra cada maniobra que hagas con tu instructor — se suma a las horas registradas en tu perfil cuando el fundador la revisa. Es un registro de la academia: tu bitácora oficial es la de tu escuela de vuelo.
           </p>
         </div>
         <span className="whitespace-nowrap font-mono text-xs text-white/45">
-          {confirmadas}/{MANIOBRAS_VUELO.length} confirmadas
+          {confirmadas}/{MANIOBRAS_VUELO.length} revisadas
         </span>
       </div>
       <div className="mt-3">

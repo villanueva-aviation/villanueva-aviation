@@ -83,7 +83,7 @@ export function Footer() {
         <div className="mt-12 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} {SITE.name}. Todos los derechos reservados.</p>
           <div className="flex items-center gap-4">
-            <p>Comunidad independiente de aviación. No afiliada a ninguna aerolínea real.</p>
+            <p>Academia digital independiente. No somos una escuela de aviación certificada ni otorgamos licencias.</p>
             <Link to={ROUTES.legal} className="shrink-0 transition-colors hover:text-gold-400">
               Legal
             </Link>

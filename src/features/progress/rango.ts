@@ -10,9 +10,9 @@ export function calcularRango(input: {
   vuelosConfirmados: number;
 }): string {
   const { progresoGeneralPct, vuelosRegistrados, vuelosConfirmados } = input;
-  if (vuelosConfirmados >= MANIOBRAS_VUELO.length) return "Piloto de Monomotor";
-  if (vuelosRegistrados > 0) return "Piloto en Práctica";
-  if (progresoGeneralPct === 100) return "Piloto en Formación Teórica";
+  if (vuelosConfirmados >= MANIOBRAS_VUELO.length) return "Cadete con maniobras completas";
+  if (vuelosRegistrados > 0) return "Cadete en práctica de vuelo";
+  if (progresoGeneralPct === 100) return "Cadete con teoría completa";
   return "Cadete";
 }
 

@@ -59,7 +59,7 @@ export function BitacoraVuelo() {
   return (
     <div>
       <PageHero
-        eyebrow="Formulario oficial"
+        eyebrow="Formulario de práctica"
         title="Bitácora de vuelo"
         description="Registra tus vuelos en pantalla e imprime tu bitácora — formato editable, listo para llenar."
       >

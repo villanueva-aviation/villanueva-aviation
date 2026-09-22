@@ -57,7 +57,7 @@ export function Perfil() {
             <StatTile icon={Award} label="XP acumulados" value={String(xp)} />
           </Reveal>
           <Reveal delay={320}>
-            <StatTile icon={Plane} label="Horas de vuelo confirmadas" value={`${horasVueloConfirmadas}h`} />
+            <StatTile icon={Plane} label="Horas de vuelo registradas" value={`${horasVueloConfirmadas}h`} />
           </Reveal>
         </div>
 
@@ -94,6 +94,9 @@ export function Perfil() {
         </div>
 
         <h2 className="mt-14 font-display text-xl font-semibold text-white">Certificados</h2>
+        <p className="mt-2 text-sm text-white/50">
+          Reconocimientos internos de Villanueva Aviation por completar módulos. No tienen validez oficial ni sustituyen una licencia.
+        </p>
         <div className="mt-6 flex flex-col gap-3">
           {certificados.map((cert, i) => (
             <Reveal

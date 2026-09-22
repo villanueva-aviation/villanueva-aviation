@@ -224,7 +224,7 @@ export function Home() {
             <div className="absolute inset-0 bg-gradient-to-br from-navy-950/95 via-navy-900/90 to-navy-950/95" />
             <div className="relative z-10 px-8 py-16 text-center md:px-16">
               <h2 className="font-display text-3xl font-semibold text-white sm:text-4xl">
-                Aquí comienza tu formación como piloto
+                Aquí empieza tu camino hacia la cabina
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-white/65">
                 Crea tu cuenta de cadete, explora la Academia y comienza a construir tu camino hacia

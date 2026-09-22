@@ -117,7 +117,7 @@ export function MiFormacion() {
               <StatTile icon={Timer} label="Horas de simulador" value={`${horasSimulador}h`} />
             </Reveal>
             <Reveal delay={320} className="col-span-2">
-              <StatTile icon={Plane} label="Horas de vuelo confirmadas" value={`${horasVueloConfirmadas}h`} />
+              <StatTile icon={Plane} label="Horas de vuelo registradas" value={`${horasVueloConfirmadas}h`} />
             </Reveal>
           </div>
         </div>

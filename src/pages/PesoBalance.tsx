@@ -55,7 +55,7 @@ export function PesoBalance() {
   return (
     <div>
       <PageHero
-        eyebrow="Formulario oficial"
+        eyebrow="Formulario de práctica"
         title="Peso y balance"
         description="Calcula el peso total y el centro de gravedad de tu vuelo. Los brazos precargados son un ejemplo genérico — reemplázalos con los datos reales de tu aeronave (POH)."
       >
