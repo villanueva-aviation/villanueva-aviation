@@ -1,25 +1,35 @@
 import { useState } from "react";
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
-import type { Tema } from "../../data/moduleContent";
+import type { Checkpoint, Tema } from "../../data/moduleContent";
+import { Comprobacion } from "./Comprobacion";
 import { ProgressBar } from "../../components/ui/ProgressBar";
 import { Button } from "../../components/ui/Button";
 import { Carousel } from "../../components/ui/Carousel";
 
 export function LessonFlow({
   temas,
+  checkpoints = [],
   isCompleted,
   onAdvance,
 }: {
   temas: Tema[];
+  checkpoints?: Checkpoint[];
   isCompleted: (temaId: string) => boolean;
   onAdvance: (temaId: string) => void;
 }) {
   const [step, setStep] = useState(0);
+  const [comprobando, setComprobando] = useState(false);
   const tema = temas[step];
   const completada = isCompleted(tema.id);
+  const checkpoint = checkpoints.find((c) => c.despuesDeTema === step);
 
   function next() {
     onAdvance(tema.id);
+    if (checkpoint && !comprobando) {
+      setComprobando(true);
+      return;
+    }
+    setComprobando(false);
     if (step + 1 < temas.length) setStep((s) => s + 1);
   }
 
@@ -49,18 +59,29 @@ export function LessonFlow({
         </div>
       )}
 
+      {comprobando && checkpoint && (
+        <div className="mt-6">
+          <Comprobacion pregunta={checkpoint.pregunta} onContinue={next} />
+        </div>
+      )}
+
       <div className="mt-6 flex items-center justify-between gap-3">
         <button
-          onClick={() => setStep((s) => Math.max(0, s - 1))}
+          onClick={() => {
+            setComprobando(false);
+            setStep((s) => Math.max(0, s - 1));
+          }}
           disabled={step === 0}
           className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:border-white/30 disabled:cursor-not-allowed disabled:opacity-30"
         >
           <ChevronLeft size={15} /> Anterior
         </button>
-        <Button onClick={next}>
-          {step + 1 >= temas.length ? "Finalizar lección" : "Siguiente lección"}
-          <ChevronRight size={15} />
-        </Button>
+        {!comprobando && (
+          <Button onClick={next}>
+            {checkpoint ? "Comprobar lo leído" : step + 1 >= temas.length ? "Finalizar lección" : "Siguiente lección"}
+            <ChevronRight size={15} />
+          </Button>
+        )}
       </div>
     </div>
   );

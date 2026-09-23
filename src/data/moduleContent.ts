@@ -852,6 +852,52 @@ export const MODULE_EVALUACION: Record<string, QuizPregunta[]> = {
   ifr: split(QUIZ_IFR).evaluacion,
 };
 
+// ---------- Comprobaciones dentro de la lección ----------
+
+/**
+ * Una pregunta de repaso cada tres temas, para que el cadete recupere lo leído
+ * en vez de acumular diez lecciones seguidas antes del primer ejercicio.
+ * Cada entrada es el id de una pregunta del banco del módulo, en orden: la
+ * primera aparece tras el tema 3, la segunda tras el 6, y así. Todas preguntan
+ * sobre material ya leído en ese punto.
+ */
+export const MODULE_CHECKPOINTS: Record<string, string[]> = {
+  fundamentos: ["fun-q2", "fun-q11"],
+  meteorologia: ["met-q3", "met-q6", "met-q9"],
+  aerodinamica: ["aero-q16", "aero-q15"],
+  navegacion: ["nav-q1", "nav-q3", "nav-q14", "nav-q9", "nav-q6", "nav-q8", "nav-q15", "nav-q12"],
+  cartografia: ["cart-q17", "cart-q13"],
+  comunicaciones: ["com-q3", "com-q12", "com-q13", "com-q6"],
+  instrumentos: ["ins-q17", "ins-q6", "ins-q12"],
+  rendimiento: ["ren-q16", "ren-q6"],
+  vfr: ["vfr-q16", "vfr-q6", "vfr-q12"],
+  operacion: ["op-q4", "op-q14", "op-q9", "op-q15"],
+  "espacios-aereos": ["esp-q3", "esp-q5", "esp-q8"],
+  reglamentacion: ["reg-q5", "reg-q15"],
+  ifr: ["ifr-q12", "ifr-q7", "ifr-q15"],
+};
+
+/** Cada cuántos temas aparece una comprobación. */
+export const TEMAS_POR_CHECKPOINT = 3;
+
+export interface Checkpoint {
+  /** Índice (0-based) del tema tras el cual se muestra la pregunta. */
+  despuesDeTema: number;
+  pregunta: QuizPregunta;
+}
+
+/** Resuelve los ids de MODULE_CHECKPOINTS contra el banco completo del módulo. */
+export function checkpointsDeModulo(slug: string): Checkpoint[] {
+  const ids = MODULE_CHECKPOINTS[slug];
+  if (!ids) return [];
+  const banco = [...(MODULE_PRACTICA[slug] ?? []), ...(MODULE_EVALUACION[slug] ?? [])];
+  return ids.flatMap((id, i) => {
+    const pregunta = banco.find((p) => p.id === id);
+    if (!pregunta) return [];
+    return [{ despuesDeTema: (i + 1) * TEMAS_POR_CHECKPOINT - 1, pregunta }];
+  });
+}
+
 // ---------- Escenarios (para el widget de decisión) ----------
 
 export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNode>; startId: string }> = {

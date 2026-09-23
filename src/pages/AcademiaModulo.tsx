@@ -7,6 +7,7 @@ import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { ACADEMIA_MODULOS, type ActividadTipo, type InteractividadTipo, type ModuloActividad } from "../data/academia";
 import {
+  checkpointsDeModulo,
   flattenTemas,
   MODULE_TERMS,
   MODULE_PRACTICA,
@@ -261,6 +262,7 @@ export function AcademiaModulo() {
                 <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
                   <LessonFlow
                     temas={temas}
+                    checkpoints={checkpointsDeModulo(modulo.slug)}
                     isCompleted={(id) => isActividadCompletada(modulo.slug, id)}
                     onAdvance={(id) => completarActividad(modulo.slug, id)}
                   />
