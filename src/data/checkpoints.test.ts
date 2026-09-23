@@ -59,6 +59,16 @@ test("cada clave de TEMA_PUNTOS corresponde a un tema real", () => {
   }
 });
 
+test("todos los temas tienen versión escaneable", () => {
+  const sinPuntos: string[] = [];
+  for (const slug of Object.keys(MODULE_CHECKPOINTS)) {
+    for (const t of flattenTemas(slug) ?? []) {
+      if (!t.puntos?.length) sinPuntos.push(t.id);
+    }
+  }
+  assert.deepEqual(sinPuntos, [], `temas sin clave/puntos en temaPuntos.ts: ${sinPuntos.join(", ")}`);
+});
+
 test("los puntos llegan al tema por flattenTemas", () => {
   for (const slug of Object.keys(MODULE_CHECKPOINTS)) {
     for (const t of flattenTemas(slug) ?? []) {

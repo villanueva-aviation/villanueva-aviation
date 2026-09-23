@@ -1030,4 +1030,365 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
       { titulo: "Si no ves la pista", texto: "frustrada, y holding si el tráfico o el clima lo requieren." },
     ],
   },
+
+  // ---------- Comunicaciones ----------
+  "comunicaciones-tema1": {
+    clave: "La fraseología existe para eliminar ambigüedad, no para sonar profesional.",
+    puntos: [
+      { titulo: "Alfabeto fonético", texto: "Alfa, Bravo, Charlie, Delta: así se deletrean matrículas y letras sin confusión." },
+      { titulo: "Números", texto: "dígito por dígito: tres cinco cero, no trescientos cincuenta." },
+      { titulo: "Afirmativo y negativo", texto: "sí y no, sin lugar a interpretación." },
+      { titulo: "Roger", texto: "recibido y entendido; no promete que vayas a cumplir nada." },
+      { titulo: "Wilco", texto: "recibido y voy a cumplir la instrucción." },
+      { titulo: "Por qué importa", texto: "reduce errores y acelera la comunicación en frecuencias congestionadas." },
+    ],
+  },
+  "comunicaciones-tema2": {
+    clave: "A quién llamas, quién eres y qué necesitas, en ese orden.",
+    puntos: [
+      { titulo: "La estructura", texto: "es fija para cualquier estación y cualquier llamada." },
+      { titulo: "Un ejemplo", texto: "Guadalajara Torre, Cessna XB-VLA, en plataforma, solicito rodaje para salida local con información Bravo." },
+      { titulo: "Matrícula completa", texto: "nunca la omitas en el primer contacto; después torre puede autorizarte a abreviarla." },
+      { titulo: "La letra del ATIS", texto: "confirma que ya tienes los datos meteorológicos y evita que te los repitan." },
+    ],
+  },
+  "comunicaciones-tema3": {
+    clave: "Todo mantenga corto de pista se lee de vuelta, sin excepción.",
+    puntos: [
+      { titulo: "Qué te dan", texto: "la ruta exacta y los puntos donde debes detenerte y esperar." },
+      { titulo: "Un ejemplo", texto: "XB-VLA, ruede a pista 20 por calle Alfa, mantenga corto de pista 02." },
+      { titulo: "El readback obligatorio", texto: "es de las pocas instrucciones donde siempre se exige." },
+      { titulo: "Por qué", texto: "un error ahí puede causar una incursión de pista." },
+      { titulo: "Si dudas", texto: "pides que repitan la ruta antes de moverte." },
+    ],
+  },
+  "comunicaciones-tema4": {
+    clave: "Nunca cruzas el umbral sin autorización explícita, aunque la pista se vea despejada.",
+    puntos: [
+      { titulo: "Primero las listas", texto: "run-up y checklist previa, en la plataforma o el punto de espera designado." },
+      { titulo: "La llamada", texto: "Torre, XB-VLA, listo para despegue, pista 20." },
+      { titulo: "Salida o despegue", texto: "la OACI reserva despegue para la autorización y recomienda decir listo para salida; en la práctica se oyen las dos." },
+      { titulo: "Lo que usan nuestras guías", texto: "las de Comunicaciones VFR e IFR de Descargas dicen listo para salida." },
+      { titulo: "Instrucciones de espera", texto: "mantenga posición, o line up and wait, si hay tráfico en pista o en corta final." },
+    ],
+  },
+  "comunicaciones-tema5": {
+    clave: "Copiado o roger no son readback de una autorización.",
+    puntos: [
+      { titulo: "Cómo suena", texto: "XB-VLA, autorizado a despegar pista 20, viento 200 a 8 nudos." },
+      { titulo: "Tu readback", texto: "tu matrícula y la confirmación de autorizado a despegar pista 20." },
+      { titulo: "Si algo no cuadra", texto: "si menciona otra pista o no coincide con tu plan, pides confirmación antes de iniciar." },
+      { titulo: "Lo que no se hace", texto: "asumir que fue un error de la torre sin confirmarlo." },
+    ],
+  },
+  "comunicaciones-tema6": {
+    clave: "Viento en cola, base y final: el orden en que realmente vuelas el circuito.",
+    puntos: [
+      { titulo: "El orden", texto: "los reportes siguen la secuencia del propio circuito." },
+      { titulo: "Cómo suenan", texto: "Torre, XB-VLA, viento en cola pista 20; luego base; luego final." },
+      { titulo: "Para qué sirven", texto: "la torre te secuencia y los demás pilotos saben dónde estás." },
+      { titulo: "Sin torre", texto: "reportas igual en la frecuencia CTAF, aunque nadie te conteste: es para informar a otros pilotos." },
+    ],
+  },
+  "comunicaciones-tema7": {
+    clave: "Quién eres, dónde estás, a qué altitud y qué piensas hacer.",
+    puntos: [
+      { titulo: "Dónde estás", texto: "normalmente sobre un punto VFR o un radial de VOR." },
+      { titulo: "Un ejemplo", texto: "XB-VLA, sobre el punto Vista Hermosa, seis mil quinientos pies, en tránsito hacia Guadalajara." },
+      { titulo: "Cuándo importan más", texto: "cerca de espacio aéreo controlado o en zonas de tráfico denso." },
+      { titulo: "Quién los usa", texto: "control, y también otros pilotos que monitorean la frecuencia para mantener separación." },
+    ],
+  },
+  "comunicaciones-tema8": {
+    clave: "Si te lo niegan, rodeas el espacio aéreo; no lo cruzas de todas formas.",
+    puntos: [
+      { titulo: "Cuándo se pide", texto: "para cruzar espacio Clase B, C o D sin aterrizar." },
+      { titulo: "Antes de entrar", texto: "solicitas y recibes la autorización de tránsito VFR." },
+      { titulo: "Cómo suena", texto: "Aproximación Guadalajara, Cessna XB-VLA, solicito tránsito VFR de norte a sur, seis mil pies, sobre la ciudad." },
+      { titulo: "Qué puede responder control", texto: "autorizarlo tal cual, darte otra ruta o altitud, o negarlo si hay demasiado tráfico." },
+    ],
+  },
+  "comunicaciones-tema9": {
+    clave: "Aproximación te secuencia antes de pasarte a Torre.",
+    puntos: [
+      { titulo: "A quién contactas primero", texto: "a Aproximación, antes de que te transfieran a Torre." },
+      { titulo: "Qué te da", texto: "vectores, altitudes y secuenciación respecto a otro tráfico." },
+      { titulo: "Cómo suena", texto: "XB-VLA, vire rumbo 180, descienda y mantenga cinco mil pies, espere vectores para secuencia visual." },
+      { titulo: "El aviso de tráfico", texto: "tráfico a las 10, dos millas, mismo nivel." },
+      { titulo: "Qué debes hacer", texto: "reportar en cuanto lo tengas a la vista." },
+    ],
+  },
+  "comunicaciones-tema10": {
+    clave: "El silencio no es autorización.",
+    puntos: [
+      { titulo: "Cuándo llega", texto: "típicamente cuando ya estás en tramo final." },
+      { titulo: "Cómo suena", texto: "XB-VLA, autorizado a aterrizar pista 20, viento 190 a 6 nudos." },
+      { titulo: "Tu readback", texto: "tu matrícula y autorizado a aterrizar pista 20." },
+      { titulo: "Toque y despegue", texto: "se solicita explícitamente y la autorización lo refleja." },
+      { titulo: "Lo que nunca se asume", texto: "que estás autorizado solo porque no escuchaste instrucción contraria." },
+    ],
+  },
+  "comunicaciones-tema11": {
+    clave: "El readback correcto confirmado por control es lo que te autoriza a proceder.",
+    puntos: [
+      { titulo: "Qué recibes antes de salir", texto: "el clearance con ruta, altitud inicial, código squawk y frecuencia de salida." },
+      { titulo: "Cómo se lee de vuelta", texto: "completo y palabra por palabra, sobre todo el squawk y las altitudes." },
+      { titulo: "Si te equivocas", texto: "control te corrige y debes repetir la versión correcta antes de continuar." },
+      { titulo: "Por qué es más crítico en IFR", texto: "hay menos margen de referencia visual para detectar un error a tiempo." },
+    ],
+  },
+  "comunicaciones-tema12": {
+    clave: "Es preferible declarar de más que de menos.",
+    puntos: [
+      { titulo: "PAN-PAN", texto: "repetido tres veces, para una urgencia sin peligro inmediato de vida, como un pasajero enfermo." },
+      { titulo: "MAYDAY", texto: "repetido tres veces, para peligro grave e inminente: falla de motor, incendio a bordo." },
+      { titulo: "El formato", texto: "matrícula, naturaleza de la emergencia, posición, altitud, almas a bordo, combustible restante e intenciones." },
+      { titulo: "Qué te da", texto: "prioridad absoluta sobre cualquier otro tráfico." },
+      { titulo: "Lo que hará control", texto: "todo lo posible por asistirte." },
+    ],
+  },
+  "comunicaciones-tema13": {
+    clave: "Cada elemento de la fraseología existe porque previene un error que ya causó incidentes.",
+    puntos: [
+      { titulo: "Omitir readback", texto: "sobre todo en mantenga corto y en autorizaciones de despegue o aterrizaje." },
+      { titulo: "Abreviar antes de tiempo", texto: "usar matrícula incompleta antes de que torre te autorice a hacerlo." },
+      { titulo: "Bloquear la frecuencia", texto: "transmitir encima de otra estación." },
+      { titulo: "Asumir autorizaciones", texto: "dar por dada una que nunca se dijo explícitamente." },
+      { titulo: "Lenguaje coloquial", texto: "usarlo en momentos críticos, en vez de fraseología estándar." },
+      { titulo: "El fondo del asunto", texto: "la disciplina de radio no es sonar profesional: es una herramienta de seguridad." },
+    ],
+  },
+
+  // ---------- Navegación ----------
+  "navegacion-tema1": {
+    clave: "Es la columna vertebral de la navegación tradicional, VFR e IFR.",
+    puntos: [
+      { titulo: "Qué es", texto: "una radioayuda terrestre que transmite información de rumbo en VHF, de 108.00 a 117.95 MHz." },
+      { titulo: "Qué te dice", texto: "tu posición angular, el radial, respecto a la estación." },
+      { titulo: "Cuántos cursos", texto: "360 posibles, uno por cada grado." },
+      { titulo: "Sobre qué se construye todo", texto: "radiales, tracking, intercepción y fixes cruzados salen de aquí." },
+    ],
+  },
+  "navegacion-tema2": {
+    clave: "El VOR te dice en qué línea estás, no a cuántas millas.",
+    puntos: [
+      { titulo: "Dos señales", texto: "una de fase de referencia, igual en todas direcciones, y una variable que rota 30 veces por segundo." },
+      { titulo: "Cómo se traduce", texto: "el receptor mide la diferencia de fase, y esa diferencia en grados es tu radial." },
+      { titulo: "Lo que no te da", texto: "la distancia en millas a la estación." },
+      { titulo: "Cómo conseguir la distancia", texto: "con un DME, o cruzando con otro VOR." },
+    ],
+  },
+  "navegacion-tema3": {
+    clave: "El radial siempre se mide DESDE el VOR hacia afuera, nunca hacia la estación.",
+    puntos: [
+      { titulo: "Qué son", texto: "las 360 líneas rectas imaginarias que salen del VOR en todas direcciones." },
+      { titulo: "Cómo se numeran", texto: "según su rumbo magnético medido desde la estación." },
+      { titulo: "Dos ejemplos", texto: "el radial 090 sale hacia el este; el 270, hacia el oeste." },
+      { titulo: "El error de cadete", texto: "creer que el radial se mide hacia el VOR." },
+      { titulo: "Lo que implica", texto: "si estás en el radial 090 estás al este de la estación, apunte donde apunte tu nariz." },
+    ],
+  },
+  "navegacion-tema4": {
+    clave: "El radial y el curso TO la estación difieren 180 grados.",
+    puntos: [
+      { titulo: "Qué te dice la bandera", texto: "si volando el curso seleccionado te acercas (TO) o te alejas (FROM) de la estación." },
+      { titulo: "Con TO", texto: "volar ese rumbo con la aguja centrada te lleva hacia el VOR." },
+      { titulo: "Con FROM", texto: "te lleva alejándote de él." },
+      { titulo: "El ejemplo que aclara", texto: "para volar TO un VOR estando en el radial 090, tu curso es 270, no 090." },
+      { titulo: "El hábito", texto: "verificar la bandera antes de asumir hacia dónde te lleva el curso." },
+    ],
+  },
+  "navegacion-tema5": {
+    clave: "Vuelas HACIA la aguja para interceptar, nunca te alejas de ella.",
+    puntos: [
+      { titulo: "Qué muestra", texto: "qué tan lejos estás del curso seleccionado en el OBS." },
+      { titulo: "Cada punto", texto: "unos 2 grados de error angular respecto al VOR." },
+      { titulo: "La escala", texto: "5 puntos a cada lado, es decir 10 grados a escala completa." },
+      { titulo: "Cómo se lee", texto: "aguja a la izquierda significa que el curso está a tu izquierda." },
+      { titulo: "Aguja centrada", texto: "estás exactamente sobre el curso seleccionado." },
+    ],
+  },
+  "navegacion-tema6": {
+    clave: "Girar el OBS no cambia tu posición ni tu rumbo: cambia la referencia del instrumento.",
+    puntos: [
+      { titulo: "Qué es", texto: "la perilla con la que seleccionas el curso o radial que quieres volar." },
+      { titulo: "Qué mueve", texto: "la referencia interna del instrumento." },
+      { titulo: "Qué cambia en pantalla", texto: "la posición de la aguja del CDI y la bandera FROM/TO." },
+      { titulo: "Qué no cambia", texto: "nada de tu vuelo real: solo le dices al instrumento contra qué curso comparar." },
+    ],
+  },
+  "navegacion-tema7": {
+    clave: "Cuatro pasos: selecciona, observa, gira e intercepta.",
+    puntos: [
+      { titulo: "1. Selecciona", texto: "el radial deseado en el OBS." },
+      { titulo: "2. Observa", texto: "hacia qué lado apunta la aguja del CDI: eso te dice de qué lado del radial estás." },
+      { titulo: "3. Gira", texto: "a un rumbo que combine tu curso deseado con un ángulo extra hacia el lado de la aguja." },
+      { titulo: "4. Mantén y alinea", texto: "ese rumbo hasta que la aguja se acerque al centro, y entonces giras al curso final." },
+    ],
+  },
+  "navegacion-tema8": {
+    clave: "Treinta grados es el equilibrio entre interceptar rápido y no pasarte.",
+    puntos: [
+      { titulo: "Con menos de 30", texto: "tardas mucho en cerrar la distancia al radial: intercepción lenta y gradual." },
+      { titulo: "Con más de 30 o 45", texto: "te arriesgas a pasarte del curso, porque la aguja se mueve muy rápido cerca del centro." },
+      { titulo: "Lo que te dan 30 grados", texto: "tiempo suficiente para anticipar el giro al curso final sin overshoot." },
+      { titulo: "Y además", texto: "es el ángulo que se enseña y se evalúa en la mayoría de los programas de entrenamiento." },
+    ],
+  },
+  "navegacion-tema9": {
+    clave: "Vuela hacia donde apunta la aguja: esa es toda la regla.",
+    puntos: [
+      { titulo: "La fórmula", texto: "rumbo de intercepción es el curso deseado más o menos el ángulo de intercepción." },
+      { titulo: "Aguja a la derecha", texto: "estás al oeste del curso: sumas. Con curso 360, interceptas con 030." },
+      { titulo: "Aguja a la izquierda", texto: "estás al este del curso: restas. Con curso 360, interceptas con 330." },
+      { titulo: "La regla práctica", texto: "aguja a la derecha, rumbo mayor que el curso; aguja a la izquierda, menor." },
+    ],
+  },
+  "navegacion-tema10": {
+    clave: "Tu rumbo real de tracking no es tu curso deseado: lleva la corrección por viento.",
+    puntos: [
+      { titulo: "Qué es", texto: "mantener el avión exactamente sobre el radial o curso durante todo el trayecto." },
+      { titulo: "En qué se diferencia", texto: "no es apuntar la nariz a la estación: es corregir constantemente por el viento." },
+      { titulo: "El WCA", texto: "un pequeño desvío del rumbo respecto al curso, hacia el lado de donde viene el viento." },
+      { titulo: "Cómo se aplica", texto: "si el viento te empuja a la derecha, vuelas unos grados a la izquierda del curso." },
+      { titulo: "Cómo sabes que funciona", texto: "la aguja se mantiene centrada." },
+    ],
+  },
+  "navegacion-tema11": {
+    clave: "Homing traza una curva; tracking traza una línea recta sobre el suelo.",
+    puntos: [
+      { titulo: "Homing", texto: "apuntar la nariz hacia la aguja o la estación, sin calcular corrección de viento." },
+      { titulo: "Qué resulta", texto: "una trayectoria curva e ineficiente: corriges de forma reactiva en vez de anticipar." },
+      { titulo: "Tracking", texto: "una línea recta real, con un ángulo de corrección calculado de antemano." },
+      { titulo: "Qué ganas", texto: "una ruta más corta, predecible y profesional." },
+      { titulo: "La regla", texto: "todo piloto instrumental domina tracking; homing solo sirve como aproximación inicial burda." },
+    ],
+  },
+  "navegacion-tema12": {
+    clave: "Donde se cruzan dos radiales está tu posición exacta, sin GPS.",
+    puntos: [
+      { titulo: "Qué necesitas", texto: "sintonizar dos VOR distintos y determinar en qué radial de cada uno estás." },
+      { titulo: "Cómo se llama", texto: "fijación cruzada, o cross-fix." },
+      { titulo: "Cómo se hace", texto: "trazas cada radial desde su VOR en la carta." },
+      { titulo: "El resultado", texto: "la intersección de ambas líneas es tu ubicación real en ese momento." },
+      { titulo: "Por qué importa", texto: "es de las formas más confiables de confirmar posición, y se espera que la ejecutes a mano." },
+    ],
+  },
+  "navegacion-tema13": {
+    clave: "Cerca de la estación y bajo, la distancia que marca no es tu distancia horizontal.",
+    puntos: [
+      { titulo: "Qué mide", texto: "la distancia real en línea recta, el slant range, en millas náuticas." },
+      { titulo: "Cómo la mide", texto: "por el tiempo que tarda una señal en ir y regresar." },
+      { titulo: "Dónde vive", texto: "muchas veces integrado con el VOR, o con el ILS." },
+      { titulo: "Qué más te da", texto: "groundspeed de acercamiento y tiempo estimado a la estación." },
+      { titulo: "El detalle a cuidar", texto: "a baja altura y muy cerca, el slant range difiere de la distancia horizontal por tu propia altura." },
+    ],
+  },
+  "navegacion-tema14": {
+    clave: "Integra en una imagen lo que antes había que leer en dos instrumentos.",
+    puntos: [
+      { titulo: "Qué combina", texto: "el indicador de rumbo giroscópico con la desviación de curso del VOR o ILS." },
+      { titulo: "Y a veces", texto: "también la pendiente de planeo, el glideslope." },
+      { titulo: "Cómo se ve", texto: "la rosa de compás gira mostrando tu rumbo real, y encima se superpone la barra del curso." },
+      { titulo: "Qué ganas", texto: "una imagen mucho más intuitiva de tu situación respecto al curso." },
+    ],
+  },
+  "navegacion-tema15": {
+    clave: "Al ver rumbo y desviación juntos, es mucho más difícil equivocarte de lado.",
+    puntos: [
+      { titulo: "Cómo se opera", texto: "seleccionas el curso con el selector, similar al OBS." },
+      { titulo: "Qué hace el instrumento", texto: "gira una barra sobre la rosa mostrando ese curso en relación a tu rumbo actual." },
+      { titulo: "La desviación", texto: "funciona igual que en un CDI normal." },
+      { titulo: "La ventaja", texto: "ves tu rumbo real al mismo tiempo, así que sabes de inmediato hacia dónde girar." },
+      { titulo: "Los extras", texto: "muchos muestran el bug de rumbo para el piloto automático y la aguja de glideslope en ILS." },
+    ],
+  },
+  "navegacion-tema16": {
+    clave: "El HSI elimina la sensibilidad inversa que confunde a tantos estudiantes.",
+    puntos: [
+      { titulo: "Qué muestra el CDI", texto: "solo la desviación del curso, sin contexto de tu rumbo real." },
+      { titulo: "El trabajo extra", texto: "mirar el indicador de rumbo aparte y combinar ambas lecturas mentalmente." },
+      { titulo: "La sensibilidad inversa", texto: "aparece cuando vuelas en la dirección equivocada del curso seleccionado." },
+      { titulo: "Cómo lo resuelve el HSI", texto: "la barra de curso siempre se muestra en su orientación real respecto a tu rumbo." },
+      { titulo: "Por eso", texto: "es el estándar en cabinas más modernas y de instrumentos avanzados." },
+    ],
+  },
+  "navegacion-tema17": {
+    clave: "El ADF no da radiales: su aguja apunta a la estación y ya.",
+    puntos: [
+      { titulo: "Qué usa", texto: "estaciones NDB en tierra; es un sistema más antiguo que el VOR." },
+      { titulo: "Qué muestra", texto: "el rumbo relativo medido desde la nariz de tu avión, apuntando siempre a la estación." },
+      { titulo: "Su ventaja", texto: "es más simple." },
+      { titulo: "Sus desventajas", texto: "menos preciso y más susceptible a tormentas eléctricas, terreno y hora del día." },
+      { titulo: "Dónde sigue vivo", texto: "en regiones donde la infraestructura VOR es limitada." },
+    ],
+  },
+  "navegacion-tema18": {
+    clave: "Solo te da la dirección hacia la estación, no tu posición.",
+    puntos: [
+      { titulo: "Qué transmite", texto: "una señal en frecuencia baja o media, igual en todas direcciones." },
+      { titulo: "Lo que no codifica", texto: "ninguna información de radial, a diferencia del VOR." },
+      { titulo: "Qué hace el receptor", texto: "detecta de qué dirección relativa viene la señal más fuerte y apunta la aguja hacia allá." },
+      { titulo: "Para saber dónde estás", texto: "hay que combinarlo con tu rumbo y, de preferencia, otra referencia cruzada." },
+    ],
+  },
+  "navegacion-tema19": {
+    clave: "Te da el rumbo magnético real a la estación, sin cálculos mentales.",
+    puntos: [
+      { titulo: "Qué combina", texto: "una rosa de compás giratoria con una o dos agujas hacia estaciones ADF o VOR." },
+      { titulo: "La diferencia con el ADF simple", texto: "la rosa gira con tu avión, así que la aguja da el rumbo magnético real, no el relativo." },
+      { titulo: "Qué te ahorra", texto: "sumar rumbo relativo más rumbo magnético de cabeza." },
+      { titulo: "Qué permite", texto: "interpretar tu posición respecto a la estación de un vistazo." },
+    ],
+  },
+  "navegacion-tema20": {
+    clave: "Traen la rosa de compás impresa para trazar radiales directo sobre la carta.",
+    puntos: [
+      { titulo: "Espacio aéreo", texto: "ubicación y clasificación: Clase B, C, D, E y G." },
+      { titulo: "Aeropuertos", texto: "con sus frecuencias." },
+      { titulo: "Terreno y obstáculos", texto: "elevaciones, y la altura de cada obstáculo." },
+      { titulo: "Estaciones VOR", texto: "su ubicación exacta, con rosa de compás para trazar radiales." },
+      { titulo: "Por qué es la base", texto: "leerla con fluidez es indispensable antes de planear cualquier ruta." },
+    ],
+  },
+  "navegacion-tema21": {
+    clave: "Un minuto de latitud es una milla náutica: la carta es su propia regla.",
+    puntos: [
+      { titulo: "Lo estándar", texto: "la escala gráfica impresa en el margen, o un plotter de navegación." },
+      { titulo: "El truco confiable", texto: "un minuto de latitud equivale a una milla náutica." },
+      { titulo: "Dónde se mide", texto: "verticalmente, en los bordes izquierdo y derecho de la carta." },
+      { titulo: "Dónde nunca", texto: "en los bordes horizontales de longitud." },
+    ],
+  },
+  "navegacion-tema22": {
+    clave: "Debes poder calcularla a mano, sin depender de la electrónica.",
+    puntos: [
+      { titulo: "Con DME o VOR/DME", texto: "el instrumento te da la distancia directa en millas náuticas." },
+      { titulo: "Sin DME", texto: "navegación por estima: mides en la carta y divides entre tu groundspeed para saber el tiempo." },
+      { titulo: "Con GPS", texto: "distancia y tiempo estimado aparecen directamente en pantalla." },
+      { titulo: "Por qué a mano", texto: "como piloto en entrenamiento tienes que poder hacerlo sin ayuda del equipo." },
+    ],
+  },
+  "navegacion-tema23": {
+    clave: "Un plan bien hecho es la diferencia entre un vuelo tranquilo y estrés innecesario en el aire.",
+    puntos: [
+      { titulo: "Checkpoints", texto: "puntos de referencia visuales claramente identificables desde el aire." },
+      { titulo: "Rumbo y distancia", texto: "magnéticos, entre cada par de checkpoints." },
+      { titulo: "Tiempo y combustible", texto: "por tramo, considerando el viento pronosticado." },
+      { titulo: "Espacio aéreo", texto: "cuál cruzarás y si necesitas autorización o comunicación con algún control." },
+      { titulo: "La meteorología", texto: "NOTAMs y METAR/TAF de salida, ruta y destino." },
+      { titulo: "El alterno", texto: "siempre definido, con reservas de combustible adecuadas." },
+    ],
+  },
+  "navegacion-tema24": {
+    clave: "Este tipo de ejercicio sobre una ruta real es exactamente lo que se evalúa en un checkride.",
+    puntos: [
+      { titulo: "La ruta", texto: "Guadalajara (MMGL) a Manzanillo (MMZO), como ejercicio integrador." },
+      { titulo: "Los VOR", texto: "identificas los disponibles para usarlos como checkpoints o para tracking directo." },
+      { titulo: "Las distancias", texto: "totales y por tramos, medidas en la carta VFR." },
+      { titulo: "Los rumbos", texto: "el magnético inicial y cómo cambia si sigues radiales de un VOR intermedio." },
+      { titulo: "El tiempo", texto: "estimado según tu velocidad de crucero y el viento pronosticado." },
+      { titulo: "El alterno", texto: "por ejemplo Colima, por si las condiciones en Manzanillo no son favorables." },
+    ],
+  },
 };
