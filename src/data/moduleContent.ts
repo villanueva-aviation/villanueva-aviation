@@ -2,12 +2,17 @@ import type { QuizPregunta } from "../features/academia/quizData";
 import type { ScenarioNode } from "../features/academia/ScenarioSimulator";
 import type { SliderConfig } from "../features/academia/DragSlider";
 import type { TermPair } from "../features/academia/TermMatch";
+import { TEMA_PUNTOS, type TemaPunto } from "./temaPuntos.ts";
 
 export interface Tema {
   id: string;
   titulo: string;
   texto: string;
   imagenes?: string[];
+  /** Idea clave del tema, cuando hay versión escaneable (ver temaPuntos.ts). */
+  clave?: string;
+  /** Puntos escaneables; el párrafo de `texto` queda desplegable debajo. */
+  puntos?: TemaPunto[];
 }
 
 export interface LeccionContenido {
@@ -334,7 +339,7 @@ export const MODULE_LECCIONES: Record<string, LeccionContenido[]> = {
 /** Aplana las lecciones de un módulo en su lista de temas (subtemas → lecciones individuales). */
 export function flattenTemas(slug: string): Tema[] | undefined {
   const lecciones = MODULE_LECCIONES[slug];
-  return lecciones?.flatMap((l) => l.temas);
+  return lecciones?.flatMap((l) => l.temas.map((t) => ({ ...t, ...TEMA_PUNTOS[t.id] })));
 }
 
 // ---------- Términos (para el widget de relacionar) ----------
