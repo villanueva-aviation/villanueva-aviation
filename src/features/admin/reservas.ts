@@ -1,4 +1,5 @@
 import { supabase } from "../../lib/supabaseClient";
+import { PREFIJO_PROYECTO_FINAL } from "../payments/reglasSesiones";
 
 export interface Reserva {
   id: string;
@@ -31,7 +32,7 @@ export async function rechazarReserva(id: string, motivo: string) {
   return supabase.from("reservas").update({ estado: "rechazada", motivo_revision: motivo }).eq("id", id);
 }
 
-export const temaProyectoFinal = (moduloTitulo: string) => `Proyecto final — ${moduloTitulo}`;
+export const temaProyectoFinal = (moduloTitulo: string) => `${PREFIJO_PROYECTO_FINAL} ${moduloTitulo}`;
 
 /** Reservas propias (cadete) que coinciden con un tema exacto, más recientes primero. RLS ya limita a las del usuario actual. */
 export async function fetchMisReservasPorTema(tema: string): Promise<Reserva[]> {

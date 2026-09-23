@@ -21,8 +21,30 @@ function cargarSdkPayPal(clientId: string): Promise<void> {
   });
 }
 
-export function PayPalButton({ onSuccess }: { onSuccess: () => void }) {
+interface PayPalButtonProps {
+  onSuccess: () => void;
+  /** Monto en USD. Por defecto, el pago único de Contenido Exclusivo. */
+  monto?: string;
+  /** Edge Function que verifica la orden del lado del servidor. */
+  funcion?: string;
+  /** Campos extra para esa función (por ejemplo, la reserva que se está pagando). */
+  cuerpo?: Record<string, unknown>;
+  /** Texto que ve el cadete en su recibo de PayPal. */
+  descripcion?: string;
+}
+
+export function PayPalButton({
+  onSuccess,
+  monto = PRECIO_CONTENIDO_EXCLUSIVO,
+  funcion = "verify-paypal-payment",
+  cuerpo,
+  descripcion,
+}: PayPalButtonProps) {
   const contenedorRef = useRef<HTMLDivElement>(null);
+  // El SDK de PayPal solo se monta una vez: sus callbacks leen los props de aquí
+  // para no re-renderizar el botón en cada cambio de estado de la página.
+  const propsRef = useRef({ onSuccess, monto, funcion, cuerpo, descripcion });
+  propsRef.current = { onSuccess, monto, funcion, cuerpo, descripcion };
   const [error, setError] = useState<string | null>(null);
   const [verificando, setVerificando] = useState(false);
 
@@ -41,7 +63,10 @@ export function PayPalButton({ onSuccess }: { onSuccess: () => void }) {
             createOrder: (_: unknown, actions: any) =>
               actions.order.create({
                 purchase_units: [
-                  { amount: { value: PRECIO_CONTENIDO_EXCLUSIVO, currency_code: "USD" } },
+                  {
+                    amount: { value: propsRef.current.monto, currency_code: "USD" },
+                    ...(propsRef.current.descripcion ? { description: propsRef.current.descripcion } : {}),
+                  },
                 ],
               }),
             onApprove: async (data: { orderID: string }, actions: any) => {
@@ -49,15 +74,15 @@ export function PayPalButton({ onSuccess }: { onSuccess: () => void }) {
               setVerificando(true);
               setError(null);
               const { data: resultado, error: fnError } = await supabase.functions.invoke(
-                "verify-paypal-payment",
-                { body: { orderId: data.orderID } },
+                propsRef.current.funcion,
+                { body: { orderId: data.orderID, ...propsRef.current.cuerpo } },
               );
               setVerificando(false);
               if (fnError || !resultado?.ok) {
                 setError("No pudimos confirmar tu pago con PayPal. Si el cargo se realizó, contáctanos.");
                 return;
               }
-              onSuccess();
+              propsRef.current.onSuccess();
             },
             onError: () => {
               setError("Ocurrió un error con PayPal. Intenta de nuevo.");

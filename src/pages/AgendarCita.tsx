@@ -9,6 +9,9 @@ import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../features/auth/AuthContext";
 import { ROUTES } from "../lib/routes";
 import { PRECIO_SESION_1A1 } from "../lib/constants";
+import { PayPalButton } from "../features/payments/PayPalButton";
+import { fetchMisPagosSesiones } from "../features/payments/sesiones";
+import { esSesionCobrable, sesionIncluidaId } from "../features/payments/reglasSesiones";
 import { fechaMinima, horariosDisponibles } from "../lib/agendaSlots";
 
 interface Reserva {
@@ -41,6 +44,8 @@ export function AgendarCita() {
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const minFecha = fechaMinima();
   const slots = horariosDisponibles(fecha);
+  const [pagadas, setPagadas] = useState<string[]>([]);
+  const incluidaId = sesionIncluidaId(reservas);
 
   async function cargarReservas() {
     const { data } = await supabase
@@ -50,8 +55,13 @@ export function AgendarCita() {
     if (data) setReservas(data as Reserva[]);
   }
 
+  async function cargarPagos() {
+    setPagadas((await fetchMisPagosSesiones()).map((p) => p.reserva_id));
+  }
+
   useEffect(() => {
     cargarReservas();
+    cargarPagos();
   }, []);
 
   async function handleSubmit(e: FormEvent) {
@@ -239,6 +249,28 @@ export function AgendarCita() {
                     <p className="mt-1.5 text-xs text-white/50">
                       {r.fecha_preferida} {r.horario_preferido}
                     </p>
+                  )}
+                  {esSesionCobrable(r) && (
+                    <div className="mt-3 border-t border-white/10 pt-3">
+                      {pagadas.includes(r.id) ? (
+                        <p className="text-xs font-medium text-emerald-400">Pagada</p>
+                      ) : r.id === incluidaId ? (
+                        <p className="text-xs text-white/50">Incluida en tu Contenido Exclusivo — sin costo.</p>
+                      ) : (
+                        <>
+                          <p className="text-xs text-white/55">{`Sesión adicional: $${PRECIO_SESION_1A1} USD (60 min).`}</p>
+                          <div className="mt-2">
+                            <PayPalButton
+                              monto={PRECIO_SESION_1A1}
+                              funcion="verify-paypal-session"
+                              cuerpo={{ reservaId: r.id }}
+                              descripcion="Sesión 1 a 1 con el fundador (60 min)"
+                              onSuccess={cargarPagos}
+                            />
+                          </div>
+                        </>
+                      )}
+                    </div>
                   )}
                 </div>
               ))}

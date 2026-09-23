@@ -9,6 +9,8 @@ import { useAuth } from "../features/auth/AuthContext";
 import { FOUNDER_EMAIL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 import { actualizarEstadoReserva, rechazarReserva, fetchTodasReservas, type Reserva } from "../features/admin/reservas";
+import { fetchTodosPagosSesiones } from "../features/payments/sesiones";
+import { esSesionCobrable, sesionesIncluidasPorCadete } from "../features/payments/reglasSesiones";
 
 const ESTADOS = ["pendiente", "confirmada", "completada"] as const;
 
@@ -35,6 +37,8 @@ function formatTiempoEscritura(segundos: number) {
 export function AdminReservas() {
   const { user, loading: authLoading } = useAuth();
   const [reservas, setReservas] = useState<Reserva[]>([]);
+  const [pagadas, setPagadas] = useState<Set<string>>(new Set());
+  const incluidas = sesionesIncluidasPorCadete(reservas);
   const [loading, setLoading] = useState(true);
   const [actualizandoId, setActualizandoId] = useState<string | null>(null);
   const [rechazandoId, setRechazandoId] = useState<string | null>(null);
@@ -46,6 +50,7 @@ export function AdminReservas() {
       setReservas(data);
       setLoading(false);
     });
+    fetchTodosPagosSesiones().then((pagos) => setPagadas(new Set(pagos.map((p) => p.reserva_id))));
   }, [authLoading, user]);
 
   if (authLoading) return null;
@@ -115,6 +120,14 @@ export function AdminReservas() {
                           {r.tipo === "examen" ? "Simulacro de examen práctico" : r.tema || "Revisión de tema"}
                         </p>
                         <Badge tone={ESTADO_TONE[r.estado] ?? "neutral"}>{r.estado}</Badge>
+                        {esSesionCobrable(r) &&
+                          (pagadas.has(r.id) ? (
+                            <Badge tone="green">Pagada</Badge>
+                          ) : incluidas.has(r.id) ? (
+                            <Badge tone="neutral">Incluida</Badge>
+                          ) : (
+                            <Badge tone="gold">Sin pago</Badge>
+                          ))}
                         {proyecto && r.tiempo_escritura_segundos != null && (
                           <span
                             className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${
