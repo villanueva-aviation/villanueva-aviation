@@ -1,6 +1,6 @@
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
-import { CONTACT_EMAIL, PRECIO_CONTENIDO_EXCLUSIVO, SITE } from "../lib/constants";
+import { CONTACT_EMAIL, PRECIO_CONTENIDO_EXCLUSIVO, PRECIO_SESION_1A1, SITE } from "../lib/constants";
 
 const SECCIONES = [
   { id: "terminos", label: "Términos de uso" },
@@ -119,6 +119,20 @@ export function Legal() {
                   {CONTACT_EMAIL}
                 </a>{" "}
                 con tu comprobante de pago y lo resolvemos.
+              </p>
+              <p>
+                <span className="text-white">Sesiones 1 a 1.</span> La primera sesión con el fundador está incluida en
+                Contenido Exclusivo. Las sesiones adicionales cuestan ${PRECIO_SESION_1A1} USD por hora (60 minutos) y
+                se pagan por PayPal una vez que confirmamos por correo la fecha y las horas solicitadas; reservar en la
+                Agenda no genera ningún cargo por sí solo.
+              </p>
+              <p>
+                Puedes reagendar o cancelar una sesión pagada avisando con al menos{" "}
+                <span className="text-white">24 horas de anticipación</span>: se reprograma sin costo o se reembolsa
+                completa, como prefieras. Con menos de 24 horas de aviso, o si no te presentas, la sesión se considera
+                impartida y no se reembolsa. Si quien cancela o no puede conectarse es el fundador, siempre se
+                reprograma sin costo o se reembolsa completa. Las sesiones son personales e intransferibles, y el
+                contenido tratado en ellas no sustituye la instrucción de un instructor de vuelo certificado.
               </p>
             </div>
           </section>
