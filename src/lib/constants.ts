@@ -19,4 +19,8 @@ export const ACADEMIA_DESBLOQUEADA = [FOUNDER_EMAIL, "bcp200578@gmail.com"];
 // PRECIO_CONTENIDO_EXCLUSIVO en la Edge Function verify-paypal-payment.
 export const PRECIO_CONTENIDO_EXCLUSIVO = "29.00";
 
+// Sesiones 1 a 1 adicionales (la primera va incluida en Contenido Exclusivo).
+// Se cobran por PayPal al confirmar la cita, no desde el sitio.
+export const PRECIO_SESION_1A1 = "15.99";
+
 export const CONTACT_EMAIL = "villanuevaaviation@gmail.com";

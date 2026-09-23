@@ -9,7 +9,7 @@ import { CONTENIDO_EXCLUSIVO } from "../data/exclusivo";
 import { useAuth } from "../features/auth/AuthContext";
 import { usePremiumAccess } from "../features/payments/usePremiumAccess";
 import { PayPalButton } from "../features/payments/PayPalButton";
-import { PRECIO_CONTENIDO_EXCLUSIVO } from "../lib/constants";
+import { PRECIO_CONTENIDO_EXCLUSIVO, PRECIO_SESION_1A1 } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 
 const numChecklists = CONTENIDO_EXCLUSIVO.filter((i) => i.tipo === "Checklist").length;
@@ -21,7 +21,7 @@ const STATS = [
   { icon: Award, valor: numExamenes, label: "Simulacros de checkride", detalle: "Oral y en vuelo" },
   { icon: Radio, valor: numAudios, label: "Sets de audio ATC", detalle: "Situaciones reales" },
   { icon: ListChecks, valor: "12", label: "Maniobras de práctica", detalle: "De familiarización a TyD" },
-  { icon: CalendarCheck, valor: "1", label: "Sesión con el fundador", detalle: "Revisión personal" },
+  { icon: CalendarCheck, valor: "1", label: "Sesión con el fundador", detalle: `Incluida; extra $${PRECIO_SESION_1A1} USD/h` },
 ];
 
 export function ContenidoExclusivo() {

@@ -8,6 +8,7 @@ import { Badge } from "../components/ui/Badge";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../features/auth/AuthContext";
 import { ROUTES } from "../lib/routes";
+import { PRECIO_SESION_1A1 } from "../lib/constants";
 import { fechaMinima, horariosDisponibles } from "../lib/agendaSlots";
 
 interface Reserva {
@@ -106,7 +107,7 @@ export function AgendarCita() {
       <PageHero
         eyebrow="Contenido de cadetes"
         title="Agenda tu sesión con el fundador"
-        description="Solicita una hora de revisión de un tema específico con el fundador, o agenda un simulacro de examen práctico."
+        description={`Solicita una hora de revisión de un tema específico con el fundador, o agenda un simulacro de examen práctico. Tu primera sesión está incluida; las siguientes cuestan $${PRECIO_SESION_1A1} USD por hora.`}
       >
         <Link
           to={ROUTES.contenidoExclusivo}
@@ -118,6 +119,14 @@ export function AgendarCita() {
       </PageHero>
 
       <Container className="py-12 md:py-16">
+        <div className="mb-8 rounded-2xl border border-gold-500/20 bg-gold-500/[0.06] p-5 md:p-6">
+          <p className="font-display text-sm font-semibold text-white">Tu primera sesión está incluida en Contenido Exclusivo</p>
+          <p className="mt-2 text-sm leading-relaxed text-white/65">
+            Las sesiones adicionales —de revisión de tema o de simulacro de examen práctico— cuestan{" "}
+            <span className="font-semibold text-white">{`$${PRECIO_SESION_1A1} USD por hora (60 minutos)`}</span>. Reserva aquí las
+            horas que quieras y, al confirmarte la cita, te envío el enlace de PayPal para el pago.
+          </p>
+        </div>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.1fr_1fr]">
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
             <div className="flex gap-2">
