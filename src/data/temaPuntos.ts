@@ -707,4 +707,327 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
       { titulo: "Antes de aplicarlo", texto: "confirma el valor exacto vigente en la normativa de tu autoridad, porque puede variar." },
     ],
   },
+
+  // ---------- Operación de Aeronave ----------
+  "operacion-tema1": {
+    clave: "Siempre, con el mismo patrón, aunque hayas volado ese avión ayer.",
+    puntos: [
+      { titulo: "Por qué existe", texto: "es tu primera línea de defensa contra fallas mecánicas en el aire." },
+      { titulo: "Mismo patrón cada vez", texto: "normalmente en sentido de las manecillas, para no saltarte ningún punto." },
+      { titulo: "Qué revisas", texto: "superficies de control libres, aceite y combustible, llantas, estructura, luces y antenas." },
+      { titulo: "El drenado", texto: "sacar el agua del sistema de combustible antes de que la encuentre el motor." },
+      { titulo: "La excusa que no vale", texto: "ya la volé ayer: las condiciones cambian de un vuelo a otro, incluso de una hora a otra." },
+    ],
+  },
+  "operacion-tema2": {
+    clave: "La checklist no reemplaza tu conocimiento: verifica que lo aplicaste bien.",
+    puntos: [
+      { titulo: "Flujo y verificación", texto: "ejecutas la secuencia de memoria en un flujo lógico por la cabina y después lees la lista para confirmar." },
+      { titulo: "Lo que no se hace", texto: "leer y ejecutar línea por línea desde cero." },
+      { titulo: "Normales", texto: "para la operación de rutina." },
+      { titulo: "Anormales", texto: "situaciones fuera de lo común que no son emergencia inmediata." },
+      { titulo: "De emergencia", texto: "los primeros pasos críticos se memorizan; el resto se consulta." },
+      { titulo: "Qué marca la diferencia", texto: "usarla en cada vuelo sin importar tu experiencia." },
+    ],
+  },
+  "operacion-tema3": {
+    clave: "Si la presión de aceite no sube en los primeros segundos, apagas de inmediato.",
+    puntos: [
+      { titulo: "La secuencia", texto: "sigue la del fabricante: mezcla y potencia en posición, cebado si el motor lo pide en frío, bomba de combustible si aplica." },
+      { titulo: "DESPEJADO", texto: "en voz alta antes de girar la llave, para alertar a quien esté cerca de la hélice." },
+      { titulo: "Lo primero que miras", texto: "la presión de aceite, apenas arranca." },
+      { titulo: "Por qué tan rápido", texto: "operar sin lubricación adecuada daña el motor severamente en muy poco tiempo." },
+    ],
+  },
+  "operacion-tema4": {
+    clave: "El rodaje exige la misma atención que el vuelo mismo.",
+    puntos: [
+      { titulo: "La dirección", texto: "con los pedales de timón, que mueven la rueda de nariz en la mayoría de los entrenadores." },
+      { titulo: "La potencia", texto: "la mínima necesaria para mantener movimiento, sin velocidades excesivas." },
+      { titulo: "Prueba de frenos", texto: "un leve toque al iniciar el movimiento para confirmar respuesta antes de continuar." },
+      { titulo: "Conciencia situacional", texto: "otro tráfico, vehículos de servicio e instrucciones de control si el aeropuerto es controlado." },
+      { titulo: "Por qué importa tanto", texto: "es donde más incursiones de pista y colisiones en tierra ocurren por distracción." },
+    ],
+  },
+  "operacion-tema5": {
+    clave: "Aquí decides, en tierra, qué harás si el motor falla justo después de despegar.",
+    puntos: [
+      { titulo: "Dónde", texto: "en el punto designado cerca de la cabecera, contra el viento y con frenos firmes." },
+      { titulo: "Magnetos", texto: "uno por uno: la caída de RPM debe estar en el rango del manual y ninguno debe apagar el motor." },
+      { titulo: "Calentador de carburador", texto: "se prueba si el avión lo lleva." },
+      { titulo: "Instrumentos del motor", texto: "temperaturas y presiones dentro de rango normal." },
+      { titulo: "Antes de despegue", texto: "configuración final de flaps y trim, y el repaso mental de la falla en despegue." },
+    ],
+  },
+  "operacion-tema6": {
+    clave: "Si algo se ve mal en los primeros segundos, todavía tienes pista para abortar.",
+    puntos: [
+      { titulo: "Potencia y dirección", texto: "potencia completa suave pero sin demora, y pies activos para mantener la línea." },
+      { titulo: "Los instrumentos", texto: "monitoreas los del motor en los primeros segundos para confirmar parámetros normales." },
+      { titulo: "Vr", texto: "a la velocidad de rotación de tu avión, presión suave atrás para levantar la nariz." },
+      { titulo: "La limpieza", texto: "retraer flaps a la altura y velocidad del POH, y el tren si el avión es retráctil." },
+    ],
+  },
+  "operacion-tema7": {
+    clave: "Vx es ángulo para librar obstáculos; Vy es tasa para ganar altura en tiempo.",
+    puntos: [
+      { titulo: "Vx", texto: "mejor ángulo: altura por distancia recorrida, para obstáculos cercanos." },
+      { titulo: "Vy", texto: "mejor tasa: altura por tiempo, una vez pasados los obstáculos inmediatos." },
+      { titulo: "Las temperaturas", texto: "las vigilas más que en crucero: potencia alta y velocidad baja dan menos flujo de enfriamiento." },
+      { titulo: "La mezcla", texto: "muchos POH piden empobrecer ligeramente por encima de cierta altitud; en ascensos cortos y bajos suele mantenerse rica." },
+    ],
+  },
+  "operacion-tema8": {
+    clave: "Es el momento de menor carga de trabajo: aprovéchalo para navegar.",
+    puntos: [
+      { titulo: "Al nivelar", texto: "reduces potencia al ajuste del POH para esa configuración." },
+      { titulo: "La mezcla", texto: "ajustas para optimizar consumo y rendimiento a esa altitud." },
+      { titulo: "Por qué empobrecer", texto: "volar rico de más desperdicia combustible y puede ensuciar bujías." },
+      { titulo: "Qué hacer con el tiempo libre", texto: "confirmar posición contra el plan, corregir deriva y hacer tus reportes." },
+      { titulo: "Lo que no se descuida", texto: "el escaneo visual constante de tráfico." },
+    ],
+  },
+  "operacion-tema9": {
+    clave: "Multiplica por 3 la altitud a perder en miles de pies: esas son las millas de anticipación.",
+    puntos: [
+      { titulo: "Por qué planearlo", texto: "evita tener que descender abruptamente cerca del destino." },
+      { titulo: "La regla del 3", texto: "altitud a perder en miles por 3, para bajar a una tasa razonable de unos 500 pies por minuto." },
+      { titulo: "Antes de bajar", texto: "reduces potencia gradualmente." },
+      { titulo: "Qué más se aprovecha", texto: "reajustar la mezcla hacia más rica, revisar el altímetro contra el reporte del destino." },
+      { titulo: "El repaso mental", texto: "la configuración esperada de aproximación y aterrizaje." },
+    ],
+  },
+  "operacion-tema10": {
+    clave: "Una aproximación inestable es la señal más clara para irte al aire.",
+    puntos: [
+      { titulo: "La configuración", texto: "reduces potencia y extiendes flaps en las etapas y velocidades del POH." },
+      { titulo: "Qué es estar estabilizado", texto: "velocidad correcta, tasa de descenso adecuada, alineado y configurado antes de cruzar el umbral." },
+      { titulo: "Qué es estar inestable", texto: "muy rápido, muy alto, mal alineado o con la configuración incompleta." },
+      { titulo: "La decisión", texto: "go-around, sin dudar y sin sentir vergüenza." },
+    ],
+  },
+  "operacion-tema11": {
+    clave: "El go-around sigue siendo la decisión correcta incluso a pocos pies del suelo.",
+    puntos: [
+      { titulo: "El flare", texto: "reduces la tasa de descenso y elevas la nariz para que toquen primero las llantas principales." },
+      { titulo: "A qué velocidad", texto: "cerca de Vs0, la pérdida en configuración de aterrizaje." },
+      { titulo: "Después de tocar", texto: "controles activos durante todo el rodaje, sobre todo en viento cruzado." },
+      { titulo: "Hasta cuándo", texto: "hasta detenerte del todo o bajar a velocidad de rodaje segura." },
+      { titulo: "Las señales de abortar", texto: "velocidad excesiva, deriva lateral sin corregir o un bote." },
+    ],
+  },
+  "operacion-tema12": {
+    clave: "El vuelo no termina al tocar: termina con el avión asegurado y la bitácora al día.",
+    puntos: [
+      { titulo: "Primero, fuera de la pista", texto: "cruzando completamente la línea de espera antes de tocar nada." },
+      { titulo: "Checklist después de aterrizaje", texto: "retraer flaps, apagar luces de aterrizaje y ajustar la mezcla para el rodaje." },
+      { titulo: "El apagado", texto: "mezcla a corte, magnetos apagados y todo en posición segura." },
+      { titulo: "La inspección post-vuelo", texto: "anotar cualquier anomalía observada durante el vuelo." },
+      { titulo: "Dejarlo listo", texto: "asegurar el avión con calzos y amarres, y la bitácora actualizada para el siguiente piloto o para mantenimiento." },
+    ],
+  },
+
+  // ---------- Espacios Aéreos ----------
+  "espacios-aereos-tema1": {
+    clave: "Para un piloto VFR, la Clase A es simplemente un techo absoluto.",
+    puntos: [
+      { titulo: "Dónde vive", texto: "desde FL180, 18,000 pies de altitud de presión, hasta FL600." },
+      { titulo: "Solo IFR", texto: "no se permite vuelo VFR bajo ninguna circunstancia." },
+      { titulo: "Qué se necesita", texto: "plan IFR activo con autorización, transponder Modo C o S y comunicación bidireccional." },
+      { titulo: "Bajo instrucciones", texto: "siguiendo indicaciones continuas del ATC." },
+    ],
+  },
+  "espacios-aereos-tema2": {
+    clave: "Un contacto por radio no basta: tienes que escuchar la autorización.",
+    puntos: [
+      { titulo: "Dónde vive", texto: "alrededor de los aeropuertos con mayor densidad de tráfico." },
+      { titulo: "Su forma", texto: "pastel de bodas invertido: círculos concéntricos que se ensanchan con la altitud." },
+      { titulo: "Autorización explícita", texto: "debes oír que te autorizan a entrar en espacio Clase B, o instrucción equivalente." },
+      { titulo: "En la carta", texto: "líneas sólidas azules gruesas." },
+      { titulo: "Equipo mínimo", texto: "transponder con Modo C y radio bidireccional operativo." },
+    ],
+  },
+  "espacios-aereos-tema3": {
+    clave: "Escuchar tu matrícula de vuelta confirma que ya puedes entrar.",
+    puntos: [
+      { titulo: "Dónde vive", texto: "aeropuertos de tráfico moderado a alto." },
+      { titulo: "Su forma", texto: "un núcleo de unas 5 millas náuticas y una repisa exterior más amplia a mayor altitud." },
+      { titulo: "Contacto bidireccional", texto: "no necesitas autorización explícita como en Clase B: basta con que control te conteste." },
+      { titulo: "En la carta", texto: "círculos sólidos magenta." },
+      { titulo: "Equipo mínimo", texto: "transponder Modo C y radio operativo, igual que en Clase B." },
+    ],
+  },
+  "espacios-aereos-tema4": {
+    clave: "Fuera del horario de la torre, la Clase D deja de ser Clase D.",
+    puntos: [
+      { titulo: "Dónde vive", texto: "aeropuertos con torre activa pero menos tráfico que B o C." },
+      { titulo: "Dimensiones típicas", texto: "unas 4 millas náuticas de radio hasta 2,500 pies sobre el nivel del aeropuerto." },
+      { titulo: "Contacto bidireccional", texto: "con la torre antes de entrar, igual que en Clase C." },
+      { titulo: "El transponder", texto: "generalmente no exige Modo C obligatorio, aunque depende de la regulación local." },
+      { titulo: "En la carta", texto: "líneas discontinuas azules." },
+      { titulo: "Cuando cierra la torre", texto: "revierte a Clase E o G según lo indique la carta." },
+    ],
+  },
+  "espacios-aereos-tema5": {
+    clave: "Es el espacio controlado más extenso, y casi nunca te pide hablar.",
+    puntos: [
+      { titulo: "Qué es", texto: "espacio controlado que no encaja en las categorías A a D." },
+      { titulo: "Dónde empieza", texto: "en superficie, a 700 pies AGL o a 1,200 pies AGL, según la ubicación." },
+      { titulo: "En la carta", texto: "sombreado degradado magenta para el inicio a 700, líneas discontinuas azules para el de 1,200." },
+      { titulo: "Para VFR", texto: "en la mayoría de los casos no exige contacto por radio obligatorio." },
+      { titulo: "Lo que sí exige", texto: "visibilidad y separación de nubes más estrictas que en Clase G." },
+    ],
+  },
+  "espacios-aereos-tema6": {
+    clave: "No controlado no significa sin reglas: ver y evitar es la única separación que existe.",
+    puntos: [
+      { titulo: "Qué es", texto: "espacio no controlado: no hay ATC gestionando el tráfico." },
+      { titulo: "Qué no se requiere", texto: "ni contacto por radio ni autorización de ningún tipo." },
+      { titulo: "Dónde vive", texto: "a baja altitud en zonas rurales, por debajo del inicio de la Clase E correspondiente." },
+      { titulo: "Lo que sí aplica", texto: "mínimos de visibilidad y separación de nubes, aunque más permisivos." },
+      { titulo: "Tu responsabilidad", texto: "mantener separación visual con el otro tráfico, al cien por ciento." },
+    ],
+  },
+  "espacios-aereos-tema7": {
+    clave: "Cruzar una restringida activa no es solo una infracción: es riesgo físico real.",
+    puntos: [
+      { titulo: "Cómo se designan", texto: "con prefijo R y un número, por ejemplo R-401." },
+      { titulo: "Qué contienen", texto: "entrenamiento militar, tiro con artillería y actividades similares." },
+      { titulo: "No están prohibidas", texto: "se pueden cruzar con autorización del organismo que las controla." },
+      { titulo: "Horarios publicados", texto: "solo están activas en ciertas horas; fuera de ellas suelen cruzarse libremente." },
+      { titulo: "Antes de asumirlo", texto: "verificar NOTAMs, siempre." },
+    ],
+  },
+  "espacios-aereos-tema8": {
+    clave: "Aquí no hay horario activo: la prohibición es permanente y absoluta.",
+    puntos: [
+      { titulo: "Cómo se designan", texto: "con prefijo P y un número." },
+      { titulo: "Qué significan", texto: "vuelo terminantemente prohibido, sin excepción ni proceso de autorización para vuelo civil." },
+      { titulo: "Qué rodean", texto: "instalaciones de seguridad nacional, residencias presidenciales u otras zonas sensibles." },
+      { titulo: "Las consecuencias", texto: "legales severas, además de posible interceptación militar." },
+    ],
+  },
+  "espacios-aereos-tema9": {
+    clave: "Legalmente puedes cruzarlas; operacionalmente, si están activas, las rodeas.",
+    puntos: [
+      { titulo: "Dónde suelen estar", texto: "frecuentemente sobre agua o costa." },
+      { titulo: "Qué señalan", texto: "ejercicios militares, actividad de misiles o tráfico intenso de otro tipo." },
+      { titulo: "La diferencia clave", texto: "no son legalmente restrictivas: no necesitas autorización para cruzarlas." },
+      { titulo: "El costo", texto: "lo haces bajo tu propio riesgo, con actividad peligrosa posiblemente en curso." },
+      { titulo: "La recomendación", texto: "evitarlas cuando estén activas, verificando NOTAMs." },
+    ],
+  },
+  "espacios-aereos-tema10": {
+    clave: "Por cada tramo: ¿tengo que hablar?, ¿qué equipo necesito?, ¿qué mínimos aplican?",
+    puntos: [
+      { titulo: "Comunicaciones", texto: "B pide autorización antes de entrar; C y D piden contacto establecido; E y G generalmente nada." },
+      { titulo: "Equipo", texto: "transponder Modo C obligatorio en B y C, y por encima de ciertas altitudes incluso en E." },
+      { titulo: "Mínimos", texto: "visibilidad y separación de nubes más estrictas en espacio controlado." },
+      { titulo: "En Clase B sobre todo", texto: "entrar sin autorización puede costar una llamada de atención inmediata o la suspensión de licencia." },
+      { titulo: "El peor caso", texto: "una situación de tráfico genuinamente peligrosa por falta de coordinación." },
+    ],
+  },
+
+  // ---------- Vuelo IFR ----------
+  "ifr-tema1": {
+    clave: "Bajo IFR la separación la garantiza el sistema, no tus ojos.",
+    puntos: [
+      { titulo: "Qué permite", texto: "volar navegando solo por instrumentos, sin depender de referencia visual externa." },
+      { titulo: "No solo por mal clima", texto: "muchos pilotos eligen IFR con buen tiempo, por la ruta estructurada y la prioridad de tránsito." },
+      { titulo: "Control continuo", texto: "estás en contacto con ATC durante todo el vuelo." },
+      { titulo: "Ruta y altitud", texto: "las autorizadas, específicas, no las que tú decidas sobre la marcha." },
+      { titulo: "El cambio grande", texto: "la separación con otro tráfico IFR la da el sistema de control, no tu observación visual." },
+    ],
+  },
+  "ifr-tema2": {
+    clave: "CRAFT: Clearance limit, Route, Altitude, Frequency, Transponder.",
+    puntos: [
+      { titulo: "Qué lleva el plan", texto: "tipo de aeronave y equipo, ruta, altitud de crucero, combustible y aeropuerto alterno." },
+      { titulo: "Clearance limit", texto: "hasta dónde llega la autorización." },
+      { titulo: "Route y Altitude", texto: "la ruta autorizada, que puede diferir de la solicitada, y las altitudes inicial y final." },
+      { titulo: "Frequency y Transponder", texto: "la frecuencia de salida a contactar y el código squawk asignado." },
+      { titulo: "Antes de proceder", texto: "lees de vuelta la autorización completa." },
+    ],
+  },
+  "ifr-tema3": {
+    clave: "Existe para garantizar separación de obstáculos y terreno en el ascenso inicial.",
+    puntos: [
+      { titulo: "Qué conecta", texto: "el aeropuerto de salida con la estructura de aerovías en ruta." },
+      { titulo: "Su propósito de diseño", texto: "la separación de obstáculos y terreno mientras asciendes." },
+      { titulo: "El beneficio adicional", texto: "organiza el flujo de salida en aeropuertos de tráfico denso." },
+      { titulo: "Las restricciones", texto: "de altitud y a veces de velocidad en puntos determinados; se cumplen salvo instrucción contraria." },
+      { titulo: "Menos radio", texto: "gran parte de la ruta y sus restricciones ya vienen pre-autorizadas en el procedimiento." },
+    ],
+  },
+  "ifr-tema4": {
+    clave: "Victor hasta FL180 por radiales VOR; Rutas Jet por encima.",
+    puntos: [
+      { titulo: "Qué son", texto: "corredores publicados que conectan fixes y forman la estructura principal de rutas IFR." },
+      { titulo: "Los fixes", texto: "generalmente VOR o puntos definidos por coordenadas." },
+      { titulo: "Aerovías Victor", texto: "baja altitud, típicamente hasta FL180, definidas por radiales VOR." },
+      { titulo: "Rutas Jet", texto: "alta altitud, sobre FL180, por radioayudas o RNAV." },
+      { titulo: "Qué implica volarlas", texto: "seguir la línea publicada a la altitud asignada, con separación garantizada por el sistema ATC." },
+    ],
+  },
+  "ifr-tema5": {
+    clave: "Es la SID al revés: te ordena la llegada en la fase más ocupada del vuelo.",
+    puntos: [
+      { titulo: "Qué conecta", texto: "la estructura de aerovías en ruta con el área terminal de tu destino." },
+      { titulo: "Qué organiza", texto: "el descenso y la entrada al espacio denso alrededor del aeropuerto." },
+      { titulo: "Las restricciones", texto: "de altitud y velocidad en puntos específicos, igual que la SID." },
+      { titulo: "Para qué", texto: "secuenciar el tráfico entrante y reducir la carga de comunicación." },
+      { titulo: "Dónde termina", texto: "generalmente enlazando con el segmento inicial de una aproximación instrumental." },
+    ],
+  },
+  "ifr-tema6": {
+    clave: "La DA es un punto de decisión, no una zona de negociación.",
+    puntos: [
+      { titulo: "Es de precisión", texto: "da guía lateral con el Localizer y vertical con el Glideslope." },
+      { titulo: "La senda", texto: "típicamente 3 grados hacia el umbral de la pista." },
+      { titulo: "Las categorías", texto: "CAT I, II y III, según qué tan bajos son los mínimos; las altas piden más equipo y entrenamiento." },
+      { titulo: "Al llegar a la DA", texto: "o tienes referencia visual suficiente para aterrizar, o ejecutas la frustrada de inmediato." },
+    ],
+  },
+  "ifr-tema7": {
+    clave: "LPV llega a mínimos comparables a un ILS categoría I, sin antena en tierra.",
+    puntos: [
+      { titulo: "La base", texto: "GPS o GNSS para volar entre waypoints por coordenadas, sin depender de estaciones terrestres." },
+      { titulo: "LNAV", texto: "solo guía lateral, similar a una aproximación de no precisión." },
+      { titulo: "LNAV/VNAV", texto: "suma guía vertical calculada, con mínimos más bajos." },
+      { titulo: "LPV", texto: "Localizer Performance with Vertical guidance: la más precisa." },
+      { titulo: "Lo que cambió", texto: "llevó aproximaciones de precisión a aeropuertos que nunca tuvieron un ILS instalado." },
+    ],
+  },
+  "ifr-tema8": {
+    clave: "Con MDA puedes volar nivelado; con DA decides en ese punto.",
+    puntos: [
+      { titulo: "Es de no precisión", texto: "usa un radial VOR como guía lateral; no hay guía vertical electrónica." },
+      { titulo: "Dónde está el VOR", texto: "a menudo en el propio campo o cerca de él." },
+      { titulo: "MDA", texto: "una altitud mínima que no puedes cruzar sin referencia visual." },
+      { titulo: "La diferencia práctica", texto: "la mantienes nivelado hasta el punto de aproximación frustrada si no ves la pista." },
+      { titulo: "Step-down fixes", texto: "descensos escalonados conforme confirmas tu posición sobre puntos publicados." },
+    ],
+  },
+  "ifr-tema9": {
+    clave: "Tres entradas, y cuál te toca depende de por dónde llegas al fix.",
+    puntos: [
+      { titulo: "Qué es", texto: "un patrón de espera en forma de hipódromo, para retrasar tu llegada de forma ordenada." },
+      { titulo: "Cuándo", texto: "por instrucción de control cuando hay congestión, o como parte de un procedimiento publicado." },
+      { titulo: "Cómo se define", texto: "por un fix, un rumbo de entrada y un lado de vueltas, generalmente a la derecha." },
+      { titulo: "Directa", texto: "la más simple: entras derecho al patrón." },
+      { titulo: "Paralela", texto: "vuelas paralelo al rumbo de entrada antes de virar." },
+      { titulo: "Teardrop (gota)", texto: "te alejas en ángulo antes de virar hacia el fix." },
+    ],
+  },
+  "ifr-tema10": {
+    clave: "Practicar el flujo completo en simulador es la mejor preparación antes de volarlo en IMC.",
+    puntos: [
+      { titulo: "Antes de salir", texto: "presentas el plan con ruta, altitud y alterno, y recibes el clearance con formato CRAFT." },
+      { titulo: "Despegue", texto: "vuelas la SID publicada con sus restricciones." },
+      { titulo: "En ruta", texto: "la aerovía asignada, bajo control continuo y cambiando frecuencias por sector." },
+      { titulo: "Descenso", texto: "la STAR hacia tu destino." },
+      { titulo: "Aproximación", texto: "ILS, RNAV o VOR según disponibilidad y mínimos." },
+      { titulo: "Si no ves la pista", texto: "frustrada, y holding si el tráfico o el clima lo requieren." },
+    ],
+  },
 };
