@@ -1391,4 +1391,26 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
       { titulo: "El alterno", texto: "por ejemplo Colima, por si las condiciones en Manzanillo no son favorables." },
     ],
   },
+  "navegacion-tema25": {
+    clave: "Es de las pocas maniobras de radionavegación donde no vuelas en línea recta.",
+    puntos: [
+      { titulo: "Qué es", texto: "una trayectoria curva a distancia constante de la estación; por ejemplo, el arco de 12 millas náuticas de un VOR/DME." },
+      { titulo: "Para qué sirve", texto: "conectar una aerovía o un radial con el tramo inicial de una aproximación sin sobrevolar la estación." },
+      { titulo: "La posición base", texto: "vuelas perpendicular a la estación: 90 grados respecto al radial en el que estás." },
+      { titulo: "Girar y torcer", texto: "dejas que la distancia se desvíe un poco, giras unos 10 grados y mueves el OBS otros 10 para el siguiente segmento." },
+      { titulo: "La entrada al arco", texto: "se anticipa un poco antes de alcanzar la distancia objetivo." },
+      { titulo: "Cuánto anticipar", texto: "como referencia, alrededor de media milla náutica a velocidades de aviación general; ajústalo según tu groundspeed." },
+    ],
+  },
+  "navegacion-tema26": {
+    clave: "Cuatro datos lo definen: fix, curso de entrada, lado de virajes y duración del tramo.",
+    puntos: [
+      { titulo: "Qué es", texto: "un circuito en forma de hipódromo alrededor de un fix, para retrasar tu llegada de forma ordenada." },
+      { titulo: "Cuándo lo vuelas", texto: "porque control te lo asigna por congestión, o porque viene publicado en un procedimiento." },
+      { titulo: "El lado de virajes", texto: "a la derecha por convención estándar, salvo que se publique lo contrario." },
+      { titulo: "Los tramos", texto: "de referencia: un minuto a 14,000 pies o menos, minuto y medio por encima, con virajes de tasa estándar de 3 grados por segundo." },
+      { titulo: "Las tres entradas", texto: "directa, paralela y en gota; cuál te toca lo decide el ángulo entre tu rumbo de llegada y el curso de entrada." },
+      { titulo: "La corrección por viento", texto: "en el tramo de alejamiento se aplica cerca del triple del ángulo usado al acercarte, y se ajusta el tiempo para que el acercamiento dure lo previsto." },
+    ],
+  },
 };
