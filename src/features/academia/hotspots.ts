@@ -101,7 +101,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
     description:
       "Mide la diferencia entre la presión dinámica del tubo pitot y la presión estática. Sus arcos de color marcan el rango de flaps (blanco), el de operación normal (verde), la zona de precaución (amarillo) y la Vne (línea roja). Sistema pitot-estático.",
     xPct: 20.0,
-    yPct: 36.7,
+    yPct: 40.8,
   },
   {
     id: "horizonte",
@@ -109,7 +109,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
     description:
       "Tu referencia primaria de actitud: muestra inclinación y cabeceo mediante un giroscopio que mantiene su orientación en el espacio. En IMC es la única referencia confiable sin visibilidad exterior. Accionado por vacío (o eléctrico en cabinas modernas).",
     xPct: 50.0,
-    yPct: 36.7,
+    yPct: 40.8,
   },
   {
     id: "altimetro",
@@ -117,7 +117,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
     description:
       "Mide la altitud comparando la presión estática contra la referencia que ajustas en la ventana Kollsman. De alta a baja presión sin reajustar, te indica más altura de la que realmente tienes. Sistema pitot-estático (solo estática).",
     xPct: 80.0,
-    yPct: 36.7,
+    yPct: 40.8,
   },
   {
     id: "coordinador",
@@ -125,7 +125,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
     description:
       "Muestra la tasa de giro, no el ángulo de inclinación: el viraje estándar son 3° por segundo, 360° en dos minutos. La bola del inclinómetro indica si el viraje está coordinado, derrapando o resbalando. Alimentación eléctrica — por eso sobrevive a una falla de vacío.",
     xPct: 20.0,
-    yPct: 75.6,
+    yPct: 77.6,
   },
   {
     id: "rumbo",
@@ -133,7 +133,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
     description:
       "Giroscopio direccional que muestra hacia dónde apunta la nariz, más estable que la brújula magnética porque no sufre errores de aceleración ni de viraje. Sufre precesión: hay que realinearlo con la brújula cada 15 minutos. Accionado por vacío.",
     xPct: 50.0,
-    yPct: 75.6,
+    yPct: 77.6,
   },
   {
     id: "variometro",
@@ -141,7 +141,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
     description:
       "Muestra la tasa de ascenso o descenso en pies por minuto, midiendo qué tan rápido cambia la presión estática. Responde con retraso de algunos segundos, así que sirve para confirmar una tendencia, no para perseguirla. Sistema pitot-estático (solo estática).",
     xPct: 80.0,
-    yPct: 75.6,
+    yPct: 77.6,
   },
 ];
 

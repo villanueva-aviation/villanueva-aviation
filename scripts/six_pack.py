@@ -10,14 +10,16 @@ diagrama donde el cadete hace clic reloj por reloj, aquí se dibuja de cero.
 El lienzo conserva la proporción y los centros de la imagen anterior, para que
 los puntos calientes ya medidos sigan cayendo donde deben.
 """
+import base64
 import math
 import pathlib
 
-W, H = 1600, 900
+W, H = 1600, 980
 # Relojes más grandes que en la imagen anterior: el texto de las caras no cabía.
 # Los porcentajes de aquí son los que van en HOTSPOT_SETS["six-pack"].
 COLUMNAS = (20.0, 50.0, 80.0)
-FILAS = (36.7, 75.6)
+FILAS = (40.8, 77.6)
+LOGO_ANCHO, LOGO_ALTO = 370, 110
 R_BISEL = 132          # borde exterior
 R_CARA = 112           # cara del reloj
 
@@ -290,6 +292,8 @@ for etiqueta, dibujar, col, fila in RELOJES:
     partes.append(dibujar(cx, cy))
     partes.append(texto(cx, cy + R_BISEL + 48, etiqueta, 16, CREMA, 600, espaciado=1.6))
 
+logo_b64 = base64.b64encode((pathlib.Path(__file__).resolve().parent / "logo-panel.png").read_bytes()).decode()
+
 svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}"
      role="img" aria-label="Panel con los seis instrumentos básicos de vuelo">
   <defs>
@@ -309,8 +313,9 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{
     </radialGradient>
   </defs>
   <rect width="{W}" height="{H}" fill="url(#fondo)"/>
-  {texto(W / 2, 74, "PANEL DE INSTRUMENTOS DE VUELO", 27, CREMA, 600, espaciado=5.5)}
-  {texto(W / 2, 108, "Los seis instrumentos básicos", 16, ORO, 400, espaciado=3)}
+  <image x="{(W - LOGO_ANCHO) / 2}" y="36" width="{LOGO_ANCHO}" height="{LOGO_ALTO}"
+         href="data:image/png;base64,{logo_b64}"/>
+  {texto(W / 2, 196, "PANEL DE INSTRUMENTOS DE VUELO", 24, CREMA, 600, espaciado=5.5)}
 {"".join(partes)}
 </svg>
 '''
