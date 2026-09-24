@@ -100,48 +100,48 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
     label: "Indicador de velocidad",
     description:
       "Mide la diferencia entre la presión dinámica del tubo pitot y la presión estática. Sus arcos de color marcan el rango de flaps (blanco), el de operación normal (verde), la zona de precaución (amarillo) y la Vne (línea roja). Sistema pitot-estático.",
-    xPct: 29.6,
-    yPct: 40.8,
+    xPct: 20.0,
+    yPct: 36.7,
   },
   {
     id: "horizonte",
     label: "Horizonte artificial",
     description:
       "Tu referencia primaria de actitud: muestra inclinación y cabeceo mediante un giroscopio que mantiene su orientación en el espacio. En IMC es la única referencia confiable sin visibilidad exterior. Accionado por vacío (o eléctrico en cabinas modernas).",
-    xPct: 51,
-    yPct: 40.8,
+    xPct: 50.0,
+    yPct: 36.7,
   },
   {
     id: "altimetro",
     label: "Altímetro",
     description:
       "Mide la altitud comparando la presión estática contra la referencia que ajustas en la ventana Kollsman. De alta a baja presión sin reajustar, te indica más altura de la que realmente tienes. Sistema pitot-estático (solo estática).",
-    xPct: 71.4,
-    yPct: 40.8,
+    xPct: 80.0,
+    yPct: 36.7,
   },
   {
     id: "coordinador",
     label: "Coordinador de giro",
     description:
       "Muestra la tasa de giro, no el ángulo de inclinación: el viraje estándar son 3° por segundo, 360° en dos minutos. La bola del inclinómetro indica si el viraje está coordinado, derrapando o resbalando. Alimentación eléctrica — por eso sobrevive a una falla de vacío.",
-    xPct: 29.6,
-    yPct: 76.8,
+    xPct: 20.0,
+    yPct: 75.6,
   },
   {
     id: "rumbo",
     label: "Indicador de rumbo",
     description:
       "Giroscopio direccional que muestra hacia dónde apunta la nariz, más estable que la brújula magnética porque no sufre errores de aceleración ni de viraje. Sufre precesión: hay que realinearlo con la brújula cada 15 minutos. Accionado por vacío.",
-    xPct: 51,
-    yPct: 76.8,
+    xPct: 50.0,
+    yPct: 75.6,
   },
   {
     id: "variometro",
     label: "Indicador de velocidad vertical",
     description:
       "Muestra la tasa de ascenso o descenso en pies por minuto, midiendo qué tan rápido cambia la presión estática. Responde con retraso de algunos segundos, así que sirve para confirmar una tendencia, no para perseguirla. Sistema pitot-estático (solo estática).",
-    xPct: 71.4,
-    yPct: 76.8,
+    xPct: 80.0,
+    yPct: 75.6,
   },
 ];
 
@@ -158,7 +158,7 @@ export const HOTSPOT_SETS: Record<string, HotspotSet> = {
     puntos: CESSNA_HOTSPOTS,
   },
   "six-pack": {
-    imagen: "/images/temas/fundamentos-tema8.jpg",
+    imagen: "/images/temas/six-pack.svg",
     alt: "Panel con los seis instrumentos básicos de vuelo",
     puntos: SIXPACK_HOTSPOTS,
   },
