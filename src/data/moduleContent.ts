@@ -126,7 +126,7 @@ export const MODULE_LECCIONES: Record<string, LeccionContenido[]> = {
   ],
   "navegacion": [
     {
-      titulo: "Radionavegación: VOR, CDI, DME, HSI y ADF",
+      titulo: "El VOR: radiales, CDI, interceptación y tracking",
       temas: [
       { id: "navegacion-tema1", titulo: "Qué es un VOR", texto: "El VOR (VHF Omnidirectional Range) es una radioayuda terrestre que transmite información de rumbo en la banda VHF (108.00–117.95 MHz), permitiendo que el avión determine su posición angular (radial) respecto a la estación. Es la columna vertebral de la navegación aérea tradicional, tanto VFR como IFR, y la base sobre la que se construyen todos los demás conceptos de este módulo: radiales, tracking, intercepción y fixes cruzados. Cada estación VOR transmite 360 cursos posibles (uno por cada grado), y el receptor a bordo interpreta esa señal para decirte exactamente en qué radial te encuentras." , imagenes: ["/images/temas/navegacion-tema1.jpg"]},
       { id: "navegacion-tema2", titulo: "Cómo funciona un VOR", texto: "Técnicamente, la estación VOR transmite dos señales simultáneas: una de fase de referencia (igual en todas direcciones) y una de fase variable (que rota electrónicamente 30 veces por segundo). El receptor del avión mide la diferencia de fase entre ambas señales, y esa diferencia en grados es exactamente tu radial respecto a la estación. No necesitas entender la electrónica a fondo, pero sí esta idea: el VOR no te dice dónde estás en millas, te dice en qué línea recta (radial) estás parado respecto a la estación — para saber la distancia exacta necesitas un DME o cruzar con otro VOR." , imagenes: ["/images/temas/navegacion-tema2.jpg"]},
@@ -140,6 +140,13 @@ export const MODULE_LECCIONES: Record<string, LeccionContenido[]> = {
       { id: "navegacion-tema10", titulo: "Seguimiento de radiales (Tracking)", texto: "Tracking es mantener tu avión exactamente sobre el radial o curso deseado durante todo el trayecto, corrigiendo constantemente por el viento. A diferencia de simplemente apuntar la nariz hacia la estación, tracking requiere calcular un Ángulo de Corrección por Viento (WCA) — un pequeño desvío del rumbo respecto al curso, hacia el lado de donde viene el viento, para compensar la deriva. Si el viento te empuja hacia la derecha del curso, corriges volando unos grados a la izquierda del curso hasta que la aguja se mantenga centrada, y ese es tu rumbo real de tracking, no tu curso deseado." , imagenes: ["/images/temas/navegacion-tema10.jpg"]},
       { id: "navegacion-tema11", titulo: "Homing vs Tracking", texto: "Homing es la técnica (menos precisa) de simplemente apuntar constantemente la nariz del avión hacia la aguja o hacia la estación, sin calcular corrección de viento — el resultado es una trayectoria curva, ineficiente, porque el viento te va desviando y vas ajustando reactivamente en vez de anticipar. Tracking, en cambio, es mantener una línea recta real sobre el suelo usando un ángulo de corrección calculado de antemano, resultando en una ruta más corta, predecible y profesional. Todo piloto instrumental debe dominar tracking; homing es aceptable solo como aproximación inicial burda, nunca como técnica final." , imagenes: ["/images/temas/navegacion-tema11.jpg"]},
       { id: "navegacion-tema12", titulo: "Navegación con dos VOR", texto: "Cuando sintonizas dos estaciones VOR distintas y determinas en qué radial de cada una te encuentras, el punto donde esos dos radiales se cruzan en la carta es tu posición exacta — esta técnica se llama fijación cruzada (cross-fix) y es una de las formas más confiables de confirmar tu posición sin GPS. Se traza cada radial desde su VOR correspondiente en la carta, y la intersección de ambas líneas es tu ubicación real en ese momento. Es una habilidad clásica de navegación por radioayudas que todo piloto debe poder ejecutar manualmente." , imagenes: ["/images/temas/navegacion-tema12.jpg"]},
+      ],
+    },
+  ],
+  "navegacion-2": [
+    {
+      titulo: "DME, HSI, ADF y RMI",
+      temas: [
       { id: "navegacion-tema13", titulo: "Qué es un DME", texto: "El DME (Distance Measuring Equipment) mide la distancia real (en línea recta, \"slant range\") entre tu avión y la estación terrestre, en millas náuticas, usando el tiempo que tarda una señal en ir y regresar. Muchas veces está integrado con el VOR (VOR/DME) o con el ILS. Además de distancia, muchos DME calculan y muestran tu velocidad de acercamiento (groundspeed) y tiempo estimado a la estación, información clave para planificación en vuelo. Ojo: a baja altura y muy cerca de la estación, la distancia \"slant range\" no es exactamente igual a tu distancia horizontal real, por la altura del avión." , imagenes: ["/images/temas/navegacion-tema13.jpg"]},
       { id: "navegacion-tema14", titulo: "Qué es un HSI", texto: "El HSI (Horizontal Situation Indicator) combina en un solo instrumento el indicador de rumbo (brújula giroscópica) con la información de desviación de curso del VOR/ILS y, en muchos casos, la pendiente de planeo (glideslope). En vez de tener el CDI separado del indicador de rumbo, el HSI los integra visualmente: la rosa de compás gira mostrando tu rumbo real, y sobre ella se superpone la barra de curso seleccionado con su desviación — dándote una imagen mucho más intuitiva de tu situación real respecto al curso, en vez de tener que interpretar dos instrumentos por separado." , imagenes: ["/images/temas/navegacion-tema14.jpg"]},
       { id: "navegacion-tema15", titulo: "Cómo usar un HSI", texto: "Para usar el HSI, seleccionas el curso deseado con el selector de curso (similar al OBS), y el instrumento gira una barra sobre la rosa de compás mostrando ese curso en relación a tu rumbo actual. La desviación de la barra respecto al centro funciona igual que un CDI normal, pero con la ventaja de que ves simultáneamente tu rumbo real, así que es mucho más difícil confundirte sobre hacia qué lado debes girar. Muchos HSI también muestran el bug de rumbo deseado para acoplar con el piloto automático, y la aguja de glideslope si estás en una aproximación ILS." , imagenes: ["/images/temas/navegacion-tema15.jpg"]},
@@ -361,15 +368,32 @@ export const MODULE_TERMS: Record<string, TermPair[]> = {
     { id: "met-6", term: "Wind shear", definition: "Cambio brusco de dirección o velocidad del viento en una distancia corta." },
     { id: "met-7", term: "Altitud de densidad", definition: "Altitud a la que el avión 'siente' que vuela, ajustada por temperatura, presión y humedad." },
   ],
-  navegacion: [
+  "navegacion": [
     { id: "nav-1", term: "VOR", definition: "Radioayuda terrestre que indica en qué radial te encuentras respecto a la estación." },
     { id: "nav-2", term: "Radial", definition: "Línea recta imaginaria medida DESDE el VOR hacia afuera, según su rumbo magnético." },
+    { id: "nav2-1", term: "TO/FROM", definition: "Bandera del CDI que indica si, volando el curso seleccionado, te acercas o te alejas de la estación." },
     { id: "nav-3", term: "CDI", definition: "Aguja que muestra qué tan lejos estás del curso seleccionado en el OBS." },
     { id: "nav-4", term: "OBS", definition: "Perilla que giras para seleccionar el curso o radial que quieres volar." },
+  ],
+  "navegacion-1b": [
     { id: "nav-5", term: "Tracking", definition: "Mantener el avión sobre el curso deseado corrigiendo constantemente por el viento." },
+    { id: "nav2-6", term: "Homing", definition: "Volar directo hacia una estación NDB sin corregir el viento; produce una trayectoria curva." },
+    { id: "nav2-7", term: "Paso sobre la estación", definition: "Momento en que el avión sobrevuela justo el VOR, cuando la bandera cambia de TO a FROM." },
+    { id: "nav-8", term: "Cross-fix", definition: "Cruzar dos radiales de distintos VOR para confirmar tu posición exacta." },
+  ],
+  "navegacion-2": [
     { id: "nav-6", term: "DME", definition: "Mide la distancia real en línea recta entre el avión y la estación, en millas náuticas." },
     { id: "nav-7", term: "HSI", definition: "Combina el indicador de rumbo con la desviación de curso VOR/ILS en un solo instrumento." },
-    { id: "nav-8", term: "Cross-fix", definition: "Cruzar dos radiales de distintos VOR para confirmar tu posición exacta." },
+    { id: "nav2-5", term: "ADF", definition: "Instrumento que apunta directamente hacia una estación NDB." },
+    { id: "nav2-rmi", term: "RMI", definition: "Indicador que combina la rosa de rumbos giratoria con una aguja que apunta a la estación: da el rumbo magnético directo, sin sumar ni restar nada." },
+    { id: "nav2-arco", term: "Arco DME", definition: "Trayectoria curva a distancia constante de una estación DME; se mantiene con virajes cortos hacia la estación cada vez que la distancia empieza a crecer." },
+  ],
+  "navegacion-2b": [
+    { id: "nav2-2", term: "Rumbo magnético", definition: "Dirección de la nariz del avión corregida por la variación magnética local." },
+    { id: "nav2-3", term: "Deriva (Wind drift)", definition: "Desviación de tu trayectoria real respecto al rumbo que vuelas, causada por el viento." },
+    { id: "nav2-4", term: "Triángulo de navegación", definition: "Relación entre rumbo, viento y trayectoria real sobre el terreno." },
+    { id: "nav2-espera", term: "Patrón de espera", definition: "Circuito ovalado sobre un fijo que permite mantener la aeronave en una posición conocida mientras se resuelve una demora." },
+    { id: "nav2-gota", term: "Entrada de gota", definition: "Una de las tres formas de incorporarse a una espera; corresponde cuando llegas al fijo por el sector opuesto al tramo de alejamiento." },
   ],
   cartografia: [
     { id: "cart-1", term: "Carta VFR (Sectional)", definition: "Carta a escala 1:500,000 usada para vuelo visual, con terreno, obstáculos y espacio aéreo." },
@@ -455,15 +479,6 @@ export const MODULE_TERMS: Record<string, TermPair[]> = {
     { id: "met2-5", term: "QNH", definition: "Ajuste de presión del altímetro referido al nivel del mar." },
     { id: "met2-6", term: "Inversión térmica", definition: "Capa de la atmósfera donde la temperatura aumenta con la altitud, en vez de disminuir." },
     { id: "met2-7", term: "Virga", definition: "Precipitación visible que se evapora antes de llegar al suelo." },
-  ],
-  "navegacion-2": [
-    { id: "nav2-1", term: "TO/FROM", definition: "Bandera del CDI que indica si, volando el curso seleccionado, te acercas o te alejas de la estación." },
-    { id: "nav2-2", term: "Rumbo magnético", definition: "Dirección de la nariz del avión corregida por la variación magnética local." },
-    { id: "nav2-3", term: "Deriva (Wind drift)", definition: "Desviación de tu trayectoria real respecto al rumbo que vuelas, causada por el viento." },
-    { id: "nav2-4", term: "Triángulo de navegación", definition: "Relación entre rumbo, viento y trayectoria real sobre el terreno." },
-    { id: "nav2-5", term: "ADF", definition: "Instrumento que apunta directamente hacia una estación NDB." },
-    { id: "nav2-6", term: "Homing", definition: "Volar directo hacia una estación NDB sin corregir el viento; produce una trayectoria curva." },
-    { id: "nav2-7", term: "Paso sobre la estación", definition: "Momento en que el avión sobrevuela justo el VOR, cuando la bandera cambia de TO a FROM." },
   ],
   "cartografia-3": [
     { id: "cart3-1", term: "Curvas de nivel", definition: "Líneas que conectan puntos de igual elevación del terreno." },
@@ -598,20 +613,34 @@ const QUIZ_NAVEGACION: QuizPregunta[] = [
   { id: "nav-q3", pregunta: "Cada punto de desviación del CDI representa aproximadamente:", opciones: ["10°", "45°", "90°", "2°"], correcta: 3 },
   { id: "nav-q4", pregunta: "El OBS sirve para:", opciones: ["Seleccionar el curso o radial deseado", "Medir la distancia hasta la estación", "Sintonizar las frecuencias de comunicación", "Encender el transponder del avión"], correcta: 0 },
   { id: "nav-q5", pregunta: "Tracking, a diferencia de Homing, se caracteriza por:", opciones: ["Apuntar siempre la nariz directo hacia la estación", "Calcular un ángulo de corrección por viento para mantener la línea recta", "Ignorar por completo el efecto del viento", "Usarse únicamente en vuelo bajo reglas IFR"], correcta: 1 },
+  { id: "nav-q9", pregunta: "La fijación cruzada (cross-fix) usa:", opciones: ["Un solo VOR sin ninguna otra referencia", "Dos radiales de VOR distintos que se cruzan en la carta", "Solo la señal del GPS a bordo", "El compás magnético usado únicamente"], correcta: 1 },
+  { id: "nav-q13", pregunta: "Si estás en el radial 090 de un VOR y quieres volar TO la estación, tu curso debe ser aproximadamente:", opciones: ["090°", "270°", "180°", "360°"], correcta: 1 },
+  { id: "nav-q14", pregunta: "El ángulo de intercepción recomendado para interceptar un radial es de:", opciones: ["10°", "60°", "30°", "90°"], correcta: 2 },
+  { id: "nav-q16", pregunta: "Usas fijación cruzada con dos VOR: el radial A lo trazaste correctamente, pero el radial B lo leíste con 10° de error. ¿Qué le pasa a tu posición fijada en la carta?", opciones: ["Se desplaza a lo largo del radial B, alejándose más cuanto mayor sea la distancia", "No se ve afectada en absoluto, un solo radial con error nunca importa", "El error se cancela automáticamente entre ambos radiales sin dejar rastro", "Solo afecta la posición si ambos radiales tienen error al mismo tiempo"], correcta: 0 },
+  { id: "nav-q20", pregunta: "La señal de un VOR viaja en línea de vista, lo que significa que:", opciones: ["Su alcance es el mismo a cualquier altitud", "Tu alcance útil depende de tu altitud y del terreno entre tú y la estación", "Solo funciona de día", "Solo se recibe dentro de espacio aéreo controlado"], correcta: 1 },
+  { id: "nav-q21", pregunta: "Antes de usar un VOR para navegar, lo primero que debes hacer es:", opciones: ["Centrar la aguja del CDI", "Identificar la estación por su código Morse", "Seleccionar tu rumbo actual en el OBS", "Confirmar que la bandera indique TO"], correcta: 1 },
+  { id: "nav-q22", pregunta: "Conforme te acercas a la estación, la misma desviación del CDI representa:", opciones: ["Cada vez más distancia lateral respecto al curso", "Cada vez menos distancia lateral respecto al curso", "Siempre la misma distancia lateral", "Una distancia que depende solo de tu velocidad"], correcta: 1 },
+  { id: "nav-q23", pregunta: "Si seleccionas en el OBS el curso recíproco al que realmente vuelas, el CDI:", opciones: ["Deja de funcionar y aparece la bandera", "Indica al revés: corregir hacia la aguja te aleja del curso", "Sigue indicando correctamente", "Se centra automáticamente"], correcta: 1 },
+  { id: "nav-q24", pregunta: "Vuelas TO la estación con el curso 360 seleccionado y el CDI se desvía a la derecha. Para volver al curso debes:", opciones: ["Virar a la izquierda, en sentido contrario a la aguja", "Virar a la derecha, hacia la aguja", "Mantener el rumbo y esperar a que se centre", "Mover el OBS hasta centrar la aguja"], correcta: 1 },
+  { id: "nav-q25", pregunta: "Justo al pasar sobre la estación la aguja oscila rápido de un lado a otro y la bandera cambia de TO a FROM. Esto se debe a:", opciones: ["Una falla del receptor", "El cono de confusión que hay sobre la vertical de la estación", "Interferencia de otra estación", "Que el OBS quedó mal seleccionado"], correcta: 1 },
+];
+
+const QUIZ_NAVEGACION_2: QuizPregunta[] = [
   { id: "nav-q6", pregunta: "El DME mide:", opciones: ["Solo el rumbo magnético actual", "La velocidad del viento en la ruta", "La distancia real en línea recta a la estación", "La frecuencia de la estación VOR"], correcta: 2 },
   { id: "nav-q7", pregunta: "Una ventaja clave del HSI sobre el CDI tradicional es:", opciones: ["Es más barato de instalar y mantener", "No requiere ningún tipo de calibración", "Funciona incluso sin electricidad a bordo", "Integra rumbo y desviación, eliminando la sensibilidad inversa"], correcta: 3 },
   { id: "nav-q8", pregunta: "El ADF, a diferencia del VOR, muestra:", opciones: ["El rumbo relativo hacia la estación, sin dar radiales", "Radiales precisos medidos desde la estación", "La distancia exacta hasta la estación", "Solo funciona correctamente durante la noche"], correcta: 0 },
-  { id: "nav-q9", pregunta: "La fijación cruzada (cross-fix) usa:", opciones: ["Un solo VOR sin ninguna otra referencia", "Dos radiales de VOR distintos que se cruzan en la carta", "Solo la señal del GPS a bordo", "El compás magnético usado únicamente"], correcta: 1 },
   { id: "nav-q10", pregunta: "En una carta VFR, la escala gráfica sirve para:", opciones: ["Calcular el viento en la ruta", "Sintonizar la frecuencia del VOR", "Medir distancias trazadas en la ruta", "Leer el reporte METAR actual"], correcta: 2 },
   { id: "nav-q11", pregunta: "Sin DME, para saber la distancia a un aeropuerto puedes usar:", opciones: ["Solo adivinar la distancia recorrida", "El transponder del avión", "El altímetro de a bordo", "Navegación por estima (dead reckoning)"], correcta: 3 },
   { id: "nav-q12", pregunta: "Planear una ruta VFR debe incluir siempre:", opciones: ["Un aeropuerto alterno con reservas de combustible adecuadas", "Solo la distancia total del tramo", "Únicamente el rumbo magnético calculado", "Nada relacionado con el clima esperado"], correcta: 0 },
-  { id: "nav-q13", pregunta: "Si estás en el radial 090 de un VOR y quieres volar TO la estación, tu curso debe ser aproximadamente:", opciones: ["090°", "270°", "180°", "360°"], correcta: 1 },
-  { id: "nav-q14", pregunta: "El ángulo de intercepción recomendado para interceptar un radial es de:", opciones: ["10°", "60°", "30°", "90°"], correcta: 2 },
   { id: "nav-q15", pregunta: "Un minuto de latitud medido verticalmente en una carta equivale aproximadamente a:", opciones: ["Una milla terrestre", "Diez millas náuticas", "No equivale a nada útil", "Una milla náutica"], correcta: 3 },
-  { id: "nav-q16", pregunta: "Usas fijación cruzada con dos VOR: el radial A lo trazaste correctamente, pero el radial B lo leíste con 10° de error. ¿Qué le pasa a tu posición fijada en la carta?", opciones: ["Se desplaza a lo largo del radial B, alejándose más cuanto mayor sea la distancia", "No se ve afectada en absoluto, un solo radial con error nunca importa", "El error se cancela automáticamente entre ambos radiales sin dejar rastro", "Solo afecta la posición si ambos radiales tienen error al mismo tiempo"], correcta: 0 },
   { id: "nav-q17", pregunta: "Vuelas sin DME y necesitas confirmar tu distancia a un aeropuerto. Comparando la navegación por estima (dead reckoning) contra una fijación cruzada con dos VOR, ¿cuál te da mayor precisión y por qué?", opciones: ["Estima, porque no depende de ninguna señal externa que pueda llegar a fallar", "Fijación cruzada, porque ubica tu posición real con dos referencias externas, sin acumular error de tiempo y viento", "Ambas técnicas tienen exactamente la misma precisión en cualquier situación", "Ninguna de las dos es confiable si no cuentas con DME a bordo"], correcta: 1 },
   { id: "nav-q18", pregunta: "Para volar un arco DME, tu posición base respecto a la estación es:", opciones: ["Perpendicular a la estación, a 90° del radial en el que te encuentras", "Directamente hacia la estación en todo momento", "Alejándote por el radial de entrada", "No existe una posición de referencia definida"], correcta: 0 },
   { id: "nav-q19", pregunta: "En un patrón de espera, ¿qué determina cuál de las tres entradas te corresponde?", opciones: ["La altitud a la que vuelas en ese momento", "El ángulo entre tu rumbo de llegada y el curso de entrada", "El tipo de aeronave que estás volando", "Siempre se usa la entrada directa"], correcta: 1 },
+  { id: "nav-q26", pregunta: "El RMI, a diferencia de un ADF de tarjeta fija, te muestra:", opciones: ["La distancia a la estación", "El rumbo magnético directo hacia la estación, sin sumar nada", "El rumbo relativo, que debes sumar a tu rumbo", "La desviación respecto a un curso seleccionado"], correcta: 1 },
+  { id: "nav-q27", pregunta: "La distancia que indica el DME es inclinada (slant range). Ese error es mayor cuando estás:", opciones: ["Muy lejos y muy bajo", "Muy alto y muy cerca de la estación", "A la misma altitud que la estación", "Volando en alejamiento"], correcta: 1 },
+  { id: "nav-q28", pregunta: "Vuelas un arco DME de 12 millas y el DME empieza a marcar 12.6 y subiendo. Debes:", opciones: ["Mantener el rumbo: el arco se corrige solo", "Virar unos grados hacia la estación hasta recuperar las 12 millas", "Virar alejándote de la estación", "Aumentar la velocidad"], correcta: 1 },
+  { id: "nav-q29", pregunta: "En un patrón de espera estándar, los virajes y el tramo de alejamiento son:", opciones: ["A la izquierda, con tramos de dos minutos", "A la derecha, con tramo de alejamiento de un minuto", "A la derecha, con tramos de tres minutos", "Indistintos, los elige el piloto"], correcta: 1 },
+  { id: "nav-q30", pregunta: "Al planear una ruta VFR, los checkpoints deben elegirse:", opciones: ["Lo más juntos posible, aunque sean difíciles de ver", "Como rasgos del terreno fáciles de identificar desde el aire, separados por tramos manejables", "Solo sobre aeropuertos", "Únicamente donde haya estaciones VOR"], correcta: 1 },
 ];
 
 const QUIZ_CARTOGRAFIA: QuizPregunta[] = [
@@ -839,6 +868,7 @@ export const MODULE_PRACTICA: Record<string, QuizPregunta[]> = {
   meteorologia: split(QUIZ_METEOROLOGIA).practica,
   aerodinamica: split(QUIZ_AERODINAMICA).practica,
   navegacion: split(QUIZ_NAVEGACION).practica,
+  "navegacion-2": split(QUIZ_NAVEGACION_2).practica,
   cartografia: split(QUIZ_CARTOGRAFIA).practica,
   comunicaciones: split(QUIZ_COMUNICACIONES).practica,
   instrumentos: split(QUIZ_INSTRUMENTOS).practica,
@@ -855,6 +885,7 @@ export const MODULE_EVALUACION: Record<string, QuizPregunta[]> = {
   meteorologia: split(QUIZ_METEOROLOGIA).evaluacion,
   aerodinamica: split(QUIZ_AERODINAMICA).evaluacion,
   navegacion: split(QUIZ_NAVEGACION).evaluacion,
+  "navegacion-2": split(QUIZ_NAVEGACION_2).evaluacion,
   cartografia: split(QUIZ_CARTOGRAFIA).evaluacion,
   comunicaciones: split(QUIZ_COMUNICACIONES).evaluacion,
   instrumentos: split(QUIZ_INSTRUMENTOS).evaluacion,
@@ -879,7 +910,8 @@ export const MODULE_CHECKPOINTS: Record<string, string[]> = {
   fundamentos: ["fun-q2", "fun-q11"],
   meteorologia: ["met-q3", "met-q6", "met-q9"],
   aerodinamica: ["aero-q16", "aero-q15"],
-  navegacion: ["nav-q1", "nav-q3", "nav-q14", "nav-q9", "nav-q6", "nav-q8", "nav-q15", "nav-q12"],
+  navegacion: ["nav-q1", "nav-q3", "nav-q14", "nav-q9"],
+  "navegacion-2": ["nav-q6", "nav-q8", "nav-q15", "nav-q12"],
   cartografia: ["cart-q17", "cart-q13"],
   comunicaciones: ["com-q3", "com-q12", "com-q13", "com-q6"],
   instrumentos: ["ins-q17", "ins-q6", "ins-q12"],
@@ -1247,6 +1279,59 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
           correct: true,
           feedback:
             "Correcto. Con el ala contaminada se aterriza rápido y con flaps reducidos: aceptas usar más pista a cambio de mantener margen sobre una velocidad de pérdida que subió y que ya no sabes exactamente dónde está.",
+        },
+      },
+    },
+  },
+  "navegacion-2": {
+    startId: "inicio",
+    tree: {
+      "inicio": {
+        id: "inicio",
+        prompt:
+          "Vas a interceptar un arco DME de 12 millas. Vuelas directo a la estación y el DME baja: marca 14 millas y sigue acercándose.",
+        options: [
+          { label: "Esperar a que el DME marque 12.0 exactas para empezar el viraje", next: "falla-1" },
+          { label: "Empezar el viraje media milla antes, para quedar tangente al arco", next: "segunda" },
+        ],
+      },
+      "falla-1": {
+        id: "falla-1",
+        prompt: "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Un viraje no es instantáneo: si empiezas justo en la distancia del arco, terminas por dentro y tienes que salir a buscarlo. Por eso se adelanta el viraje aproximadamente media milla, que es lo que el avión recorre mientras gira.",
+        },
+      },
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Adelantar el viraje es lo que te deja tangente al arco en vez de cruzarlo por dentro.\n\nQuedas establecido en las 12 millas. A mitad del arco el DME empieza a marcar 12.6 y sigue subiendo, aunque no has cambiado el rumbo.",
+        options: [
+          { label: "Mantener el rumbo: en un arco la distancia oscila sola", next: "falla-2" },
+          { label: "Virar unos grados hacia la estación hasta recuperar las 12 millas", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt: "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "En un arco la distancia no se corrige sola: un rumbo constante te lleva por una tangente, alejándote cada vez más. El viento acelera ese alejamiento. Si no corriges, terminas volando una recta en vez de un arco.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt: "",
+        options: [],
+        outcome: {
+          correct: true,
+          feedback:
+            "Exacto. Un arco DME se vuela como una sucesión de tramos rectos cortos: cada vez que la distancia crece, se vira unos grados hacia la estación; cuando se acerca de más, unos grados hacia afuera. No es una curva, es una cadena de correcciones pequeñas.",
         },
       },
     },
@@ -1984,7 +2069,21 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
 // ---------- Sliders (para el widget de configuración numérica) ----------
 
 export const MODULE_SLIDERS: Record<string, SliderConfig> = {
-  navegacion: {
+  aerodinamica: {
+    title: "Configuración de tren y flaps vs. resistencia (drag)",
+    description:
+      "Mueve el control de configuración limpia a configuración de aterrizaje y observa cómo cambia la resistencia al avance, la velocidad y el consumo.",
+    minLabel: "Configuración limpia (tren y flaps arriba)",
+    maxLabel: "Configuración de aterrizaje (tren y flaps abajo)",
+    metrics: [
+      { label: "Velocidad", unit: "kt", from: 110, to: 90 },
+      { label: "Consumo", unit: "gph", from: 9.5, to: 13.2, decimals: 1 },
+      { label: "Resistencia (drag)", unit: "%", from: 15, to: 90, warnAbove: 60 },
+    ],
+    footnote:
+      "Extender el tren de aterrizaje y los flaps aumenta la resistencia al avance, lo que reduce la velocidad y aumenta el consumo de combustible — por eso solo se usa esta configuración cerca del aterrizaje.",
+  },
+  "navegacion-2": {
     title: "Efecto del viento en contra sobre tu navegación",
     description:
       "Mueve el control para simular viento en contra creciente en la ruta MMGL → MMZO y observa cómo cambian tu velocidad de tierra, tiempo de vuelo y combustible necesario.",

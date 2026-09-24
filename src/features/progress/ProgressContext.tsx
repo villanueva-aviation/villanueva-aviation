@@ -5,6 +5,7 @@ import { readStorage } from "../../lib/storage";
 import { useAuth } from "../auth/AuthContext";
 import { fetchProgresoRemoto, guardarProgresoRemoto, type ProgresoRemoto, type QuizResult } from "./academiaProgresoRemoto";
 import { marcarGraduacionTeoria } from "./graduacionTeoria";
+import { reindexarLecciones } from "./migrarProgreso";
 
 export type ModuloEstado = "disponible" | "en-progreso" | "completado";
 
@@ -75,15 +76,24 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     fetchProgresoRemoto(user.id).then(async (remoto) => {
       if (cancelado) return;
       if (remoto) {
-        setState(remoto);
-        setLoading(false);
+        // Un módulo pudo partirse desde la última vez que entró: las lecciones
+        // que cambiaron de módulo se reubican una sola vez y se persisten.
+        const { completadas, cambio } = reindexarLecciones(remoto.completadas ?? {});
+        const alDia = cambio ? { ...remoto, completadas } : remoto;
+        if (cambio) await guardarProgresoRemoto(user.id, alDia);
+        if (!cancelado) {
+          setState(alDia);
+          setLoading(false);
+        }
         return;
       }
       // Sin fila remota todavía: si hay progreso legado en este navegador
       // (de antes de que esto viviera en Supabase), lo migramos una sola vez.
       const legado = readStorage<ProgressState | null>(LEGACY_STORAGE_KEY, null);
-      const inicial = legado ?? ESTADO_VACIO;
-      if (legado) await guardarProgresoRemoto(user.id, legado);
+      const inicial = legado
+        ? { ...legado, completadas: reindexarLecciones(legado.completadas ?? {}).completadas }
+        : ESTADO_VACIO;
+      if (legado) await guardarProgresoRemoto(user.id, inicial);
       if (!cancelado) {
         setState(inicial);
         setLoading(false);

@@ -7,6 +7,7 @@ import { Reveal } from "../components/ui/Reveal";
 import { TrackerLine, type TrackerStage } from "../components/tracker/TrackerLine";
 import { DISCORD_URL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
+import { ACADEMIA_MODULOS } from "../data/academia";
 
 const RUTA_DEMO: TrackerStage[] = [
   { id: "fundamentos", label: "Fundamentos", status: "bloqueado" },
@@ -186,7 +187,7 @@ export function Home() {
           </div>
           <Reveal delay={360} className="mt-14 flex justify-center">
             <Button to={ROUTES.academia} variant="ghost">
-              Ver los 13 módulos <ArrowRight size={16} />
+              Ver los {ACADEMIA_MODULOS.length} módulos <ArrowRight size={16} />
             </Button>
           </Reveal>
         </Container>
@@ -203,7 +204,7 @@ export function Home() {
             <SectionHeading
               eyebrow="Ruta de formación"
               title="Un camino claro, de principio a fin"
-              description="Un resumen de tus 13 módulos, de Fundamentos a la evaluación final."
+              description={`Un resumen de tus ${ACADEMIA_MODULOS.length} módulos, de Fundamentos a la evaluación final.`}
               align="center"
             />
           </Reveal>

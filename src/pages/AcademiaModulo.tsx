@@ -149,7 +149,16 @@ function InteractividadWidget({
     }
     case "slider": {
       const config = MODULE_SLIDERS[modulo.slug];
-      return config ? <DragSlider config={config} /> : <DragSlider />;
+      // Sin configuración no hay simulador: antes caía a un ejemplo del
+      // componente que resultaba ser el de otro módulo.
+      if (!config) {
+        return (
+          <p className="flex items-center gap-2 text-sm text-white/45">
+            <Lock size={14} /> Contenido en preparación — se publicará próximamente.
+          </p>
+        );
+      }
+      return <DragSlider config={config} />;
     }
     case "audio":
       return <AudioPhraseology onComplete={onComplete} cards={AUDIO_SETS[actividad.audioSetId ?? ""]} />;

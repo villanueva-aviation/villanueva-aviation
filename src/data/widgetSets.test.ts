@@ -4,7 +4,15 @@ import { ACADEMIA_MODULOS } from "./academia.ts";
 import { HOTSPOT_SETS } from "../features/academia/hotspots.ts";
 import { AUDIO_SETS } from "./fraseologiaATC.ts";
 import { CIRCUITO_SETS, TRAMOS_CIRCUITO } from "./circuitoTrafico.ts";
-import { MODULE_SCENARIOS } from "./moduleContent.ts";
+import {
+  MODULE_CHECKPOINTS,
+  MODULE_EVALUACION,
+  MODULE_PRACTICA,
+  MODULE_SCENARIOS,
+  MODULE_SLIDERS,
+  MODULE_TERMS,
+  checkpointsDeModulo,
+} from "./moduleContent.ts";
 
 const interactividades = ACADEMIA_MODULOS.flatMap((m) =>
   m.actividades.filter((a) => a.tipo === "interactividad").map((a) => ({ modulo: m.slug, ...a })),
@@ -148,5 +156,68 @@ test("los escenarios están bien formados", () => {
     }
     const aciertos = finales.filter((n) => n.outcome?.correct);
     assert.equal(aciertos.length, 1, `"${id}" tiene ${aciertos.length} desenlaces correctos, debe haber uno`);
+  }
+});
+
+// ---------- Integridad de cada módulo ----------
+
+// TermMatch con un id que no existe no falla: renderiza cero parejas.
+test("cada actividad de términos resuelve contra un set real", () => {
+  for (const a of interactividades.filter((x) => x.widget === "terminos")) {
+    const id = a.termSetId ?? a.modulo;
+    const set = MODULE_TERMS[id];
+    assert.ok(set, `${a.modulo}/${a.id}: no existe el set de términos "${id}"`);
+    assert.ok(set.length >= 3, `${a.modulo}/${a.id}: el set "${id}" tiene ${set.length} parejas`);
+  }
+});
+
+test("el slider resuelve contra una configuración real", () => {
+  for (const a of interactividades.filter((x) => x.widget === "slider")) {
+    assert.ok(MODULE_SLIDERS[a.modulo], `${a.modulo}/${a.id}: no hay slider para este módulo`);
+  }
+});
+
+test("todo módulo con evaluación tiene banco de preguntas", () => {
+  for (const m of ACADEMIA_MODULOS) {
+    const tieneEvaluacion = m.actividades.some((a) => a.tipo === "evaluacion");
+    if (!tieneEvaluacion) continue;
+    const evaluacion = MODULE_EVALUACION[m.slug] ?? [];
+    const practica = MODULE_PRACTICA[m.slug] ?? [];
+    assert.ok(evaluacion.length >= 5, `${m.slug}: evaluación con ${evaluacion.length} preguntas`);
+    assert.ok(practica.length >= 3, `${m.slug}: práctica con ${practica.length} preguntas`);
+  }
+});
+
+// checkpointsDeModulo descarta en silencio los ids que no encuentra en el banco
+// del módulo, así que un checkpoint mal repartido simplemente desaparece.
+test("todos los checkpoints declarados se resuelven", () => {
+  for (const m of ACADEMIA_MODULOS) {
+    const declarados = MODULE_CHECKPOINTS[m.slug] ?? [];
+    if (declarados.length === 0) continue;
+    const resueltos = checkpointsDeModulo(m.slug);
+    assert.equal(resueltos.length, declarados.length, `${m.slug}: ${resueltos.length} de ${declarados.length}`);
+    const temas = m.actividades.filter((a) => a.tipo === "leccion").length;
+    for (const c of resueltos) {
+      assert.ok(c.despuesDeTema < temas, `${m.slug}: checkpoint tras el tema ${c.despuesDeTema + 1} de ${temas}`);
+    }
+  }
+});
+
+test("todo módulo tiene lecciones", () => {
+  for (const m of ACADEMIA_MODULOS) {
+    const temas = m.actividades.filter((a) => a.tipo === "leccion").length;
+    assert.ok(temas >= 4, `${m.slug} tiene ${temas} temas`);
+  }
+});
+
+// La razón de partir Navegación fue que tenía 26 temas y el siguiente más
+// largo 13. Si un módulo vuelve a dispararse, conviene enterarse.
+test("ningún módulo se dispara en número de temas", () => {
+  const cuentas = ACADEMIA_MODULOS.map((m) => ({
+    slug: m.slug,
+    temas: m.actividades.filter((a) => a.tipo === "leccion").length,
+  }));
+  for (const c of cuentas) {
+    assert.ok(c.temas <= 16, `${c.slug} tiene ${c.temas} temas: conviene partirlo`);
   }
 });

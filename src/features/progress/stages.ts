@@ -7,7 +7,9 @@ function estadoDe(slug: string, modulos: { slug: string; estado: ModuloEstado }[
 
 export function buildFormationStages(modulos: { slug: string; estado: ModuloEstado }[]): TrackerStage[] {
   const fundamentos = estadoDe("fundamentos", modulos);
-  const teoricos = ["meteorologia", "aerodinamica", "navegacion", "comunicaciones"].map((s) => estadoDe(s, modulos));
+  const teoricos = ["meteorologia", "aerodinamica", "navegacion", "navegacion-2", "comunicaciones"].map((s) =>
+    estadoDe(s, modulos),
+  );
   const vfr = estadoDe("vfr", modulos);
   const ifr = estadoDe("ifr", modulos);
 

@@ -22,22 +22,7 @@ export interface SliderConfig {
   footnote: string;
 }
 
-const DEFAULT_CONFIG: SliderConfig = {
-  title: "Configuración de tren y flaps vs. resistencia (drag)",
-  description:
-    "Mueve el control de configuración limpia a configuración de aterrizaje y observa cómo cambia la resistencia al avance, la velocidad y el consumo.",
-  minLabel: "Configuración limpia (tren y flaps arriba)",
-  maxLabel: "Configuración de aterrizaje (tren y flaps abajo)",
-  metrics: [
-    { label: "Velocidad", unit: "kt", from: 110, to: 90 },
-    { label: "Consumo", unit: "gph", from: 9.5, to: 13.2, decimals: 1 },
-    { label: "Resistencia (drag)", unit: "%", from: 15, to: 90, warnAbove: 60 },
-  ],
-  footnote:
-    "Extender el tren de aterrizaje y los flaps aumenta la resistencia al avance, lo que reduce la velocidad y aumenta el consumo de combustible — por eso solo se usa esta configuración cerca del aterrizaje.",
-};
-
-export function DragSlider({ config = DEFAULT_CONFIG }: { config?: SliderConfig }) {
+export function DragSlider({ config }: { config: SliderConfig }) {
   const [value, setValue] = useState(0);
   const t = value / 100;
 
