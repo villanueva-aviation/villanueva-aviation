@@ -915,21 +915,22 @@ export function checkpointsDeModulo(slug: string): Checkpoint[] {
 // ---------- Escenarios (para el widget de decisión) ----------
 
 export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNode>; startId: string }> = {
-  meteorologia: {
+  "meteorologia": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Vuelas VFR y a 20 millas por delante observas una línea de cumulonimbos (CB) que crece rápidamente, bloqueando tu ruta directa.",
         options: [
-          { label: "Intentar cruzar entre dos células para ganar tiempo", next: "mala" },
-          { label: "Desviarte alrededor, manteniendo al menos 20 millas de distancia de la línea", next: "buena" },
+          { label: "Intentar cruzar entre dos células para ganar tiempo", next: "falla-1" },
+          { label: "Desviarte alrededor, manteniendo al menos 20 millas de distancia de la línea", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -937,33 +938,55 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Cruzar entre células de tormenta expone a turbulencia severa, granizo y wind shear extremo. La separación mínima recomendada de un CB activo es de al menos 20 millas náuticas — 'cruzar rápido' nunca es una opción segura.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Mantener distancia generosa de las células convectivas — idealmente 20 NM o más — evita la turbulencia severa y el wind shear asociados, aunque signifique un desvío más largo.\n\nEl desvío te agrega 25 minutos de vuelo. Tu destino ahora reporta el techo bajando a 1,200 pies, y el viento de frente durante el rodeo te comió más combustible del previsto: te quedan 50 minutos a bordo. El alterno, con cielo despejado, está a 25 minutos.",
+        options: [
+          { label: "Continuar al destino: 25 minutos de vuelo y te quedan 25 de reserva", next: "falla-2" },
+          { label: "Desviarte al alterno ahora, mientras el combustible todavía está de tu lado", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Llegarías con 25 minutos de combustible a un aeropuerto con el techo bajando, sin margen para un motor y al aire ni para buscar otra opción. La reserva no es un número que se negocia en el aire: es lo que te permite equivocarte una vez más.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Mantener distancia generosa de las células convectivas — idealmente 20 NM o más — evita la turbulencia severa y el wind shear asociados, aunque signifique un desvío más largo.",
+            "Exacto. Desviarte temprano cuesta un vuelo incompleto; desviarte tarde cuesta el avión. La decisión correcta se toma cuando todavía tienes combustible para tomarla, no cuando ya no queda alternativa.",
         },
       },
     },
   },
-  instrumentos: {
+  "instrumentos": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "En vuelo IFR en nubes, notas que el horizonte artificial y el indicador de rumbo comienzan a inclinarse lentamente sin motivo aparente — sospechas una falla de la bomba de vacío.",
         options: [
-          { label: "Ignorar y seguir confiando en el horizonte artificial", next: "mala" },
-          { label: "Reconocer la falla y volar 'panel parcial' con coordinador de viraje, altímetro y compás", next: "buena" },
+          { label: "Ignorar y seguir confiando en el horizonte artificial", next: "falla-1" },
+          { label: "Reconocer la falla y volar 'panel parcial' con coordinador de viraje, altímetro y compás", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -971,32 +994,55 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Seguir confiando en un horizonte artificial que ya falló lleva fácilmente a una actitud inusual no percibida — es una causa clásica de accidentes por desorientación espacial.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Ante una falla de vacío, el procedimiento estándar es reconocerla y recurrir al 'panel parcial': coordinador de viraje, altímetro, velocímetro y compás magnético para mantener control de actitud.\n\nCubres el horizonte y el direccional, y vuelas con coordinador, altímetro y compás. Llevas diez minutos así, en IMC, y el control te pregunta intenciones. Tu destino está a 15 millas pero exige una aproximación ILS completa; un aeropuerto con techo alto y aproximación directa está a 30.",
+        options: [
+          { label: "Seguir al destino y volar el ILS en panel parcial", next: "falla-2" },
+          { label: "Declarar tu situación, pedir vectores e ir al campo con mejor clima", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Un ILS exige seguimiento fino de rumbo y senda justo cuando perdiste los dos instrumentos que te dan esa precisión. Estarías eligiendo la aproximación más demandante con la mitad del panel, para ahorrar quince millas.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Ante una falla de vacío, el procedimiento estándar es reconocerla y recurrir al 'panel parcial': coordinador de viraje, altímetro, velocímetro y compás magnético para mantener control de actitud.",
+            "Correcto. Declarar la falla no es admitir un error: es lo que hace que el control te dé vectores, te libere el espacio y te quite carga de trabajo. Y cambiar a una aproximación más simple con mejor clima convierte una emergencia en un aterrizaje.",
         },
       },
     },
   },
-  operacion: {
+  "operacion": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
-        prompt: "Durante el arranque del motor notas humo y llamas visibles saliendo del escape — fuego en tierra durante el arranque.",
+        prompt:
+          "Durante el arranque del motor notas humo y llamas visibles saliendo del escape — fuego en tierra durante el arranque.",
         options: [
-          { label: "Seguir intentando encender para 'quemar' el exceso de combustible", next: "mala" },
-          { label: "Continuar girando el motor de arranque, cortar mezcla y combustible, y evacuar con extintor listo", next: "buena" },
+          { label: "Seguir intentando encender para 'quemar' el exceso de combustible", next: "falla-1" },
+          { label: "Continuar girando el motor de arranque, cortar mezcla y combustible, y evacuar con extintor listo", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1004,14 +1050,35 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Insistir en encender con fuego activo alimenta el incendio en lugar de sofocarlo — el procedimiento de fuego en arranque exige cortar el combustible, no darle más.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. El procedimiento estándar es seguir girando el motor de arranque para que 'aspire' el fuego hacia el interior, cortar mezcla y magnetos, cerrar la válvula de combustible, y evacuar con extintor a la mano si persiste.\n\nEl fuego se apaga y la aeronave queda segura en plataforma. Al revisar encuentras restos de combustible quemado en el escape y hollín en el carenado inferior, pero nada se ve roto a simple vista.",
+        options: [
+          { label: "Purgar el motor, volver a arrancar y hacer el vuelo: ya no hay fuego", next: "falla-2" },
+          { label: "Dejar la aeronave en tierra y reportarlo a mantenimiento para inspección", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Un fuego en el arranque deja daño que no se ve desde afuera: mangueras de combustible resecas, cableado con el aislante comprometido, sellos vencidos. La aeronave dejó de ser aeronavegable en el momento en que hubo llamas, y solo mantenimiento puede devolverle esa condición.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. El procedimiento estándar es seguir girando el motor de arranque para que 'aspire' el fuego hacia el interior, cortar mezcla y magnetos, cerrar la válvula de combustible, y evacuar con extintor a la mano si persiste.",
+            "Así es. Apagar el fuego resolvió la emergencia, no la causa. Reportarlo y dejar que mantenimiento inspeccione es lo que evita que el mismo fuego vuelva a aparecer en el aire, donde no hay extintor ni por dónde evacuar.",
         },
       },
     },
@@ -1019,17 +1086,19 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
   "espacios-aereos": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
-        prompt: "Vuelas VFR y tu ruta cruza el espacio aéreo Clase C de un aeropuerto grande. Aún no has establecido contacto por radio.",
+        prompt:
+          "Vuelas VFR y tu ruta cruza el espacio aéreo Clase C de un aeropuerto grande. Aún no has establecido contacto por radio.",
         options: [
-          { label: "Entrar de todas formas, es solo un cruce rápido", next: "mala" },
-          { label: "Contactar a control de aproximación antes de entrar y esperar contacto establecido", next: "buena" },
+          { label: "Entrar de todas formas, es solo un cruce rápido", next: "falla-1" },
+          { label: "Contactar a control de aproximación antes de entrar y esperar contacto establecido", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1037,32 +1106,55 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Entrar a espacio Clase C sin haber establecido contacto por radio es una violación regulatoria y de seguridad — se requiere contacto bidireccional establecido antes de ingresar.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. El espacio Clase C exige comunicación bidireccional con control antes de ingresar. Escuchar tu identificación de vuelta confirma que fuiste aceptado en el espacio.\n\nTe dan código de transponder y entras. A mitad del espacio, el control te instruye: \"mantenga 3,500 y vire a rumbo 090\" para separarte de un tráfico comercial en aproximación. El rumbo te saca bastante de tu ruta planeada.",
+        options: [
+          { label: "Seguir tu ruta: en Clase C las instrucciones a un VFR son sugerencias", next: "falla-2" },
+          { label: "Cumplir la instrucción, colacionarla, y pedir regresar a ruta cuando el tráfico lo permita", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Dentro de Clase C el control provee separación entre el tráfico VFR y el IFR, y para eso sus instrucciones son obligatorias. Desviarte de una instrucción sin avisar deja al controlador resolviendo una separación con datos falsos.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. El espacio Clase C exige comunicación bidireccional con control antes de ingresar. Escuchar tu identificación de vuelta confirma que fuiste aceptado en el espacio.",
+            "Correcto. Aceptar el servicio de Clase C incluye aceptar sus instrucciones. Colacionarlas confirma al controlador que te tiene, y pedir el regreso a ruta cuando el tráfico pase es lo que convierte el desvío en una pausa y no en un problema.",
         },
       },
     },
   },
-  ifr: {
+  "ifr": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
-        prompt: "Estás en una aproximación ILS y llegas a la altitud de decisión (DA) sin tener la pista o sus referencias visuales a la vista.",
+        prompt:
+          "Estás en una aproximación ILS y llegas a la altitud de decisión (DA) sin tener la pista o sus referencias visuales a la vista.",
         options: [
-          { label: "Descender un poco más 'por si acaso' aparece la pista", next: "mala" },
-          { label: "Ejecutar el procedimiento de aproximación frustrada (missed approach) de inmediato", next: "buena" },
+          { label: "Descender un poco más 'por si acaso' aparece la pista", next: "falla-1" },
+          { label: "Ejecutar el procedimiento de aproximación frustrada (missed approach) de inmediato", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1070,14 +1162,35 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Descender por debajo de la altitud de decisión sin referencias visuales elimina el margen de obstáculos garantizado por el procedimiento — es una causa de accidentes CFIT en aproximaciones instrumentales.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Al llegar a la DA/MDA sin las referencias visuales requeridas, el procedimiento es ejecutar la aproximación frustrada de inmediato y evaluar un nuevo intento o alterno.\n\nEjecutas la frustrada y el control te pregunta intenciones. Tu combustible alcanza para un intento más y después el alterno, que está a 20 minutos y reporta buen clima.",
+        options: [
+          { label: "Pedir otro intento del mismo ILS de inmediato", next: "falla-2" },
+          { label: "Preguntar si el clima cambió; si no, dirigirte al alterno", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Repetir la misma aproximación con el mismo clima gasta tu única opción restante para obtener el mismo resultado. Un segundo intento solo se justifica si algo cambió: una mejoría reportada, un cambio de viento, otra pista disponible.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Al llegar a la DA/MDA sin las referencias visuales requeridas, el procedimiento es ejecutar la aproximación frustrada de inmediato y evaluar un nuevo intento o alterno.",
+            "Exacto. La pregunta correcta antes de un segundo intento es qué cambió. Si la respuesta es nada, el alterno deja de ser un plan de respaldo y pasa a ser el plan, todavía con combustible para ejecutarlo con calma.",
         },
       },
     },
@@ -1085,18 +1198,19 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
   "meteorologia-2": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Vuelas VFR en un día frío, entras brevemente en nubes bajas por error y notas una fina capa de hielo formándose en el borde de ataque del ala.",
         options: [
-          { label: "Continuar en las nubes esperando salir pronto a un área más cálida", next: "mala" },
-          { label: "Salir de las nubes de inmediato (ascendiendo o descendiendo) hacia aire más cálido, y desviarte de la zona", next: "buena" },
+          { label: "Continuar en las nubes esperando salir pronto a un área más cálida", next: "falla-1" },
+          { label: "Salir de las nubes de inmediato (ascendiendo o descendiendo) hacia aire más cálido, y desviarte de la zona", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1104,33 +1218,55 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "El engelamiento puede empeorar en segundos y degradar gravemente la aerodinámica del ala. Esperar 'a ver si mejora' dentro de la nube es exactamente lo que no debes hacer.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Ante cualquier indicio de engelamiento, la prioridad es salir de inmediato de las condiciones que lo producen — buscando aire más cálido o VMC — y evitar esa zona en el resto del vuelo.\n\nSales de las nubes y el hielo deja de acumularse, pero la capa que ya tienes no se desprende. Necesitas más potencia para sostener la velocidad y los mandos se sienten pesados. Vas a aterrizar así.",
+        options: [
+          { label: "Aterrizar con tu velocidad y flaps de aproximación normales", next: "falla-2" },
+          { label: "Aterrizar más rápido de lo normal y con flaps reducidos o sin flaps", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Un ala contaminada con hielo entra en pérdida a una velocidad mayor y con menos aviso que un ala limpia, y los flaps completos pueden agravar el comportamiento del empenaje. Volar la aproximación de siempre es volar con márgenes que el hielo ya se llevó.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Ante cualquier indicio de engelamiento, la prioridad es salir de inmediato de las condiciones que lo producen — buscando aire más cálido o VMC — y evitar esa zona en el resto del vuelo.",
+            "Correcto. Con el ala contaminada se aterriza rápido y con flaps reducidos: aceptas usar más pista a cambio de mantener margen sobre una velocidad de pérdida que subió y que ya no sabes exactamente dónde está.",
         },
       },
     },
   },
-  navegacion: {
+  "navegacion": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Vuelas siguiendo un radial del VOR con viento cruzado. Mantienes el rumbo constante, pero notas que la aguja del CDI se desvía lentamente hacia un lado.",
         options: [
-          { label: "Ignorar la desviación, seguramente corriges al final del tramo", next: "mala" },
-          { label: "Corregir el rumbo hacia el lado de la desviación y hacer tracking activo, ajustando conforme lo pida el viento", next: "buena" },
+          { label: "Ignorar la desviación, seguramente corriges al final del tramo", next: "falla-1" },
+          { label: "Corregir el rumbo hacia el lado de la desviación y hacer tracking activo, ajustando conforme lo pida el viento", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1138,33 +1274,55 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Ignorar una desviación que crece te aleja cada vez más del curso — al final del tramo el error puede ser demasiado grande para corregir con margen.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. El tracking activo significa ajustar tu rumbo constantemente para compensar el viento y mantener la aguja centrada, no solo apuntar al rumbo original y esperar.\n\nCorriges y el CDI se centra. Veinte minutos después la aguja empieza a oscilar de un lado a otro en pocos segundos y la bandera cambia de TO a FROM, sin que hayas tocado nada.",
+        options: [
+          { label: "Perseguir la aguja con virajes en cada oscilación", next: "falla-2" },
+          { label: "Reconocer el paso de estación: mantener rumbo hasta que la aguja se estabilice", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Estás en el cono de confusión, justo encima de la estación, donde el VOR no puede darte información útil. Perseguir la aguja ahí te hace virar a ambos lados por un dato que no significa nada, y sales del cono desalineado.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. El tracking activo significa ajustar tu rumbo constantemente para compensar el viento y mantener la aguja centrada, no solo apuntar al rumbo original y esperar.",
+            "Exacto. El cambio de TO a FROM es el paso de estación, y la oscilación dura lo que tardas en cruzar el cono. Se mantiene el rumbo, se deja que el instrumento se recupere, y se continúa en el tramo de salida.",
         },
       },
     },
   },
-  cartografia: {
+  "cartografia": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Planeas una ruta VFR que cruza justo el límite de un círculo azul discontinuo de espacio Clase D.",
         options: [
-          { label: "Asumir que, al ser discontinuo, no necesitas contactar a nadie", next: "mala" },
-          { label: "Contactar a la torre correspondiente antes de entrar y obtener autorización o instrucciones", next: "buena" },
+          { label: "Asumir que, al ser discontinuo, no necesitas contactar a nadie", next: "falla-1" },
+          { label: "Contactar a la torre correspondiente antes de entrar y obtener autorización o instrucciones", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1172,33 +1330,55 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "El símbolo discontinuo indica el límite lateral de la Clase D, no que sea opcional contactarla — requiere contacto bidireccional establecido antes de entrar, igual que la Clase C.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Clase D exige contacto bidireccional con la torre antes de ingresar, sin importar que su símbolo en la carta sea una línea discontinua en vez de sólida.\n\nLa torre te responde con tu matrícula y te autoriza a cruzar. Más adelante, tu ruta entra en un cuadrante de la carta marcado con una cifra grande y clara: 12 en grande y 4 en pequeño. Vuelas a 11,500 pies.",
+        options: [
+          { label: "Mantener 11,500: esa cifra es solo referencia informativa", next: "falla-2" },
+          { label: "Ascender por encima de esa cifra, o rodear el cuadrante, antes de entrar", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Esa cifra es la Elevación Máxima del cuadrante, en cientos de pies: 12,400. Es el punto más alto del terreno o de los obstáculos dentro de ese rectángulo de la carta. Volando a 11,500 estarías novecientos pies por debajo de algo que está ahí.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Clase D exige contacto bidireccional con la torre antes de ingresar, sin importar que su símbolo en la carta sea una línea discontinua en vez de sólida.",
+            "Correcto. La Elevación Máxima del cuadrante se lee en cientos de pies y marca lo más alto que hay dentro de ese rectángulo. Cruzarlo exige estar por encima con margen, y si no tienes el desempeño para ascender, se rodea.",
         },
       },
     },
   },
-  comunicaciones: {
+  "comunicaciones": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Estás por hacer tu primer contacto con Torre para aterrizar, y otro piloto está transmitiendo justo cuando ibas a llamar.",
         options: [
-          { label: "Transmitir de inmediato, tu mensaje es corto y seguro cabe", next: "mala" },
-          { label: "Esperar a que la frecuencia quede libre antes de transmitir tu llamada", next: "buena" },
+          { label: "Transmitir de inmediato, tu mensaje es corto y seguro cabe", next: "falla-1" },
+          { label: "Esperar a que la frecuencia quede libre antes de transmitir tu llamada", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1206,14 +1386,35 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Transmitir mientras otra estación habla produce 'stepping on' — ninguno de los dos mensajes se entiende bien, y puede ocultar información crítica de seguridad.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Nunca transmitas sobre otra estación, sin importar qué tan corto sea tu mensaje — espera a que la frecuencia esté libre.\n\nLa frecuencia queda libre y haces tu llamada. La torre responde: \"XB-VLA, reporte viento en cola pista 20, número dos detrás de un Cessna en base.\"",
+        options: [
+          { label: "Responder \"copiado\" y seguir volando tu circuito", next: "falla-2" },
+          { label: "Colacionar la instrucción con tu matrícula y reportar cuando tengas al Cessna a la vista", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "\"Copiado\" no le dice al controlador qué entendiste. Te asignó una posición en la secuencia y un tráfico que debes localizar, y ninguna de las dos cosas queda confirmada. Si no ves al Cessna, la torre necesita saberlo ahora, no en final.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Nunca transmitas sobre otra estación, sin importar qué tan corto sea tu mensaje — espera a que la frecuencia esté libre.",
+            "Así es. El colacionado con matrícula cierra el circuito de la comunicación, y reportar el tráfico a la vista es lo que le permite a la torre pasarte la responsabilidad de la separación visual. Si no lo ves, se dice: \"negativo contacto\".",
         },
       },
     },
@@ -1221,18 +1422,19 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
   "instrumentos-2": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "En vuelo, notas que el velocímetro empieza a comportarse de forma errática: sube y baja igual que el altímetro en vez de reflejar cambios reales de velocidad.",
         options: [
-          { label: "Confiar en el velocímetro y ajustar la actitud según sus lecturas", next: "mala" },
-          { label: "Sospechar un bloqueo del sistema pitot-estático, y usar actitud + potencia conocidas en vez del velocímetro", next: "buena" },
+          { label: "Confiar en el velocímetro y ajustar la actitud según sus lecturas", next: "falla-1" },
+          { label: "Sospechar un bloqueo del sistema pitot-estático, y usar actitud + potencia conocidas en vez del velocímetro", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1240,33 +1442,55 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Un velocímetro que se comporta como altímetro es el síntoma clásico de un bloqueo del sistema pitot-estático — confiar en él puede llevarte a una actitud peligrosa.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Ante indicaciones erráticas del sistema pitot-estático, la referencia segura es la combinación conocida de actitud y potencia para la fase de vuelo, no las lecturas del instrumento afectado.\n\nVuelas por actitud y potencia. Al iniciar el descenso, el velocímetro marca cada vez menos aunque no has reducido potencia, y el altímetro se quedó congelado en la última lectura.",
+        options: [
+          { label: "Bajar la nariz para recuperar la velocidad indicada", next: "falla-2" },
+          { label: "Abrir la fuente de estática alterna y seguir volando por actitud y potencia", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "El altímetro congelado delata que lo bloqueado es la toma estática, no el pitot. Con esa falla el velocímetro miente al revés: en descenso indica menos de lo que realmente vuelas. Bajar la nariz persiguiendo esa lectura te lleva a exceso de velocidad real.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Ante indicaciones erráticas del sistema pitot-estático, la referencia segura es la combinación conocida de actitud y potencia para la fase de vuelo, no las lecturas del instrumento afectado.",
+            "Correcto. La estática alterna, que toma presión del interior de la cabina, devuelve lecturas utilizables aunque ligeramente altas en altitud. Y mientras tanto, la actitud y la potencia conocidas siguen siendo la referencia que no depende de tuberías bloqueadas.",
         },
       },
     },
   },
-  rendimiento: {
+  "rendimiento": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Vas a despegar de una pista corta en un día caluroso, y tus cálculos de rendimiento muestran un margen muy ajustado para despejar los árboles al final de la pista.",
         options: [
-          { label: "Despegar de todos modos, seguro el manual exagera un poco", next: "mala" },
-          { label: "Reducir peso, esperar a que baje la temperatura, o buscar una pista más larga antes de despegar", next: "buena" },
+          { label: "Despegar de todos modos, seguro el manual exagera un poco", next: "falla-1" },
+          { label: "Reducir peso, esperar a que baje la temperatura, o buscar una pista más larga antes de despegar", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1274,14 +1498,35 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Los datos de rendimiento del manual ya asumen condiciones ideales de pilotaje — un margen ajustado en el papel casi nunca mejora en la práctica, y una altitud de densidad alta reduce aún más el rendimiento real.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Ante un margen ajustado de despegue, la decisión correcta es cambiar las condiciones a tu favor — menos peso, menor temperatura o más pista — nunca 'intentarlo y ver'.\n\nEsperas a la tarde, la temperatura baja ocho grados y tus números cierran con margen. Al hacer el cálculo final notas que el viento también cambió: ahora sopla ocho nudos por la cola en la pista que pensabas usar.",
+        options: [
+          { label: "Despegar igual: ocho nudos de cola son poca cosa", next: "falla-2" },
+          { label: "Despegar por la pista opuesta, con el viento de frente, aunque implique más rodaje", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "El viento de cola alarga la carrera de despegue mucho más de lo que la intuición sugiere, y acabas de recuperar tu margen a punta de esperar horas. Ocho nudos de cola se comen buena parte de lo que ganaste con la temperatura.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Ante un margen ajustado de despegue, la decisión correcta es cambiar las condiciones a tu favor — menos peso, menor temperatura o más pista — nunca 'intentarlo y ver'.",
+            "Exacto. El viento de frente es el único factor de rendimiento que mejora tus números gratis, y el único que puedes elegir con solo rodar al otro extremo. En pista corta, esa elección vale más que cualquier técnica de despegue.",
         },
       },
     },
@@ -1289,18 +1534,19 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
   "operacion-2": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Ya iniciaste el despegue y, antes de alcanzar la velocidad de rotación, notas una vibración anormal del motor.",
         options: [
-          { label: "Continuar el despegue, seguro se estabiliza en el aire", next: "mala" },
-          { label: "Cerrar la potencia de inmediato y abortar el despegue mientras aún hay pista suficiente para detenerte", next: "buena" },
+          { label: "Continuar el despegue, seguro se estabiliza en el aire", next: "falla-1" },
+          { label: "Cerrar la potencia de inmediato y abortar el despegue mientras aún hay pista suficiente para detenerte", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1308,14 +1554,35 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Una anomalía del motor antes de rotar es exactamente el escenario para un despegue rechazado — continuar con un problema conocido, a baja altura y baja velocidad, es la combinación más peligrosa.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Antes de alcanzar la velocidad de rotación, cualquier anomalía seria del motor debe resultar en cerrar potencia y frenar de inmediato, mientras la pista restante lo permita.\n\nAbortas y te detienes con pista de sobra. El motor sigue funcionando y en ralentí la vibración ya no se nota.",
+        options: [
+          { label: "Alinearte otra vez e intentarlo: probablemente fue basura en el combustible", next: "falla-2" },
+          { label: "Liberar la pista, informar a la torre y revisar el motor en plataforma", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Que la vibración desaparezca en ralentí no dice nada: a esa potencia el motor casi no trabaja. Volver a intentarlo es apostar a que el problema no reaparezca justo cuando ya no queda pista para abortar por segunda vez.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Antes de alcanzar la velocidad de rotación, cualquier anomalía seria del motor debe resultar en cerrar potencia y frenar de inmediato, mientras la pista restante lo permita.",
+            "Correcto. Un despegue abortado por causa desconocida termina en plataforma, no en un segundo intento. El aborto ya fue la decisión difícil; repetir el despegue sin saber qué pasó la desperdicia.",
         },
       },
     },
@@ -1323,18 +1590,19 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
   "espacios-aereos-2": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Vuelas VFR y te acercas a un área marcada como TFR (restricción temporal de vuelo) que no conocías, activa por una visita oficial.",
         options: [
-          { label: "Continuar tu ruta directa, seguramente ya expiró", next: "mala" },
-          { label: "Desviarte de inmediato del área y verificar los NOTAMs vigentes antes de continuar", next: "buena" },
+          { label: "Continuar tu ruta directa, seguramente ya expiró", next: "falla-1" },
+          { label: "Desviarte de inmediato del área y verificar los NOTAMs vigentes antes de continuar", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1342,33 +1610,55 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Entrar a un TFR activo sin autorización puede resultar en interceptación y consecuencias legales severas — nunca asumas que 'ya expiró' sin verificarlo.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Ante cualquier TFR, la acción segura es evitarla de inmediato y confirmar su estado vigente contra los NOTAMs actuales antes de replantear tu ruta.\n\nTe desvías y revisas los NOTAMs. Al reconstruir tu trayectoria te das cuenta de que rozaste el borde del área restringida durante unos segundos antes de virar. Nadie te llamó por radio.",
+        options: [
+          { label: "No decir nada: fueron segundos y nadie se dio cuenta", next: "falla-2" },
+          { label: "Contactar a la dependencia ATC de la zona, informar lo ocurrido y seguir sus instrucciones", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "El radar sí se dio cuenta, aunque nadie te haya llamado en ese momento. Una incursión detectada y no reportada deja de ser un error de planificación y pasa a parecer un ocultamiento, que es lo que convierte un incidente en una sanción seria.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Ante cualquier TFR, la acción segura es evitarla de inmediato y confirmar su estado vigente contra los NOTAMs actuales antes de replantear tu ruta.",
+            "Así es. Reportarlo tú mismo cambia por completo cómo se trata el asunto: el control puede pedirte un número de teléfono al aterrizar, y la disposición a informar es lo que suele distinguir una corrección de una acción administrativa.",
         },
       },
     },
   },
-  reglamentacion: {
+  "reglamentacion": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Un amigo te pide ser tu primer pasajero. Han pasado más de 90 días desde tu último despegue y aterrizaje.",
         options: [
-          { label: "Llevarlo de todos modos, ya sabes volar", next: "mala" },
-          { label: "Verificar tu currency de despegues y aterrizajes recientes antes de llevar pasajeros, y practicar solo si no la cumples", next: "buena" },
+          { label: "Llevarlo de todos modos, ya sabes volar", next: "falla-1" },
+          { label: "Verificar tu currency de despegues y aterrizajes recientes antes de llevar pasajeros, y practicar solo si no la cumples", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1376,14 +1666,35 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Saber volar no es lo mismo que cumplir la currency legal requerida para llevar pasajeros — hacerlo sin ella, aunque te sientas capaz, es una violación reglamentaria.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. La regulación exige un mínimo de despegues y aterrizajes recientes para poder llevar pasajeros — si no la cumples, primero debes practicar solo (o con instructor) hasta recuperarla.\n\nConfirmas que no cumples: tu último despegue y aterrizaje fue hace cuatro meses. Vas al aeródromo a hacer los tres despegues y aterrizajes que te devuelven la vigencia, y tu amigo ya está ahí esperándote.",
+        options: [
+          { label: "Hacer los tres circuitos con él a bordo: total, él es quien quiere volar contigo", next: "falla-2" },
+          { label: "Hacer los tres despegues y aterrizajes solo, y recogerlo después", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Los vuelos con los que recuperas la vigencia son justamente los que no puedes hacer llevando pasajeros: ese es el sentido del requisito. Tu amigo no deja de ser pasajero por ser tu amigo.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. La regulación exige un mínimo de despegues y aterrizajes recientes para poder llevar pasajeros — si no la cumples, primero debes practicar solo (o con instructor) hasta recuperarla.",
+            "Correcto. Primero recuperas la vigencia solo, y una vez cumplidos los tres despegues y aterrizajes, ya puedes llevarlo. Son veinte minutos de circuitos que separan un vuelo legal de uno que no lo es.",
         },
       },
     },
@@ -1391,18 +1702,19 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
   "ifr-2": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Vuelas una aproximación de no precisión y llegas al MDA sin haber alcanzado el punto de aproximación frustrada ni tener las referencias visuales requeridas.",
         options: [
-          { label: "Descender un poco más abajo del MDA para intentar verla mejor", next: "mala" },
-          { label: "Nivelar en el MDA y continuar hasta el punto de aproximación frustrada, ejecutándola si no obtienes referencias", next: "buena" },
+          { label: "Descender un poco más abajo del MDA para intentar verla mejor", next: "falla-1" },
+          { label: "Nivelar en el MDA y continuar hasta el punto de aproximación frustrada, ejecutándola si no obtienes referencias", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1410,33 +1722,55 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Descender por debajo del MDA sin referencias visuales elimina el margen de obstáculos garantizado por el procedimiento — es una causa directa de accidentes CFIT.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. En una aproximación de no precisión, el MDA se mantiene nivelado hasta el punto de aproximación frustrada o hasta obtener referencias visuales — nunca se desciende por debajo 'para ver mejor'.\n\nNivelas en el MDA. A media milla del punto de aproximación frustrada alcanzas a ver las luces de aproximación, pero todavía no la pista ni sus marcas.",
+        options: [
+          { label: "Descender hacia la pista: ya tienes referencias visuales", next: "falla-2" },
+          { label: "Descender solo hasta cien pies sobre la zona de toma, y frustrar si la pista no aparece", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Las luces de aproximación por sí solas no autorizan a descender hasta la pista. Son una referencia intermedia, y tratarlas como si fueran la pista es descender a ciegas los últimos cientos de pies.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. En una aproximación de no precisión, el MDA se mantiene nivelado hasta el punto de aproximación frustrada o hasta obtener referencias visuales — nunca se desciende por debajo 'para ver mejor'.",
+            "Exacto. Con las luces de aproximación a la vista puedes bajar hasta cien pies sobre la elevación de la zona de toma; por debajo de eso hacen falta la pista o sus marcas. Si a esa altura no aparecen, se frustra.",
         },
       },
     },
   },
-  fundamentos: {
+  "fundamentos": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Vuelas recto y nivelado a velocidad constante. Sin cambiar la actitud, reduces la potencia del motor de forma notable. ¿Qué ocurre primero?",
         options: [
-          { label: "El avión se mantiene nivelado, solo pierde velocidad indefinidamente", next: "mala" },
-          { label: "El empuje deja de igualar la resistencia, y al caer la sustentación por debajo del peso, el avión empieza a descender", next: "buena" },
+          { label: "El avión se mantiene nivelado, solo pierde velocidad indefinidamente", next: "falla-1" },
+          { label: "El empuje deja de igualar la resistencia, y al caer la sustentación por debajo del peso, el avión empieza a descender", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1444,33 +1778,55 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Las 4 fuerzas no se ajustan solas: si reduces el empuje sin cambiar la actitud, la velocidad cae, la sustentación ya no alcanza a igualar el peso, y el avión empieza a descender — no se queda nivelado indefinidamente.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Al reducir potencia sin cambiar la actitud, el empuje deja de igualar la resistencia (pierdes velocidad) y, con menos velocidad, la sustentación cae por debajo del peso — el avión entra en descenso hasta que ajustes potencia o actitud.\n\nEl avión desciende. Mantienes la actitud y la velocidad se estabiliza un poco por encima de la anterior, con un régimen de descenso constante. Quieres volver a la altitud que tenías.",
+        options: [
+          { label: "Tirar del bastón para dejar de descender", next: "falla-2" },
+          { label: "Devolver la potencia, y usar la actitud para sostener la velocidad", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Sin potencia, tirar del bastón solo cambia velocidad por altura: subes unos segundos, pierdes velocidad, y terminas más lento en el mismo descenso o entrando en pérdida. La altura que ganaste la pagaste con la energía que te quedaba.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Al reducir potencia sin cambiar la actitud, el empuje deja de igualar la resistencia (pierdes velocidad) y, con menos velocidad, la sustentación cae por debajo del peso — el avión entra en descenso hasta que ajustes potencia o actitud.",
+            "Correcto, y ese es el resumen de todo el módulo: la potencia gobierna si subes o bajas, y la actitud gobierna qué tan rápido vas. Cuando se confunden los dos papeles es cuando el avión hace lo contrario de lo que esperabas.",
         },
       },
     },
   },
-  aerodinamica: {
+  "aerodinamica": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Estás en el viraje de base a final, un poco bajo y lento, y para no pasarte de la línea de la pista aprietas el viraje con más alerón e inclinación. ¿Qué haces?",
         options: [
-          { label: "Aumentar el ángulo de inclinación con más alerón para cerrar el viraje rápido", next: "mala" },
-          { label: "Nivelar las alas, aceptar pasarte un poco de la línea, y ajustar con timón y potencia", next: "buena" },
+          { label: "Aumentar el ángulo de inclinación con más alerón para cerrar el viraje rápido", next: "falla-1" },
+          { label: "Nivelar las alas, aceptar pasarte un poco de la línea, y ajustar con timón y potencia", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1478,14 +1834,35 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Apretar el viraje a baja velocidad aumenta el factor de carga y la velocidad de pérdida en ese preciso instante — es el clásico escenario de pérdida/barrena en el viraje base-final, una de las causas más comunes de accidentes fatales cerca del patrón.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Nunca aprietes un viraje a baja velocidad para corregir alineación. Es preferible pasarte un poco de la línea de la pista y hacer un ajuste amplio o un go-around, que arriesgar una pérdida asimétrica en un viraje pronunciado cerca del suelo.\n\nNivelas las alas y te pasas de la línea de la pista. Ahora estás a quinientos pies, desalineado, y con la velocidad cinco nudos por debajo de la de aproximación.",
+        options: [
+          { label: "Alinearte con el timón, sin inclinar más las alas", next: "falla-2" },
+          { label: "Aplicar potencia, ir al aire y volver a integrarte al circuito", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Cruzar con timón a baja velocidad y baja altura es exactamente la secuencia que produce la pérdida con barrena en el viraje base-final. El ala de adentro se frena, entra en pérdida primero, y a quinientos pies no hay altura para recuperar.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Nunca aprietes un viraje a baja velocidad para corregir alineación. Es preferible pasarte un poco de la línea de la pista y hacer un ajuste amplio o un go-around, que arriesgar una pérdida asimétrica en un viraje pronunciado cerca del suelo.",
+            "Así es. Desde una aproximación desalineada, lenta y baja no se rescata nada: se va al aire. Un circuito de más cuesta cinco minutos, y es la maniobra que más accidentes ha evitado en la historia de la aviación general.",
         },
       },
     },
@@ -1493,18 +1870,19 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
   "vfr-2": {
     startId: "inicio",
     tree: {
-      inicio: {
+      "inicio": {
         id: "inicio",
         prompt:
           "Te acercas a un aeródromo no controlado y ves a otro avión entrar directo a 'final' sin haber pasado por el tramo de viento en cola. Tú ya estás integrado en el patrón. ¿Qué haces?",
         options: [
-          { label: "Acelerar para llegar tú primero a la pista, ya que entraste de forma correcta", next: "mala" },
-          { label: "Comunicar tu posición por radio, ceder el paso si es necesario y ajustar tu trayectoria para mantener separación", next: "buena" },
+          { label: "Acelerar para llegar tú primero a la pista, ya que entraste de forma correcta", next: "falla-1" },
+          { label: "Comunicar tu posición por radio, ceder el paso si es necesario y ajustar tu trayectoria para mantener separación", next: "segunda" },
         ],
       },
-      mala: {
-        id: "mala",
-        prompt: "",
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: false,
@@ -1512,14 +1890,91 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
             "Tener la razón sobre quién entró 'correctamente' no evita una colisión. La prioridad reglamentaria existe, pero la responsabilidad de 'ver y evitar' siempre es de ambos pilotos — competir por la pista es exactamente lo que no debes hacer.",
         },
       },
-      buena: {
-        id: "buena",
-        prompt: "",
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Correcto. Ante cualquier conflicto en el patrón, la solución es comunicar tu posición y ajustar tu propia trayectoria (por ejemplo, extendiendo el viento en cola) — nunca forzar la situación asumiendo que el otro piloto cederá.\n\nCedes el paso y el otro avión aterriza sin novedad. Ya en final corto, ves que un tercer avión se alinea en la pista para despegar, sin haber anunciado nada en la frecuencia.",
+        options: [
+          { label: "Continuar el aterrizaje: tienes preferencia porque estás aterrizando", next: "falla-2" },
+          { label: "Ir al aire, anunciarlo por radio y reintegrarte al circuito", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "La preferencia no despeja la pista. Ese avión no te ha escuchado y no te está viendo, y tu derecho de paso no sirve de nada si los dos terminan en el mismo lugar. En un aeródromo no controlado, la separación depende de que alguien ceda.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
         options: [],
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Ante cualquier conflicto en el patrón, la solución es comunicar tu posición y ajustar tu propia trayectoria (por ejemplo, extendiendo el viento en cola) — nunca forzar la situación asumiendo que el otro piloto cederá.",
+            "Correcto. El motor y al aire es gratis y siempre está disponible. En un aeródromo sin torre, el piloto que ve el conflicto es el que tiene que resolverlo, sin importar a quién le tocaba el paso.",
+        },
+      },
+    },
+  },
+  "vfr": {
+    startId: "inicio",
+    tree: {
+      "inicio": {
+        id: "inicio",
+        prompt:
+          "Vuelas VFR de MMGL a MMZO. A 30 millas de tu destino notas que la visibilidad empieza a bajar y el techo de nubes desciende.",
+        options: [
+          { label: "Continuar el plan original, seguro que mejora", next: "falla-1" },
+          { label: "Consultar el clima actualizado de MMZO y alternos", next: "segunda" },
+        ],
+      },
+      "falla-1": {
+        id: "falla-1",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Continuar sin más información es el error más común que lleva a VFR-en-IMC. Siempre reevalúa cuando las condiciones cambian, no asumas que van a mejorar.",
+        },
+      },
+      "segunda": {
+        id: "segunda",
+        prompt:
+          "Bien: pedir información antes de decidir es lo que te deja opciones.\n\nEl METAR de MMZO reporta techo bajo y visibilidad por debajo de mínimos VFR. Tienes combustible para 40 minutos adicionales.",
+        options: [
+          { label: "Intentar aterrizar de todas formas, ya casi llegas", next: "falla-2" },
+          { label: "Desviarte a un aeropuerto alterno con mejor clima", next: "exito" },
+        ],
+      },
+      "falla-2": {
+        id: "falla-2",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: false,
+          feedback:
+            "Intentar aterrizar por debajo de mínimos VFR es una de las causas principales de accidentes de vuelo controlado contra el terreno. La proximidad al destino nunca justifica romper los mínimos.",
+        },
+      },
+      "exito": {
+        id: "exito",
+        prompt:
+          "",
+        options: [],
+        outcome: {
+          correct: true,
+          feedback:
+            "Correcto. Desviarte a tiempo, con combustible de sobra y antes de quedar en una situación sin salidas, es exactamente la decisión que se espera de un piloto VFR.",
         },
       },
     },

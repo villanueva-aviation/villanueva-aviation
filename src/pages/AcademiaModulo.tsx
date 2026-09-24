@@ -136,7 +136,16 @@ function InteractividadWidget({
       return <DragDropLabels onComplete={onComplete} setId={actividad.hotspotSetId} />;
     case "escenario": {
       const scenario = MODULE_SCENARIOS[actividad.scenarioId ?? modulo.slug];
-      return scenario ? <ScenarioSimulator tree={scenario.tree} startId={scenario.startId} /> : <ScenarioSimulator />;
+      // Sin árbol no hay nada que simular: antes caía a un escenario de ejemplo
+      // que no tenía que ver con el módulo, y nadie lo notaba.
+      if (!scenario) {
+        return (
+          <p className="flex items-center gap-2 text-sm text-white/45">
+            <Lock size={14} /> Contenido en preparación — se publicará próximamente.
+          </p>
+        );
+      }
+      return <ScenarioSimulator tree={scenario.tree} startId={scenario.startId} />;
     }
     case "slider": {
       const config = MODULE_SLIDERS[modulo.slug];

@@ -4,6 +4,7 @@ import { ACADEMIA_MODULOS } from "./academia.ts";
 import { HOTSPOT_SETS } from "../features/academia/hotspots.ts";
 import { AUDIO_SETS } from "./fraseologiaATC.ts";
 import { CIRCUITO_SETS, TRAMOS_CIRCUITO } from "./circuitoTrafico.ts";
+import { MODULE_SCENARIOS } from "./moduleContent.ts";
 
 const interactividades = ACADEMIA_MODULOS.flatMap((m) =>
   m.actividades.filter((a) => a.tipo === "interactividad").map((a) => ({ modulo: m.slug, ...a })),
@@ -94,5 +95,58 @@ test("el diagrama, el drag-drop y el circuito llegan a más de un módulo", () =
   for (const widget of ["diagrama", "dragdrop", "circuito"]) {
     const modulos = new Set(interactividades.filter((a) => a.widget === widget).map((a) => a.modulo));
     assert.ok(modulos.size >= 2, `"${widget}" solo se usa en ${[...modulos].join(", ")}`);
+  }
+});
+
+// ---------- Escenarios ----------
+
+// Si el id no resuelve, ScenarioSimulator cae a su árbol por omisión y el
+// cadete practica el escenario de otro módulo sin que nada lo indique.
+test("cada escenario del temario resuelve contra un árbol real", () => {
+  for (const a of interactividades.filter((x) => x.widget === "escenario")) {
+    const id = a.scenarioId ?? a.modulo;
+    assert.ok(MODULE_SCENARIOS[id], `${a.modulo}/${a.id}: no existe el escenario "${id}"`);
+  }
+});
+
+test("todo escenario encadena al menos dos decisiones", () => {
+  for (const [id, esc] of Object.entries(MODULE_SCENARIOS)) {
+    const profundidad = (nodo: string, visto = new Set<string>()): number => {
+      if (visto.has(nodo)) return 0;
+      visto.add(nodo);
+      const n = esc.tree[nodo];
+      if (!n || n.options.length === 0) return 0;
+      return 1 + Math.max(...n.options.map((o) => profundidad(o.next, new Set(visto))));
+    };
+    assert.ok(profundidad(esc.startId) >= 2, `"${id}" se resuelve con una sola decisión`);
+  }
+});
+
+test("los escenarios están bien formados", () => {
+  for (const [id, esc] of Object.entries(MODULE_SCENARIOS)) {
+    assert.ok(esc.tree[esc.startId], `"${id}": el nodo inicial no existe`);
+
+    const alcanzables = new Set<string>();
+    const pendientes = [esc.startId];
+    while (pendientes.length) {
+      const actual = pendientes.pop()!;
+      if (alcanzables.has(actual)) continue;
+      alcanzables.add(actual);
+      for (const o of esc.tree[actual]?.options ?? []) {
+        assert.ok(esc.tree[o.next], `"${id}": la opción "${o.label}" apunta a "${o.next}", que no existe`);
+        pendientes.push(o.next);
+      }
+    }
+
+    for (const nodo of Object.keys(esc.tree)) {
+      assert.ok(alcanzables.has(nodo), `"${id}": el nodo "${nodo}" no se alcanza desde el inicio`);
+    }
+
+    const finales = Object.values(esc.tree).filter((n) => n.options.length === 0);
+    for (const f of finales) {
+      assert.ok(f.outcome, `"${id}": el nodo "${f.id}" no tiene salida ni desenlace`);
+    }
+    const aciertos = finales.filter((n) => n.outcome?.correct);
+    assert.equal(aciertos.length, 1, `"${id}" tiene ${aciertos.length} desenlaces correctos, debe haber uno`);
   }
 });
