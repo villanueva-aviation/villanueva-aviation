@@ -39,6 +39,7 @@ export const ROUTES = {
   feedback: "/comparte-tu-experiencia",
   legal: "/legal",
   ingresar: "/ingresar",
+  empieza: "/empieza",
 } as const;
 
 export const NAV_LINKS = [

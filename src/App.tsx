@@ -49,6 +49,7 @@ const AdminGraduados = lazy(() => import("./pages/AdminGraduados").then((m) => (
 const AdminCadetes = lazy(() => import("./pages/AdminCadetes").then((m) => ({ default: m.AdminCadetes })));
 const Feedback = lazy(() => import("./pages/Feedback").then((m) => ({ default: m.Feedback })));
 const Legal = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Legal })));
+const Empieza = lazy(() => import("./pages/Empieza").then((m) => ({ default: m.Empieza })));
 const Ingresar = lazy(() => import("./pages/Ingresar").then((m) => ({ default: m.Ingresar })));
 const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m.NotFound })));
 
@@ -251,6 +252,7 @@ function RoutedContent() {
               </ProtectedRoute>
             }
           />
+          <Route path={ROUTES.empieza} element={<Empieza />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
@@ -259,16 +261,19 @@ function RoutedContent() {
 }
 
 function App() {
+  // La página de aterrizaje va sin barra ni pie del sitio: cada enlace de más es una salida.
+  const { pathname } = useLocation();
+  const aterrizaje = pathname === ROUTES.empieza;
   return (
     <AuthProvider>
       <ProgressProvider>
         <div className="flex min-h-screen flex-col bg-navy-950">
           <ScrollToTop />
-          <Navbar />
+          {!aterrizaje && <Navbar />}
           <main className="flex-1">
             <RoutedContent />
           </main>
-          <Footer />
+          {!aterrizaje && <Footer />}
         </div>
       </ProgressProvider>
     </AuthProvider>
