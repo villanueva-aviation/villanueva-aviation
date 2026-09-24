@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Check, CheckCircle2, ChevronLeft, ChevronRight, Copy, RotateCcw, XCircle } from "lucide-react";
-import { SITUACIONES_CIRCUITO, TRAMOS_CIRCUITO, type SituacionCircuito } from "../../data/circuitoTrafico";
+import { CIRCUITO_SETS, SITUACIONES_CIRCUITO, TRAMOS_CIRCUITO, type SituacionCircuito } from "../../data/circuitoTrafico";
 
 type PosicionesTablero = Record<string, { xPct: number; yPct: number }>;
 
@@ -19,10 +19,8 @@ function IconAvionCircuito({ size = 20, className }: { size?: number; className?
   );
 }
 
-function elegirSituacionAleatoria(excluirId?: string): SituacionCircuito {
-  const opciones = excluirId
-    ? SITUACIONES_CIRCUITO.filter((s) => s.id !== excluirId)
-    : SITUACIONES_CIRCUITO;
+function elegirSituacionAleatoria(banco: SituacionCircuito[], excluirId?: string): SituacionCircuito {
+  const opciones = excluirId && banco.length > 1 ? banco.filter((s) => s.id !== excluirId) : banco;
   return opciones[Math.floor(Math.random() * opciones.length)];
 }
 
@@ -299,14 +297,26 @@ function TableroCircuito({
   );
 }
 
-export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
-  const [modo, setModo] = useState<"aprende" | "prueba">("aprende");
+export function CircuitoTrafico({
+  onComplete,
+  setId = "comunicaciones",
+  modoInicial = "aprende",
+}: {
+  onComplete?: () => void;
+  /** Qué tanda de preguntas usa el modo "Ponte a prueba". */
+  setId?: string;
+  /** Los módulos que repiten el widget arrancan directo en la prueba: el
+   *  recorrido ya lo hicieron en Comunicaciones. */
+  modoInicial?: "aprende" | "prueba";
+}) {
+  const banco = CIRCUITO_SETS[setId] ?? SITUACIONES_CIRCUITO;
+  const [modo, setModo] = useState<"aprende" | "prueba">(modoInicial);
 
   const [paradaActiva, setParadaActiva] = useState(1);
   const [rutaAvion, setRutaAvion] = useState<RutaAvion | undefined>(undefined);
   const tramoActivo = TRAMOS_CIRCUITO.find((t) => t.numero === paradaActiva)!;
 
-  const [situacionActual, setSituacionActual] = useState<SituacionCircuito>(() => elegirSituacionAleatoria());
+  const [situacionActual, setSituacionActual] = useState<SituacionCircuito>(() => elegirSituacionAleatoria(banco));
   const [tramoElegidoId, setTramoElegidoId] = useState<string | null>(null);
   const [aciertos, setAciertos] = useState(0);
   const [intentos, setIntentos] = useState(0);
@@ -329,7 +339,7 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
     setModo(nuevo);
     setRutaAvion(undefined);
     if (nuevo === "prueba") {
-      setSituacionActual(elegirSituacionAleatoria());
+      setSituacionActual(elegirSituacionAleatoria(banco));
       setTramoElegidoId(null);
       setAciertos(0);
       setIntentos(0);
@@ -364,7 +374,7 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
     if (id === situacionActual.tramoCorrectoId) {
       setAciertos((a) => a + 1);
       autoAvanzarRef.current = setTimeout(() => {
-        setSituacionActual((actual) => elegirSituacionAleatoria(actual.id));
+        setSituacionActual((actual) => elegirSituacionAleatoria(banco, actual.id));
         setTramoElegidoId(null);
         autoAvanzarRef.current = null;
       }, 1000);
@@ -372,7 +382,7 @@ export function CircuitoTrafico({ onComplete }: { onComplete?: () => void }) {
   }
 
   function siguienteSituacion() {
-    setSituacionActual((actual) => elegirSituacionAleatoria(actual.id));
+    setSituacionActual((actual) => elegirSituacionAleatoria(banco, actual.id));
     setTramoElegidoId(null);
   }
 

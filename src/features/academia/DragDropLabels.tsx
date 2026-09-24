@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Check, RotateCcw } from "lucide-react";
-import { CESSNA_HOTSPOTS } from "./hotspots";
+import { HOTSPOT_SETS } from "./hotspots";
 
 function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr];
@@ -11,12 +11,14 @@ function shuffle<T>(arr: T[]): T[] {
   return copy;
 }
 
-export function DragDropLabels({ onComplete }: { onComplete: () => void }) {
-  const labels = useMemo(() => shuffle(CESSNA_HOTSPOTS.map((h) => h.id)), []);
+export function DragDropLabels({ onComplete, setId = "cessna" }: { onComplete: () => void; setId?: string }) {
+  const juego = HOTSPOT_SETS[setId] ?? HOTSPOT_SETS.cessna;
+  const zonas = juego.puntos;
+  const labels = useMemo(() => shuffle(zonas.map((h) => h.id)), [zonas]);
   const [placed, setPlaced] = useState<Record<string, string>>({});
   const [wrongZone, setWrongZone] = useState<string | null>(null);
 
-  const allCorrect = CESSNA_HOTSPOTS.every((h) => placed[h.id] === h.id);
+  const allCorrect = zonas.every((h) => placed[h.id] === h.id);
 
   function handleDrop(zoneId: string, e: React.DragEvent) {
     e.preventDefault();
@@ -25,7 +27,7 @@ export function DragDropLabels({ onComplete }: { onComplete: () => void }) {
     if (labelId === zoneId) {
       const next = { ...placed, [zoneId]: labelId };
       setPlaced(next);
-      if (CESSNA_HOTSPOTS.every((h) => next[h.id] === h.id)) onComplete();
+      if (zonas.every((h) => next[h.id] === h.id)) onComplete();
     } else {
       setWrongZone(zoneId);
       setTimeout(() => setWrongZone(null), 500);
@@ -45,8 +47,8 @@ export function DragDropLabels({ onComplete }: { onComplete: () => void }) {
       </p>
 
       <div className="relative mt-5 overflow-hidden rounded-2xl border border-white/10 bg-navy-950">
-        <img src="/images/cessna-topview.png" alt="Cessna 172 de Villanueva Aviation, vista superior" className="w-full" />
-        {CESSNA_HOTSPOTS.map((h) => (
+        <img src={juego.imagen} alt={juego.alt} className="w-full" />
+        {zonas.map((h) => (
           <div
             key={h.id}
             onDragOver={(e) => e.preventDefault()}
@@ -71,7 +73,7 @@ export function DragDropLabels({ onComplete }: { onComplete: () => void }) {
 
       <div className="mt-5 flex flex-wrap gap-2">
         {availableLabels.map((id) => {
-          const hotspot = CESSNA_HOTSPOTS.find((h) => h.id === id)!;
+          const hotspot = zonas.find((h) => h.id === id)!;
           return (
             <span
               key={id}

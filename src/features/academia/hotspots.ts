@@ -86,3 +86,89 @@ export const CESSNA_HOTSPOTS: Hotspot[] = [
     yPct: 10.3,
   },
 ];
+
+/**
+ * Los seis instrumentos analógicos básicos, en su distribución real: arriba
+ * los tres de referencia primaria, abajo los tres de apoyo. Las descripciones
+ * salen de los temas del módulo de Instrumentos, e incluyen de qué sistema se
+ * alimenta cada uno — que es lo que explica cuáles se caen juntos cuando falla
+ * el vacío, el pitot o la estática.
+ */
+export const SIXPACK_HOTSPOTS: Hotspot[] = [
+  {
+    id: "velocimetro",
+    label: "Indicador de velocidad",
+    description:
+      "Mide la diferencia entre la presión dinámica del tubo pitot y la presión estática. Sus arcos de color marcan el rango de flaps (blanco), el de operación normal (verde), la zona de precaución (amarillo) y la Vne (línea roja). Sistema pitot-estático.",
+    xPct: 29.6,
+    yPct: 40.8,
+  },
+  {
+    id: "horizonte",
+    label: "Horizonte artificial",
+    description:
+      "Tu referencia primaria de actitud: muestra inclinación y cabeceo mediante un giroscopio que mantiene su orientación en el espacio. En IMC es la única referencia confiable sin visibilidad exterior. Accionado por vacío (o eléctrico en cabinas modernas).",
+    xPct: 51,
+    yPct: 40.8,
+  },
+  {
+    id: "altimetro",
+    label: "Altímetro",
+    description:
+      "Mide la altitud comparando la presión estática contra la referencia que ajustas en la ventana Kollsman. De alta a baja presión sin reajustar, te indica más altura de la que realmente tienes. Sistema pitot-estático (solo estática).",
+    xPct: 71.4,
+    yPct: 40.8,
+  },
+  {
+    id: "coordinador",
+    label: "Coordinador de giro",
+    description:
+      "Muestra la tasa de giro, no el ángulo de inclinación: el viraje estándar son 3° por segundo, 360° en dos minutos. La bola del inclinómetro indica si el viraje está coordinado, derrapando o resbalando. Alimentación eléctrica — por eso sobrevive a una falla de vacío.",
+    xPct: 29.6,
+    yPct: 76.8,
+  },
+  {
+    id: "rumbo",
+    label: "Indicador de rumbo",
+    description:
+      "Giroscopio direccional que muestra hacia dónde apunta la nariz, más estable que la brújula magnética porque no sufre errores de aceleración ni de viraje. Sufre precesión: hay que realinearlo con la brújula cada 15 minutos. Accionado por vacío.",
+    xPct: 51,
+    yPct: 76.8,
+  },
+  {
+    id: "variometro",
+    label: "Indicador de velocidad vertical",
+    description:
+      "Muestra la tasa de ascenso o descenso en pies por minuto, midiendo qué tan rápido cambia la presión estática. Responde con retraso de algunos segundos, así que sirve para confirmar una tendencia, no para perseguirla. Sistema pitot-estático (solo estática).",
+    xPct: 71.4,
+    yPct: 76.8,
+  },
+];
+
+export interface HotspotSet {
+  imagen: string;
+  alt: string;
+  puntos: Hotspot[];
+}
+
+export const HOTSPOT_SETS: Record<string, HotspotSet> = {
+  cessna: {
+    imagen: "/images/cessna-topview.png",
+    alt: "Cessna 172 de Villanueva Aviation, vista superior",
+    puntos: CESSNA_HOTSPOTS,
+  },
+  "six-pack": {
+    imagen: "/images/temas/fundamentos-tema8.jpg",
+    alt: "Panel con los seis instrumentos básicos de vuelo",
+    puntos: SIXPACK_HOTSPOTS,
+  },
+  /** Solo las superficies que mueven la aeronave en sus tres ejes. Sirve para
+   *  arrastrar etiquetas sin la ayuda del resto de la estructura. */
+  superficies: {
+    imagen: "/images/cessna-topview.png",
+    alt: "Superficies de control del Cessna 172, vista superior",
+    puntos: CESSNA_HOTSPOTS.filter((h) =>
+      ["aleron", "flaps", "elevador", "timon", "estabilizador-horizontal", "estabilizador-vertical"].includes(h.id),
+    ),
+  },
+};

@@ -14,7 +14,7 @@ import {
   Layers,
   Gavel,
 } from "lucide-react";
-import { flattenTemas } from "./moduleContent";
+import { flattenTemas } from "./moduleContent.ts";
 
 export type ActividadTipo = "leccion" | "interactividad" | "practica" | "evaluacion" | "proyecto";
 
@@ -30,6 +30,14 @@ export interface ModuloActividad {
   termSetId?: string;
   /** Solo para widget "escenario": qué árbol de decisión usar (por defecto, el slug del módulo). */
   scenarioId?: string;
+  /** Solo para widgets "diagrama" y "dragdrop": qué juego de puntos usar (por defecto, "cessna"). */
+  hotspotSetId?: string;
+  /** Solo para widget "audio": qué tanda de fraseología usar. */
+  audioSetId?: string;
+  /** Solo para widget "circuito": qué tanda de preguntas usar (por defecto, "comunicaciones"). */
+  circuitoSetId?: string;
+  /** Solo para widget "circuito": arrancar directo en "Ponte a prueba". */
+  circuitoSoloPrueba?: boolean;
 }
 
 export interface AcademiaModulo {
@@ -104,7 +112,8 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
       ...leccionesDeTemas("aerodinamica"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Simulador de configuración vs. resistencia", widget: "slider" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
-      { id: "interactividad-3", tipo: "interactividad", titulo: "Simulador de decisión: viraje base-final", widget: "escenario" },
+      { id: "interactividad-3", tipo: "interactividad", titulo: "Arrastra las superficies de control", widget: "dragdrop", hotspotSetId: "superficies" },
+      { id: "interactividad-4", tipo: "interactividad", titulo: "Simulador de decisión: viraje base-final", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: efectos de control" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Aerodinámica" },
       { id: "proyecto-1", tipo: "proyecto", titulo: "Proyecto final: analiza tu propia maniobra" },
@@ -159,11 +168,12 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
       "Usando el modo de práctica de voz, graba una secuencia completa de llamadas de un vuelo imaginario que inventes: desde el primer contacto con Torre, pasando por rodaje y despegue, hasta tu primer reporte en crucero. Envía un resumen escrito de tu secuencia para revisión.",
     actividades: [
       ...leccionesDeTemas("comunicaciones"),
-      { id: "interactividad-1", tipo: "interactividad", titulo: "Práctica de fraseología con audio", widget: "audio" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Fraseología con audio: rodaje y despegue", widget: "audio", audioSetId: "rodaje-despegue" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-3", tipo: "interactividad", titulo: "Circuito de tráfico: recorrido y práctica", widget: "circuito" },
       { id: "interactividad-4", tipo: "interactividad", titulo: "Relaciona más términos clave", widget: "terminos", termSetId: "comunicaciones-2" },
-      { id: "interactividad-5", tipo: "interactividad", titulo: "Simulador de decisión: frecuencia ocupada", widget: "escenario" },
+      { id: "interactividad-5", tipo: "interactividad", titulo: "Fraseología con audio: emergencias y aproximación", widget: "audio", audioSetId: "emergencias-aproximacion" },
+      { id: "interactividad-6", tipo: "interactividad", titulo: "Simulador de decisión: frecuencia ocupada", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: simulacro de llamadas" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Comunicaciones" },
       { id: "proyecto-1", tipo: "proyecto", titulo: "Proyecto final: tu propia secuencia de llamadas" },
@@ -179,8 +189,9 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
       "Inventa un escenario de falla de instrumentos (por ejemplo, falla eléctrica parcial o de vacío) durante un tramo específico de un vuelo, y explica paso a paso qué instrumentos usarías y en qué orden para mantener control seguro del avión. Envíalo para revisión.",
     actividades: [
       ...leccionesDeTemas("instrumentos"),
-      { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
-      { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: falla de vacío", widget: "escenario" },
+      { id: "interactividad-1", tipo: "interactividad", titulo: "Explora el Six Pack instrumento por instrumento", widget: "diagrama", hotspotSetId: "six-pack" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
+      { id: "interactividad-3", tipo: "interactividad", titulo: "Simulador de decisión: falla de vacío", widget: "escenario" },
       { id: "interactividad-3", tipo: "interactividad", titulo: "Relaciona más términos clave", widget: "terminos", termSetId: "instrumentos-2" },
       { id: "interactividad-4", tipo: "interactividad", titulo: "Simulador de decisión: bloqueo del sistema pitot-estático", widget: "escenario", scenarioId: "instrumentos-2" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: lectura de instrumentos" },
@@ -219,7 +230,8 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
       ...leccionesDeTemas("vfr"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Simulador de decisión: clima cambiante", widget: "escenario" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
-      { id: "interactividad-3", tipo: "interactividad", titulo: "Simulador de decisión: conflicto en el patrón", widget: "escenario", scenarioId: "vfr-2" },
+      { id: "interactividad-3", tipo: "interactividad", titulo: "Ubícate en el circuito de tráfico", widget: "circuito", circuitoSetId: "vfr", circuitoSoloPrueba: true },
+      { id: "interactividad-4", tipo: "interactividad", titulo: "Simulador de decisión: conflicto en el patrón", widget: "escenario", scenarioId: "vfr-2" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: planificación VFR" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de VFR" },
       { id: "proyecto-1", tipo: "proyecto", titulo: "Proyecto final: tu propia llegada VFR" },
@@ -239,6 +251,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
       { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: fuego en el arranque", widget: "escenario" },
       { id: "interactividad-3", tipo: "interactividad", titulo: "Relaciona más términos clave", widget: "terminos", termSetId: "operacion-2" },
       { id: "interactividad-4", tipo: "interactividad", titulo: "Simulador de decisión: despegue rechazado", widget: "escenario", scenarioId: "operacion-2" },
+      { id: "interactividad-5", tipo: "interactividad", titulo: "Qué te toca hacer en cada tramo del circuito", widget: "circuito", circuitoSetId: "operacion", circuitoSoloPrueba: true },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: secuencia de procedimientos" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Operación" },
       { id: "proyecto-1", tipo: "proyecto", titulo: "Proyecto final: tu propio briefing de emergencia" },

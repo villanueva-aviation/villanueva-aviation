@@ -114,3 +114,9 @@ export const FRASEOLOGIA_EMERGENCIAS_APROXIMACION: PhraseologyCard[] = [
     ],
   },
 ];
+
+/** Tandas de fraseología que puede pedir una actividad de la Academia. */
+export const AUDIO_SETS: Record<string, PhraseologyCard[]> = {
+  "rodaje-despegue": FRASEOLOGIA_RODAJE_DESPEGUE,
+  "emergencias-aproximacion": FRASEOLOGIA_EMERGENCIAS_APROXIMACION,
+};

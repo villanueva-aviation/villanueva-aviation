@@ -21,11 +21,12 @@ import { useAuth } from "../features/auth/AuthContext";
 import { usePremiumAccess } from "../features/payments/usePremiumAccess";
 import { useProgress } from "../features/progress/ProgressContext";
 import { ModuleStepper, type StepperStage } from "../features/academia/ModuleStepper";
-import { AirplaneDiagram } from "../features/academia/AirplaneDiagram";
+import { HotspotDiagram } from "../features/academia/HotspotDiagram";
 import { DragDropLabels } from "../features/academia/DragDropLabels";
 import { ScenarioSimulator } from "../features/academia/ScenarioSimulator";
 import { DragSlider } from "../features/academia/DragSlider";
 import { AudioPhraseology } from "../features/academia/AudioPhraseology";
+import { AUDIO_SETS } from "../data/fraseologiaATC";
 import { CircuitoTrafico } from "../features/academia/CircuitoTrafico";
 import { TermMatch } from "../features/academia/TermMatch";
 import { LessonFlow } from "../features/academia/LessonFlow";
@@ -132,7 +133,7 @@ function InteractividadWidget({
 }) {
   switch (actividad.widget) {
     case "dragdrop":
-      return <DragDropLabels onComplete={onComplete} />;
+      return <DragDropLabels onComplete={onComplete} setId={actividad.hotspotSetId} />;
     case "escenario": {
       const scenario = MODULE_SCENARIOS[actividad.scenarioId ?? modulo.slug];
       return scenario ? <ScenarioSimulator tree={scenario.tree} startId={scenario.startId} /> : <ScenarioSimulator />;
@@ -142,16 +143,22 @@ function InteractividadWidget({
       return config ? <DragSlider config={config} /> : <DragSlider />;
     }
     case "audio":
-      return <AudioPhraseology onComplete={onComplete} />;
+      return <AudioPhraseology onComplete={onComplete} cards={AUDIO_SETS[actividad.audioSetId ?? ""]} />;
     case "terminos": {
       const pairs = MODULE_TERMS[actividad.termSetId ?? modulo.slug] ?? [];
       return <TermMatch pairs={pairs} onComplete={onComplete} />;
     }
     case "circuito":
-      return <CircuitoTrafico onComplete={onComplete} />;
+      return (
+        <CircuitoTrafico
+          onComplete={onComplete}
+          setId={actividad.circuitoSetId}
+          modoInicial={actividad.circuitoSoloPrueba ? "prueba" : "aprende"}
+        />
+      );
     case "diagrama":
     default:
-      return <AirplaneDiagram />;
+      return <HotspotDiagram setId={actividad.hotspotSetId} />;
   }
 }
 

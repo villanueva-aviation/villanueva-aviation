@@ -1,15 +1,18 @@
 import { useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Check, Copy, RotateCcw } from "lucide-react";
-import { CESSNA_HOTSPOTS, type Hotspot } from "./hotspots";
+import { HOTSPOT_SETS, type Hotspot } from "./hotspots";
 
-export function AirplaneDiagram() {
+/** Diagrama con puntos calientes sobre una imagen. El mismo widget sirve para
+ *  la aeronave y para el panel de instrumentos: solo cambia el juego de puntos. */
+export function HotspotDiagram({ setId = "cessna" }: { setId?: string }) {
+  const juego = HOTSPOT_SETS[setId] ?? HOTSPOT_SETS.cessna;
   const [searchParams] = useSearchParams();
   const editable = searchParams.has("editar");
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const [positions, setPositions] = useState<Hotspot[]>(CESSNA_HOTSPOTS);
-  const [active, setActive] = useState(CESSNA_HOTSPOTS[0].id);
+  const [positions, setPositions] = useState<Hotspot[]>(juego.puntos);
+  const [active, setActive] = useState(juego.puntos[0].id);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const activeHotspot = positions.find((h) => h.id === active) ?? positions[0];
@@ -41,7 +44,7 @@ export function AirplaneDiagram() {
   }
 
   function resetPositions() {
-    setPositions(CESSNA_HOTSPOTS);
+    setPositions(juego.puntos);
   }
 
   function copyCode() {
@@ -77,8 +80,8 @@ export function AirplaneDiagram() {
           className="relative overflow-hidden rounded-2xl border border-white/10 bg-navy-950 select-none"
         >
           <img
-            src="/images/cessna-topview.png"
-            alt="Cessna 172 de Villanueva Aviation, vista superior"
+            src={juego.imagen}
+            alt={juego.alt}
             className="w-full"
             draggable={false}
           />
