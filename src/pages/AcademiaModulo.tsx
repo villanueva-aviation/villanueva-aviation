@@ -198,6 +198,8 @@ export function AcademiaModulo() {
     etapaInicial && stageKeys.includes(etapaInicial) ? etapaInicial : "introduccion",
   );
   const bloqueo = useBloqueoPorProyecto(slug);
+  const { user } = useAuth();
+  const esBienvenida = searchParams.get("bienvenida") === "1";
 
   if (!modulo) return <Navigate to={ROUTES.academia} replace />;
   if (progresoLoading) return null;
@@ -254,6 +256,17 @@ export function AcademiaModulo() {
       </PageHero>
 
       <Container className="py-12 md:py-16">
+        {esBienvenida && progreso.completadasCount === 0 && (
+          <div className="mb-8 rounded-2xl border border-gold-500/30 bg-gold-500/[0.06] p-5">
+            <p className="font-display text-sm font-semibold text-gold-400">
+              Bienvenido a Villanueva Aviation{user?.nombre ? `, ${user.nombre}` : ""}
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-white/70">
+              Esta es tu primera lección. Léela a tu ritmo: cada tema trae la idea clave y los puntos esenciales, y puedes
+              abrir la explicación completa cuando quieras.
+            </p>
+          </div>
+        )}
         <ModuleStepper stages={stages} activeKey={activeStage} onSelect={setActiveStage} />
 
         {progreso.estado === "completado" && (

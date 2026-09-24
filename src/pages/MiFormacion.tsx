@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight, Award, BookCheck, ClipboardCheck, Gauge, Plane, Target, Timer } from "lucide-react";
 import { CadetTabs } from "../components/layout/CadetTabs";
 import { Container } from "../components/ui/Container";
@@ -11,6 +13,7 @@ import { ACADEMIA_MODULOS } from "../data/academia";
 import { contarExamenesAprobados } from "../data/evaluaciones";
 import { useHorasVueloConfirmadas } from "../features/practica/vuelosPractica";
 import { useRango } from "../features/progress/rango";
+import { bienvenidaVista, marcarBienvenidaVista } from "../features/progress/bienvenida";
 import { ROUTES } from "../lib/routes";
 
 export function MiFormacion() {
@@ -40,7 +43,23 @@ export function MiFormacion() {
   const examenesAprobados = contarExamenesAprobados(examenResultado);
   const horasVueloConfirmadas = useHorasVueloConfirmadas();
 
-  if (loading) return null;
+  // Un cadete sin una sola actividad completada no necesita un tablero de
+  // estadísticas en ceros: necesita empezar. La primera vez que entra desde
+  // este navegador se le lleva directo a la lección 1 (no en un bucle: la
+  // marca queda guardada); si vuelve sin haber avanzado, ve el tablero con un
+  // solo paso claro en vez de "Bienvenido de vuelta".
+  const esNuevo = leccionesCompletadas === 0;
+  const urlPrimeraLeccion = `${ROUTES.academiaModulo(moduloActual.slug)}?etapa=leccion&bienvenida=1`;
+  const navigate = useNavigate();
+  const irAPrimeraLeccion = !loading && esNuevo && !bienvenidaVista();
+
+  useEffect(() => {
+    if (!irAPrimeraLeccion) return;
+    marcarBienvenidaVista();
+    navigate(urlPrimeraLeccion, { replace: true });
+  }, [irAPrimeraLeccion, navigate, urlPrimeraLeccion]);
+
+  if (loading || irAPrimeraLeccion) return null;
 
   return (
     <div>
@@ -50,10 +69,12 @@ export function MiFormacion() {
             Mi Formación
           </span>
           <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">
-            Bienvenido de vuelta, {user?.nombre ?? "Cadete"}
+            {esNuevo ? "Bienvenido" : "Bienvenido de vuelta"}, {user?.nombre ?? "Cadete"}
           </h1>
           <p className="mt-3 max-w-xl text-white/60">
-            Esta es tu cabina de entrenamiento personal. Aquí verás tu progreso, tu próxima lección y tus logros.
+            {esNuevo
+              ? "Tu primera lección te espera. Cada tema trae la idea clave y los puntos esenciales, y cada pocos temas hay una pregunta rápida para comprobar lo que leíste."
+              : "Esta es tu cabina de entrenamiento personal. Aquí verás tu progreso, tu próxima lección y tus logros."}
           </p>
 
           <div className="mt-8 flex items-center gap-3">
@@ -78,7 +99,7 @@ export function MiFormacion() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr]">
           <Reveal className="rounded-2xl border border-gold-500/25 bg-gradient-to-br from-navy-900 to-navy-800 p-6 md:p-8">
             <span className="font-display text-xs font-semibold uppercase tracking-wide text-gold-500">
-              {formacionCompleta ? "Formación completada" : "Módulo actual"}
+              {formacionCompleta ? "Formación completada" : esNuevo ? "Tu primer paso" : "Módulo actual"}
             </span>
             <h2 className="mt-2 font-display text-2xl font-semibold text-white">
               {formacionCompleta ? "¡Completaste todos los módulos!" : moduloActual.titulo}
@@ -88,17 +109,22 @@ export function MiFormacion() {
                 ? "Puedes repasar cualquier módulo o revisar tus certificados en tu perfil."
                 : moduloActual.resumen}
             </p>
-            <div className="mt-5 max-w-sm">
-              <ProgressBar value={progresoActual.progresoPct} />
-              <p className="mt-2 text-xs text-white/45">{progresoActual.progresoPct}% completado</p>
-            </div>
+            {!esNuevo && (
+              <div className="mt-5 max-w-sm">
+                <ProgressBar value={progresoActual.progresoPct} />
+                <p className="mt-2 text-xs text-white/45">{progresoActual.progresoPct}% completado</p>
+              </div>
+            )}
             {siguiente && (
               <p className="mt-4 text-sm text-white/55">
-                Próxima actividad: <span className="text-white">{siguiente.titulo}</span>
+                {esNuevo ? "Primera lección" : "Próxima actividad"}: <span className="text-white">{siguiente.titulo}</span>
               </p>
             )}
-            <Button to={formacionCompleta ? ROUTES.perfil : ROUTES.academiaModulo(moduloActual.slug)} className="mt-6 group">
-              {formacionCompleta ? "Ver mi perfil" : "Continuar formación"}
+            <Button
+              to={formacionCompleta ? ROUTES.perfil : esNuevo ? urlPrimeraLeccion : ROUTES.academiaModulo(moduloActual.slug)}
+              className="mt-6 group"
+            >
+              {formacionCompleta ? "Ver mi perfil" : esNuevo ? "Empezar mi primera lección" : "Continuar formación"}
               <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" />
             </Button>
           </Reveal>
