@@ -42,6 +42,7 @@ const AgendarCita = lazy(() => import("./pages/AgendarCita").then((m) => ({ defa
 const GuiaVFR = lazy(() => import("./pages/GuiaVFR").then((m) => ({ default: m.GuiaVFR })));
 const Aventura = lazy(() => import("./pages/Aventura").then((m) => ({ default: m.Aventura })));
 const AdminAventura = lazy(() => import("./pages/AdminAventura").then((m) => ({ default: m.AdminAventura })));
+const EntrenadorEsperas = lazy(() => import("./pages/EntrenadorEsperas").then((m) => ({ default: m.EntrenadorEsperasPage })));
 const Comunidad = lazy(() => import("./pages/Comunidad").then((m) => ({ default: m.Comunidad })));
 const Perfil = lazy(() => import("./pages/Perfil").then((m) => ({ default: m.Perfil })));
 const AdminVuelosPractica = lazy(() => import("./pages/AdminVuelosPractica").then((m) => ({ default: m.AdminVuelosPractica })));
@@ -197,6 +198,7 @@ function RoutedContent() {
           <Route path={ROUTES.guiaVFR} element={<GuiaVFR />} />
           <Route path={ROUTES.comunidad} element={<Comunidad />} />
           <Route path={ROUTES.aventura} element={<Aventura />} />
+          <Route path={ROUTES.entrenadorEsperas} element={<EntrenadorEsperas />} />
           <Route
             path={ROUTES.adminAventura}
             element={

@@ -41,6 +41,7 @@ export const ROUTES = {
   ingresar: "/ingresar",
   empieza: "/empieza",
   aventura: "/aventura",
+  entrenadorEsperas: "/entrenador-esperas",
   adminAventura: "/admin/aventura",
 } as const;
 

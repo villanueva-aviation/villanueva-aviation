@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test src/features/academia/phraseologyEvaluator.test.ts src/lib/clima.test.ts src/lib/discord.test.ts src/features/payments/reglasSesiones.test.ts src/data/checkpoints.test.ts src/data/widgetSets.test.ts src/features/progress/migrarProgreso.test.ts src/features/admin/contactoCadete.test.ts src/features/landing/datosPruebaVor.test.ts src/features/aventura/aventura.test.ts"
+    "test": "node --experimental-strip-types --test src/features/academia/phraseologyEvaluator.test.ts src/lib/clima.test.ts src/lib/discord.test.ts src/features/payments/reglasSesiones.test.ts src/data/checkpoints.test.ts src/data/widgetSets.test.ts src/features/progress/migrarProgreso.test.ts src/features/admin/contactoCadete.test.ts src/features/landing/datosPruebaVor.test.ts src/features/aventura/aventura.test.ts src/features/entrenador/esperas.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
