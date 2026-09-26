@@ -10,6 +10,7 @@ export function ChecklistPremiumC172() {
       emergencia={CHECKLIST_EMERGENCIA}
       flujos={FLUJOS_C172}
       vspeeds={VSPEEDS_C172}
+      notaVspeeds="Valores del POH del Cessna 172S, en KIAS (otras versiones del 172 varían). Confirma los de tu avión y los de tu versión del simulador."
     />
   );
 }

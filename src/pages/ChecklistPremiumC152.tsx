@@ -10,6 +10,7 @@ export function ChecklistPremiumC152() {
       emergencia={CHECKLIST_C152_EMERGENCIA}
       flujos={FLUJOS_C152}
       vspeeds={VSPEEDS_C152}
+      notaVspeeds="Valores del POH del Cessna 152, en KIAS. Confirma los de tu avión y los de tu versión del simulador."
     />
   );
 }

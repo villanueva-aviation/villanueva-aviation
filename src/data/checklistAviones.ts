@@ -37,7 +37,7 @@ const AVISO = "Referencia para simulación y formación, basada en procedimiento
 const avisoPoh = (fuente: string) =>
   `Los procedimientos y las velocidades están tomados del manual del fabricante (${fuente}). El checklist oficial es el de tu manual (AFM/POH) y el del propio simulador: si difieren, mandan los suyos.`;
 
-// ponytail: valores de V-speeds de referencia (redondeados, avión típico a peso máximo); confirmar contra el POH antes de usarlos como dato.
+// Las V-speeds del DA40 NG, el C208B, el Dakota y el C185 vienen de sus manuales (POH/AFM). Confirmar siempre contra el manual del avión.
 export const AVIONES_CHECKLIST: Record<string, AvionChecklist> = {
   da40: {
     id: "da40",
@@ -154,15 +154,18 @@ export const AVIONES_CHECKLIST: Record<string, AvionChecklist> = {
       ["falla-electrica", "Falla eléctrica total", ["Breakers y alternador", "Cargas no esenciales OFF", "Radio y transponder primero", "Aeropuerto más cercano"]],
     ]),
     vspeeds: [
-      { clave: "Vr", nombre: "Rotación", valor: "59 kt" },
-      { clave: "Vx", nombre: "Mejor ángulo de ascenso", valor: "62 kt" },
-      { clave: "Vy", nombre: "Mejor tasa de ascenso", valor: "68 kt" },
-      { clave: "Vglide", nombre: "Mejor planeo", valor: "73 kt" },
-      { clave: "Vfe", nombre: "Máxima con flaps extendidos", valor: "108 kt (despegue) / 91 kt (aterrizaje)" },
-      { clave: "Vno", nombre: "Máxima estructural normal", valor: "129 kt" },
-      { clave: "Vne", nombre: "Nunca exceder", valor: "178 kt" },
-      { clave: "Vs", nombre: "Pérdida, configuración limpia", valor: "49 kt" },
+      { clave: "Vr", nombre: "Rotación (flaps T/O)", valor: "56–67 kt según el peso (67 kt a 1,280 kg)" },
+      { clave: "Vy", nombre: "Mejor tasa de ascenso (flaps T/O)", valor: "72 kt" },
+      { clave: "Vcl", nombre: "Ascenso de crucero (flaps arriba)", valor: "88 kt" },
+      { clave: "Vglide", nombre: "Mejor planeo (flaps arriba)", valor: "88 kt" },
+      { clave: "Va", nombre: "Velocidad de maniobra", valor: "101 kt hasta 1,080 kg · 108 kt hasta 1,180 kg · 113 kt más de 1,180 kg" },
+      { clave: "Vfe", nombre: "Máxima con flaps extendidos", valor: "110 kt (T/O) / 98 kt (LDG)" },
+      { clave: "Vno", nombre: "Máxima estructural normal", valor: "130 kt" },
+      { clave: "Vne", nombre: "Nunca exceder", valor: "172 kt" },
+      { clave: "Vs", nombre: "Pérdida, flaps arriba", valor: "58 kt a 1,000 kg · 64 kt a 1,200 kg" },
+      { clave: "Vs0", nombre: "Pérdida, flaps LDG", valor: "55 kt a 1,000 kg · 59 kt a 1,200 kg" },
     ],
+    notaVspeeds: "Valores del manual de vuelo del DA40 NG (AFM 6.01.15-E, rev. 3), en KIAS; varias dependen del peso. Confirma los de tu avión y los de tu versión del simulador.",
   },
 
   c208: {
@@ -275,13 +278,17 @@ export const AVIONES_CHECKLIST: Record<string, AvionChecklist> = {
       ["falla-electrica", "Falla eléctrica total", ["Breakers y generador", "Cargas no esenciales OFF", "Radio y transponder primero", "Aeropuerto más cercano"]],
     ]),
     vspeeds: [
-      { clave: "Vr", nombre: "Rotación", valor: "80 kt" },
-      { clave: "Vy", nombre: "Mejor tasa de ascenso", valor: "87 kt" },
-      { clave: "Vglide", nombre: "Mejor planeo", valor: "90 kt" },
-      { clave: "Vfe", nombre: "Máxima con flaps extendidos", valor: "150 kt (20°) / 125 kt (30°)" },
-      { clave: "Vno", nombre: "Máxima estructural normal", valor: "175 kt" },
-      { clave: "Vs0", nombre: "Pérdida, configuración de aterrizaje", valor: "61 kt" },
+      { clave: "Vr", nombre: "Rotación", valor: "70–75 kt" },
+      { clave: "V50", nombre: "Ascenso inicial (flaps 20°)", valor: "85–95 kt" },
+      { clave: "Vx", nombre: "Mejor ángulo de ascenso", valor: "72 kt" },
+      { clave: "Vy", nombre: "Mejor tasa de ascenso", valor: "104 kt (nivel del mar a 10,000 ft) · 87 kt a 20,000 ft" },
+      { clave: "Va", nombre: "Velocidad de maniobra", valor: "148 kt a 8,750 lb (137 kt a 7,500 lb)" },
+      { clave: "Vglide", nombre: "Mejor planeo (sin pod de carga)", valor: "97 kt a 8,750 lb · 90 kt a 7,500 lb" },
+      { clave: "Vfe", nombre: "Máxima con flaps extendidos", valor: "175 kt (hasta 10°) / 150 kt (10° a 20°) / 125 kt (más de 20°)" },
+      { clave: "Vmo", nombre: "Máxima de operación", valor: "175 kt" },
+      { clave: "Vxw", nombre: "Viento cruzado demostrado", valor: "20 kt" },
     ],
+    notaVspeeds: "Valores del POH del Cessna 208B con G1000, en KIAS; varias dependen del peso. Confirma los de tu avión y los de tu versión del simulador.",
   },
 
   dakota: {
