@@ -19,8 +19,8 @@ const COLOR_SECTOR: Record<Entrada, string> = {
   paralela: "rgba(127,179,255,0.22)",
 };
 const R = 150;
-const LARGO = 74; // del patrón, en unidades del SVG
-const ANCHO = 36;
+const LARGO = 78; // del patrón, en unidades del SVG
+const ANCHO = 54; // diámetro del giro: el viraje estándar es más ancho que el tramo de un minuto
 const META_SEGUNDOS = 15;
 
 const rad = (g: number) => (g * Math.PI) / 180;
@@ -52,6 +52,8 @@ function Diagrama({ s, revelar }: { s: Situacion; revelar: boolean }) {
   const B = punto(s.alejamiento, LARGO);
   const D = punto(ladoEspera, ANCHO);
   const C = suma(D, B);
+  // Los dos giros de 180° van en el sentido de la espera (1 = horario, como el rumbo).
+  const sentido = s.giros === "derecha" ? 1 : 0;
   const llegada = norm(s.rumbo + 180); // de dónde vienes
   const origen = punto(llegada, R - 8);
   const cercano = punto(llegada, 34);
@@ -73,7 +75,7 @@ function Diagrama({ s, revelar }: { s: Situacion; revelar: boolean }) {
         SECTORES.map((sec) => {
           const t = trazoSector(s, sec.desde, sec.hasta);
           const correcto = sec.entrada === entradaEspera(s.rumbo, s.alejamiento, s.giros);
-          const etiqueta = punto(t.medio, R * 0.62);
+          const etiqueta = punto(t.medio, R * 0.8);
           return (
             <g key={sec.entrada}>
               <path d={`M 0 0 L ${p(punto(t.ini, R))} A ${R} ${R} 0 ${t.grande} 1 ${p(punto(t.fin, R))} Z`}
@@ -86,7 +88,13 @@ function Diagrama({ s, revelar }: { s: Situacion; revelar: boolean }) {
         })}
 
       {/* Patrón: inbound sobre el radial, alejamiento desplazado hacia el lado de la espera */}
-      <path d={`M ${p(A)} L ${p(D)} L ${p(C)} L ${p(B)} Z`} fill="none" stroke={ORO} strokeWidth="2.5" strokeLinejoin="round" />
+      <path
+        d={`M ${p(B)} L ${p(A)} A ${ANCHO / 2} ${ANCHO / 2} 0 0 ${sentido} ${p(D)} L ${p(C)} A ${ANCHO / 2} ${ANCHO / 2} 0 0 ${sentido} ${p(B)} Z`}
+        fill="none"
+        stroke={ORO}
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
       <path d={flecha(punto(s.alejamiento, LARGO / 2), acercamiento, 7)} fill={ORO} />
       <circle r="4.5" fill="white" />
       <text x="9" y="-8" fontSize="11" fontWeight="600" fill="white">VOR</text>
