@@ -139,6 +139,7 @@ export function Aventura() {
     <div>
       <PageHero
         eyebrow="The Adventure"
+        fondo="/images/aventura-hero.webp"
         title="Un vuelo a la vez, sin saltarme ningún aeropuerto"
         description={`Salgo de Guadalajara (MMGL) en mi Cessna 152 XB-VLA y cada aterrizaje queda registrado aquí, con su video. Son vuelos en simulador, con ${HORAS_IVAO.toLocaleString("es-MX")} horas registradas en IVAO detrás.`}
       />
