@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Timer } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
@@ -75,6 +75,28 @@ export function Academia() {
               </Reveal>
             );
           })}
+        </div>
+
+        <div className="mt-16">
+          <h2 className="font-display text-xl font-semibold text-white">Práctica extra</h2>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/60">
+            Herramientas cortas para entrenar decisiones.
+          </p>
+          <Link
+            to={ROUTES.entrenadorEsperas}
+            className="card-hover group mt-5 flex max-w-xl items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gold-500/10 text-gold-400">
+              <Timer size={22} strokeWidth={1.75} />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-display text-base font-semibold text-white">Entrenador de esperas</h3>
+              <p className="mt-1 text-sm leading-relaxed text-white/60">
+                Te damos la espera y tu rumbo de llegada: elige la entrada (directa, gota o paralela) en menos de 15 segundos.
+              </p>
+            </div>
+            <ArrowRight size={16} className="shrink-0 text-gold-400 transition-transform duration-200 [@media(hover:hover)_and_(pointer:fine)]:group-hover:translate-x-0.5" />
+          </Link>
         </div>
       </Container>
     </div>
