@@ -6,7 +6,7 @@ import { Button } from "../components/ui/Button";
 import { fetchVuelosAventura, type VueloAventura } from "../features/aventura/aventura";
 import { formatoDuracion, resumenAventura } from "../features/aventura/calculos";
 import { MapaAventura } from "../features/aventura/MapaAventura";
-import { HORAS_IVAO_APROX } from "../lib/constants";
+import { HORAS_IVAO } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 
 const FECHA = new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
@@ -76,7 +76,7 @@ export function Aventura() {
       <PageHero
         eyebrow="The Adventure"
         title="Un vuelo a la vez, sin saltarme ningún aeropuerto"
-        description={`Salgo de Guadalajara (MMGL) en un Beechcraft A36TC y cada aterrizaje queda registrado aquí, con su video. Son vuelos en simulador, con unas ${HORAS_IVAO_APROX.toLocaleString("es-MX")} horas registradas en IVAO detrás.`}
+        description={`Salgo de Guadalajara (MMGL) en un Beechcraft A36TC y cada aterrizaje queda registrado aquí, con su video. Son vuelos en simulador, con ${HORAS_IVAO.toLocaleString("es-MX")} horas registradas en IVAO detrás.`}
       />
 
       <Container className="py-12 md:py-16">
