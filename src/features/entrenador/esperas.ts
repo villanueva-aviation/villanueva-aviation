@@ -1,19 +1,15 @@
 /**
  * Entradas a una espera (AIM 5-3-8, FAA; PANS-OPS 8168, OACI). Se decide con el rumbo con el que llegas al
- * fijo respecto al curso de ACERCAMIENTO (el rumbo del tramo que llega al fijo). En una espera estándar
- * (giros a la derecha), medido desde ese rumbo:
- *   a su derecha (0° a 180°)               -> directa    (180° de sector)
- *   a su izquierda, hasta 70°              -> gota       (70°)
- *   a su izquierda, de 70° a 180°          -> paralela   (110°)
- * En una espera a la izquierda todo se refleja.
- *
- * Es lo mismo que decir: directa si girar en el sentido de la espera hasta el rumbo de alejamiento son menos
- * de 180°; si no, paralela cuando bastan menos de 110° a la izquierda, y gota en el resto.
- * Ejemplo de la FAA: espera al este del VOR (radial 090), a la derecha: llegar con 230° es gota, con 160°
- * paralela y con 340° directa.
- *
- * Internamente se usa la diferencia d = rumbo de llegada − curso de alejamiento (0-359, hacia el lado de la
- * espera): paralela 0-110, gota 110-180, directa 180-360.
+ * fijo (rumbo a la estación) comparado con el rumbo de ALEJAMIENTO:
+ *   hasta 70° hacia el lado de la espera            -> gota      (70° de sector)
+ *   hasta 110° hacia el lado contrario              -> paralela  (110°)
+ *   el resto                                        -> directa   (180°)
+ * En una espera a la derecha el lado de la espera es la izquierda del rumbo de alejamiento. Con números,
+ * d = rumbo de llegada − curso de alejamiento (0-359; se invierte en esperas a la izquierda):
+ *   paralela 0° a 110°, directa 110° a 290°, gota 290° a 360° (o sea, -70° a 0°).
+ * La figura de la FAA para la espera al este del VOR (radial 090, giros a la derecha) marca los rumbos 020
+ * (la línea de 70°), 090 y 200: 020 a 090 gota, 090 a 200 paralela, 200 a 020 directa. Contrastado con el
+ * calculador de entradas de holdingentrycalculator.com (70 de 70 casos, esperas a la derecha y a la izquierda).
  */
 export type Giros = "derecha" | "izquierda";
 export type Entrada = "directa" | "gota" | "paralela";
@@ -36,20 +32,20 @@ export function diferencia(rumbo: number, alejamiento: number, giros: Giros): nu
 export function entradaEspera(rumbo: number, alejamiento: number, giros: Giros): Entrada {
   const d = diferencia(rumbo, alejamiento, giros);
   if (d > 0 && d <= 110) return "paralela";
-  if (d > 110 && d <= 180) return "gota";
-  return "directa";
+  if (d > 110 && d <= 290) return "directa";
+  return "gota";
 }
 
 /** Los tres sectores en el espacio de la diferencia (grados), para dibujarlos. */
 export const SECTORES: { entrada: Entrada; desde: number; hasta: number }[] = [
+  { entrada: "gota", desde: -70, hasta: 0 },
   { entrada: "paralela", desde: 0, hasta: 110 },
-  { entrada: "gota", desde: 110, hasta: 180 },
-  { entrada: "directa", desde: 180, hasta: 360 },
+  { entrada: "directa", desde: 110, hasta: 290 },
 ];
 
 /** Las preguntas evitan rumbos pegados a una frontera, donde dos fuentes pueden discrepar por un grado. */
 const MARGEN = 10;
-const cercaDeFrontera = (d: number) => [0, 110, 180].some((f) => Math.abs(d - f) < MARGEN) || 360 - d < MARGEN;
+const cercaDeFrontera = (d: number) => [0, 110, 290].some((f) => Math.abs(d - f) < MARGEN) || 360 - d < MARGEN;
 
 export function generarSituacion(azar: () => number = Math.random): Situacion {
   const giros: Giros = azar() < 0.75 ? "derecha" : "izquierda";

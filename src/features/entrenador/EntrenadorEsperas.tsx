@@ -198,14 +198,14 @@ export function EntrenadorEsperas() {
                 </span>
               </p>
               <p className="mt-2 text-sm leading-relaxed text-white/75">
-                <b className="text-white">Regla fácil:</b> compara tu rumbo con el de acercamiento (
-                {String(norm(s.alejamiento + 180)).padStart(3, "0")}°). {s.giros === "derecha" ? "A su derecha" : "A su izquierda"}: directa.{" "}
-                {s.giros === "derecha" ? "A su izquierda" : "A su derecha"} hasta 70°: gota. Del otro lado de esos 70° hasta 180°: paralela.
+                <b className="text-white">Regla fácil:</b> compara tu rumbo de llegada con el de alejamiento ({String(s.alejamiento).padStart(3, "0")}°). Hasta
+                70° hacia el lado de la espera ({s.giros === "derecha" ? "a su izquierda" : "a su derecha"}): gota. Hasta 110° hacia el otro lado (
+                {s.giros === "derecha" ? "a su derecha" : "a su izquierda"}): paralela. Todo lo demás: directa.
               </p>
               <p className="mt-2 text-sm leading-relaxed text-white/60">
                 Con números: diferencia = rumbo de llegada − curso de alejamiento
                 {s.giros === "izquierda" ? " (invertida, porque la espera es a la izquierda)" : ""} = <b className="text-white">{d}°</b>. Paralela de 0° a
-                110°, gota de 110° a 180°, directa de 180° a 360°.
+                110°, directa de 110° a 290°, gota de 290° a 360° (−70° a 0°).
               </p>
               <p className="mt-2 text-sm leading-relaxed text-white/75">
                 <b className="text-white">Cómo se vuela:</b> {comoSeVuela(correcta, s.giros)}
