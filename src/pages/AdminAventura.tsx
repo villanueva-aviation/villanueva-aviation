@@ -94,7 +94,7 @@ export function AdminAventura() {
   const [origen, setOrigen] = useState<Extremo>({ ...VACIO, icao: "MMGL" });
   const [destino, setDestino] = useState<Extremo>(VACIO);
   const [fecha, setFecha] = useState(() => new Date().toISOString().slice(0, 10));
-  const [avion, setAvion] = useState("Beechcraft A36TC");
+  const [avion, setAvion] = useState("Cessna 152 XB-VLA");
   const [horas, setHoras] = useState("");
   const [minutos, setMinutos] = useState("");
   const [distancia, setDistancia] = useState("");
