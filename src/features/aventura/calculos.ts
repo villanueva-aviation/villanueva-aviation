@@ -35,3 +35,12 @@ export function formatoDuracion(minutos: number): string {
 export function fechaMexico(instanteIso: string): string {
   return new Date(instanteIso).toLocaleDateString("sv-SE", { timeZone: "America/Mexico_City" });
 }
+
+/** Cada aeropuerto donde se aterrizó, con la fecha de la primera vez. `vuelos` viene del más antiguo al más reciente. */
+export function aeropuertosCompletados(vuelos: VueloAventura[]): { icao: string; nombre: string; fecha: string }[] {
+  const vistos = new Map<string, { icao: string; nombre: string; fecha: string }>();
+  for (const v of vuelos) {
+    if (!vistos.has(v.destino_icao)) vistos.set(v.destino_icao, { icao: v.destino_icao, nombre: v.destino_nombre, fecha: v.fecha });
+  }
+  return [...vistos.values()];
+}

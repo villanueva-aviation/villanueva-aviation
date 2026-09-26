@@ -6,10 +6,16 @@ import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "../features/auth/AuthContext";
 import {
+  borrarArchivos,
+  borrarProximo,
   borrarVueloAventura,
+  fetchProximo,
   fetchVuelosAventura,
   fetchVuelosVolanta,
+  guardarProximo,
   insertarVueloAventura,
+  subirArchivo,
+  type ProximoDestino,
   type RedAventura,
   type VueloAventura,
   type VueloVolanta,
@@ -101,12 +107,20 @@ export function AdminAventura() {
   const [deVolanta, setDeVolanta] = useState<VueloVolanta[] | null>(null);
   const [cargandoVolanta, setCargandoVolanta] = useState(false);
   const [errorVolanta, setErrorVolanta] = useState("");
+  const [comoLoHice, setComoLoHice] = useState("");
+  const [imagen, setImagen] = useState<File | null>(null);
+  const [plan, setPlan] = useState<File | null>(null);
+  const [claveArchivos, setClaveArchivos] = useState(0);
+  const [proximo, setProximo] = useState<Extremo>(VACIO);
+  const [proximoActual, setProximoActual] = useState<ProximoDestino | null>(null);
+  const [avisoProximo, setAvisoProximo] = useState("");
 
   const esFundador = user?.email === FOUNDER_EMAIL;
 
   // El siguiente vuelo sale de donde aterrizó el anterior: así no se salta ningún aeropuerto.
   useEffect(() => {
     if (authLoading || !esFundador) return;
+    fetchProximo().then(setProximoActual);
     fetchVuelosAventura().then(async (lista) => {
       setVuelos(lista);
       const ultimo = lista[lista.length - 1];
@@ -168,6 +182,14 @@ export function AdminAventura() {
     if (video && !video.startsWith("https://")) return setError("El link del video debe empezar con https://");
 
     setGuardando(true);
+    const imagenSubida = imagen ? await subirArchivo("imagen", imagen) : null;
+    const planSubido = plan ? await subirArchivo("plan", plan) : null;
+    const falloSubida = imagenSubida?.error ?? planSubido?.error;
+    if (falloSubida) {
+      await borrarArchivos({ plan_imagen_path: imagenSubida?.path ?? null, plan_archivo_path: planSubido?.path ?? null });
+      setGuardando(false);
+      return setError(`No se pudo subir el archivo: ${falloSubida}`);
+    }
     const { error: fallo } = await insertarVueloAventura({
       fecha,
       origen_icao: origen.icao,
@@ -185,9 +207,16 @@ export function AdminAventura() {
       red,
       video_url: video.trim() || null,
       notas: notas.trim() || null,
+      como_lo_hice: comoLoHice.trim() || null,
+      plan_imagen_path: imagenSubida?.path ?? null,
+      plan_archivo_path: planSubido?.path ?? null,
+      plan_archivo_nombre: plan?.name ?? null,
     });
     setGuardando(false);
-    if (fallo) return setError(`No se pudo guardar: ${fallo.message}`);
+    if (fallo) {
+      await borrarArchivos({ plan_imagen_path: imagenSubida?.path ?? null, plan_archivo_path: planSubido?.path ?? null });
+      return setError(`No se pudo guardar: ${fallo.message}`);
+    }
 
     const lista = await fetchVuelosAventura();
     setVuelos(lista);
@@ -199,12 +228,41 @@ export function AdminAventura() {
     setFpm("");
     setVideo("");
     setNotas("");
+    setComoLoHice("");
+    setImagen(null);
+    setPlan(null);
+    setClaveArchivos((n) => n + 1);
+    // Si el vuelo terminó en el próximo destino anunciado, ya no es "próximo": es completado.
+    if (proximoActual?.icao === destino.icao) {
+      await borrarProximo();
+      setProximoActual(null);
+    }
+  }
+
+  async function fijarProximo() {
+    setAvisoProximo("");
+    const [lat, lon] = [Number(proximo.lat), Number(proximo.lon)];
+    if (proximo.icao.length !== 4 || !proximo.nombre.trim() || !Number.isFinite(lat) || !Number.isFinite(lon)) {
+      return setAvisoProximo("Revisa el aeropuerto: ICAO, nombre y coordenadas.");
+    }
+    const nuevo = { icao: proximo.icao, nombre: proximo.nombre.trim(), lat, lon };
+    const { error: fallo } = await guardarProximo(nuevo);
+    if (fallo) return setAvisoProximo(`No se pudo guardar: ${fallo.message}`);
+    setProximoActual(nuevo);
+    setProximo(VACIO);
+  }
+
+  async function quitarProximo() {
+    await borrarProximo();
+    setProximoActual(null);
   }
 
   async function borrar(v: VueloAventura) {
     if (!window.confirm(`¿Borrar el vuelo ${v.origen_icao} → ${v.destino_icao}?`)) return;
     const { error: fallo } = await borrarVueloAventura(v.id);
-    if (!fallo) setVuelos((prev) => prev.filter((x) => x.id !== v.id));
+    if (fallo) return;
+    await borrarArchivos(v);
+    setVuelos((prev) => prev.filter((x) => x.id !== v.id));
   }
 
   return (
@@ -285,6 +343,23 @@ export function AdminAventura() {
             </Campo>
           </div>
 
+          <Campo etiqueta="Cómo lo hice (opcional: altitud de crucero, ruta, clima, consejos para quien quiera repetirlo)">
+            <textarea className={INPUT} rows={4} value={comoLoHice} onChange={(e) => setComoLoHice(e.target.value)} />
+          </Campo>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Campo etiqueta="Imagen del plan de vuelo (PNG, JPG o WebP, máx. 5 MB)">
+              <input
+                key={`img-${claveArchivos}`}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className={INPUT}
+                onChange={(e) => setImagen(e.target.files?.[0] ?? null)}
+              />
+            </Campo>
+            <Campo etiqueta="Archivo del plan (.pln, .lnmpln, .fms…, máx. 1 MB)">
+              <input key={`plan-${claveArchivos}`} type="file" className={INPUT} onChange={(e) => setPlan(e.target.files?.[0] ?? null)} />
+            </Campo>
+          </div>
           <Campo etiqueta="Link del video (https://…, opcional)">
             <input className={INPUT} value={video} onChange={(e) => setVideo(e.target.value)} />
           </Campo>
@@ -299,6 +374,25 @@ export function AdminAventura() {
             </Button>
           </div>
         </form>
+
+        <section className="mt-14 flex max-w-3xl flex-col gap-3">
+          <h2 className="font-display text-xl font-semibold text-white">Próximo destino</h2>
+          <p className="text-sm text-white/60">
+            {proximoActual
+              ? `Ahora: ${proximoActual.icao} · ${proximoActual.nombre}. Se quita solo cuando registres un vuelo que aterrice ahí.`
+              : "Anuncia a dónde vas: se dibuja punteado en el mapa."}
+          </p>
+          {proximoActual && (
+            <div>
+              <Button variant="secondary" onClick={quitarProximo}>Quitar próximo destino</Button>
+            </div>
+          )}
+          <CamposAeropuerto titulo="Nuevo próximo destino" valor={proximo} onChange={setProximo} />
+          {avisoProximo && <p role="alert" className="text-sm text-red-300">{avisoProximo}</p>}
+          <div>
+            <Button variant="secondary" onClick={fijarProximo}>Fijar próximo destino</Button>
+          </div>
+        </section>
 
         <h2 className="mt-14 font-display text-xl font-semibold text-white">Vuelos registrados ({vuelos.length})</h2>
         <div className="mt-4 flex max-w-3xl flex-col gap-2">

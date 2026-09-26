@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { distanciaNm, fechaMexico, formatoDuracion, resumenAventura } from "./calculos.ts";
+import { aeropuertosCompletados, distanciaNm, fechaMexico, formatoDuracion, resumenAventura } from "./calculos.ts";
 import type { VueloAventura } from "./aventura.ts";
 
 test("distanciaNm: Guadalajara a Ciudad de México ronda las 248 NM", () => {
@@ -28,4 +28,10 @@ test("resumenAventura cuenta cada aeropuerto una sola vez", () => {
 test("fechaMexico: 04:17 UTC del 15 es todavía el 14 en Guadalajara", () => {
   assert.equal(fechaMexico("2026-09-15T04:17:29.969Z"), "2026-09-14");
   assert.equal(fechaMexico("2026-09-15T18:00:00Z"), "2026-09-15");
+});
+
+test("aeropuertosCompletados: solo destinos, con la fecha de la primera vez", () => {
+  const v = (d: string, fecha: string) => ({ destino_icao: d, destino_nombre: d, fecha }) as VueloAventura;
+  const r = aeropuertosCompletados([v("MMLO", "2026-10-01"), v("MMQT", "2026-10-04"), v("MMLO", "2026-10-09")]);
+  assert.deepEqual(r.map((a) => [a.icao, a.fecha]), [["MMLO", "2026-10-01"], ["MMQT", "2026-10-04"]]);
 });

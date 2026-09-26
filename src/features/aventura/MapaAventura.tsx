@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import type { VueloAventura } from "./aventura";
+import type { ProximoDestino, VueloAventura } from "./aventura";
 
 const ORO = "#d4af37";
 
 /** La ruta completa: una línea por vuelo y un punto por aeropuerto; el último destino, resaltado. */
-export function MapaAventura({ vuelos }: { vuelos: VueloAventura[] }) {
+export function MapaAventura({ vuelos, proximo }: { vuelos: VueloAventura[]; proximo: ProximoDestino | null }) {
   const contenedor = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,22 +44,31 @@ export function MapaAventura({ vuelos }: { vuelos: VueloAventura[] }) {
           fillColor: ORO,
           fillOpacity: 1,
         })
-          .bindTooltip(`${icao} · ${nombre}`)
+          .bindTooltip(`✓ ${icao} · ${nombre}`)
           .addTo(mapa);
       }
+    }
+
+    if (proximo) {
+      const destino: L.LatLngTuple = [proximo.lat, proximo.lon];
+      L.polyline([[ultimo.destino_lat, ultimo.destino_lon], destino], { color: ORO, weight: 2, opacity: 0.6, dashArray: "6 8" }).addTo(mapa);
+      L.circleMarker(destino, { radius: 6, color: ORO, weight: 2, fillOpacity: 0 })
+        .bindTooltip(`Próximo destino · ${proximo.icao} · ${proximo.nombre}`)
+        .addTo(mapa);
+      puntos.push(destino);
     }
 
     mapa.fitBounds(L.latLngBounds(puntos), { padding: [48, 48], maxZoom: 7 });
     return () => {
       mapa.remove();
     };
-  }, [vuelos]);
+  }, [vuelos, proximo]);
 
   return (
     <div
       ref={contenedor}
       role="img"
-      aria-label="Mapa con la ruta y los aeropuertos visitados"
+      aria-label="Mapa con la ruta y los aeropuertos donde ya aterricé"
       className="h-[340px] w-full overflow-hidden rounded-2xl border border-white/10 bg-navy-950 sm:h-[440px]"
     />
   );
