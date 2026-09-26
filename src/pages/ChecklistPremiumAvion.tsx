@@ -14,6 +14,8 @@ export function ChecklistPremiumAvion() {
       emergencia={a.emergencia}
       flujos={a.flujos}
       vspeeds={a.vspeeds}
+      notaVspeeds={a.notaVspeeds}
+      potencia={a.potencia}
       descripcion={a.nota}
     />
   );

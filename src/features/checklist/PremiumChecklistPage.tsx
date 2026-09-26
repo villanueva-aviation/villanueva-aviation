@@ -5,8 +5,10 @@ import { Container } from "../../components/ui/Container";
 import { ChecklistInteractive } from "./ChecklistInteractive";
 import { FlowDiagram } from "./FlowDiagram";
 import { VSpeedsTable } from "./VSpeedsTable";
+import { TablaReferencia } from "./TablaReferencia";
 import type { ChecklistFase } from "../../data/checklistC172";
 import type { Flujo, VSpeed } from "../../data/checklistPremium";
+import type { TablaReferencia as Tabla } from "../../data/checklistAviones";
 import { ROUTES } from "../../lib/routes";
 
 export function PremiumChecklistPage({
@@ -15,6 +17,8 @@ export function PremiumChecklistPage({
   emergencia,
   flujos,
   vspeeds,
+  notaVspeeds = "Valores genéricos de referencia — confirma los de tu aeronave específica en su POH.",
+  potencia,
   descripcion = "Checklist completo, flujos de memoria para emergencias y V-speeds de referencia — todo en un solo lugar.",
 }: {
   titulo: string;
@@ -22,6 +26,8 @@ export function PremiumChecklistPage({
   emergencia: ChecklistFase[];
   flujos: Flujo[];
   vspeeds: VSpeed[];
+  notaVspeeds?: string;
+  potencia?: Tabla;
   descripcion?: string;
 }) {
   return (
@@ -43,13 +49,21 @@ export function PremiumChecklistPage({
       <Container className="flex flex-col gap-10 py-12 md:py-16">
         <div>
           <h2 className="font-display text-lg font-semibold text-white">V-speeds de referencia</h2>
-          <p className="mt-1.5 text-sm text-white/55">
-            Valores genéricos de referencia — confirma los de tu aeronave específica en su POH.
-          </p>
+          <p className="mt-1.5 text-sm text-white/55">{notaVspeeds}</p>
           <div className="mt-4">
             <VSpeedsTable vspeeds={vspeeds} />
           </div>
         </div>
+
+        {potencia && (
+          <div>
+            <h2 className="font-display text-lg font-semibold text-white">{potencia.titulo}</h2>
+            <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-white/55">{potencia.nota}</p>
+            <div className="mt-4">
+              <TablaReferencia tabla={potencia} />
+            </div>
+          </div>
+        )}
 
         <div>
           <h2 className="font-display text-lg font-semibold text-white">Flujos de memoria — emergencias</h2>

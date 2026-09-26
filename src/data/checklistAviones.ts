@@ -1,6 +1,14 @@
 import type { ChecklistFase } from "./checklistC172";
 import type { Flujo, VSpeed } from "./checklistPremium";
 
+/** Tabla de consulta que solo tienen los aviones cuyos datos salen de un manual (potencia de crucero, rendimiento…). */
+export interface TablaReferencia {
+  titulo: string;
+  nota: string;
+  columnas: string[];
+  filas: string[][];
+}
+
 export interface AvionChecklist {
   id: string;
   nombre: string;
@@ -10,6 +18,9 @@ export interface AvionChecklist {
   emergencia: ChecklistFase[];
   flujos: Flujo[];
   vspeeds: VSpeed[];
+  /** Si las V-speeds vienen de un manual, esta nota reemplaza al aviso genérico de "valores de referencia". */
+  notaVspeeds?: string;
+  potencia?: TablaReferencia;
 }
 
 type Fase = [id: string, titulo: string, items: string[]];
@@ -446,6 +457,19 @@ export const AVIONES_CHECKLIST: Record<string, AvionChecklist> = {
       { clave: "Vapp", nombre: "Aproximación final (flaps 40°)", valor: "72 kt" },
       { clave: "Vxw", nombre: "Viento cruzado demostrado", valor: "17 kt" },
     ],
+    notaVspeeds: "Valores del manual del fabricante, en KIAS. Confirma los de tu avión y los de tu versión del simulador.",
+    potencia: {
+      titulo: "Potencia de crucero (presión de admisión)",
+      nota: "Presión de admisión en pulgadas de mercurio (in Hg), atmósfera estándar. Para mantener la misma potencia, suma cerca de 1 % por cada 6 °C sobre la estándar y réstalo por cada 6 °C bajo ella. F.T. significa acelerador a fondo: a esa altitud no alcanzas ese porcentaje. El máximo continuo del motor son 2,400 RPM y 75 % es el máximo normal de crucero.",
+      columnas: ["Altitud", "65 % · 2,300 RPM", "65 % · 2,400 RPM", "75 % · 2,300 RPM", "75 % · 2,400 RPM"],
+      filas: [
+        ["Nivel del mar", "21.7", "21.0", "23.9", "23.1"],
+        ["2,000 ft", "21.2", "20.6", "23.4", "22.6"],
+        ["4,000 ft", "20.8", "20.2", "22.8", "22.1"],
+        ["6,000 ft", "20.3", "19.7", "22.3", "21.7"],
+        ["8,000 ft", "19.9", "19.3", "—", "F.T."],
+      ],
+    },
   },
 
   c185: {
@@ -583,5 +607,16 @@ export const AVIONES_CHECKLIST: Record<string, AvionChecklist> = {
       { clave: "Vs0", nombre: "Pérdida, flaps 40° (3,350 lb)", valor: "49 kt (56 mph)" },
       { clave: "Vapp", nombre: "Aproximación con flaps abajo", valor: "65–74 kt (75–85 mph)" },
     ],
+    notaVspeeds: "Valores del manual del A185F de 1975, convertidos de mph a nudos (las mph van entre paréntesis). Confirma los de tu avión y los de tu versión del simulador.",
+    potencia: {
+      titulo: "Rendimiento de crucero",
+      nota: "Velocidad verdadera (TAS) y consumo con mezcla de rango extendido, en atmósfera estándar y sin viento. El manual los da en mph y en millas por galón: aquí van en nudos, y el consumo en galones por hora se calcula como TAS entre millas por galón. Las combinaciones exactas de RPM y presión de admisión para cada porcentaje las da la computadora de potencia de Cessna que acompaña al avión; el rango recomendado es de 15 a 25 in Hg y 2,200 a 2,550 RPM, sin pasar de 75 %.",
+      columnas: ["Altitud", "75 % de potencia", "65 % de potencia", "55 % de potencia"],
+      filas: [
+        ["Nivel del mar", "136 kt · 15.8 GPH", "128 kt · 13.6 GPH", "119 kt · 11.7 GPH"],
+        ["4,000 ft", "141 kt · 15.7 GPH", "132 kt · 13.6 GPH", "123 kt · 11.7 GPH"],
+        ["7,500 ft", "146 kt · 15.7 GPH", "136 kt · 13.7 GPH", "127 kt · 11.7 GPH"],
+      ],
+    },
   },
 };
