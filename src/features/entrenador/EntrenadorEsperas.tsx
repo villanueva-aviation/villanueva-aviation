@@ -45,6 +45,29 @@ function trazoSector(s: Situacion, desde: number, hasta: number) {
   return { ini, fin, medio: norm(ini + ancho / 2), grande: ancho > 180 ? 1 : 0, ancho };
 }
 
+/** Número del curso de un tramo, girado para seguir la línea y nunca de cabeza. */
+function RumboTramo({ pos, rumbo }: { pos: [number, number]; rumbo: number }) {
+  let angulo = norm(rumbo - 90);
+  if (angulo > 90 && angulo <= 270) angulo -= 180;
+  else if (angulo > 270) angulo -= 360;
+  return (
+    <text
+      transform={`translate(${p(pos)}) rotate(${angulo.toFixed(1)})`}
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize="13"
+      fontWeight="700"
+      fill={ORO}
+      stroke="#0b1d34"
+      strokeWidth="3"
+      paintOrder="stroke"
+      strokeLinejoin="round"
+    >
+      {String(rumbo).padStart(3, "0")}°
+    </text>
+  );
+}
+
 function Diagrama({ s, revelar }: { s: Situacion; revelar: boolean }) {
   const acercamiento = norm(s.alejamiento + 180);
   const ladoEspera = s.giros === "derecha" ? acercamiento + 90 : acercamiento - 90;
@@ -54,6 +77,8 @@ function Diagrama({ s, revelar }: { s: Situacion; revelar: boolean }) {
   const C = suma(D, B);
   // Los dos giros de 180° van en el sentido de la espera (1 = horario, como el rumbo).
   const sentido = s.giros === "derecha" ? 1 : 0;
+  const medioAcercamiento = punto(s.alejamiento, LARGO / 2);
+  const medioAlejamiento = suma(D, punto(s.alejamiento, LARGO / 2));
   const llegada = norm(s.rumbo + 180); // de dónde vienes
   const origen = punto(llegada, R - 8);
   const cercano = punto(llegada, 34);
@@ -95,12 +120,13 @@ function Diagrama({ s, revelar }: { s: Situacion; revelar: boolean }) {
         strokeWidth="2.5"
         strokeLinejoin="round"
       />
-      <path d={flecha(punto(s.alejamiento, LARGO / 2), acercamiento, 7)} fill={ORO} />
+      <path d={flecha(medioAcercamiento, acercamiento, 7)} fill={ORO} />
+      <path d={flecha(medioAlejamiento, s.alejamiento, 7)} fill={ORO} />
       <circle r="4.5" fill="white" />
       <text x="9" y="-8" fontSize="11" fontWeight="600" fill="white">VOR</text>
-      <text x={punto(s.alejamiento, LARGO + 16)[0]} y={punto(s.alejamiento, LARGO + 16)[1] + 4} textAnchor="middle" fontSize="10" fill={ORO}>
-        {String(s.alejamiento).padStart(3, "0")}°
-      </text>
+      {/* Como en una carta: el curso de cada tramo, alineado con la línea y por fuera del patrón */}
+      <RumboTramo pos={suma(medioAcercamiento, punto(ladoEspera + 180, 15))} rumbo={acercamiento} />
+      <RumboTramo pos={suma(medioAlejamiento, punto(ladoEspera, 15))} rumbo={s.alejamiento} />
 
       {/* Tu avión llega al fijo con ese rumbo */}
       <line x1={origen[0]} y1={origen[1]} x2={cercano[0]} y2={cercano[1]} stroke="white" strokeWidth="2" strokeDasharray="5 4" />
