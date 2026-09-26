@@ -1,4 +1,4 @@
-import { BookOpen, ClipboardCheck, Compass, Download, Home, Sparkles, UserCircle, Users, Waypoints } from "lucide-react";
+import { BookOpen, ClipboardCheck, Compass, Download, Home, Plane, Sparkles, UserCircle, Users, Waypoints } from "lucide-react";
 
 export const ROUTES = {
   home: "/",
@@ -40,6 +40,8 @@ export const ROUTES = {
   legal: "/legal",
   ingresar: "/ingresar",
   empieza: "/empieza",
+  aventura: "/aventura",
+  adminAventura: "/admin/aventura",
 } as const;
 
 export const NAV_LINKS = [
@@ -50,6 +52,7 @@ export const NAV_LINKS = [
   { label: "Evaluaciones", to: ROUTES.evaluaciones, icon: ClipboardCheck },
   { label: "Contenido Exclusivo", to: ROUTES.contenidoExclusivo, icon: Sparkles },
   { label: "Descargas", to: ROUTES.descargas, icon: Download },
+  { label: "Aventura", to: ROUTES.aventura, icon: Plane },
   { label: "Comunidad", to: ROUTES.comunidad, icon: Users },
 ];
 

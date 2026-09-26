@@ -24,3 +24,6 @@ export const PRECIO_CONTENIDO_EXCLUSIVO = "29.00";
 export const PRECIO_SESION_1A1 = "15.99";
 
 export const CONTACT_EMAIL = "villanuevaaviation@gmail.com";
+
+// Horas que el fundador lleva registradas en IVAO. Es un aproximado: se muestra como "unas N horas".
+export const HORAS_IVAO_APROX = 6000;

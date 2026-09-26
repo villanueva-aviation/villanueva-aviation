@@ -8,11 +8,12 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test src/features/academia/phraseologyEvaluator.test.ts src/lib/clima.test.ts src/lib/discord.test.ts src/features/payments/reglasSesiones.test.ts src/data/checkpoints.test.ts src/data/widgetSets.test.ts src/features/progress/migrarProgreso.test.ts src/features/admin/contactoCadete.test.ts src/features/landing/datosPruebaVor.test.ts"
+    "test": "node --experimental-strip-types --test src/features/academia/phraseologyEvaluator.test.ts src/lib/clima.test.ts src/lib/discord.test.ts src/features/payments/reglasSesiones.test.ts src/data/checkpoints.test.ts src/data/widgetSets.test.ts src/features/progress/migrarProgreso.test.ts src/features/admin/contactoCadete.test.ts src/features/landing/datosPruebaVor.test.ts src/features/aventura/aventura.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
     "framer-motion": "^13.2.0",
+    "leaflet": "^1.9.4",
     "lucide-react": "^1.37.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/leaflet": "^1.9.22",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",

@@ -256,3 +256,8 @@ body {
 .animate-shimmer {
   animation: shimmer 3.5s ease-in-out infinite;
 }
+
+/* Mapa de /aventura: invierte los mosaicos claros de OpenStreetMap para que casen con el fondo navy. */
+.tiles-oscuros {
+  filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(0.95) saturate(0.6);
+}

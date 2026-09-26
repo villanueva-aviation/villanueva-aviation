@@ -8,6 +8,7 @@ import { TrackerLine, type TrackerStage } from "../components/tracker/TrackerLin
 import { DISCORD_URL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 import { ACADEMIA_MODULOS } from "../data/academia";
+import { PanelAventura } from "../features/aventura/PanelAventura";
 
 const RUTA_DEMO: TrackerStage[] = [
   { id: "fundamentos", label: "Fundamentos", status: "bloqueado" },
@@ -216,6 +217,8 @@ export function Home() {
           </Reveal>
         </Container>
       </section>
+
+      <PanelAventura />
 
       {/* CTA FINAL */}
       <section className="border-t border-white/10 py-24 md:py-32">
