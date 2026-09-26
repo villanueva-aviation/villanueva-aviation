@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Navigate } from "react-router-dom";
-import { Trash2 } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
@@ -8,11 +8,13 @@ import { useAuth } from "../features/auth/AuthContext";
 import {
   borrarVueloAventura,
   fetchVuelosAventura,
+  fetchVuelosVolanta,
   insertarVueloAventura,
   type RedAventura,
   type VueloAventura,
+  type VueloVolanta,
 } from "../features/aventura/aventura";
-import { distanciaNm, formatoDuracion } from "../features/aventura/calculos";
+import { distanciaNm, fechaMexico, formatoDuracion } from "../features/aventura/calculos";
 import { FOUNDER_EMAIL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 
@@ -96,6 +98,9 @@ export function AdminAventura() {
   const [notas, setNotas] = useState("");
   const [error, setError] = useState("");
   const [guardando, setGuardando] = useState(false);
+  const [deVolanta, setDeVolanta] = useState<VueloVolanta[] | null>(null);
+  const [cargandoVolanta, setCargandoVolanta] = useState(false);
+  const [errorVolanta, setErrorVolanta] = useState("");
 
   const esFundador = user?.email === FOUNDER_EMAIL;
 
@@ -121,6 +126,34 @@ export function AdminAventura() {
   const sugerida = textos.every((t) => t.trim() !== "" && Number.isFinite(Number(t)))
     ? distanciaNm(...(textos.map(Number) as [number, number, number, number]))
     : null;
+
+  async function traerDeVolanta() {
+    setCargandoVolanta(true);
+    setErrorVolanta("");
+    const { vuelos: lista, error: fallo } = await fetchVuelosVolanta();
+    setCargandoVolanta(false);
+    if (fallo) return setErrorVolanta(fallo);
+    setDeVolanta(lista);
+  }
+
+  async function extremo(icao: string): Promise<Extremo> {
+    const a = await buscarAeropuerto(icao);
+    return a ? { icao, nombre: a[1], lat: String(a[2]), lon: String(a[3]) } : { ...VACIO, icao };
+  }
+
+  /** Vuelca un vuelo de Volanta en el formulario. Tú lo revisas, pones el video y lo guardas. */
+  async function usarVuelo(v: VueloVolanta) {
+    setOrigen(await extremo(v.origen));
+    setDestino(await extremo(v.destino));
+    setFecha(fechaMexico(v.salida));
+    setAvion(v.matricula ? `${v.avion} (${v.matricula})` : v.avion);
+    const total = Math.max(1, Math.round(v.minutos));
+    setHoras(String(Math.floor(total / 60)));
+    setMinutos(String(total % 60));
+    setDistancia("");
+    setFpm(v.aterrizaje === 0 ? "" : String(Math.round(v.aterrizaje)));
+    window.scrollTo({ top: document.getElementById("formulario-vuelo")?.offsetTop ?? 0, behavior: "smooth" });
+  }
 
   async function guardar(e: FormEvent) {
     e.preventDefault();
@@ -182,7 +215,45 @@ export function AdminAventura() {
         description="Llénalo al aterrizar. El origen ya viene con el destino del vuelo anterior."
       />
       <Container className="py-12 md:py-16">
-        <form onSubmit={guardar} className="flex max-w-3xl flex-col gap-4">
+        <section className="mb-8 max-w-3xl rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-display text-base font-semibold text-white">Traer desde Volanta</h2>
+              <p className="mt-1 text-xs text-white/55">Elige un vuelo y el formulario se llena solo. Tú lo revisas antes de guardar.</p>
+            </div>
+            <Button variant="secondary" onClick={traerDeVolanta} disabled={cargandoVolanta}>
+              <Download size={15} /> {cargandoVolanta ? "Consultando..." : "Traer mis vuelos"}
+            </Button>
+          </div>
+          {errorVolanta && <p role="alert" className="mt-3 text-sm text-red-300">{errorVolanta}</p>}
+          {deVolanta && (
+            <ul className="mt-4 flex flex-col gap-2">
+              {deVolanta.map((v) => {
+                const registrado = vuelos.some(
+                  (x) => x.fecha === fechaMexico(v.salida) && x.origen_icao === v.origen && x.destino_icao === v.destino,
+                );
+                return (
+                  <li key={v.id}>
+                    <button
+                      type="button"
+                      disabled={registrado}
+                      onClick={() => usarVuelo(v)}
+                      className="flex w-full items-center justify-between gap-3 rounded-xl border border-white/10 px-4 py-2.5 text-left text-sm text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60 disabled:opacity-40 [@media(hover:hover)_and_(pointer:fine)]:enabled:hover:border-gold-500/40"
+                    >
+                      <span>
+                        {fechaMexico(v.salida)} · {v.origen} → {v.destino}
+                        <span className="text-white/50"> · {v.avion} · {formatoDuracion(Math.max(1, Math.round(v.minutos)))}</span>
+                      </span>
+                      {registrado && <span className="shrink-0 text-xs text-white/50">ya registrado</span>}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
+        <form id="formulario-vuelo" onSubmit={guardar} className="flex max-w-3xl flex-col gap-4">
           <CamposAeropuerto titulo="Origen" valor={origen} onChange={setOrigen} />
           <CamposAeropuerto titulo="Destino" valor={destino} onChange={setDestino} />
 

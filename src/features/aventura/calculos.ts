@@ -30,3 +30,8 @@ export function formatoDuracion(minutos: number): string {
   const m = minutos % 60;
   return h === 0 ? `${m} min` : `${h} h ${String(m).padStart(2, "0")} min`;
 }
+
+/** Fecha (AAAA-MM-DD) en hora de Ciudad de México de un instante UTC: un vuelo de las 22:00 locales no debe quedar en el día siguiente. */
+export function fechaMexico(instanteIso: string): string {
+  return new Date(instanteIso).toLocaleDateString("sv-SE", { timeZone: "America/Mexico_City" });
+}

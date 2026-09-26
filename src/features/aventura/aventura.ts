@@ -44,3 +44,24 @@ export async function insertarVueloAventura(vuelo: NuevoVueloAventura) {
 export async function borrarVueloAventura(id: string) {
   return supabase.from("aventura_vuelos").delete().eq("id", id);
 }
+
+/** Un vuelo tal como lo devuelve la función volanta-vuelos (que consulta Volanta). */
+export interface VueloVolanta {
+  id: string;
+  /** UTC, ISO */
+  salida: string;
+  minutos: number;
+  /** 0 = Volanta no registró aterrizaje */
+  aterrizaje: number;
+  origen: string;
+  destino: string;
+  avion: string;
+  matricula: string | null;
+}
+
+export async function fetchVuelosVolanta(): Promise<{ vuelos: VueloVolanta[]; error: string | null }> {
+  const { data, error } = await supabase.functions.invoke("volanta-vuelos");
+  if (error) return { vuelos: [], error: "No se pudo llegar a la función (¿ya está desplegada?)." };
+  if (!data?.ok) return { vuelos: [], error: data?.motivo ?? "Volanta no respondió." };
+  return { vuelos: data.vuelos as VueloVolanta[], error: null };
+}
