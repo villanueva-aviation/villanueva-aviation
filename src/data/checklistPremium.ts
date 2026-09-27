@@ -49,32 +49,37 @@ export const FLUJOS_C172: Flujo[] = [
   },
 ];
 
-// El C152 es de motor a carburador y sin G1000: procedimientos genéricos, no los del C172 (que es a inyección).
+// El C152 es de motor a carburador, una sola válvula de combustible (sin selector) y sin bomba auxiliar — no los pasos del C172 a inyección.
 export const FLUJOS_C152: Flujo[] = [
   {
+    id: "c152-falla-inmediata-despegue",
+    titulo: "Falla de motor inmediatamente después del despegue",
+    pasos: ["Velocidad: 60 KIAS", "Mezcla: CORTE", "Combustible: OFF", "Encendido: OFF", "Aterrizar recto al frente"],
+  },
+  {
     id: "c152-falla-motor-vuelo",
-    titulo: "Falla de motor en vuelo",
-    pasos: ["Velocidad de mejor planeo", "Área de aterrizaje seleccionada", "Combustible: AMBOS", "Mezcla: RICA", "Magnetos: AMBOS, luego cada uno", "Bomba auxiliar: ON si aplica", "Si no responde: MAYDAY"],
+    titulo: "Falla de motor en vuelo (reencendido)",
+    pasos: ["Velocidad de mejor planeo: 60 KIAS", "Calentador de carburador: ON", "Primer: adentro y trabado", "Combustible: ON", "Mezcla: RICA", "Encendido: AMBOS (o START)"],
   },
   {
     id: "c152-fuego-vuelo",
-    titulo: "Fuego en vuelo (motor)",
-    pasos: ["Mezcla: CORTE", "Combustible: OFF", "Calefacción cabina: cerrada", "Velocidad de planeo establecida", "Magnetos: OFF"],
+    titulo: "Fuego de motor en vuelo",
+    pasos: ["Mezcla: CORTE", "Combustible: OFF", "Master: OFF", "Calefacción cabina: cerrada", "Velocidad: 85 KIAS si no se apaga"],
   },
   {
     id: "c152-falla-electrica",
-    titulo: "Falla eléctrica total",
-    pasos: ["Alternador y breakers: verificados", "Cargas no esenciales: OFF", "Priorizar transponder y radio", "Planear aeropuerto más cercano"],
+    titulo: "Falla eléctrica (baja tensión)",
+    pasos: ["Radios: OFF", "Master: OFF y luego ON", "Luz de baja tensión: revisada", "Si vuelve a fallar: alternador OFF, terminar vuelo"],
   },
   {
     id: "c152-aterrizaje-forzado",
     titulo: "Aterrizaje forzado sin motor",
-    pasos: ["Velocidad de mejor planeo", "Área seleccionada, viento a favor", "Combustible y magnetos: OFF", "Puertas: sin asegurar", "Cinturones: ajustados al máximo", "Squawk 7700"],
+    pasos: ["Velocidad: 65 KIAS (flaps arriba) / 60 (flaps abajo)", "Mezcla y combustible: OFF", "Encendido: OFF", "Puertas: sin asegurar", "Cinturones: ajustados al máximo", "Toque: cola baja"],
   },
   {
     id: "c152-perdida-barrena",
     titulo: "Recuperación de pérdida / barrena incipiente",
-    pasos: ["Potencia: ralentí", "Alerones: neutros", "Timón: opuesto a la rotación", "Elevador: presión hacia adelante", "Nivelar y aplicar potencia"],
+    pasos: ["Alerones: neutros", "Gases: ralentí", "Timón: opuesto a la rotación, a fondo", "Control de mando: adelante con firmeza", "Al detenerse: neutralizar timón y recuperar"],
   },
 ];
 

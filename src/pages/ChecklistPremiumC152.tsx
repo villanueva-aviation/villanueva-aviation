@@ -1,5 +1,5 @@
 import { PremiumChecklistPage } from "../features/checklist/PremiumChecklistPage";
-import { CHECKLIST_C152_NORMAL, CHECKLIST_C152_EMERGENCIA } from "../data/checklistC152";
+import { CHECKLIST_C152_NORMAL, CHECKLIST_C152_EMERGENCIA, LIMITES_C152, SISTEMAS_C152 } from "../data/checklistC152";
 import { FLUJOS_C152, VSPEEDS_C152 } from "../data/checklistPremium";
 
 export function ChecklistPremiumC152() {
@@ -11,6 +11,8 @@ export function ChecklistPremiumC152() {
       flujos={FLUJOS_C152}
       vspeeds={VSPEEDS_C152}
       notaVspeeds="Valores del POH del Cessna 152, en KIAS. Confirma los de tu avión y los de tu versión del simulador."
+      limites={LIMITES_C152}
+      sistemas={SISTEMAS_C152}
     />
   );
 }
