@@ -56,7 +56,10 @@ function FaseCard({ fase }: { fase: ChecklistFase }) {
               >
                 {isChecked && <Check size={11} strokeWidth={3} className="animate-check-in" />}
               </span>
-              {item.texto}
+              <span className="flex flex-col gap-1">
+                {item.texto}
+                {item.porque && <span className="text-xs font-normal text-white/40">{item.porque}</span>}
+              </span>
             </button>
           );
         })}

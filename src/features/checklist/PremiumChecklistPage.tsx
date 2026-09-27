@@ -8,7 +8,7 @@ import { VSpeedsTable } from "./VSpeedsTable";
 import { TablaReferencia } from "./TablaReferencia";
 import type { ChecklistFase } from "../../data/checklistC172";
 import type { Flujo, VSpeed } from "../../data/checklistPremium";
-import type { TablaReferencia as Tabla } from "../../data/checklistAviones";
+import type { Sistema, TablaReferencia as Tabla } from "../../data/checklistAviones";
 import { ROUTES } from "../../lib/routes";
 
 export function PremiumChecklistPage({
@@ -19,6 +19,8 @@ export function PremiumChecklistPage({
   vspeeds,
   notaVspeeds = "Valores genéricos de referencia — confirma los de tu aeronave específica en su POH.",
   potencia,
+  limites,
+  sistemas,
   descripcion = "Checklist completo, flujos de memoria para emergencias y V-speeds de referencia — todo en un solo lugar.",
 }: {
   titulo: string;
@@ -28,6 +30,8 @@ export function PremiumChecklistPage({
   vspeeds: VSpeed[];
   notaVspeeds?: string;
   potencia?: Tabla;
+  limites?: Tabla;
+  sistemas?: Sistema[];
   descripcion?: string;
 }) {
   return (
@@ -61,6 +65,31 @@ export function PremiumChecklistPage({
             <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-white/55">{potencia.nota}</p>
             <div className="mt-4">
               <TablaReferencia tabla={potencia} />
+            </div>
+          </div>
+        )}
+
+        {limites && (
+          <div>
+            <h2 className="font-display text-lg font-semibold text-white">{limites.titulo}</h2>
+            <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-white/55">{limites.nota}</p>
+            <div className="mt-4">
+              <TablaReferencia tabla={limites} />
+            </div>
+          </div>
+        )}
+
+        {sistemas && sistemas.length > 0 && (
+          <div>
+            <h2 className="font-display text-lg font-semibold text-white">Sistemas clave</h2>
+            <p className="mt-1.5 text-sm text-white/55">Cómo funciona el avión, no solo qué hacer con él.</p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {sistemas.map((s) => (
+                <div key={s.titulo} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                  <h3 className="font-display text-sm font-semibold text-gold-400">{s.titulo}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-white/70">{s.texto}</p>
+                </div>
+              ))}
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 import { PremiumChecklistPage } from "../features/checklist/PremiumChecklistPage";
-import { CHECKLIST_NORMAL, CHECKLIST_EMERGENCIA } from "../data/checklistC172";
+import { CHECKLIST_NORMAL, CHECKLIST_EMERGENCIA, LIMITES_C172, SISTEMAS_C172 } from "../data/checklistC172";
 import { FLUJOS_C172, VSPEEDS_C172 } from "../data/checklistPremium";
 
 export function ChecklistPremiumC172() {
@@ -11,6 +11,8 @@ export function ChecklistPremiumC172() {
       flujos={FLUJOS_C172}
       vspeeds={VSPEEDS_C172}
       notaVspeeds="Valores del POH del Cessna 172S, en KIAS (otras versiones del 172 varían). Confirma los de tu avión y los de tu versión del simulador."
+      limites={LIMITES_C172}
+      sistemas={SISTEMAS_C172}
     />
   );
 }

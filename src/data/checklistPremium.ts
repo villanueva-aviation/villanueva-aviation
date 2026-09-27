@@ -18,24 +18,29 @@ export interface VSpeed {
  */
 export const FLUJOS_C172: Flujo[] = [
   {
+    id: "falla-inmediata-despegue",
+    titulo: "Falla de motor inmediatamente después del despegue",
+    pasos: ["Velocidad: 70 KIAS (flaps arriba) / 65 (flaps abajo)", "Mezcla: CORTE", "Combustible: OFF", "Encendido: OFF", "Puerta: sin asegurar", "Aterrizar recto al frente"],
+  },
+  {
     id: "falla-motor-vuelo",
-    titulo: "Falla de motor en vuelo",
-    pasos: ["Velocidad de mejor planeo", "Área de aterrizaje seleccionada", "Combustible: AMBOS", "Mezcla: RICA", "Magnetos: AMBOS, luego cada uno", "Bomba auxiliar: ON", "Si no responde: MAYDAY"],
+    titulo: "Falla de motor en vuelo (reencendido)",
+    pasos: ["Velocidad de mejor planeo: 68 KIAS", "Válvula de combustible: ON, selector AMBOS", "Bomba auxiliar: ON", "Mezcla: RICA", "Encendido: AMBOS (o START)", "Si no responde: área seleccionada y MAYDAY"],
   },
   {
     id: "fuego-vuelo",
-    titulo: "Fuego en vuelo (motor)",
-    pasos: ["Mezcla: CORTE", "Combustible: OFF", "Calefacción cabina: cerrada", "Velocidad de planeo establecida", "Magnetos: OFF"],
+    titulo: "Fuego de motor en vuelo",
+    pasos: ["Mezcla: CORTE", "Válvula de combustible: OFF", "Bomba auxiliar: OFF", "Master: OFF", "Calefacción cabina: cerrada", "Velocidad: 100 KIAS si no se apaga"],
   },
   {
     id: "falla-electrica",
-    titulo: "Falla eléctrica total",
-    pasos: ["Alternador y breakers: verificados", "Cargas no esenciales: OFF", "Priorizar transponder y radio", "Planear aeropuerto más cercano"],
+    titulo: "Falla eléctrica (baja tensión)",
+    pasos: ["Aviónica Master: OFF", "Breaker del alternador: revisado", "Master: OFF y luego ON", "Aviónica Master: ON otra vez", "Si vuelve a fallar: alternador OFF, terminar vuelo"],
   },
   {
     id: "aterrizaje-forzado",
     titulo: "Aterrizaje forzado sin motor",
-    pasos: ["Velocidad de mejor planeo", "Área seleccionada, viento a favor", "Combustible y magnetos: OFF", "Puertas: sin asegurar", "Cinturones: ajustados al máximo", "Squawk 7700"],
+    pasos: ["Velocidad: 70 KIAS (flaps arriba) / 65 (flaps abajo)", "Mezcla y combustible: OFF", "Encendido: OFF", "Puertas: sin asegurar", "Cinturones: ajustados al máximo", "Toque: cola baja"],
   },
   {
     id: "perdida-barrena",
@@ -44,8 +49,34 @@ export const FLUJOS_C172: Flujo[] = [
   },
 ];
 
-// Análogos al C172 — misma familia de procedimientos, valores de V-speeds distintos.
-export const FLUJOS_C152: Flujo[] = FLUJOS_C172.map((f) => ({ ...f, id: `c152-${f.id}` }));
+// El C152 es de motor a carburador y sin G1000: procedimientos genéricos, no los del C172 (que es a inyección).
+export const FLUJOS_C152: Flujo[] = [
+  {
+    id: "c152-falla-motor-vuelo",
+    titulo: "Falla de motor en vuelo",
+    pasos: ["Velocidad de mejor planeo", "Área de aterrizaje seleccionada", "Combustible: AMBOS", "Mezcla: RICA", "Magnetos: AMBOS, luego cada uno", "Bomba auxiliar: ON si aplica", "Si no responde: MAYDAY"],
+  },
+  {
+    id: "c152-fuego-vuelo",
+    titulo: "Fuego en vuelo (motor)",
+    pasos: ["Mezcla: CORTE", "Combustible: OFF", "Calefacción cabina: cerrada", "Velocidad de planeo establecida", "Magnetos: OFF"],
+  },
+  {
+    id: "c152-falla-electrica",
+    titulo: "Falla eléctrica total",
+    pasos: ["Alternador y breakers: verificados", "Cargas no esenciales: OFF", "Priorizar transponder y radio", "Planear aeropuerto más cercano"],
+  },
+  {
+    id: "c152-aterrizaje-forzado",
+    titulo: "Aterrizaje forzado sin motor",
+    pasos: ["Velocidad de mejor planeo", "Área seleccionada, viento a favor", "Combustible y magnetos: OFF", "Puertas: sin asegurar", "Cinturones: ajustados al máximo", "Squawk 7700"],
+  },
+  {
+    id: "c152-perdida-barrena",
+    titulo: "Recuperación de pérdida / barrena incipiente",
+    pasos: ["Potencia: ralentí", "Alerones: neutros", "Timón: opuesto a la rotación", "Elevador: presión hacia adelante", "Nivelar y aplicar potencia"],
+  },
+];
 
 export const VSPEEDS_C172: VSpeed[] = [
   { clave: "Vr", nombre: "Rotación", valor: "55 kt" },

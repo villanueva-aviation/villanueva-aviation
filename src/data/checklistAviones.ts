@@ -1,12 +1,18 @@
 import type { ChecklistFase } from "./checklistC172";
 import type { Flujo, VSpeed } from "./checklistPremium";
 
-/** Tabla de consulta que solo tienen los aviones cuyos datos salen de un manual (potencia de crucero, rendimiento…). */
+/** Tabla de consulta que solo tienen los aviones cuyos datos salen de un manual (potencia de crucero, rendimiento, límites…). */
 export interface TablaReferencia {
   titulo: string;
   nota: string;
   columnas: string[];
   filas: string[][];
+}
+
+/** Descripción corta de un sistema del avión (combustible, eléctrico…), no un procedimiento. */
+export interface Sistema {
+  titulo: string;
+  texto: string;
 }
 
 export interface AvionChecklist {
@@ -21,6 +27,8 @@ export interface AvionChecklist {
   /** Si las V-speeds vienen de un manual, esta nota reemplaza al aviso genérico de "valores de referencia". */
   notaVspeeds?: string;
   potencia?: TablaReferencia;
+  limites?: TablaReferencia;
+  sistemas?: Sistema[];
 }
 
 type Fase = [id: string, titulo: string, items: string[]];

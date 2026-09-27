@@ -56,7 +56,8 @@ Deno.serve(async (req) => {
       id: f.id,
       // Volanta manda la hora sin zona: es UTC.
       salida: `${f.offBlocksTime}Z`,
-      minutos: f.realFlightTime,
+      // realFlightTime llega en segundos (1080 = 18 min), no en minutos.
+      minutos: Math.round(f.realFlightTime / 60),
       aterrizaje: f.landingRate,
       origen: f.origin?.icaoCode ?? "",
       destino: f.destination?.icaoCode ?? "",
