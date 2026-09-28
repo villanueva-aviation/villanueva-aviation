@@ -59,7 +59,7 @@ function CamposAeropuerto({ titulo, valor, onChange }: { titulo: string; valor: 
   const [aviso, setAviso] = useState("");
 
   async function alCambiarIcao(texto: string) {
-    const icao = texto.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4);
+    const icao = texto.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4);
     onChange({ ...valor, icao });
     setAviso("");
     if (icao.length !== 4) return;
