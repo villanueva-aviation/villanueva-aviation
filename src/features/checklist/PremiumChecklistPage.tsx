@@ -6,9 +6,11 @@ import { ChecklistInteractive } from "./ChecklistInteractive";
 import { FlowDiagram } from "./FlowDiagram";
 import { VSpeedsTable } from "./VSpeedsTable";
 import { TablaReferencia } from "./TablaReferencia";
+import { PanelDiagram } from "./PanelDiagram";
 import type { ChecklistFase } from "../../data/checklistC172";
 import type { Flujo, VSpeed } from "../../data/checklistPremium";
 import type { Sistema, TablaReferencia as Tabla } from "../../data/checklistAviones";
+import type { PanelDiagramaData } from "../../data/panelesAviones";
 import { ROUTES } from "../../lib/routes";
 
 export function PremiumChecklistPage({
@@ -21,6 +23,7 @@ export function PremiumChecklistPage({
   potencia,
   limites,
   sistemas,
+  panel,
   descripcion = "Checklist completo, flujos de memoria para emergencias y V-speeds de referencia — todo en un solo lugar.",
 }: {
   titulo: string;
@@ -32,6 +35,7 @@ export function PremiumChecklistPage({
   potencia?: Tabla;
   limites?: Tabla;
   sistemas?: Sistema[];
+  panel?: PanelDiagramaData;
   descripcion?: string;
 }) {
   return (
@@ -90,6 +94,18 @@ export function PremiumChecklistPage({
                   <p className="mt-1.5 text-sm leading-relaxed text-white/70">{s.texto}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {panel && (
+          <div>
+            <h2 className="font-display text-lg font-semibold text-white">Diagrama del panel</h2>
+            <p className="mt-1.5 text-sm text-white/55">
+              Ubica cada control antes de volar — pasa de la teoría del checklist a reconocerlo en la cabina.
+            </p>
+            <div className="mt-4">
+              <PanelDiagram panel={panel} />
             </div>
           </div>
         )}
