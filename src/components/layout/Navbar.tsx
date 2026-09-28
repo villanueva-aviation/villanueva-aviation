@@ -166,7 +166,7 @@ export function Navbar() {
           <Logo />
 
           <nav className="hidden items-center xl:flex">
-            {NAV_LINKS.map((link, i) => (
+            {NAV_LINKS.filter((link) => !("soloMenus" in link)).map((link, i) => (
               <div key={link.to} className="flex items-center">
                 {i > 0 && <span className="mx-1 h-4 w-px bg-white/10" />}
                 <NavLink

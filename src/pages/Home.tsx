@@ -1,4 +1,5 @@
 import { ArrowRight, Gauge, MessageCircle, PlayCircle, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
 import { SectionHeading } from "../components/ui/SectionHeading";
@@ -9,6 +10,7 @@ import { DISCORD_URL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 import { ACADEMIA_MODULOS } from "../data/academia";
 import { PanelAventura } from "../features/aventura/PanelAventura";
+import { FLOTA, TOTAL_AVIONES, fotoFlota } from "../data/flota";
 
 const RUTA_DEMO: TrackerStage[] = [
   { id: "fundamentos", label: "Fundamentos", status: "bloqueado" },
@@ -17,6 +19,11 @@ const RUTA_DEMO: TrackerStage[] = [
   { id: "operacion", label: "Operación y procedimientos", status: "bloqueado" },
   { id: "evaluacion", label: "Evaluación final", status: "bloqueado" },
 ];
+
+// Uno por categoría: el primer vuelo, el salto a multimotor y el turbohélice.
+const ADELANTO_FLOTA = ["c152", "seneca", "c90"].map((clave) =>
+  FLOTA.flatMap((etapa) => etapa.aviones).find((a) => a.clave === clave)!,
+);
 
 const POR_QUE_SIMULACION = [
   {
@@ -90,14 +97,14 @@ export function Home() {
 
           <div className="mt-8 flex justify-center sm:hidden">
             <span className="inline-flex max-w-md items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-center font-sans text-[10px] font-normal text-white/70">
-              Aeronave XB-VLA · captura real de simulador — Villanueva Aviation
+              Captura real de simulador — Villanueva Aviation
             </span>
           </div>
         </div>
 
         <div className="absolute inset-x-0 bottom-8 z-10 hidden justify-center px-6 sm:flex">
           <span className="inline-flex max-w-md items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-1.5 text-center font-sans text-xs font-normal text-white/70">
-            Aeronave XB-VLA · captura real de simulador — Villanueva Aviation
+            Captura real de simulador — Villanueva Aviation
           </span>
         </div>
       </section>
@@ -118,7 +125,14 @@ export function Home() {
               </p>
             </Reveal>
             <Reveal delay={150} className="relative aspect-square overflow-hidden rounded-3xl border border-white/10">
-              <img src="/images/msfs-xbvla-farmland.jpg" alt="XB-VLA en vuelo, captura de simulador" className="h-full w-full object-cover" />
+              <img
+                src={fotoFlota("c172").src}
+                srcSet={fotoFlota("c172").srcSet}
+                sizes="(min-width: 1024px) 40vw, 100vw"
+                alt="Cessna 172S XB-VNA en vuelo, captura de simulador"
+                loading="lazy"
+                className="h-full w-full object-cover object-[60%_50%]"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-transparent to-transparent" />
             </Reveal>
           </div>
@@ -215,6 +229,45 @@ export function Home() {
             </span>
             <TrackerLine stages={RUTA_DEMO} />
           </Reveal>
+        </Container>
+      </section>
+
+      {/* LA FLOTA */}
+      <section className="border-t border-white/10 py-20 md:py-28">
+        <Container>
+          <Reveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <SectionHeading
+              eyebrow="Flota virtual"
+              title={`${TOTAL_AVIONES} aviones con los colores de la academia`}
+              description="Del Cessna 152 del primer vuelo solo al King Air: la flota que vuela en simulador, ordenada como se sube de categoría en la aviación real."
+            />
+            <Button to={ROUTES.flota} variant="ghost" className="shrink-0">
+              Conoce la flota <ArrowRight size={16} />
+            </Button>
+          </Reveal>
+          <div className="-mx-6 mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0">
+            {ADELANTO_FLOTA.map((avion, i) => (
+              <Reveal key={avion.clave} delay={i * 120} className="w-[82%] shrink-0 snap-start sm:w-auto">
+                <Link
+                  to={ROUTES.flota}
+                  className="group block overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] transition-colors duration-300 hover:border-gold-500/40"
+                >
+                  <img
+                    src={fotoFlota(avion.clave).src}
+                    srcSet={fotoFlota(avion.clave).srcSet}
+                    sizes="(min-width: 640px) 33vw, 82vw"
+                    alt={`${avion.modelo} ${avion.matricula} en vuelo, captura de simulador`}
+                    loading="lazy"
+                    className="aspect-video w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
+                  />
+                  <div className="flex items-baseline justify-between gap-3 px-5 py-4">
+                    <span className="font-display text-xl font-bold tracking-tight text-white tabular-nums">{avion.matricula}</span>
+                    <span className="truncate text-xs text-white/50">{avion.modelo}</span>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
         </Container>
       </section>
 

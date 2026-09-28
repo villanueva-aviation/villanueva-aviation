@@ -141,7 +141,7 @@ export function Aventura() {
         eyebrow="The Adventure"
         fondo="/images/aventura-hero-2.webp"
         title="Un vuelo a la vez, sin saltarme ningún aeropuerto"
-        description={`Salgo de Guadalajara (MMGL) en mi Cessna 152 XB-VLA y cada aterrizaje queda registrado aquí, con su video. Son vuelos en simulador, con ${HORAS_IVAO.toLocaleString("es-MX")} horas registradas en IVAO detrás.`}
+        description={`Salgo de Guadalajara (MMGL) en mi Cessna 152 XB-CDT y cada aterrizaje queda registrado aquí, con su video. Son vuelos en simulador, con ${HORAS_IVAO.toLocaleString("es-MX")} horas registradas en IVAO detrás.`}
       />
 
       <Container className="py-12 md:py-16">

@@ -1,4 +1,4 @@
-import { BookOpen, ClipboardCheck, Compass, Download, Home, Plane, Sparkles, UserCircle, Users, Waypoints } from "lucide-react";
+import { BookOpen, ClipboardCheck, Compass, Download, Home, Plane, PlaneTakeoff, Sparkles, UserCircle, Users, Waypoints } from "lucide-react";
 
 export const ROUTES = {
   home: "/",
@@ -41,6 +41,7 @@ export const ROUTES = {
   ingresar: "/ingresar",
   empieza: "/empieza",
   aventura: "/aventura",
+  flota: "/flota",
   entrenadorEsperas: "/entrenador-esperas",
   adminAventura: "/admin/aventura",
 } as const;
@@ -54,6 +55,8 @@ export const NAV_LINKS = [
   { label: "Contenido Exclusivo", to: ROUTES.contenidoExclusivo, icon: Sparkles },
   { label: "Descargas", to: ROUTES.descargas, icon: Download },
   { label: "Aventura", to: ROUTES.aventura, icon: Plane },
+  // Fuera de la barra superior (ya no cabe en escritorio): aparece en el menú móvil y en el pie.
+  { label: "Flota", to: ROUTES.flota, icon: PlaneTakeoff, soloMenus: true },
   { label: "Comunidad", to: ROUTES.comunidad, icon: Users },
 ];
 
