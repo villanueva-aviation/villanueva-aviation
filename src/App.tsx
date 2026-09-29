@@ -14,6 +14,7 @@ import { Home } from "./pages/Home";
 const Academia = lazy(() => import("./pages/Academia").then((m) => ({ default: m.Academia })));
 const AcademiaModulo = lazy(() => import("./pages/AcademiaModulo").then((m) => ({ default: m.AcademiaModulo })));
 const ExamenTipo = lazy(() => import("./pages/ExamenTipo").then((m) => ({ default: m.ExamenTipo })));
+const GuiaEstudioPdf = lazy(() => import("./pages/GuiaEstudioPdf").then((m) => ({ default: m.GuiaEstudioPdf })));
 const MiFormacion = lazy(() => import("./pages/MiFormacion").then((m) => ({ default: m.MiFormacion })));
 const Tracker = lazy(() => import("./pages/Tracker").then((m) => ({ default: m.Tracker })));
 const Evaluaciones = lazy(() => import("./pages/Evaluaciones").then((m) => ({ default: m.Evaluaciones })));
@@ -78,6 +79,14 @@ function RoutedContent() {
             element={
               <ProtectedRoute>
                 <Academia />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/academia/avion/:clave/guia"
+            element={
+              <ProtectedRoute>
+                <GuiaEstudioPdf />
               </ProtectedRoute>
             }
           />
@@ -293,11 +302,11 @@ function App() {
       <ProgressProvider>
         <div className="flex min-h-screen flex-col bg-navy-950">
           <ScrollToTop />
-          {!aterrizaje && <Navbar />}
+          {!aterrizaje && <div className="print:hidden"><Navbar /></div>}
           <main className="flex-1">
             <RoutedContent />
           </main>
-          {!aterrizaje && <Footer />}
+          {!aterrizaje && <div className="print:hidden"><Footer /></div>}
         </div>
       </ProgressProvider>
     </AuthProvider>

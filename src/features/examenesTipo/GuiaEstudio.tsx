@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, ChevronDown } from "lucide-react";
+import { BookOpen, ChevronDown, Download } from "lucide-react";
+import { ROUTES } from "../../lib/routes";
 import { VSpeedsTable } from "../checklist/VSpeedsTable";
 import { TablaReferencia } from "../checklist/TablaReferencia";
 import { FlowDiagram } from "../checklist/FlowDiagram";
@@ -22,7 +23,7 @@ interface Fuente {
 }
 
 /** Los mismos datos de los checklists del sitio: así la guía nunca contradice al examen. */
-function fuenteDe(clave: string): Fuente | null {
+export function fuenteDe(clave: string): Fuente | null {
   if (clave === "c152") {
     return {
       vspeeds: VSPEEDS_C152,
@@ -149,11 +150,16 @@ export function GuiaEstudio({ clave, preguntas, checklistHref }: { clave: string
         </Seccion>
       </div>
 
-      {checklistHref && (
-        <Link to={checklistHref} className="mt-5 inline-block text-sm font-medium text-gold-400 hover:underline">
-          Abrir el checklist interactivo del avión
+      <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium">
+        <Link to={ROUTES.guiaEstudioPdf(clave)} className="inline-flex items-center gap-1.5 text-gold-400 hover:underline">
+          <Download size={15} /> Descargar la guía en PDF
         </Link>
-      )}
+        {checklistHref && (
+          <Link to={checklistHref} className="text-gold-400 hover:underline">
+            Abrir el checklist interactivo del avión
+          </Link>
+        )}
+      </div>
     </div>
   );
 }
