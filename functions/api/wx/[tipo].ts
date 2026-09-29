@@ -2,8 +2,13 @@
 // El servicio no envía cabeceras CORS, así que el navegador no puede consultarlo directo.
 const TIPOS = new Set(["metar", "taf"]);
 
+// Abierto a cualquier origen: son datos públicos de solo lectura, y así el fondo de pantalla
+// animado (un archivo local, sin dominio) puede mostrar el METAR.
 const json = (cuerpo: string, status = 200, extra: Record<string, string> = {}) =>
-  new Response(cuerpo, { status, headers: { "content-type": "application/json; charset=utf-8", ...extra } });
+  new Response(cuerpo, {
+    status,
+    headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*", ...extra },
+  });
 
 export const onRequestGet = async ({ params, request }: { params: { tipo: string }; request: Request }) => {
   const ids = (new URL(request.url).searchParams.get("ids") ?? "").toUpperCase();
