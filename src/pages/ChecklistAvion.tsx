@@ -9,7 +9,7 @@ export function ChecklistAvion() {
   if (!a) return <Navigate to={ROUTES.descargas} replace />;
   return (
     <AircraftChecklistPage
-      titulo={`${a.nombre} — Normal y Emergencia`}
+      titulo={`${a.nombre} — ${a.emergencia.length ? "Normal y Emergencia" : "Normal"}`}
       normal={a.normal}
       emergencia={a.emergencia}
       descripcion={`Toca cada punto para marcarlo conforme lo verificas. ${a.nota}`}

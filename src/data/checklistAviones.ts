@@ -1335,6 +1335,63 @@ export const AVIONES_CHECKLIST: Record<string, AvionChecklist> = {
     ],
   },
 
+  c408: {
+    id: "c408",
+    nombre: "Cessna 408 SkyCourier",
+    nota: "Checklist básico de referencia para simulador: solo procedimientos normales. Cessna no publica el manual del SkyCourier, así que aquí no hay velocidades, límites ni emergencias; los pasos salen de un checklist comunitario para simulador y los datos generales, de la información pública de Textron Aviation. Bimotor turbohélice de carga o 19 pasajeros con dos Pratt & Whitney PT6A-65SC de unos 1,100 shp, hélices de cuatro palas con autofeather y reversa, y Garmin G1000 NXi. Para volarlo, manda siempre el checklist y las velocidades de tu simulador.",
+    normal: fases("c408n", [
+      ["antes-arrancar", "Antes de arrancar", [
+        ["Cubiertas retiradas, calzas fuera y recorrido exterior completo", "Una cubierta olvidada en una toma de aire o el pitot puede terminar en falla de motor o de velocidad."],
+        ["Freno de estacionamiento — ON; batería — ON; aviónica — ON", "Deja el avión frenado y con energía para el arranque."],
+        ["Condición — CUTOFF; hélice — MAX; potencia — IDLE", "Es la posición de arranque de la turbina."],
+        ["Área de hélices despejada; luz anticolisión — ON; separador inercial — según se requiera", "Avisa a cualquiera cerca de las hélices antes de que giren."],
+      ]],
+      ["arranque", "Arranque de motores", [
+        ["Ignición — ON; arrancador — ENGAGE; bomba de refuerzo — ON", "El arrancador hace girar el generador de gas antes de meter combustible."],
+        ["Presión de aceite — subiendo", "Si no sube, se aborta el arranque."],
+        ["Condición — LOW al llegar a 12 % de NG; ITT — vigilar", "Meter combustible con poco NG da un arranque caliente."],
+        ["Arrancador — OFF al llegar a 50 % de NG; ignición — NORM; bomba de refuerzo — NORM", "Ya el motor se sostiene solo."],
+        ["Repetir con el motor 2", "Se arranca un motor a la vez."],
+        ["Flaps — TAKEOFF; altímetro — revisado y ajustado; luces de navegación y rodaje — ON; luces de cabina — según se requiera", "Deja el avión configurado antes de rodar."],
+      ]],
+      ["rodaje", "Rodaje", [
+        ["Piloto automático — preparado; área de rodaje — despejada", "Deja listo el autopiloto para después del despegue."],
+        ["Antihielo — según se requiera (calefacción de pitot y estática ON)", "Con humedad visible y frío, el hielo en las tomas da lecturas falsas."],
+      ]],
+      ["antes-despegue", "Antes de despegue", [
+        ["Briefing de piloto y copiloto — dado; instrumentos de vuelo — ajustados; controles — libres", "En un bimotor se repasa antes qué hacer si falla un motor."],
+        ["Autofeather — armado", "Embandera solo la hélice del motor que falle en el despegue."],
+        ["Luces de aterrizaje y estrobos — ON; aire de sangrado — ON; luz de cabina — OFF", "Las luces te hacen visible; el aire de sangrado de los motores da calefacción y ventilación a la cabina."],
+        ["Condición — HIGH", "Deja los motores listos para responder de inmediato."],
+      ]],
+      ["crucero", "Crucero", [
+        ["Potencia — ajustada; luces de aterrizaje y rodaje — OFF; separador inercial — OFF", "El separador se usa solo cuando hace falta proteger el motor."],
+      ]],
+      ["descenso", "Descenso", [
+        ["Antihielo — según se requiera; altímetro — revisado y ajustado", "Sin el dato de presión del destino, el altímetro marca una altura distinta a la real."],
+      ]],
+      ["aterrizaje", "Aterrizaje", [
+        ["Flaps — ajustados; hélices — MAX; luces exteriores — ON; piloto automático — OFF", "Hélices adelante para tener potencia completa si hace falta un motor y al aire."],
+      ]],
+      ["despues-aterrizar", "Después de aterrizar", [
+        ["Flaps — UP; condición — LOW; luces de aterrizaje y estrobos — OFF; luces de cabina — ON", "Los estrobos deslumbran a otros pilotos en tierra."],
+      ]],
+      ["apagado", "Apagado", [
+        ["Freno de estacionamiento — ON; potencia — IDLE; condición — CUTOFF; hélices — FEATHER", "Así se apaga la turbina: cortando el combustible."],
+        ["Todas las luces, aviónica y batería — OFF; revisión de cabina — completa", "Evita descargar la batería entre vuelos."],
+      ]],
+    ]),
+    emergencia: [],
+    flujos: [],
+    vspeeds: [],
+    sistemas: [
+      {
+        titulo: "Lo que sí se sabe del SkyCourier",
+        texto: "Dos turbohélices Pratt & Whitney PT6A-65SC de unos 1,100 shp, hélices McCauley de cuatro palas con autofeather y reversa, y aviónica Garmin G1000 NXi con tres pantallas. Peso máximo de despegue de 19,000 lb, 720 galones de combustible, techo de 25,000 ft y crucero máximo de 210 KTAS. Lleva 19 pasajeros o unas 6,000 lb de carga. Su certificado de tipo de la FAA es el A00016WI (marzo de 2022).",
+      },
+    ],
+  },
+
   c208: {
     id: "c208",
     nombre: "Cessna 208B Caravan",

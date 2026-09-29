@@ -39,7 +39,7 @@ export function AircraftChecklistPage({
       </PageHero>
 
       <Container className="py-12 md:py-16">
-        <div className="flex gap-2">
+        {emergencia.length > 0 && <div className="flex gap-2">
           <button
             onClick={() => setModo("normal")}
             className={`rounded-full border px-5 py-2.5 text-sm font-medium transition-colors duration-200 ${
@@ -60,7 +60,7 @@ export function AircraftChecklistPage({
           >
             Emergencia
           </button>
-        </div>
+        </div>}
 
         <div className="mt-8">
           <ChecklistInteractive fases={modo === "normal" ? normal : emergencia} />

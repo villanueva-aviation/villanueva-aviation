@@ -272,6 +272,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     soloInteractivo: true,
   },
   {
+    id: "checklist-c408",
+    categoria: "Checklists",
+    nombre: "Checklist Cessna 408 SkyCourier — Normal (básico)",
+    descripcion: "Bimotor turbohélice de carga: checklist básico de referencia para simulador, del arranque de los PT6 al apagado. Sin velocidades ni emergencias, porque Cessna no publica su manual.",
+    version: "v1.0",
+    fecha: "2026-09-29",
+    imagen: "/images/exclusivo-checklist-c408.jpg",
+    interactivoHref: "/checklist/c408",
+    soloInteractivo: true,
+  },
+  {
     id: "formulario-bitacora",
     categoria: "Formularios de práctica",
     nombre: "Bitácora de vuelo editable",
