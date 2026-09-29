@@ -15,6 +15,8 @@ export interface ExamenTipo {
   /** Misma clave que en la flota (flota.ts), para reusar su foto y matrícula. */
   clave: string;
   modelo: string;
+  /** Nombre para la insignia cuando el del modelo es muy largo (si falta, se abrevia el modelo). */
+  corto?: string;
   /** El primero es gratis para enganchar; el resto va dentro de Contenido Exclusivo. */
   gratis: boolean;
   preguntas: PreguntaTipo[];
@@ -48,7 +50,7 @@ export const EVALUACION_PRACTICA = [
 ];
 
 export function nombreCorto(examen: ExamenTipo) {
-  return examen.modelo.replace(/^Cessna /, "C").replace(/^Diamond /, "");
+  return examen.corto ?? examen.modelo.replace(/^Cessna /, "C").replace(/^Diamond /, "");
 }
 
 const C152: PreguntaTipo[] = [
@@ -217,10 +219,69 @@ const DA40: PreguntaTipo[] = [
   { id: "da40-e9", area: "Emergencias", pregunta: "Hay fuego al arrancar en tierra. ¿Qué haces?", opciones: ["Seguir girando el arrancador", "Cortar combustible, Motor y Eléctrico, abrir el canopy y evacuar", "Subir la potencia a MAX", "Esperar a que se apague solo"], correcta: 1 },
 ];
 
+// C208B Grand Caravan con G1000 y turbohélice PT6A-114A (AVIONES_CHECKLIST.c208 en checklistAviones.ts).
+const C208: PreguntaTipo[] = [
+  // ---------- Velocidades ----------
+  { id: "c208-v1", area: "Velocidades", pregunta: "¿A qué velocidad se rota en el despegue normal del Caravan?", opciones: ["55–60 KIAS", "62–67 KIAS", "70–75 KIAS", "85–90 KIAS"], correcta: 2 },
+  { id: "c208-v2", area: "Velocidades", pregunta: "¿Cuál es la velocidad de ascenso inicial con flaps 20°?", opciones: ["70–75 KIAS", "85–95 KIAS", "100–110 KIAS", "120–130 KIAS"], correcta: 1 },
+  { id: "c208-v3", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor ángulo de ascenso (Vx)?", opciones: ["62 KIAS", "72 KIAS", "87 KIAS", "104 KIAS"], correcta: 1 },
+  { id: "c208-v4", area: "Velocidades", pregunta: "Entre el nivel del mar y 10,000 ft, ¿cuál es la velocidad de mejor tasa de ascenso (Vy)?", opciones: ["87 KIAS", "95 KIAS", "104 KIAS", "120 KIAS"], correcta: 2 },
+  { id: "c208-v5", area: "Velocidades", pregunta: "Con 8,750 lb y sin pod de carga, ¿cuál es la velocidad de mejor planeo?", opciones: ["80 KIAS", "90 KIAS", "97 KIAS", "110 KIAS"], correcta: 2 },
+  { id: "c208-v6", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima de operación (Vmo)?", opciones: ["148 KIAS", "163 KIAS", "175 KIAS", "190 KIAS"], correcta: 2 },
+  { id: "c208-v7", area: "Velocidades", pregunta: "Con 8,750 lb, ¿cuál es la velocidad de maniobra (Va)?", opciones: ["125 KIAS", "137 KIAS", "148 KIAS", "175 KIAS"], correcta: 2 },
+  { id: "c208-v8", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima con flaps de más de 20°?", opciones: ["100 KIAS", "125 KIAS", "150 KIAS", "175 KIAS"], correcta: 1 },
+  { id: "c208-v9", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima con flaps entre 10° y 20°?", opciones: ["125 KIAS", "140 KIAS", "150 KIAS", "175 KIAS"], correcta: 2 },
+  { id: "c208-v10", area: "Velocidades", pregunta: "En el despegue, ¿cuándo se retraen los flaps de 20° a 10°?", opciones: ["Al rotar", "Al pasar 85 KIAS", "Al pasar 125 KIAS", "Al llegar a 1,000 ft"], correcta: 1 },
+
+  // ---------- Limitaciones ----------
+  { id: "c208-l1", area: "Limitaciones", pregunta: "¿Cuál es el peso máximo de despegue del 208B?", opciones: ["8,000 lb", "8,500 lb", "8,750 lb", "8,785 lb"], correcta: 2 },
+  { id: "c208-l2", area: "Limitaciones", pregunta: "¿Cuál es el peso máximo de aterrizaje?", opciones: ["8,000 lb", "8,500 lb", "8,750 lb", "8,785 lb"], correcta: 1 },
+  { id: "c208-l3", area: "Limitaciones", pregunta: "¿Cuál es la ITT máxima para el despegue?", opciones: ["685 °C", "740 °C", "805 °C", "1,090 °C"], correcta: 2 },
+  { id: "c208-l4", area: "Limitaciones", pregunta: "¿Cuál es la ITT máxima continua (crucero)?", opciones: ["685 °C", "740 °C", "805 °C", "850 °C"], correcta: 1 },
+  { id: "c208-l5", area: "Limitaciones", pregunta: "Durante el arranque, ¿cuál es la ITT máxima y por cuánto tiempo?", opciones: ["805 °C, 5 segundos", "1,090 °C, 2 segundos", "1,090 °C, 20 segundos", "740 °C, sin límite"], correcta: 1 },
+  { id: "c208-l6", area: "Limitaciones", pregunta: "¿Cuál es el Ng máximo?", opciones: ["52 %", "97 %", "101.6 %", "110 %"], correcta: 2 },
+  { id: "c208-l7", area: "Limitaciones", pregunta: "¿Cuál es el torque máximo continuo?", opciones: ["1,600 ft-lb", "1,865 ft-lb", "1,970 ft-lb", "2,200 ft-lb"], correcta: 1 },
+  { id: "c208-l8", area: "Limitaciones", pregunta: "¿Cuál es el factor de carga con flaps abajo?", opciones: ["+3.8 g", "+3.0 g", "+2.4 g", "+4.4 g"], correcta: 2 },
+  { id: "c208-l9", area: "Limitaciones", pregunta: "¿Cuál es el viento cruzado máximo demostrado?", opciones: ["12 nudos", "15 nudos", "17 nudos", "20 nudos"], correcta: 3 },
+  { id: "c208-l10", area: "Limitaciones", pregunta: "¿Cuál es la diferencia máxima de combustible entre tanques en crucero?", opciones: ["50 lb", "100 lb", "200 lb", "500 lb"], correcta: 2 },
+
+  // ---------- Sistemas ----------
+  { id: "c208-s1", area: "Sistemas", pregunta: "¿Qué motor lleva el Caravan 208B?", opciones: ["Lycoming TIO-540 a pistón", "Pratt & Whitney PT6A-114A, turbohélice", "Honeywell TPE331", "Austro E4 diésel"], correcta: 1 },
+  { id: "c208-s2", area: "Sistemas", pregunta: "¿Qué tres palancas controlan el motor?", opciones: ["Gases, mezcla y hélice", "Potencia, hélice y condición", "Potencia, mezcla y condición", "Gases, hélice y calentador de carburador"], correcta: 1 },
+  { id: "c208-s3", area: "Sistemas", pregunta: "¿Qué posiciones tiene la palanca de condición?", opciones: ["RICA, POBRE y CORTE", "CUTOFF, LOW IDLE y HIGH IDLE", "OFF, ON y START", "FEATHER, MIN y MAX"], correcta: 1 },
+  { id: "c208-s4", area: "Sistemas", pregunta: "¿Para qué sirve el rango beta de la hélice?", opciones: ["Para embanderar en vuelo", "Paso negativo que frena en el rodaje y el aterrizaje", "Para subir más rápido", "Para arrancar sin batería"], correcta: 1 },
+  { id: "c208-s5", area: "Sistemas", pregunta: "¿Qué hace el separador inercial?", opciones: ["Separa el agua del combustible", "Desvía el aire de entrada para proteger el motor de hielo y objetos extraños", "Enfría el aceite", "Separa los dos tanques de combustible"], correcta: 1 },
+  { id: "c208-s6", area: "Sistemas", pregunta: "Si falla el generador principal, ¿qué sostiene el sistema eléctrico?", opciones: ["Solo la batería, por 30 minutos", "El alternador de respaldo (STBY ALT PWR), con menos capacidad", "Un generador de aire de impacto", "Nada: hay que aterrizar de inmediato"], correcta: 1 },
+  { id: "c208-s7", area: "Sistemas", pregunta: "¿Qué ciclo de uso tiene el motor de arranque con batería?", opciones: ["10 s ON / 10 s OFF", "30 s ON / 60 s OFF", "60 s ON / 30 s OFF", "Sin límite"], correcta: 1 },
+  { id: "c208-s8", area: "Sistemas", pregunta: "¿Por qué nunca se lleva la palanca de potencia por debajo de IDLE en vuelo?", opciones: ["Porque apaga el motor", "Porque mete la hélice en beta y puede causar una sobrevelocidad", "Porque se traba la palanca", "Porque se enciende el separador inercial"], correcta: 1 },
+
+  // ---------- Procedimientos normales ----------
+  { id: "c208-n1", area: "Procedimientos normales", pregunta: "¿En qué posición va la palanca de condición para arrancar?", opciones: ["HIGH IDLE", "LOW IDLE", "CUTOFF", "No importa"], correcta: 2 },
+  { id: "c208-n2", area: "Procedimientos normales", pregunta: "¿Qué Ng mínimo estable se espera antes de pasar la condición a LOW IDLE?", opciones: ["5 %", "12 %", "52 %", "70 %"], correcta: 1 },
+  { id: "c208-n3", area: "Procedimientos normales", pregunta: "¿Qué es lo más vigilado al pasar la condición a LOW IDLE en el arranque?", opciones: ["La presión de combustible en los tanques", "La ITT, por el riesgo de un arranque caliente", "La RPM de la hélice", "El voltaje de la batería"], correcta: 1 },
+  { id: "c208-n4", area: "Procedimientos normales", pregunta: "Si la ITT sube rápido hacia el límite en el arranque, ¿qué haces?", opciones: ["Subir la potencia", "Regresar la condición a CUTOFF", "Poner la hélice en FEATHER", "Esperar a que baje sola"], correcta: 1 },
+  { id: "c208-n5", area: "Procedimientos normales", pregunta: "¿Con cuántos grados de flaps se despega normalmente?", opciones: ["0°", "10°", "20°", "30°"], correcta: 2 },
+  { id: "c208-n6", area: "Procedimientos normales", pregunta: "¿Qué ITT se recomienda no superar de forma sostenida en el ascenso?", opciones: ["685 °C", "740 °C", "805 °C", "900 °C"], correcta: 1 },
+  { id: "c208-n7", area: "Procedimientos normales", pregunta: "¿Qué rango de RPM de hélice se usa en crucero?", opciones: ["1,200–1,500 RPM", "1,600–1,900 RPM", "2,000–2,200 RPM", "2,300–2,700 RPM"], correcta: 1 },
+  { id: "c208-n8", area: "Procedimientos normales", pregunta: "¿Cómo se apaga correctamente la turbina?", opciones: ["Batería OFF", "Tras 1 minuto con la ITT estable al mínimo: hélice FEATHER y condición CUTOFF", "Cerrando la válvula de combustible con potencia MAX", "Con la hélice en beta"], correcta: 1 },
+  { id: "c208-n9", area: "Procedimientos normales", pregunta: "¿En qué posición va la palanca de condición antes de aterrizar?", opciones: ["CUTOFF", "LOW IDLE", "HIGH IDLE", "BETA"], correcta: 2 },
+
+  // ---------- Emergencias ----------
+  { id: "c208-e1", area: "Emergencias", pregunta: "Falla el motor justo después del despegue. ¿Qué haces con la hélice?", opciones: ["La dejas en MAX", "La embanderas", "La pasas a beta", "Nada"], correcta: 1 },
+  { id: "c208-e2", area: "Emergencias", pregunta: "En un aterrizaje forzado sin motor, ¿qué velocidad se vuela con flaps arriba?", opciones: ["80 KIAS", "90 KIAS", "100 KIAS", "120 KIAS"], correcta: 2 },
+  { id: "c208-e3", area: "Emergencias", pregunta: "Sin arrancador disponible, ¿qué velocidad mínima necesitas para reencender con la hélice embanderada?", opciones: ["100 KIAS", "120 KIAS", "140 KIAS", "175 KIAS"], correcta: 2 },
+  { id: "c208-e4", area: "Emergencias", pregunta: "Fuego de motor en vuelo. ¿Qué haces primero?", opciones: ["Potencia MAX para llegar al aeropuerto", "Potencia IDLE, hélice FEATHER, condición CUTOFF y combustible cerrado", "Encender la calefacción de cabina", "Reiniciar el generador"], correcta: 1 },
+  { id: "c208-e5", area: "Emergencias", pregunta: "Falla el generador y no se recupera con RESET. ¿Qué implica?", opciones: ["Aterrizar de inmediato en cualquier campo", "Generador TRIP, reducir carga y continuar con el respaldo alterno", "Apagar el motor", "Seguir igual, sin cambios"], correcta: 1 },
+  { id: "c208-e6", area: "Emergencias", pregunta: "El voltaje del bus sube de 32.5 V. ¿Qué haces?", opciones: ["Batería OFF", "Generador TRIP", "Encender más equipos", "Nada, es normal"], correcta: 1 },
+  { id: "c208-e7", area: "Emergencias", pregunta: "Tras un fuego eléctrico ya apagado necesitas energía. ¿Qué NO haces?", opciones: ["Encender los equipos uno por uno", "Reiniciar el breaker que falló", "Revisar los breakers", "Poner la batería en ON"], correcta: 1 },
+  { id: "c208-e8", area: "Emergencias", pregunta: "Hay fuego de motor al arrancar en tierra. ¿Qué haces?", opciones: ["Seguir con el arrancador y subir la potencia", "Arrancador OFF, combustible cerrado, batería OFF y evacuar", "Condición a HIGH IDLE", "Hélice en beta"], correcta: 1 },
+];
+
 export const EXAMENES_TIPO: ExamenTipo[] = [
   { clave: "c152", modelo: "Cessna 152", gratis: true, preguntas: C152 },
   { clave: "c172", modelo: "Cessna 172", gratis: false, preguntas: C172 },
   { clave: "da40", modelo: "Diamond DA40 NG", gratis: false, preguntas: DA40 },
+  { clave: "c208", modelo: "Cessna 208B Grand Caravan", corto: "Caravan", gratis: false, preguntas: C208 },
 ];
 
 export function examenTipo(clave: string | undefined) {
