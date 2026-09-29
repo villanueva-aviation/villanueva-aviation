@@ -17,6 +17,8 @@ type Fase = { tipo: "inicio" } | { tipo: "examen"; preguntas: PreguntaTipo[] } |
 
 const { preguntasPorIntento, aprobacion, esperaHoras } = REGLAS_EXAMEN_TIPO;
 
+const CHECKLIST: Record<string, string> = { c152: ROUTES.checklistC152, c172: ROUTES.checklistC172 };
+
 const fechaHora = new Intl.DateTimeFormat("es-MX", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
 
 export function ExamenTipo() {
@@ -104,8 +106,8 @@ export function ExamenTipo() {
                 <p className="text-sm text-white/70">
                   Tu último intento fue de {guardado?.score}%. Puedes volver a presentarlo el {fechaHora.format(espera)}.
                 </p>
-                {examen.clave === "c152" && (
-                  <Button to={ROUTES.checklistC152} variant="secondary" className="mt-5">Repasar con el checklist</Button>
+                {CHECKLIST[examen.clave] && (
+                  <Button to={CHECKLIST[examen.clave]} variant="secondary" className="mt-5">Repasar con el checklist</Button>
                 )}
               </div>
             ) : (
@@ -152,7 +154,7 @@ function Resultado({ corto, clave, score, passed, reforzar }: { corto: string; c
         </div>
       )}
       <div className="mt-7 flex flex-wrap gap-3">
-        {clave === "c152" && <Button to={ROUTES.checklistC152}>Repasar con el checklist del C152</Button>}
+        {CHECKLIST[clave] && <Button to={CHECKLIST[clave]}>Repasar con el checklist del {corto}</Button>}
         <Button to={ROUTES.academia} variant="secondary">Volver a la Academia</Button>
       </div>
     </div>
