@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Timer } from "lucide-react";
+import { ArrowRight, Award, Timer } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
 import { ProgressBar } from "../components/ui/ProgressBar";
 import { Reveal } from "../components/ui/Reveal";
 import { ACADEMIA_MODULOS } from "../data/academia";
+import { EXAMENES_TIPO } from "../data/examenesTipo";
+import { FLOTA, fotoFlota } from "../data/flota";
 import { ROUTES } from "../lib/routes";
 import { useProgress, type ModuloEstado } from "../features/progress/ProgressContext";
 
@@ -22,7 +24,7 @@ const ESTADO_TONE: Record<ModuloEstado, "gold" | "green" | "neutral"> = {
 };
 
 export function Academia() {
-  const { moduloProgreso, loading } = useProgress();
+  const { moduloProgreso, examenTipoResultado, loading } = useProgress();
 
   if (loading) return null;
 
@@ -75,6 +77,49 @@ export function Academia() {
               </Reveal>
             );
           })}
+        </div>
+
+        <div className="mt-16">
+          <h2 className="font-display text-xl font-semibold text-white">Insignias de avión</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/60">
+            Demuestra que conoces a fondo cada avión de la flota: velocidades, limitaciones, sistemas y emergencias.
+            Aprueba su examen y gana la insignia "Experto en…". El del Cessna 152 es gratis.
+          </p>
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            {FLOTA.flatMap((etapa) => etapa.aviones).map((avion) => {
+              const examen = EXAMENES_TIPO.find((e) => e.clave === avion.clave);
+              const ganada = examen ? examenTipoResultado(avion.clave)?.passed : false;
+              const foto = fotoFlota(avion.clave);
+              const contenido = (
+                <>
+                  <img src={foto.src} srcSet={foto.srcSet} sizes="(min-width: 1024px) 20vw, 50vw" alt="" loading="lazy" className="aspect-[16/9] w-full rounded-lg object-cover" />
+                  <p className="mt-3 font-display text-sm font-semibold text-white">{avion.modelo}</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {ganada ? (
+                      <Badge tone="green"><Award size={11} className="mr-1" />Teórico</Badge>
+                    ) : examen ? (
+                      <Badge tone={examen.gratis ? "gold" : "neutral"}>{examen.gratis ? "Gratis" : "Exclusivo"}</Badge>
+                    ) : (
+                      <Badge tone="neutral">Próximamente</Badge>
+                    )}
+                  </div>
+                </>
+              );
+              return examen ? (
+                <Link
+                  key={avion.clave}
+                  to={ROUTES.examenTipo(avion.clave)}
+                  className="card-hover rounded-2xl border border-gold-500/25 bg-white/[0.03] p-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60"
+                >
+                  {contenido}
+                </Link>
+              ) : (
+                <div key={avion.clave} className="rounded-2xl border border-white/10 bg-white/[0.02] p-3 opacity-60">
+                  {contenido}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         <div className="mt-16">

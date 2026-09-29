@@ -4,6 +4,7 @@ export const ROUTES = {
   home: "/",
   academia: "/academia",
   academiaModulo: (slug: string) => `/academia/${slug}`,
+  examenTipo: (clave: string) => `/academia/avion/${clave}`,
   miFormacion: "/mi-formacion",
   tracker: "/tracker",
   evaluaciones: "/evaluaciones",

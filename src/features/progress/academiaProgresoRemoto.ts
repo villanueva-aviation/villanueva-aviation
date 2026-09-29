@@ -3,6 +3,8 @@ import { supabase } from "../../lib/supabaseClient";
 export interface QuizResult {
   score: number;
   passed: boolean;
+  /** Fecha ISO del último intento; la usan los exámenes por avión para la espera tras reprobar. */
+  fecha?: string;
 }
 
 export interface ProgresoRemoto {

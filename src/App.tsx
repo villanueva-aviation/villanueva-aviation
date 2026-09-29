@@ -13,6 +13,7 @@ import { Home } from "./pages/Home";
 
 const Academia = lazy(() => import("./pages/Academia").then((m) => ({ default: m.Academia })));
 const AcademiaModulo = lazy(() => import("./pages/AcademiaModulo").then((m) => ({ default: m.AcademiaModulo })));
+const ExamenTipo = lazy(() => import("./pages/ExamenTipo").then((m) => ({ default: m.ExamenTipo })));
 const MiFormacion = lazy(() => import("./pages/MiFormacion").then((m) => ({ default: m.MiFormacion })));
 const Tracker = lazy(() => import("./pages/Tracker").then((m) => ({ default: m.Tracker })));
 const Evaluaciones = lazy(() => import("./pages/Evaluaciones").then((m) => ({ default: m.Evaluaciones })));
@@ -77,6 +78,14 @@ function RoutedContent() {
             element={
               <ProtectedRoute>
                 <Academia />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/academia/avion/:clave"
+            element={
+              <ProtectedRoute>
+                <ExamenTipo />
               </ProtectedRoute>
             }
           />

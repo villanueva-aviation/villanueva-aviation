@@ -8,10 +8,16 @@ export function Quiz({
   preguntas,
   passingScore = 70,
   onFinish,
+  onRespuestas,
+  permitirReintento = true,
 }: {
   preguntas: QuizPregunta[];
   passingScore?: number;
   onFinish: (score: number, passed: boolean) => void;
+  /** Qué preguntas acertó, en orden; para desglosar el resultado por tema. */
+  onRespuestas?: (aciertos: boolean[]) => void;
+  /** Los exámenes con espera tras reprobar lo apagan. */
+  permitirReintento?: boolean;
 }) {
   const [step, setStep] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -34,6 +40,7 @@ export function Quiz({
     if (step + 1 >= preguntas.length) {
       const finalScore = Math.round((answers.filter(Boolean).length / preguntas.length) * 100);
       setFinished(true);
+      onRespuestas?.(answers);
       onFinish(finalScore, finalScore >= passingScore);
       return;
     }
@@ -65,7 +72,7 @@ export function Quiz({
           Obtuviste <span className="text-white">{score}%</span> de aciertos
           {passingScore > 0 && ` · Mínimo requerido: ${passingScore}%`}
         </p>
-        {!passed && (
+        {!passed && permitirReintento && (
           <Button variant="secondary" className="mt-6" onClick={handleRetry}>
             <RotateCcw size={15} /> Reintentar
           </Button>

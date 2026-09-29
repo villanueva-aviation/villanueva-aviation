@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { ACADEMIA_MODULOS } from "../../data/academia";
+import { Plane } from "lucide-react";
 import { CADETE_BASE, CERTIFICADOS_BASE, LOGROS_BASE, type Certificado, type Logro } from "../../data/cadete";
+import { EXAMENES_TIPO } from "../../data/examenesTipo";
+import { combinarResultado } from "../examenesTipo/reglas";
 import { readStorage } from "../../lib/storage";
 import { useAuth } from "../auth/AuthContext";
 import { fetchProgresoRemoto, guardarProgresoRemoto, type ProgresoRemoto, type QuizResult } from "./academiaProgresoRemoto";
@@ -36,6 +39,9 @@ interface ProgressContextValue {
   completarActividad: (slug: string, actividadId: string) => void;
   registrarExamen: (slug: string, actividadId: string, score: number, passed: boolean) => void;
   examenResultado: (slug: string) => QuizResult | null;
+  /** Exámenes teóricos por avión (insignias "Experto en …"). */
+  registrarExamenTipo: (clave: string, score: number, passed: boolean) => void;
+  examenTipoResultado: (clave: string) => QuizResult | null;
   progresoGeneralPct: number;
   temasDebiles: TemaDebil[];
   xp: number;
@@ -50,6 +56,9 @@ interface ProgressContextValue {
 const ProgressContext = createContext<ProgressContextValue | null>(null);
 
 const LEGACY_STORAGE_KEY = "cadet-progress";
+
+// Los exámenes por avión se guardan junto a los de los módulos, con este prefijo en la clave.
+const PREFIJO_TIPO = "tipo-";
 
 function estadoDeModulo(completadasCount: number, total: number): ModuloEstado {
   if (completadasCount === 0) return "disponible";
@@ -133,6 +142,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const moduloActual = modulos.find((m) => m.estado === "en-progreso" || m.estado === "disponible") ?? modulos[modulos.length - 1];
 
     const temasDebiles: TemaDebil[] = Object.entries(state.examenes)
+      .filter(([slug]) => !slug.startsWith(PREFIJO_TIPO))
       .map(([slug, r]) => ({
         slug,
         titulo: ACADEMIA_MODULOS.find((m) => m.slug === slug)?.titulo ?? slug,
@@ -146,7 +156,15 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const vfrCompletado = modulos.find((m) => m.slug === "vfr")?.estado === "completado";
     const algunaPerfecta = Object.values(state.examenes).some((r) => r.score === 100);
 
-    const logros = LOGROS_BASE.map((logro) => {
+    const logrosTipo: Logro[] = EXAMENES_TIPO.map((ex) => ({
+      id: `${PREFIJO_TIPO}${ex.clave}`,
+      titulo: `Experto en ${ex.modelo.replace(/^Cessna /, "C")} · Teórico`,
+      descripcion: `Aprueba el examen teórico del ${ex.modelo} (simulador).`,
+      icon: Plane,
+      desbloqueado: Boolean(state.examenes[`${PREFIJO_TIPO}${ex.clave}`]?.passed),
+    }));
+
+    const logrosBase = LOGROS_BASE.map((logro) => {
       switch (logro.id) {
         case "primer-vuelo":
           return { ...logro, desbloqueado: totalCompletadas > 0 };
@@ -164,6 +182,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
           return logro;
       }
     });
+    const logros = [...logrosBase, ...logrosTipo];
 
     const certificados: Certificado[] = CERTIFICADOS_BASE.map((cert) => {
       const modulo = modulos.find((m) => m.slug === cert.id);
@@ -191,6 +210,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         });
       },
       examenResultado: (slug: string) => state.examenes[slug] ?? null,
+      registrarExamenTipo: (clave: string, score: number, passed: boolean) => {
+        const llave = `${PREFIJO_TIPO}${clave}`;
+        const resultado = combinarResultado(state.examenes[llave] ?? null, score, passed, new Date().toISOString());
+        persist({ ...state, examenes: { ...state.examenes, [llave]: resultado } });
+      },
+      examenTipoResultado: (clave: string) => state.examenes[`${PREFIJO_TIPO}${clave}`] ?? null,
       progresoGeneralPct,
       temasDebiles,
       xp,
