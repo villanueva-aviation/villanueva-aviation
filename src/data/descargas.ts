@@ -228,6 +228,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     soloInteractivo: true,
   },
   {
+    id: "checklist-v35",
+    categoria: "Checklists",
+    nombre: "Checklist Beechcraft V35B Bonanza — Normal y emergencia",
+    descripcion: "Alto rendimiento con cola en V: checklist con tren eléctrico y su manivela de emergencia, cowl flaps, empobrecimiento con EGT y emergencias, con datos de su manual.",
+    version: "v1.0",
+    fecha: "2026-09-29",
+    imagen: "/images/exclusivo-checklist-v35.jpg",
+    interactivoHref: "/checklist/v35",
+    soloInteractivo: true,
+  },
+  {
     id: "formulario-bitacora",
     categoria: "Formularios de práctica",
     nombre: "Bitácora de vuelo editable",

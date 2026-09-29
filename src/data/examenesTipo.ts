@@ -338,11 +338,72 @@ const ARROW: PreguntaTipo[] = [
   { id: "arrow-e9", area: "Emergencias", pregunta: "Fuego de motor en vuelo. ¿Qué haces?", opciones: ["Selector OFF, acelerador cerrado, mezcla CORTE, bomba eléctrica OFF y aterrizaje sin motor", "Potencia a fondo al aeropuerto más cercano", "Abrir la calefacción", "Subir el tren y seguir"], correcta: 0 },
 ];
 
+// Beechcraft V35B Bonanza: cola en V, tren eléctrico con manivela, IO-520 a inyección (AVIONES_CHECKLIST.v35, POH 35-590118-31B).
+const V35: PreguntaTipo[] = [
+  // ---------- Velocidades ----------
+  { id: "v35-v1", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima para bajar el tren o volar con él abajo?", opciones: ["123 KIAS", "134 KIAS", "154 KIAS", "167 KIAS"], correcta: 2 },
+  { id: "v35-v2", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima con flaps extendidos en el V35B?", opciones: ["105 KIAS", "117 KIAS", "123 KIAS", "134 KIAS"], correcta: 2 },
+  { id: "v35-v3", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor tasa de ascenso (Vy)?", opciones: ["77 KIAS", "90 KIAS", "96 KIAS", "107 KIAS"], correcta: 2 },
+  { id: "v35-v4", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor ángulo de ascenso (Vx)?", opciones: ["71 KIAS", "77 KIAS", "83 KIAS", "96 KIAS"], correcta: 1 },
+  { id: "v35-v5", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor planeo?", opciones: ["83 KIAS", "96 KIAS", "105 KIAS", "115 KIAS"], correcta: 2 },
+  { id: "v35-v6", area: "Velocidades", pregunta: "¿A qué velocidad se hace la aproximación final de un aterrizaje sin motor?", opciones: ["70 KIAS", "77 KIAS", "83 KIAS", "105 KIAS"], correcta: 2 },
+  { id: "v35-v7", area: "Velocidades", pregunta: "¿Por qué la aproximación sin motor es más rápida que la normal?", opciones: ["Para llegar antes", "Para tener control en el flare sin potencia", "Porque el tren va arriba", "Para enfriar el motor"], correcta: 1 },
+  { id: "v35-v8", area: "Velocidades", pregunta: "¿Cuál es la velocidad que nunca debe excederse (Vne)?", opciones: ["167 KIAS", "183 KIAS", "196 KIAS", "205 KIAS"], correcta: 2 },
+  { id: "v35-v9", area: "Velocidades", pregunta: "¿Cuál es la velocidad de maniobra y de aire turbulento?", opciones: ["118 KIAS", "123 KIAS", "134 KIAS", "154 KIAS"], correcta: 2 },
+  { id: "v35-v10", area: "Velocidades", pregunta: "¿Cuál es la velocidad de ascenso de crucero?", opciones: ["96 KIAS", "107 KIAS", "120 KIAS", "134 KIAS"], correcta: 1 },
+  { id: "v35-v11", area: "Velocidades", pregunta: "¿Cuál es la velocidad de un descenso de emergencia?", opciones: ["105 KIAS", "134 KIAS", "154 KIAS", "196 KIAS"], correcta: 2 },
+
+  // ---------- Limitaciones ----------
+  { id: "v35-l1", area: "Limitaciones", pregunta: "¿Cuál es el peso máximo de despegue del V35B?", opciones: ["2,750 lb", "3,100 lb", "3,400 lb", "3,650 lb"], correcta: 2 },
+  { id: "v35-l2", area: "Limitaciones", pregunta: "¿En qué categoría está certificado y cuál es su factor de carga con flaps arriba?", opciones: ["Normal, +3.8 g", "Utilitaria, +4.4 g", "Acrobática, +6.0 g", "Normal, +4.4 g"], correcta: 1 },
+  { id: "v35-l3", area: "Limitaciones", pregunta: "¿Cuál es el factor de carga con flaps abajo?", opciones: ["+1.5 g", "+2.0 g", "+3.0 g", "+4.4 g"], correcta: 1 },
+  { id: "v35-l4", area: "Limitaciones", pregunta: "¿Cuál es la presión de admisión máxima?", opciones: ["25 in Hg", "27.5 in Hg", "29.6 in Hg", "32 in Hg"], correcta: 2 },
+  { id: "v35-l5", area: "Limitaciones", pregunta: "¿Cuál es la temperatura máxima de cabezas de cilindro?", opciones: ["380 °F", "420 °F", "460 °F", "500 °F"], correcta: 2 },
+  { id: "v35-l6", area: "Limitaciones", pregunta: "¿Con cuánto combustible mínimo se puede despegar?", opciones: ["5 galones en total", "Fuera de la banda amarilla y al menos 13 galones en cada tanque", "Medio tanque en cada ala", "No hay mínimo"], correcta: 1 },
+  { id: "v35-l7", area: "Limitaciones", pregunta: "¿Cuál es el rango de presión de aceite (mínima a máxima)?", opciones: ["20 a 90 PSI", "25 a 100 PSI", "30 a 100 PSI", "60 a 90 PSI"], correcta: 2 },
+  { id: "v35-l8", area: "Limitaciones", pregunta: "¿Cuánto combustible utilizable tiene el sistema opcional?", opciones: ["44 galones", "56 galones", "74 galones", "80 galones"], correcta: 2 },
+  { id: "v35-l9", area: "Limitaciones", pregunta: "¿Están permitidas las barrenas?", opciones: ["Sí, con flaps arriba", "Sí, en categoría utilitaria", "No: están prohibidas", "Solo con un instructor"], correcta: 2 },
+
+  // ---------- Sistemas ----------
+  { id: "v35-s1", area: "Sistemas", pregunta: "¿Cómo funciona la cola en V?", opciones: ["Una superficie es elevador y la otra timón", "Las dos se mueven juntas para cabeceo y opuestas para guiñada", "Solo controla el cabeceo; hay un timón aparte", "Es fija; se controla con alerones"], correcta: 1 },
+  { id: "v35-s2", area: "Sistemas", pregunta: "¿Cómo sube y baja el tren del Bonanza?", opciones: ["Con una bomba hidráulica", "Con un motor eléctrico y varillas", "Con presión de aire", "Con una palanca manual"], correcta: 1 },
+  { id: "v35-s3", area: "Sistemas", pregunta: "¿A qué presión de admisión suena la bocina con el tren arriba?", opciones: ["Bajo unas 12 in Hg", "Bajo unas 18 in Hg", "Sobre 25 in Hg", "A cualquier potencia"], correcta: 0 },
+  { id: "v35-s4", area: "Sistemas", pregunta: "¿Para qué sirve el interruptor de seguridad del amortiguador?", opciones: ["Para bajar el tren solo", "Evita que el tren suba en tierra, pero no se debe confiar en él", "Mide el peso del avión", "Apaga el motor al aterrizar"], correcta: 1 },
+  { id: "v35-s5", area: "Sistemas", pregunta: "¿Qué pasa si dejas el selector de combustible entre dos retenes?", opciones: ["Alimenta de los dos tanques", "No pasa combustible al motor", "Alimenta del tanque izquierdo", "Nada, es normal"], correcta: 1 },
+  { id: "v35-s6", area: "Sistemas", pregunta: "¿Qué motor lleva el V35B?", opciones: ["Lycoming IO-360 de 200 hp", "Continental IO-520 de 285 hp", "Continental IO-550 de 300 hp", "Lycoming IO-540 de 300 hp"], correcta: 1 },
+  { id: "v35-s7", area: "Sistemas", pregunta: "¿Cómo se deja un flap en posición intermedia?", opciones: ["No se puede", "Poniendo el interruptor en OFF cuando llega a la posición deseada", "Con una palanca manual", "Jalando el breaker"], correcta: 1 },
+  { id: "v35-s8", area: "Sistemas", pregunta: "¿Cuándo van abiertos los cowl flaps?", opciones: ["Solo en crucero", "En tierra, en el despegue y según haga falta en el ascenso", "Nunca: son de emergencia", "Solo en el descenso"], correcta: 1 },
+
+  // ---------- Procedimientos normales ----------
+  { id: "v35-n1", area: "Procedimientos normales", pregunta: "¿Cómo va la bomba auxiliar de combustible en el despegue y el aterrizaje?", opciones: ["Encendida siempre", "Apagada, salvo pérdida de presión de combustible", "Encendida solo en el aterrizaje", "Da igual"], correcta: 1 },
+  { id: "v35-n2", area: "Procedimientos normales", pregunta: "¿Cómo se ceba el motor en el arranque normal?", opciones: ["Con una bomba de cebado manual", "Mezcla rica, acelerador a fondo y bomba auxiliar ON hasta el máximo de flujo, luego OFF", "Con el calentador de carburador", "Bomba auxiliar ON durante todo el arranque"], correcta: 1 },
+  { id: "v35-n3", area: "Procedimientos normales", pregunta: "¿Cuánto tiempo máximo se puede usar el motor de arranque?", opciones: ["10 segundos cada minuto", "30 segundos en cualquier periodo de 4 minutos", "1 minuto seguido", "Sin límite"], correcta: 1 },
+  { id: "v35-n4", area: "Procedimientos normales", pregunta: "En la prueba de magnetos a 1,700 RPM, ¿cuál es la caída máxima?", opciones: ["125 RPM y 50 de diferencia", "150 RPM y 50 de diferencia", "175 RPM y 50 de diferencia", "200 RPM y 75 de diferencia"], correcta: 1 },
+  { id: "v35-n5", area: "Procedimientos normales", pregunta: "Al ejercitar la hélice en el run-up, ¿cuánto deben caer las RPM?", opciones: ["50 a 100 RPM", "100 a 200 RPM", "300 a 400 RPM", "Más de 700 RPM"], correcta: 2 },
+  { id: "v35-n6", area: "Procedimientos normales", pregunta: "¿Hasta qué temperatura de aceite no se pasa de 1,200 RPM?", opciones: ["50 °F", "75 °F", "100 °F", "150 °F"], correcta: 1 },
+  { id: "v35-n7", area: "Procedimientos normales", pregunta: "¿A qué velocidad despega el Bonanza con peso máximo?", opciones: ["63 KIAS", "71 KIAS", "77 KIAS", "83 KIAS"], correcta: 1 },
+  { id: "v35-n8", area: "Procedimientos normales", pregunta: "¿Qué potencia se usa en el ascenso de crucero?", opciones: ["A fondo y 2,700 RPM", "25 in Hg (o a fondo) y 2,500 RPM", "20 in Hg y 2,300 RPM", "29.6 in Hg y 2,700 RPM"], correcta: 1 },
+  { id: "v35-n9", area: "Procedimientos normales", pregunta: "Empobreciendo con el EGT para crucero económico, ¿dónde se deja la mezcla?", opciones: ["En el pico exacto", "25 °F del lado pobre del pico", "25 °F del lado rico del pico", "100 °F del lado pobre del pico"], correcta: 2 },
+  { id: "v35-n10", area: "Procedimientos normales", pregunta: "En un aterrizaje abortado, ¿qué se sube primero?", opciones: ["El tren", "Los flaps", "Los cowl flaps", "Todo a la vez"], correcta: 1 },
+
+  // ---------- Emergencias ----------
+  { id: "v35-e1", area: "Emergencias", pregunta: "¿Qué es lo primero en la extensión manual del tren?", opciones: ["Girar la manivela", "Jalar el breaker LDG GEAR y poner la palanca en DOWN", "Apagar la batería", "Subir la velocidad"], correcta: 1 },
+  { id: "v35-e2", area: "Emergencias", pregunta: "¿Hacia dónde y cuántas vueltas se gira la manivela del tren?", opciones: ["Horario, unas 20 vueltas", "Antihorario, unas 50 vueltas", "Horario, unas 50 vueltas", "Antihorario, unas 10 vueltas"], correcta: 1 },
+  { id: "v35-e3", area: "Emergencias", pregunta: "¿Se puede subir el tren con la manivela?", opciones: ["Sí, girándola al revés", "No: la manivela solo lo baja", "Sí, con el breaker adentro", "Solo en tierra"], correcta: 1 },
+  { id: "v35-e4", area: "Emergencias", pregunta: "Tras una extensión manual de emergencia real, ¿qué NO haces?", opciones: ["Aterrizar", "Mover controles del tren o reiniciar breakers hasta que el avión esté en gatos", "Revisar las luces verdes", "Guardar la manivela"], correcta: 1 },
+  { id: "v35-e5", area: "Emergencias", pregunta: "Falla el motor en vuelo con altura. ¿Qué haces primero?", opciones: ["Otro tanque, bomba auxiliar ON, mezcla FULL RICH, magnetos y aire alterno", "Bajar el tren", "Apagar la batería", "Subir la nariz"], correcta: 0 },
+  { id: "v35-e6", area: "Emergencias", pregunta: "¿Cuál es la configuración de máximo planeo?", opciones: ["Tren abajo y flaps completos", "Tren y flaps arriba, cowl flaps cerrados, hélice en LOW RPM y 105 KIAS", "Hélice en HIGH RPM y 83 KIAS", "Tren abajo y 154 KIAS"], correcta: 1 },
+  { id: "v35-e7", area: "Emergencias", pregunta: "Fuego de motor en vuelo. ¿Qué haces primero?", opciones: ["Abrir las ventilas", "Jalar FIREWALL AIR para cerrar, mezcla CORTE y selector OFF", "Bomba auxiliar ON", "Intentar reencender"], correcta: 1 },
+  { id: "v35-e8", area: "Emergencias", pregunta: "Te desorientas en nubes y la velocidad crece rápido. ¿Qué recurso da el manual?", opciones: ["Subir los flaps", "Bajar el tren para agregar resistencia", "Apagar el motor", "Cerrar los cowl flaps"], correcta: 1 },
+  { id: "v35-e9", area: "Emergencias", pregunta: "Hay sobrevelocidad de la hélice. ¿Qué haces?", opciones: ["Subir la potencia", "Acelerador atrás hasta la línea roja, reducir la velocidad y revisar la presión de aceite", "Mezcla CORTE", "Bajar el tren"], correcta: 1 },
+];
+
 export const EXAMENES_TIPO: ExamenTipo[] = [
   { clave: "c152", modelo: "Cessna 152", gratis: true, preguntas: C152 },
   { clave: "c172", modelo: "Cessna 172", gratis: false, preguntas: C172 },
   { clave: "da40", modelo: "Diamond DA40 NG", gratis: false, preguntas: DA40 },
   { clave: "arrow", modelo: "Piper PA-28R-201 Arrow", corto: "Arrow", gratis: false, preguntas: ARROW },
+  { clave: "v35", modelo: "Beechcraft V35B Bonanza", corto: "Bonanza V35", gratis: false, preguntas: V35 },
   { clave: "c208", modelo: "Cessna 208B Grand Caravan", corto: "Caravan", gratis: false, preguntas: C208 },
 ];
 

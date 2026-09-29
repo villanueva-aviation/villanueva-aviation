@@ -73,6 +73,15 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     interactivoHref: "/premium/checklist/arrow",
   },
   {
+    id: "checklist-premium-v35",
+    tipo: "Checklist",
+    titulo: "Checklist Premium — Beechcraft V35B Bonanza",
+    descripcion: "Cola en V y tren eléctrico: checklist completo, flujos de memoria (incluida la extensión manual del tren) y velocidades de su manual.",
+    duracion: "3 secciones",
+    imagen: "/images/exclusivo-checklist-v35.jpg",
+    interactivoHref: "/premium/checklist/v35",
+  },
+  {
     id: "agendar-cita",
     tipo: "Agenda",
     titulo: "Agenda tu sesión con el fundador",
