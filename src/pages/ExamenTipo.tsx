@@ -18,7 +18,7 @@ type Fase = { tipo: "inicio" } | { tipo: "examen"; preguntas: PreguntaTipo[] } |
 
 const { preguntasPorIntento, aprobacion, esperaHoras, dominio } = REGLAS_EXAMEN_TIPO;
 
-const CHECKLIST: Record<string, string> = { c152: ROUTES.checklistC152, c172: ROUTES.checklistC172, da40: ROUTES.checklistAvion("da40"), c208: ROUTES.checklistAvion("c208") };
+const CHECKLIST: Record<string, string> = { c152: ROUTES.checklistC152, c172: ROUTES.checklistC172, da40: ROUTES.checklistAvion("da40"), arrow: ROUTES.checklistAvion("arrow"), c208: ROUTES.checklistAvion("c208") };
 
 const fechaHora = new Intl.DateTimeFormat("es-MX", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
 

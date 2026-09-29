@@ -64,6 +64,15 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     interactivoHref: "/premium/checklist/c185",
   },
   {
+    id: "checklist-premium-arrow",
+    tipo: "Checklist",
+    titulo: "Checklist Premium — Piper PA-28R-201 Arrow",
+    descripcion: "Tren retráctil y hélice de velocidad constante: checklist completo, flujos de memoria (incluida la extensión de emergencia del tren) y velocidades de su manual.",
+    duracion: "3 secciones",
+    imagen: "/images/exclusivo-checklist-arrow.jpg",
+    interactivoHref: "/premium/checklist/arrow",
+  },
+  {
     id: "agendar-cita",
     tipo: "Agenda",
     titulo: "Agenda tu sesión con el fundador",

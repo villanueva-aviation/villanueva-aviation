@@ -217,6 +217,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     soloInteractivo: true,
   },
   {
+    id: "checklist-arrow",
+    categoria: "Checklists",
+    nombre: "Checklist Piper PA-28R-201 Arrow — Normal y emergencia",
+    descripcion: "El primer avión complejo: checklist con tren retráctil, extensión de emergencia del tren, hélice de velocidad constante y emergencias, con datos de su manual.",
+    version: "v1.0",
+    fecha: "2026-09-29",
+    imagen: "/images/exclusivo-checklist-arrow.jpg",
+    interactivoHref: "/checklist/arrow",
+    soloInteractivo: true,
+  },
+  {
     id: "formulario-bitacora",
     categoria: "Formularios de práctica",
     nombre: "Bitácora de vuelo editable",

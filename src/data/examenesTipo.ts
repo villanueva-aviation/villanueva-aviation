@@ -277,10 +277,72 @@ const C208: PreguntaTipo[] = [
   { id: "c208-e8", area: "Emergencias", pregunta: "Hay fuego de motor al arrancar en tierra. ¿Qué haces?", opciones: ["Seguir con el arrancador y subir la potencia", "Arrancador OFF, combustible cerrado, batería OFF y evacuar", "Condición a HIGH IDLE", "Hélice en beta"], correcta: 1 },
 ];
 
+// PA-28R-201 Arrow: tren retráctil, hélice de velocidad constante, IO-360 a inyección (AVIONES_CHECKLIST.arrow, POH VB-1612).
+const ARROW: PreguntaTipo[] = [
+  // ---------- Velocidades ----------
+  { id: "arrow-v1", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima para bajar el tren?", opciones: ["107 KIAS", "118 KIAS", "129 KIAS", "146 KIAS"], correcta: 2 },
+  { id: "arrow-v2", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima para subir el tren?", opciones: ["103 KIAS", "107 KIAS", "118 KIAS", "129 KIAS"], correcta: 1 },
+  { id: "arrow-v3", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima con flaps extendidos?", opciones: ["85 KIAS", "103 KIAS", "107 KIAS", "129 KIAS"], correcta: 1 },
+  { id: "arrow-v4", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor tasa de ascenso con el tren arriba?", opciones: ["78 KIAS", "85 KIAS", "90 KIAS", "104 KIAS"], correcta: 2 },
+  { id: "arrow-v5", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor ángulo de ascenso con el tren arriba?", opciones: ["72 KIAS", "78 KIAS", "85 KIAS", "90 KIAS"], correcta: 1 },
+  { id: "arrow-v6", area: "Velocidades", pregunta: "Con el tren abajo, las velocidades de mejor ascenso:", opciones: ["Suben", "Bajan, por la resistencia del tren", "Son iguales", "Dejan de aplicar"], correcta: 1 },
+  { id: "arrow-v7", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor planeo a 2,750 lb, con tren y flaps arriba?", opciones: ["72 KIAS", "75 KIAS", "79 KIAS", "90 KIAS"], correcta: 2 },
+  { id: "arrow-v8", area: "Velocidades", pregunta: "¿Cuál es la velocidad que nunca debe excederse (Vne)?", opciones: ["163 KIAS", "173 KIAS", "183 KIAS", "195 KIAS"], correcta: 2 },
+  { id: "arrow-v9", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima estructural normal (Vno)?", opciones: ["129 KIAS", "137 KIAS", "146 KIAS", "155 KIAS"], correcta: 2 },
+  { id: "arrow-v10", area: "Velocidades", pregunta: "Con 2,750 lb, ¿cuál es la velocidad de maniobra (Va)?", opciones: ["96 KIAS", "108 KIAS", "118 KIAS", "124 KIAS"], correcta: 2 },
+  { id: "arrow-v11", area: "Velocidades", pregunta: "¿A qué velocidad se trimea la aproximación final con flaps 40°?", opciones: ["65 KIAS", "70 KIAS", "75 KIAS", "85 KIAS"], correcta: 2 },
+
+  // ---------- Limitaciones ----------
+  { id: "arrow-l1", area: "Limitaciones", pregunta: "¿Cuál es el peso máximo del Arrow?", opciones: ["2,450 lb", "2,550 lb", "2,750 lb", "3,000 lb"], correcta: 2 },
+  { id: "arrow-l2", area: "Limitaciones", pregunta: "¿Cuánto equipaje se puede llevar como máximo?", opciones: ["100 lb", "120 lb", "150 lb", "200 lb"], correcta: 3 },
+  { id: "arrow-l3", area: "Limitaciones", pregunta: "¿Cuál es la RPM máxima del motor?", opciones: ["2,400 RPM", "2,550 RPM", "2,700 RPM", "2,800 RPM"], correcta: 2 },
+  { id: "arrow-l4", area: "Limitaciones", pregunta: "¿Cuánto combustible utilizable tiene?", opciones: ["48 galones", "53 galones", "72 galones", "77 galones"], correcta: 2 },
+  { id: "arrow-l5", area: "Limitaciones", pregunta: "¿Cuál es el factor de carga positivo máximo?", opciones: ["+3.0 g", "+3.8 g", "+4.4 g", "+6.0 g"], correcta: 1 },
+  { id: "arrow-l6", area: "Limitaciones", pregunta: "¿Qué maniobras están aprobadas?", opciones: ["Barrenas y loopings", "Sin acrobacia ni barrenas; máximo 60° de alabeo y 30° de cabeceo", "Cualquiera abajo de Va", "Solo barrenas con flaps arriba"], correcta: 1 },
+  { id: "arrow-l7", area: "Limitaciones", pregunta: "¿Cuál es el rango normal de presión de aceite (arco verde)?", opciones: ["25 a 60 PSI", "60 a 90 PSI", "90 a 100 PSI", "20 a 115 PSI"], correcta: 1 },
+  { id: "arrow-l8", area: "Limitaciones", pregunta: "¿Cuál es el viento cruzado máximo demostrado?", opciones: ["12 nudos", "15 nudos", "17 nudos", "20 nudos"], correcta: 2 },
+  { id: "arrow-l9", area: "Limitaciones", pregunta: "¿Cuál es la temperatura máxima de aceite?", opciones: ["200 °F", "225 °F", "245 °F", "265 °F"], correcta: 2 },
+
+  // ---------- Sistemas ----------
+  { id: "arrow-s1", area: "Sistemas", pregunta: "¿Cómo sube y baja el tren del Arrow?", opciones: ["Con una manivela manual", "Con una bomba hidráulica eléctrica", "Con un motor eléctrico y cables", "Con presión de aire del motor"], correcta: 1 },
+  { id: "arrow-s2", area: "Sistemas", pregunta: "¿Qué indica la luz roja WARNING GEAR UNSAFE?", opciones: ["Que el tren está abajo y trabado", "Que el tren está en tránsito o no está ni arriba ni abajo y trabado", "Que falta aceite hidráulico", "Que la bomba del tren está apagada"], correcta: 1 },
+  { id: "arrow-s3", area: "Sistemas", pregunta: "Todas las luces del tren apagadas en vuelo significan:", opciones: ["Falla eléctrica", "Tren arriba", "Tren abajo", "Tren en tránsito"], correcta: 1 },
+  { id: "arrow-s4", area: "Sistemas", pregunta: "Con el tren arriba, ¿cuándo suena la bocina de aviso del tren?", opciones: ["Solo al tocar pista", "Al bajar la presión de admisión de unas 14 in Hg o al pasar los flaps de 10°", "Al pasar de 129 KIAS", "Nunca en vuelo"], correcta: 1 },
+  { id: "arrow-s5", area: "Sistemas", pregunta: "Si falla la hidráulica del tren en vuelo, ¿qué pasa?", opciones: ["El tren se queda trabado arriba", "El tren cae solo: no tiene seguros mecánicos arriba", "El tren sube por completo", "Se apaga el motor"], correcta: 1 },
+  { id: "arrow-s6", area: "Sistemas", pregunta: "¿Qué motor lleva el Arrow PA-28R-201?", opciones: ["Lycoming O-320 de 160 hp a carburador", "Lycoming IO-360-C1C6 de 200 hp a inyección", "Lycoming O-540 de 235 hp", "Continental IO-550 de 300 hp"], correcta: 1 },
+  { id: "arrow-s7", area: "Sistemas", pregunta: "¿Qué posiciones tiene el selector de combustible?", opciones: ["IZQUIERDO, DERECHO y AMBOS", "IZQUIERDO, DERECHO y OFF", "Solo ON y OFF", "PRINCIPAL y RESERVA"], correcta: 1 },
+  { id: "arrow-s8", area: "Sistemas", pregunta: "¿Qué pasa si se obstruye la toma de aire del motor?", opciones: ["El motor se apaga sin remedio", "La compuerta de aire alterno se abre sola, o con la palanca", "Se enciende el calentador de carburador", "Sube la presión de aceite"], correcta: 1 },
+  { id: "arrow-s9", area: "Sistemas", pregunta: "¿Qué controla la palanca de la hélice?", opciones: ["La presión de admisión", "Las RPM, y el gobernador ajusta el paso", "La mezcla", "El flujo de combustible"], correcta: 1 },
+
+  // ---------- Procedimientos normales ----------
+  { id: "arrow-n1", area: "Procedimientos normales", pregunta: "¿Qué se revisa primero al subir a la cabina, antes de encender el master?", opciones: ["Que la palanca del tren esté en DOWN", "Que los flaps estén en 40°", "Que la hélice esté en FULL DECREASE", "Que la mezcla esté en RICH"], correcta: 0 },
+  { id: "arrow-n2", area: "Procedimientos normales", pregunta: "¿Cómo se ceba el motor en un arranque en frío?", opciones: ["Con la bomba de cebado manual", "Bomba eléctrica ON y mezcla RICH hasta ver flujo, luego CORTE", "Con el calentador de carburador", "No se ceba nunca"], correcta: 1 },
+  { id: "arrow-n3", area: "Procedimientos normales", pregunta: "¿En cuánto tiempo debe aparecer la presión de aceite tras el arranque?", opciones: ["5 segundos", "30 segundos", "1 minuto", "2 minutos"], correcta: 1 },
+  { id: "arrow-n4", area: "Procedimientos normales", pregunta: "En la prueba de magnetos a 2,000 RPM, ¿cuál es la caída máxima?", opciones: ["125 RPM y 50 de diferencia", "150 RPM y 50 de diferencia", "175 RPM y 50 de diferencia", "200 RPM y 100 de diferencia"], correcta: 2 },
+  { id: "arrow-n5", area: "Procedimientos normales", pregunta: "En un despegue normal, ¿a qué velocidad se rota?", opciones: ["50–60 KIAS", "55–65 KIAS", "65–75 KIAS", "78–90 KIAS"], correcta: 2 },
+  { id: "arrow-n6", area: "Procedimientos normales", pregunta: "¿Con cuántos flaps se hace un despegue de pista corta o blanda?", opciones: ["0°", "10°", "25°", "40°"], correcta: 2 },
+  { id: "arrow-n7", area: "Procedimientos normales", pregunta: "¿Qué confirma que el tren está abajo antes de aterrizar?", opciones: ["El ruido del tren", "Tres luces verdes y la luz roja apagada", "La luz roja encendida", "Que la bocina deje de sonar"], correcta: 1 },
+  { id: "arrow-n8", area: "Procedimientos normales", pregunta: "¿Dónde va la hélice para la aproximación y el aterrizaje?", opciones: ["FULL DECREASE", "A la mitad", "FULL INCREASE", "Donde estaba en crucero"], correcta: 2 },
+  { id: "arrow-n9", area: "Procedimientos normales", pregunta: "¿Cada cuánto se alternan los tanques en crucero?", opciones: ["Cada 15 minutos", "Cada hora", "Solo al vaciarse uno", "Nunca: se vuela de AMBOS"], correcta: 1 },
+  { id: "arrow-n10", area: "Procedimientos normales", pregunta: "¿Por qué se suben los flaps antes de que bajen los pasajeros?", opciones: ["Para que no se dañen con el viento", "Porque el flap derecho es el escalón y solo aguanta peso completamente arriba", "Para apagar el motor", "Para cerrar la puerta"], correcta: 1 },
+
+  // ---------- Emergencias ----------
+  { id: "arrow-e1", area: "Emergencias", pregunta: "El tren no marca abajo y trabado. ¿Bajo qué velocidad haces la extensión de emergencia?", opciones: ["79 KIAS", "87 KIAS", "107 KIAS", "129 KIAS"], correcta: 1 },
+  { id: "arrow-e2", area: "Emergencias", pregunta: "¿Qué hace la palanca de emergencia del tren?", opciones: ["Enciende una bomba de respaldo", "Libera la presión hidráulica para que el tren caiga por gravedad", "Sube el tren", "Apaga la bocina de aviso"], correcta: 1 },
+  { id: "arrow-e3", area: "Emergencias", pregunta: "Antes de la extensión de emergencia, de día, ¿qué revisas en las luces?", opciones: ["Nada, se procede directo", "Luces de navegación OFF y focos de las luces del tren", "Luces de aterrizaje ON", "Estrobos ON"], correcta: 1 },
+  { id: "arrow-e4", area: "Emergencias", pregunta: "Pierdes potencia en el despegue con pista suficiente adelante. ¿Qué haces?", opciones: ["Subir el tren y virar", "Dejar el tren abajo y aterrizar recto", "Intentar reencender antes de todo", "Regresar a la pista con un viraje de 180°"], correcta: 1 },
+  { id: "arrow-e5", area: "Emergencias", pregunta: "Pierdes potencia al despegar y adelante hay terreno irregular. ¿Qué haces con el tren?", opciones: ["Lo dejas abajo", "Palanca del tren a UP", "Extensión de emergencia", "No importa"], correcta: 1 },
+  { id: "arrow-e6", area: "Emergencias", pregunta: "En un aterrizaje sin motor, ¿qué pasa si apagas el master antes de decidir el tren?", opciones: ["Nada", "El tren ya no se puede subir", "El tren sube solo", "Se enciende la bomba de emergencia"], correcta: 1 },
+  { id: "arrow-e7", area: "Emergencias", pregunta: "Pérdida de potencia en vuelo con altura. ¿Qué haces primero?", opciones: ["Otro tanque, bomba eléctrica ON, mezcla RICH y aire alterno abierto", "Calentador de carburador ON", "Tren abajo y flaps 40°", "Master OFF"], correcta: 0 },
+  { id: "arrow-e8", area: "Emergencias", pregunta: "Con falla del alternador, si se agota la batería, ¿cómo bajas el tren?", opciones: ["Con la bomba hidráulica normal", "Con la extensión de emergencia, y sin luces de posición del tren", "No se puede bajar", "Con la manivela del piso"], correcta: 1 },
+  { id: "arrow-e9", area: "Emergencias", pregunta: "Fuego de motor en vuelo. ¿Qué haces?", opciones: ["Selector OFF, acelerador cerrado, mezcla CORTE, bomba eléctrica OFF y aterrizaje sin motor", "Potencia a fondo al aeropuerto más cercano", "Abrir la calefacción", "Subir el tren y seguir"], correcta: 0 },
+];
+
 export const EXAMENES_TIPO: ExamenTipo[] = [
   { clave: "c152", modelo: "Cessna 152", gratis: true, preguntas: C152 },
   { clave: "c172", modelo: "Cessna 172", gratis: false, preguntas: C172 },
   { clave: "da40", modelo: "Diamond DA40 NG", gratis: false, preguntas: DA40 },
+  { clave: "arrow", modelo: "Piper PA-28R-201 Arrow", corto: "Arrow", gratis: false, preguntas: ARROW },
   { clave: "c208", modelo: "Cessna 208B Grand Caravan", corto: "Caravan", gratis: false, preguntas: C208 },
 ];
 
