@@ -100,6 +100,15 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     interactivoHref: "/premium/checklist/seneca",
   },
   {
+    id: "checklist-premium-c90",
+    tipo: "Checklist",
+    titulo: "Checklist Premium — Beechcraft King Air C90GTx",
+    descripcion: "Turbohélice bimotor: checklist completo, flujos de memoria (falla de motor en el despegue, descenso de emergencia y tren alterno) y límites de torque e ITT.",
+    duracion: "3 secciones",
+    imagen: "/images/exclusivo-checklist-c90.jpg",
+    interactivoHref: "/premium/checklist/c90",
+  },
+  {
     id: "agendar-cita",
     tipo: "Agenda",
     titulo: "Agenda tu sesión con el fundador",

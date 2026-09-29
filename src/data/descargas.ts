@@ -261,6 +261,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     soloInteractivo: true,
   },
   {
+    id: "checklist-c90",
+    categoria: "Checklists",
+    nombre: "Checklist Beechcraft King Air C90GTx — Normal y emergencia",
+    descripcion: "Bimotor turbohélice presurizado: checklist con arranque de PT6, torque e ITT, autofeather, falla de motor en el despegue, descenso de emergencia y extensión alterna del tren.",
+    version: "v1.0",
+    fecha: "2026-09-29",
+    imagen: "/images/exclusivo-checklist-c90.jpg",
+    interactivoHref: "/checklist/c90",
+    soloInteractivo: true,
+  },
+  {
     id: "formulario-bitacora",
     categoria: "Formularios de práctica",
     nombre: "Bitácora de vuelo editable",

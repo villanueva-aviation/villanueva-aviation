@@ -1167,6 +1167,174 @@ export const AVIONES_CHECKLIST: Record<string, AvionChecklist> = {
     ],
   },
 
+  c90: {
+    id: "c90",
+    nombre: "Beechcraft King Air C90GTx",
+    nota: "Bimotor turbohélice presurizado con dos Pratt & Whitney PT6A-135A de 550 shp, hélices de cuatro palas que se embanderan y tienen reversa, autofeather y tren hidráulico. El motor se maneja por torque e ITT: el primer límite que se alcanza es el que manda. Los procedimientos y límites salen del manual de entrenamiento de FlightSafety para el C90GTi/C90GTx (2.ª edición, 2010), que resume el manual de vuelo del fabricante; el checklist oficial es el de tu manual (POH/AFM) y el del propio simulador. Las velocidades están en KIAS.",
+    normal: fases("c90n", [
+      ["prevuelo", "Inspección prevuelo", [
+        ["Peso, balance y combustible — calculados; tren — DN; freno de estacionamiento — puesto; batería y aviónica — OFF", "Un King Air cargado llega fácil a su peso máximo; se calcula antes de subir."],
+        ["Recorrido exterior: superficies sin hielo, drenados de combustible, aceite de cada motor, tomas de aire y escapes libres, hélices sin daños y sin su amarre", "El agua en el combustible apaga una turbina igual que un motor de pistón."],
+        ["Sistema de detección y extintores de fuego — probados con el selector TEST", "Cada motor tiene su propio extintor de un solo disparo: hay que saber que funciona."],
+        ["Oxígeno — cantidad y mascarillas revisadas", "Es presurizado, pero si falla la presurización necesitas oxígeno en segundos."],
+      ]],
+      ["antes-arrancar", "Antes de arrancar", [
+        ["Palancas de potencia — IDLE; palancas de condición — FUEL CUTOFF; hélices — adelante", "Es la posición de arranque de la turbina."],
+        ["Voltaje de batería — 22 V o más (o planta externa)", "Con poca batería, el arranque sale lento y caliente."],
+        ["Presurización y aire acondicionado — preparados; interruptores del panel — según el checklist", "El aire acondicionado carga mucho a los motores en tierra."],
+      ]],
+      ["arranque", "Arranque de motores", [
+        ["Arrancador — ON; con N1 estable, palanca de condición a LO IDLE, sin trabarla en el retén", "Así puedes regresarla rápido a FUEL CUTOFF si la ITT sube de más."],
+        ["ITT — vigilar: máximo 1,090 °C y solo 2 segundos; si se acerca al límite, condición a FUEL CUTOFF", "Es el momento de más riesgo: un arranque caliente daña la turbina en segundos."],
+        ["Presión de aceite — sube rápido a 40 PSI mínimo, sin pasar de 105 PSI", "Sin presión de aceite, el motor se está quedando sin lubricación."],
+        ["Arrancador — máximo 40 s encendido y 60 s de descanso; tras el tercer ciclo, 30 minutos apagado", "Más tiempo sobrecalienta el arrancador-generador."],
+        ["Generador — ON y cargando; repetir con el otro motor", "Cada motor tiene su arrancador-generador de 250 A."],
+      ]],
+      ["rodaje", "Rodaje", [
+        ["Con N1 bajo 70 %, ITT máxima de 685 °C; si sube, reducir la carga eléctrica y subir la condición a HI IDLE", "A bajo N1 pasa poco aire por el motor y se calienta."],
+        ["No operar las hélices estables en tierra entre 500 y 1,100 RPM", "En ese rango se generan esfuerzos que pueden romper la hélice."],
+        ["Controlar la velocidad con ground fine o reversa; hélices adelante para que la reversa sea pareja", "Frenar con la hélice cuida los frenos, pero en grava daña las palas."],
+      ]],
+      ["antes-despegue", "Antes de despegue", [
+        ["Checklist antes de despegue completo; revisar VR y la velocidad de ascenso con un motor", "Tener las velocidades frescas es el briefing de un bimotor."],
+        ["Autofeather — probado (TEST, con unos 500 ft-lb de torque) y en ARM", "Es lo que embandera solo la hélice del motor que falla en el despegue."],
+        ["Briefing: una falla antes de VR se aborta; después de VR se continúa", "Decidirlo antes te ahorra segundos que valen mucho."],
+      ]],
+      ["despegue", "Despegue", [
+        ["Frenos puestos; potencia fijada; luces AUTOFEATHER encendidas (ambas palancas arriba de 90 % de N1); soltar frenos", "El autofeather solo queda armado con las dos palancas arriba de 90 % de N1."],
+        ["En la carrera: torque e ITT revisados; anunciadores revisados", "Máximo 1,520 ft-lb y 805 °C."],
+        ["En VR, rotar a unos 10° nariz arriba; ascenso positivo; tren — UP", "El tren sube en unos 6 segundos."],
+        ["Yaw damper — ON; a 400 ft AGL acelerar a 108 KIAS; flaps — UP; potencia de ascenso; a 150 KIAS luces fuera", "Así limpias el avión con altura y velocidad seguras."],
+      ]],
+      ["ascenso", "Ascenso", [
+        ["150 KIAS hasta 10,000 ft; 130 KIAS de 10,000 a 20,000 ft; 120 KIAS de 20,000 a 25,000 ft; 110 KIAS de 25,000 a 30,000 ft", "El perfil de ascenso del manual baja la velocidad conforme subes."],
+        ["Torque e ITT dentro de límites: abajo o con frío limita el torque; alto o con calor limita la ITT", "El primer límite que se alcanza es el que manda."],
+      ]],
+      ["crucero", "Crucero", [
+        ["Potencia de crucero — fijada; autofeather — OFF", "El autofeather es solo para despegue, ascenso y motor y al aire."],
+        ["Presurización — revisada (5.0 PSI de diferencial: cabina a unos 6,000 ft con el avión a 20,000 ft)", "Altitud máxima: 30,000 ft."],
+      ]],
+      ["aterrizaje", "Aproximación y aterrizaje", [
+        ["Llegada a unos 140 KIAS y 600 ft-lb; tramo con el viento: flaps APPROACH y 130 KIAS", "Flaps de aproximación bajo 184 KIAS."],
+        ["Tren — DOWN bajo 182 KIAS; tres verdes; base y final a 120 KIAS", "El tren baja por presión hidráulica y queda trabado mecánicamente."],
+        ["Aterrizaje asegurado: flaps DOWN (bajo 148 KIAS), transición a VREF, yaw damper OFF", "No se bajan todos los flaps hasta estar seguro de aterrizar."],
+        ["En el umbral: tren confirmado abajo, VREF, potencia a IDLE, hélices adelante; al tocar, ground fine o reversa y frenos", "Salir de la reversa a unos 40 kt para no erosionar las palas."],
+      ]],
+      ["motor-y-al-aire", "Aterrizaje abortado", [
+        ["Potencia — máxima permitida; 101 KIAS; flaps — UP; tren — UP", "Ya libre de obstáculos, velocidad de ascenso normal."],
+        ["Sin flaps: 115 KIAS de aproximación, y 101 KIAS como mínimo si hay que abortar", "Sin flaps la pérdida es más alta."],
+      ]],
+    ]),
+    emergencia: fases("c90e", [
+      ["abortar", "Despegue abortado (hasta VR)", [
+        ["Reconocer la razón; palancas de potencia — GROUND FINE; frenado máximo o el necesario; reversa según se requiera; mantener el rumbo", "La reversa sirve más a alta velocidad y los frenos a baja velocidad."],
+        ["Con falla de un motor, cuidado con la reversa asimétrica", "La reversa de un solo motor hace girar el avión."],
+      ]],
+      ["falla-despegue", "Falla de motor en el despegue (después de VR)", [
+        ["Rotar en VR a unos 10°; ascenso positivo; tren — UP; mantener el rumbo de la pista", "Seguir es más seguro que abortar después de VR."],
+        ["Potencia máxima permitida; confirmar la hélice embanderada (autofeather); V2 hasta 400 ft AGL", "No retrases la palanca del motor que falló hasta que el autofeather haya detenido su hélice."],
+        ["A 400 ft AGL: acelerar a 108 KIAS (línea azul), flaps UP, yaw damper ON", "Puede hacer falta hasta 5° de alabeo hacia el motor bueno y casi todo el timón de ese lado."],
+        ["Con tiempo: checklist de falla de motor y aterrizar en cuanto sea práctico", "Con un motor el margen es mínimo."],
+      ]],
+      ["autofeather", "Cómo trabaja el autofeather", [
+        ["Se arma con el interruptor en ARM y las dos palancas arriba de 90 % de N1 (luces AUTOFEATHER encendidas)", "Si alguna palanca baja de 90 %, queda inoperativo."],
+        ["Si el torque del motor que falla baja de unos 400 ft-lb, se desarma el del motor bueno; bajo unos 260 ft-lb embandera la hélice del motor que falla", "Así nunca embandera los dos motores."],
+        ["Se usa en despegue, ascenso y motor y al aire; se apaga en crucero", "En crucero no hace falta y evita un embanderamiento no deseado."],
+      ]],
+      ["aterrizaje-un-motor", "Aterrizaje con un motor", [
+        ["Llegada a 140 KIAS y unos 1,000 ft-lb; flaps APPROACH; 130 KIAS; tren DOWN; hélice del motor bueno adelante", "Con un motor, el torque necesario es más o menos el doble."],
+        ["Final a 120 KIAS; flaps DOWN solo cuando ya no haya posibilidad de motor y al aire", "Con todos los flaps, un motor y al aire con un motor es muy difícil."],
+        ["Mantener al menos 10 kt sobre VREF hasta tener asegurado el aterrizaje; reversa con cuidado", "La reversa de un motor se usa solo en pista pavimentada, lisa y seca."],
+      ]],
+      ["motor-y-al-aire-un-motor", "Motor y al aire con un motor", [
+        ["Potencia — máxima permitida; tren — UP; flaps — UP; 108 KIAS", "La línea azul da el mejor ascenso con un motor."],
+      ]],
+      ["descenso-emergencia", "Descenso de emergencia (pérdida de presurización)", [
+        ["Oxígeno — armado; mascarilla de la tripulación — puesta; pasajeros — según se requiera", "Sin presión, la conciencia útil a gran altitud dura muy poco."],
+        ["Palancas de potencia — IDLE; hélices — adelante con suavidad; flaps — APPROACH; tren — DOWN (bajo 182 KIAS)", "Si vas más rápido que 182 KIAS, mantén la altitud hasta bajar de esa velocidad."],
+        ["Actitud inicial de 14° nariz abajo, máximo 182 KIAS; avisar a ATC", "Unos 500 ft antes de nivelar, reducir el régimen de descenso."],
+      ]],
+      ["motor", "Indicaciones del motor", [
+        ["Presión de aceite bajo 40 PSI: apagar el motor o aterrizar lo antes posible con la potencia mínima", "Entre 40 y 85 PSI se tolera solo para terminar el vuelo, con potencia reducida."],
+        ["ITT alta en tierra con N1 bajo 70 %: reducir la carga eléctrica y subir la condición a HI IDLE", "Más N1 mete más aire y enfría la turbina."],
+        ["Luz FUEL PRESS (bomba de refuerzo): con el crossfeed en AUTO se abre solo y la luz se apaga", "Si falla la bomba de alta presión del motor, el motor se apaga."],
+        ["Sin presión P3 en el control de combustible: el motor queda en flujo mínimo (unos 48 % de N1) y las palancas no lo mueven", "Hay que tratarlo como un motor sin potencia útil."],
+      ]],
+      ["fuego", "Fuego de motor", [
+        ["Identificar el motor con la luz de fuego; asegurar el motor (condición a FUEL CUTOFF, hélice en bandera)", "Primero se corta el combustible del motor que se quema."],
+        ["Cerrar su válvula de corte en el firewall y, si sigue, disparar su extintor", "Cada motor tiene su propio extintor, de un solo disparo."],
+        ["Aterrizar en cuanto sea posible", "Con fuego a bordo, el objetivo es tierra, no el aeropuerto más cómodo."],
+      ]],
+      ["electrica", "Falla de generador", [
+        ["Luz ámbar DC GEN: el generador salió de línea; intentar RESET y luego ON", "Cada motor tiene su arrancador-generador de 250 A a 28 V."],
+        ["Si no regresa: generador OFF y vigilar la carga del otro, sin pasar de su límite", "Un solo generador puede sostener el sistema si se reduce la carga."],
+      ]],
+      ["tren", "Extensión alterna del tren", [
+        ["Breaker LANDING GEAR RELAY — jalarlo; palanca del tren — DN", "Desconecta la bomba eléctrica para que la bomba manual trabaje."],
+        ["Bomba manual (entre el asiento del piloto y el pedestal) — bombear hasta tener tres verdes y sentir resistencia", "Sin electricidad no hay luces: la resistencia al bombear confirma que el tren quedó abajo y trabado."],
+        ["El tren no se puede subir a mano en vuelo; no mover controles ni reiniciar breakers hasta que el avión esté en gatos", "La falla pudo estar en el circuito de subida."],
+      ]],
+      ["perdidas", "Recuperación de pérdida", [
+        ["Potencia hacia el torque máximo, bajar la nariz hasta que deje de sonar el aviso y nivelar las alas al mismo tiempo", "La bocina suena unos 10 kt antes del buffet."],
+        ["Ascenso positivo; flaps UP a la línea azul o más (101 KIAS en configuración de aterrizaje); tren UP", "Subir los flaps antes de tener velocidad hace perder sustentación."],
+      ]],
+    ]),
+    flujos: flujos("c90", [
+      ["falla-despegue", "Falla de motor en el despegue", ["Rotar en VR, tren UP", "Potencia máxima; confirmar la bandera", "V2 hasta 400 ft AGL", "108 KIAS, flaps UP, yaw damper ON", "Hasta 5° de alabeo hacia el motor bueno"]],
+      ["descenso", "Descenso de emergencia", ["Mascarillas y oxígeno", "Potencia IDLE, hélices adelante", "Flaps APPROACH, tren DOWN", "14° nariz abajo, máximo 182 KIAS", "Avisar a ATC"]],
+      ["tren-alterno", "Extensión alterna del tren", ["Breaker LANDING GEAR RELAY: jalar", "Palanca del tren: DN", "Bombear a mano", "Tres verdes y resistencia", "No tocar nada hasta los gatos"]],
+    ]),
+    vspeeds: [
+      { clave: "Vmca", nombre: "Mínima de control con un motor", valor: "85 kt con flaps arriba · 83 kt con flaps de aproximación" },
+      { clave: "Vyse", nombre: "Mejor tasa con un motor (línea azul)", valor: "108 kt" },
+      { clave: "Va", nombre: "Velocidad de maniobra (C90GTx)", valor: "163 kt (169 kt en el C90GTi)" },
+      { clave: "Vfe", nombre: "Máxima con flaps", valor: "184 kt con APPROACH · 148 kt con DOWN" },
+      { clave: "Vlo", nombre: "Máxima para operar el tren", valor: "182 kt para bajarlo · 163 kt para subirlo" },
+      { clave: "Vle", nombre: "Máxima con el tren abajo", valor: "182 kt" },
+      { clave: "Vmo", nombre: "Máxima de operación", valor: "226 kt" },
+      { clave: "Vs", nombre: "Pérdida (peso máximo, ralentí)", valor: "88 kt flaps arriba · 83 kt APPROACH · 78 kt flaps completos" },
+      { clave: "Vbalk", nombre: "Aterrizaje abortado", valor: "101 kt" },
+      { clave: "Vapp", nombre: "Aproximación", valor: "130 kt en el tramo con el viento, 120 kt en base y final, luego VREF" },
+    ],
+    notaVspeeds: "Valores del manual de entrenamiento de FlightSafety para el C90GTx con 10,485 lb, en KIAS. La línea azul (108 KIAS) es la velocidad a la que el manual pide acelerar con un motor; confírmala en el velocímetro de tu simulador.",
+    limites: {
+      titulo: "Límites de operación",
+      nota: "Del manual de entrenamiento de FlightSafety para el C90GTi/C90GTx, motores PT6A-135A de 550 shp. El límite oficial siempre es el de tu manual y tu simulador.",
+      columnas: ["Límite", "Valor"],
+      filas: [
+        ["Peso máximo de despegue", "10,485 lb (C90GTx) · 10,100 lb (C90GTi)"],
+        ["Torque", "1,520 ft-lb sostenido · 1,626 ft-lb hasta 20 segundos"],
+        ["ITT", "805 °C en despegue y máxima continua · 1,090 °C en el arranque, solo 2 segundos · 685 °C con N1 bajo 70 %"],
+        ["N1", "101.5 % máximo continuo · 102.6 % hasta 2 segundos · LO IDLE 58 % · HI IDLE 70 %"],
+        ["Hélices", "1,600 a 1,900 RPM · en tierra, prohibido estable entre 500 y 1,100 RPM · reversa máximo 1 minuto"],
+        ["Aceite", "Presión 85 a 105 PSI normal, 40 PSI mínima · temperatura −40 a 99 °C"],
+        ["Arrancador", "40 s ON y 60 s OFF, tres ciclos; luego 30 minutos OFF"],
+        ["Combustible utilizable", "384 gal (192 por lado)"],
+        ["Presurización", "5.0 ± 0.1 PSI de diferencial"],
+        ["Altitud máxima", "30,000 ft"],
+        ["Generadores", "250 A de carga continua cada uno, 28.25 V"],
+      ],
+    },
+    sistemas: [
+      {
+        titulo: "Turbina PT6A y sus palancas",
+        texto: "Tres palancas por motor: potencia (controla el N1 y con él el torque), hélice (1,600 a 1,900 RPM, y bandera al fondo) y condición (FUEL CUTOFF, LO IDLE y HI IDLE). La potencia se limita por torque o por ITT, lo que llegue primero: con frío o abajo manda el torque; con calor o alto manda la ITT.",
+      },
+      {
+        titulo: "Hélices, reversa y autofeather",
+        texto: "Hélices de cuatro palas que se embanderan, con ground fine y reversa. Se embanderan solas al apagar el motor, porque pierden la presión de aceite. El autofeather se arma con las dos palancas arriba de 90 % de N1 y embandera la hélice del motor que falla cuando su torque baja de unos 260 ft-lb, desarmando antes el del motor bueno.",
+      },
+      {
+        titulo: "Combustible",
+        texto: "Cada lado tiene un tanque en la góndola y cuatro en el ala, conectados, con 192 galones utilizables (384 en total). Una bomba eléctrica de refuerzo alimenta la bomba de alta presión del motor; si la de refuerzo falla, se enciende FUEL PRESS y, con el crossfeed en AUTO, el otro lado alimenta al motor.",
+      },
+      {
+        titulo: "Tren, presurización y eléctrico",
+        texto: "El tren sube y baja con una bomba hidráulica eléctrica en unos 6 segundos; arriba se sostiene con presión hidráulica y abajo con seguros mecánicos. Para emergencias hay una bomba manual. La cabina se presuriza a 5.0 PSI (unos 6,000 ft de cabina a 20,000 ft). Cada motor tiene un arrancador-generador de 250 A.",
+      },
+    ],
+  },
+
   c208: {
     id: "c208",
     nombre: "Cessna 208B Caravan",

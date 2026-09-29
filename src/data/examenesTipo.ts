@@ -528,6 +528,76 @@ const SENECA: PreguntaTipo[] = [
   { id: "seneca-e8", area: "Emergencias", pregunta: "En un aterrizaje con el tren arriba, ya asegurado, ¿qué haces con las hélices?", opciones: ["FULL FORWARD", "FEATHER", "Las dejas igual", "Ralentí"], correcta: 1 },
 ];
 
+// King Air C90GTx: bimotor turbohélice PT6A-135A (AVIONES_CHECKLIST.c90, manual de entrenamiento de FlightSafety C90GTi/GTx).
+const C90: PreguntaTipo[] = [
+  // ---------- Velocidades ----------
+  { id: "c90-v1", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima de operación (Vmo)?", opciones: ["182 KIAS", "204 KIAS", "226 KIAS", "245 KIAS"], correcta: 2 },
+  { id: "c90-v2", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima para bajar el tren o volar con él abajo?", opciones: ["148 KIAS", "163 KIAS", "182 KIAS", "184 KIAS"], correcta: 2 },
+  { id: "c90-v3", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima para subir el tren?", opciones: ["148 KIAS", "163 KIAS", "182 KIAS", "184 KIAS"], correcta: 1 },
+  { id: "c90-v4", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima con flaps en APPROACH?", opciones: ["148 KIAS", "163 KIAS", "182 KIAS", "184 KIAS"], correcta: 3 },
+  { id: "c90-v5", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima con flaps en DOWN?", opciones: ["120 KIAS", "130 KIAS", "148 KIAS", "163 KIAS"], correcta: 2 },
+  { id: "c90-v6", area: "Velocidades", pregunta: "¿Cuál es la VMC del C90GTx con flaps arriba?", opciones: ["78 KIAS", "83 KIAS", "85 KIAS", "101 KIAS"], correcta: 2 },
+  { id: "c90-v7", area: "Velocidades", pregunta: "Después de una falla de motor en el despegue, a 400 ft AGL, ¿a qué velocidad (línea azul) aceleras?", opciones: ["101 KIAS", "108 KIAS", "120 KIAS", "150 KIAS"], correcta: 1 },
+  { id: "c90-v8", area: "Velocidades", pregunta: "¿A qué velocidad se hace un aterrizaje abortado con los dos motores?", opciones: ["85 KIAS", "101 KIAS", "108 KIAS", "120 KIAS"], correcta: 1 },
+  { id: "c90-v9", area: "Velocidades", pregunta: "¿Cuál es la velocidad de maniobra del C90GTx?", opciones: ["148 KIAS", "163 KIAS", "169 KIAS", "182 KIAS"], correcta: 1 },
+  { id: "c90-v10", area: "Velocidades", pregunta: "Hasta 10,000 ft, ¿a qué velocidad se asciende según el perfil del manual?", opciones: ["110 KIAS", "120 KIAS", "130 KIAS", "150 KIAS"], correcta: 3 },
+  { id: "c90-v11", area: "Velocidades", pregunta: "¿Cuál es la velocidad de pérdida con flaps completos, peso máximo y ralentí?", opciones: ["70 KIAS", "78 KIAS", "83 KIAS", "88 KIAS"], correcta: 1 },
+
+  // ---------- Limitaciones ----------
+  { id: "c90-l1", area: "Limitaciones", pregunta: "¿Cuál es el torque máximo sostenido?", opciones: ["1,315 ft-lb", "1,520 ft-lb", "1,626 ft-lb", "1,865 ft-lb"], correcta: 1 },
+  { id: "c90-l2", area: "Limitaciones", pregunta: "¿Cuál es la ITT máxima en despegue y máxima continua?", opciones: ["685 °C", "740 °C", "805 °C", "880 °C"], correcta: 2 },
+  { id: "c90-l3", area: "Limitaciones", pregunta: "¿Cuál es la ITT máxima en el arranque y por cuánto tiempo?", opciones: ["805 °C, 5 segundos", "880 °C, 20 segundos", "1,090 °C, 2 segundos", "1,090 °C, 10 segundos"], correcta: 2 },
+  { id: "c90-l4", area: "Limitaciones", pregunta: "Con N1 bajo 70 % en tierra, ¿qué ITT no se debe pasar?", opciones: ["585 °C", "685 °C", "805 °C", "1,090 °C"], correcta: 1 },
+  { id: "c90-l5", area: "Limitaciones", pregunta: "¿Cuál es el N1 máximo continuo?", opciones: ["98.5 %", "100 %", "101.5 %", "104 %"], correcta: 2 },
+  { id: "c90-l6", area: "Limitaciones", pregunta: "¿En qué rango de RPM está prohibido operar las hélices estables en tierra?", opciones: ["200 a 400 RPM", "500 a 1,100 RPM", "1,200 a 1,500 RPM", "1,600 a 1,900 RPM"], correcta: 1 },
+  { id: "c90-l7", area: "Limitaciones", pregunta: "¿Cuál es el ciclo máximo del arrancador?", opciones: ["30 s ON y 60 s OFF", "40 s ON y 60 s OFF, tres ciclos y luego 30 minutos", "10 s ON y 20 s OFF", "Sin límite"], correcta: 1 },
+  { id: "c90-l8", area: "Limitaciones", pregunta: "¿Cuál es el peso máximo de despegue del C90GTx?", opciones: ["9,600 lb", "10,100 lb", "10,485 lb", "12,500 lb"], correcta: 2 },
+  { id: "c90-l9", area: "Limitaciones", pregunta: "¿Cuál es el diferencial de presurización?", opciones: ["3.5 PSI", "4.2 PSI", "5.0 PSI", "6.5 PSI"], correcta: 2 },
+  { id: "c90-l10", area: "Limitaciones", pregunta: "¿Cuánto tiempo máximo se permite la reversa?", opciones: ["20 segundos", "1 minuto", "5 minutos", "Sin límite"], correcta: 1 },
+
+  // ---------- Sistemas ----------
+  { id: "c90-s1", area: "Sistemas", pregunta: "¿Qué motores lleva el King Air C90GTx?", opciones: ["Dos PT6A-21 de 550 shp", "Dos PT6A-135A de 550 shp", "Dos TPE331 de 650 shp", "Dos PT6A-60A de 1,050 shp"], correcta: 1 },
+  { id: "c90-s2", area: "Sistemas", pregunta: "¿Qué posiciones tiene la palanca de condición?", opciones: ["RICH, LEAN y CUTOFF", "FUEL CUTOFF, LO IDLE y HI IDLE", "FEATHER, LOW y HIGH", "OFF, START y RUN"], correcta: 1 },
+  { id: "c90-s3", area: "Sistemas", pregunta: "¿Qué limita la potencia a gran altitud o con calor?", opciones: ["El torque", "La ITT", "Las RPM de la hélice", "La presión de aceite"], correcta: 1 },
+  { id: "c90-s4", area: "Sistemas", pregunta: "¿Cuándo queda armado el autofeather?", opciones: ["Siempre que el interruptor esté en ARM", "Con el interruptor en ARM y las dos palancas arriba de 90 % de N1", "Solo en crucero", "Al bajar el tren"], correcta: 1 },
+  { id: "c90-s5", area: "Sistemas", pregunta: "¿Qué pasa con las hélices al apagar los motores?", opciones: ["Quedan en paso fino", "Se embanderan solas al perder la presión de aceite", "Quedan en reversa", "Siguen girando"], correcta: 1 },
+  { id: "c90-s6", area: "Sistemas", pregunta: "¿Cuánto combustible utilizable tiene en total?", opciones: ["192 gal", "264 gal", "384 gal", "544 gal"], correcta: 2 },
+  { id: "c90-s7", area: "Sistemas", pregunta: "¿Cómo se sostiene el tren arriba?", opciones: ["Con seguros mecánicos", "Con presión hidráulica", "Con un motor eléctrico", "Con resortes"], correcta: 1 },
+  { id: "c90-s8", area: "Sistemas", pregunta: "Falla la bomba de refuerzo de un lado con el crossfeed en AUTO. ¿Qué pasa?", opciones: ["Se apaga el motor", "Se abre el crossfeed y el otro lado lo alimenta", "Se embandera la hélice", "Nada, no hay aviso"], correcta: 1 },
+  { id: "c90-s9", area: "Sistemas", pregunta: "¿Qué pasa si falla la bomba de alta presión del motor?", opciones: ["Nada, la de refuerzo la sustituye", "El motor se apaga", "Baja el torque a la mitad", "Se enciende el crossfeed"], correcta: 1 },
+
+  // ---------- Procedimientos normales ----------
+  { id: "c90-n1", area: "Procedimientos normales", pregunta: "¿Por qué no se traba la palanca de condición en LO IDLE durante el arranque?", opciones: ["Porque no tiene retén", "Para poder regresarla rápido a FUEL CUTOFF si la ITT sube de más", "Para ahorrar combustible", "Para cebar el motor"], correcta: 1 },
+  { id: "c90-n2", area: "Procedimientos normales", pregunta: "Con ITT alta en tierra y N1 bajo, ¿qué haces?", opciones: ["Apagar el motor", "Reducir la carga eléctrica y subir la condición a HI IDLE", "Bajar la hélice a 1,100 RPM", "Usar reversa"], correcta: 1 },
+  { id: "c90-n3", area: "Procedimientos normales", pregunta: "¿A cuántos grados de nariz arriba se rota en VR?", opciones: ["5°", "10°", "15°", "20°"], correcta: 1 },
+  { id: "c90-n4", area: "Procedimientos normales", pregunta: "¿Cuándo se apaga el autofeather?", opciones: ["Nunca", "Al establecer el crucero", "Antes del despegue", "Al bajar el tren"], correcta: 1 },
+  { id: "c90-n5", area: "Procedimientos normales", pregunta: "¿Cuándo se bajan los flaps a DOWN en una aproximación normal?", opciones: ["En el tramo con el viento", "Cuando el aterrizaje está asegurado", "Al interceptar la senda", "Antes de bajar el tren"], correcta: 1 },
+  { id: "c90-n6", area: "Procedimientos normales", pregunta: "¿Dónde deben estar las hélices para usar la reversa?", opciones: ["En bandera", "Totalmente adelante", "A la mitad", "Da igual"], correcta: 1 },
+  { id: "c90-n7", area: "Procedimientos normales", pregunta: "¿A qué velocidad conviene salir de la reversa?", opciones: ["A unos 20 kt", "A unos 40 kt", "A unos 80 kt", "Al detenerse"], correcta: 1 },
+  { id: "c90-n8", area: "Procedimientos normales", pregunta: "¿Qué velocidad se mantiene en una aproximación sin flaps?", opciones: ["101 KIAS", "108 KIAS", "115 KIAS", "130 KIAS"], correcta: 2 },
+
+  // ---------- Motor inoperativo ----------
+  { id: "c90-m1", area: "Motor inoperativo", pregunta: "Falla un motor antes de VR. ¿Qué haces?", opciones: ["Continuar el despegue", "Abortar: potencia a GROUND FINE, frenos y reversa según se requiera", "Rotar de inmediato", "Subir el tren"], correcta: 1 },
+  { id: "c90-m2", area: "Motor inoperativo", pregunta: "Falla un motor después de VR. ¿Qué haces con el tren?", opciones: ["Lo dejas abajo", "Lo subes con ascenso positivo", "Extensión alterna", "Lo subes antes de rotar"], correcta: 1 },
+  { id: "c90-m3", area: "Motor inoperativo", pregunta: "Tras una falla en el despegue, ¿cuándo retrasas la palanca de potencia del motor que falló?", opciones: ["De inmediato", "Hasta que el autofeather haya detenido su hélice", "Nunca", "Al llegar a 1,000 ft"], correcta: 1 },
+  { id: "c90-m4", area: "Motor inoperativo", pregunta: "Con un motor, ¿cuánto alabeo hacia el motor bueno puede hacer falta para mantener el rumbo de la pista?", opciones: ["Nada", "Hasta 5°", "15°", "30°"], correcta: 1 },
+  { id: "c90-m5", area: "Motor inoperativo", pregunta: "¿Qué velocidad mantienes hasta 400 ft AGL tras una falla en el despegue?", opciones: ["VR", "V2", "108 KIAS", "150 KIAS"], correcta: 1 },
+  { id: "c90-m6", area: "Motor inoperativo", pregunta: "En un aterrizaje con un motor, ¿cuándo bajas todos los flaps?", opciones: ["En el tramo con el viento", "Cuando ya no haya posibilidad de motor y al aire", "Al bajar el tren", "Nunca"], correcta: 1 },
+  { id: "c90-m7", area: "Motor inoperativo", pregunta: "Con un motor, ¿cuánto torque hace falta más o menos en la aproximación?", opciones: ["El mismo", "La mitad", "Más o menos el doble", "El máximo"], correcta: 2 },
+  { id: "c90-m8", area: "Motor inoperativo", pregunta: "¿Cómo evita el autofeather embanderar los dos motores?", opciones: ["No lo evita", "Al bajar el torque del motor que falla, desarma el del motor bueno", "Solo funciona en el motor izquierdo", "El piloto elige cuál"], correcta: 1 },
+  { id: "c90-m9", area: "Motor inoperativo", pregunta: "¿Cuándo se puede usar la reversa de un solo motor?", opciones: ["Nunca", "Con cuidado, en pista pavimentada, lisa y seca", "En cualquier pista", "Solo en el aire"], correcta: 1 },
+
+  // ---------- Emergencias ----------
+  { id: "c90-e1", area: "Emergencias", pregunta: "Pierdes la presurización a gran altitud. ¿Qué es lo primero?", opciones: ["Bajar el tren", "Mascarilla de oxígeno puesta", "Avisar a ATC", "Reducir la potencia"], correcta: 1 },
+  { id: "c90-e2", area: "Emergencias", pregunta: "¿Cuál es la actitud inicial y la velocidad máxima del descenso de emergencia?", opciones: ["5° y 150 KIAS", "14° nariz abajo y 182 KIAS", "20° y 226 KIAS", "10° y 163 KIAS"], correcta: 1 },
+  { id: "c90-e3", area: "Emergencias", pregunta: "¿Qué es lo primero en la extensión alterna del tren?", opciones: ["Bombear", "Jalar el breaker LANDING GEAR RELAY y poner la palanca en DN", "Apagar la batería", "Subir la velocidad"], correcta: 1 },
+  { id: "c90-e4", area: "Emergencias", pregunta: "Sin electricidad, ¿cómo confirmas que el tren quedó abajo tras bombearlo?", opciones: ["Por las luces verdes", "Por la resistencia al bombear", "Por la bocina", "No se puede"], correcta: 1 },
+  { id: "c90-e5", area: "Emergencias", pregunta: "La presión de aceite de un motor baja de 40 PSI. ¿Qué haces?", opciones: ["Nada, es normal", "Apagar el motor o aterrizar lo antes posible con la potencia mínima", "Subir la potencia", "Usar reversa"], correcta: 1 },
+  { id: "c90-e6", area: "Emergencias", pregunta: "¿Cuántas veces se puede disparar el extintor de cada motor?", opciones: ["Ilimitadas", "Una vez", "Dos veces", "Tres veces"], correcta: 1 },
+  { id: "c90-e7", area: "Emergencias", pregunta: "Se enciende la luz ámbar DC GEN. ¿Qué significa?", opciones: ["Batería baja", "Ese generador salió de línea", "Falla del inversor", "Sobrecarga de la batería"], correcta: 1 },
+  { id: "c90-e8", area: "Emergencias", pregunta: "En la recuperación de una pérdida, ¿cuándo subes los flaps?", opciones: ["De inmediato", "A la línea azul o más", "Al tocar pista", "Nunca"], correcta: 1 },
+];
+
 export const EXAMENES_TIPO: ExamenTipo[] = [
   { clave: "c152", modelo: "Cessna 152", gratis: true, preguntas: C152 },
   { clave: "c172", modelo: "Cessna 172", gratis: false, preguntas: C172 },
@@ -537,6 +607,7 @@ export const EXAMENES_TIPO: ExamenTipo[] = [
   { clave: "a36", modelo: "Beechcraft A36TC Bonanza", corto: "Bonanza A36TC", gratis: false, preguntas: A36 },
   { clave: "seneca", modelo: "Piper PA-34 Seneca V", corto: "Seneca V", gratis: false, preguntas: SENECA },
   { clave: "c208", modelo: "Cessna 208B Grand Caravan", corto: "Caravan", gratis: false, preguntas: C208 },
+  { clave: "c90", modelo: "Beechcraft King Air C90GTx", corto: "King Air C90", gratis: false, preguntas: C90 },
 ];
 
 export function examenTipo(clave: string | undefined) {
