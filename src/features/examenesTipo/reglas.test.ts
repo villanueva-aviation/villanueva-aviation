@@ -26,14 +26,15 @@ test("el banco de cada avión es válido", () => {
 });
 
 test("un intento trae n preguntas distintas, de todas las áreas, con la respuesta correcta intacta", () => {
-  const banco = EXAMENES_TIPO[0].preguntas;
-  const original = new Map(banco.map((p) => [p.id, p.opciones[p.correcta]]));
-  for (let s = 1; s <= 50; s++) {
-    const intento = armarIntento(banco, 20, semilla(s));
-    assert.equal(intento.length, 20);
-    assert.equal(new Set(intento.map((p) => p.id)).size, 20);
-    assert.equal(new Set(intento.map((p) => p.area)).size, new Set(banco.map((p) => p.area)).size);
-    for (const p of intento) assert.equal(p.opciones[p.correcta], original.get(p.id));
+  for (const { clave, preguntas: banco } of EXAMENES_TIPO) {
+    const original = new Map(banco.map((p) => [p.id, p.opciones[p.correcta]]));
+    for (let s = 1; s <= 50; s++) {
+      const intento = armarIntento(banco, 20, semilla(s));
+      assert.equal(intento.length, 20, clave);
+      assert.equal(new Set(intento.map((p) => p.id)).size, 20, clave);
+      assert.equal(new Set(intento.map((p) => p.area)).size, new Set(banco.map((p) => p.area)).size, clave);
+      for (const p of intento) assert.equal(p.opciones[p.correcta], original.get(p.id), clave);
+    }
   }
 });
 

@@ -250,6 +250,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     soloInteractivo: true,
   },
   {
+    id: "checklist-seneca",
+    categoria: "Checklists",
+    nombre: "Checklist Piper PA-34-220T Seneca V — Normal y emergencia",
+    descripcion: "El bimotor de la flota: checklist con VMC y línea azul, identificación y embanderamiento del motor que falla, crossfeed, turbos y emergencias.",
+    version: "v1.0",
+    fecha: "2026-09-29",
+    imagen: "/images/exclusivo-checklist-seneca.jpg",
+    interactivoHref: "/checklist/seneca",
+    soloInteractivo: true,
+  },
+  {
     id: "formulario-bitacora",
     categoria: "Formularios de práctica",
     nombre: "Bitácora de vuelo editable",

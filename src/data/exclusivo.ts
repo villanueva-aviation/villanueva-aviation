@@ -91,6 +91,15 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     interactivoHref: "/premium/checklist/a36",
   },
   {
+    id: "checklist-premium-seneca",
+    tipo: "Checklist",
+    titulo: "Checklist Premium — Piper PA-34-220T Seneca V",
+    descripcion: "Bimotor: checklist completo, flujos de memoria (falla de motor tras despegar y cómo asegurarlo) y velocidades clave como la VMC y la línea azul.",
+    duracion: "3 secciones",
+    imagen: "/images/exclusivo-checklist-seneca.jpg",
+    interactivoHref: "/premium/checklist/seneca",
+  },
+  {
     id: "agendar-cita",
     tipo: "Agenda",
     titulo: "Agenda tu sesión con el fundador",

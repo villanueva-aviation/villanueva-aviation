@@ -5,7 +5,8 @@ import type { QuizPregunta } from "../features/academia/quizData";
 // Los números salen de los mismos datos del POH que usan los checklists del sitio
 // (checklistC152.ts y checklistPremium.ts), para que examen y checklist nunca se contradigan.
 
-export type AreaExamen = "Velocidades" | "Limitaciones" | "Sistemas" | "Procedimientos normales" | "Emergencias";
+/** "Motor inoperativo" solo aplica a los bimotores. */
+export type AreaExamen = "Velocidades" | "Limitaciones" | "Sistemas" | "Procedimientos normales" | "Motor inoperativo" | "Emergencias";
 
 export interface PreguntaTipo extends QuizPregunta {
   area: AreaExamen;
@@ -459,6 +460,74 @@ const A36: PreguntaTipo[] = [
   { id: "a36-e9", area: "Emergencias", pregunta: "¿Qué es lo primero en la extensión manual del tren?", opciones: ["Girar la manivela", "152 KIAS o menos, breaker LDG GR MOTOR OFF y palanca en DOWN", "Apagar la batería", "Bomba auxiliar HI"], correcta: 1 },
 ];
 
+// PA-34-220T Seneca V: bimotor turbo (AVIONES_CHECKLIST.seneca, documentación del Seneca V de Carenado). Único banco con el área "Motor inoperativo".
+const SENECA: PreguntaTipo[] = [
+  // ---------- Velocidades ----------
+  { id: "seneca-v1", area: "Velocidades", pregunta: "¿Cuál es la VMC del Seneca V (raya roja)?", opciones: ["61 KIAS", "66 KIAS", "71 KIAS", "79 KIAS"], correcta: 1 },
+  { id: "seneca-v2", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor tasa de ascenso con un motor (línea azul)?", opciones: ["79 KIAS", "83 KIAS", "88 KIAS", "90 KIAS"], correcta: 2 },
+  { id: "seneca-v3", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor ángulo de ascenso con un motor (Vxse)?", opciones: ["73 KIAS", "79 KIAS", "83 KIAS", "88 KIAS"], correcta: 2 },
+  { id: "seneca-v4", area: "Velocidades", pregunta: "En un despegue normal con flaps 0° y peso máximo, ¿a qué velocidad se rota?", opciones: ["66 KIAS", "71 KIAS", "79 KIAS", "88 KIAS"], correcta: 2 },
+  { id: "seneca-v5", area: "Velocidades", pregunta: "En un despegue de pista corta con flaps 25°, ¿a qué velocidad se rota?", opciones: ["66 KIAS", "71 KIAS", "73 KIAS", "79 KIAS"], correcta: 1 },
+  { id: "seneca-v6", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima para bajar el tren?", opciones: ["107 KIAS", "113 KIAS", "128 KIAS", "135 KIAS"], correcta: 2 },
+  { id: "seneca-v7", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima para subir el tren?", opciones: ["88 KIAS", "107 KIAS", "113 KIAS", "128 KIAS"], correcta: 1 },
+  { id: "seneca-v8", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima con flaps extendidos?", opciones: ["103 KIAS", "107 KIAS", "113 KIAS", "128 KIAS"], correcta: 2 },
+  { id: "seneca-v9", area: "Velocidades", pregunta: "¿Cuál es la velocidad que nunca debe excederse (Vne)?", opciones: ["183 KIAS", "196 KIAS", "204 KIAS", "212 KIAS"], correcta: 2 },
+  { id: "seneca-v10", area: "Velocidades", pregunta: "¿A qué velocidad se vuela la aproximación final normal?", opciones: ["82 KIAS", "85 KIAS", "90 KIAS", "95 KIAS"], correcta: 2 },
+  { id: "seneca-v11", area: "Velocidades", pregunta: "¿A qué velocidad se hace el ascenso de crucero?", opciones: ["88 KIAS", "100 KIAS", "110 KIAS", "120 KIAS"], correcta: 2 },
+
+  // ---------- Limitaciones ----------
+  { id: "seneca-l1", area: "Limitaciones", pregunta: "¿Cuál es la presión de admisión máxima en el despegue?", opciones: ["29.6 in Hg", "32 in Hg", "36 in Hg", "38 in Hg"], correcta: 3 },
+  { id: "seneca-l2", area: "Limitaciones", pregunta: "¿A qué RPM se despega?", opciones: ["2,300 RPM", "2,500 RPM", "2,600 RPM", "2,700 RPM"], correcta: 2 },
+  { id: "seneca-l3", area: "Limitaciones", pregunta: "¿Cuál es la TIT máxima en crucero?", opciones: ["1,450 °F", "1,550 °F", "1,650 °F", "1,750 °F"], correcta: 2 },
+  { id: "seneca-l4", area: "Limitaciones", pregunta: "Para encontrar el pico de TIT, ¿qué se permite?", opciones: ["Pasar de 1,800 °F sin límite", "Llegar a 1,700 °F hasta 60 segundos", "Llegar a 1,750 °F por 5 minutos", "Nada: nunca pasar de 1,600 °F"], correcta: 1 },
+  { id: "seneca-l5", area: "Limitaciones", pregunta: "Con un solo alternador, ¿qué carga eléctrica no se debe pasar?", opciones: ["50 A", "70 A", "85 A", "100 A"], correcta: 2 },
+  { id: "seneca-l6", area: "Limitaciones", pregunta: "¿Cuándo se puede usar el crossfeed?", opciones: ["En el despegue", "Solo en vuelo nivelado de crucero", "En el aterrizaje", "Siempre"], correcta: 1 },
+  { id: "seneca-l7", area: "Limitaciones", pregunta: "¿Cuánto tiempo máximo se puede probar la calefacción del pitot en tierra?", opciones: ["30 segundos", "1 minuto", "3 minutos", "10 minutos"], correcta: 2 },
+  { id: "seneca-l8", area: "Limitaciones", pregunta: "Con 4,407 lb, ¿cuál es la velocidad de maniobra?", opciones: ["113 KIAS", "128 KIAS", "135 KIAS", "164 KIAS"], correcta: 2 },
+
+  // ---------- Sistemas ----------
+  { id: "seneca-s1", area: "Sistemas", pregunta: "¿Qué hace el crossfeed?", opciones: ["Pasa aceite de un motor al otro", "Deja que un motor tome combustible del tanque del otro lado", "Sincroniza las hélices", "Une los dos sistemas eléctricos"], correcta: 1 },
+  { id: "seneca-s2", area: "Sistemas", pregunta: "¿Qué significa embanderar una hélice?", opciones: ["Ponerla a máximas RPM", "Poner las palas de canto al viento para que deje de frenar", "Invertir el paso para frenar", "Sincronizarla con la otra"], correcta: 1 },
+  { id: "seneca-s3", area: "Sistemas", pregunta: "¿Por qué hay que embanderar antes de que la hélice baje de 800 RPM?", opciones: ["Porque se apaga el alternador", "Porque abajo de 800 RPM un seguro impide embanderarla", "Porque se daña el turbo", "No importa la RPM"], correcta: 1 },
+  { id: "seneca-s4", area: "Sistemas", pregunta: "¿De cuántos voltios es el sistema eléctrico?", opciones: ["12 V", "14 V", "24 V", "28 V"], correcta: 3 },
+  { id: "seneca-s5", area: "Sistemas", pregunta: "¿Cuándo se enciende el anunciador LO BUS?", opciones: ["Con el voltaje bajo unos 25 V", "Con un alternador sobre 85 A", "Al arrancar los motores", "Con el tren abajo"], correcta: 0 },
+  { id: "seneca-s6", area: "Sistemas", pregunta: "¿Para qué sirve el espejo de la góndola del motor?", opciones: ["Para ver la hélice", "Para ver que la rueda de nariz esté abajo", "Para revisar el hielo del ala", "Para ver el tráfico"], correcta: 1 },
+  { id: "seneca-s7", area: "Sistemas", pregunta: "¿Cuándo van encendidas las bombas de combustible de respaldo?", opciones: ["Solo en tierra", "En el despegue, el aterrizaje y sobre 10,000 ft", "Siempre en crucero", "Nunca: son de emergencia"], correcta: 1 },
+  { id: "seneca-s8", area: "Sistemas", pregunta: "Si las dos bombas de vacío fallan, ¿qué instrumentos giroscópicos quedan?", opciones: ["Todos", "El coordinador de viraje y el direccional del piloto", "Solo el horizonte", "Ninguno"], correcta: 1 },
+
+  // ---------- Procedimientos normales ----------
+  { id: "seneca-n1", area: "Procedimientos normales", pregunta: "En el run-up, ¿a qué RPM se prueba el embanderamiento de las hélices?", opciones: ["1,000 RPM", "1,500 RPM", "2,000 RPM", "2,300 RPM"], correcta: 1 },
+  { id: "seneca-n2", area: "Procedimientos normales", pregunta: "¿Cuál es la caída máxima al probar el embanderamiento o ejercitar las hélices?", opciones: ["100 RPM", "150 RPM", "300 RPM", "500 RPM"], correcta: 2 },
+  { id: "seneca-n3", area: "Procedimientos normales", pregunta: "¿A qué RPM se prueban los magnetos y cuál es la caída máxima?", opciones: ["1,700 RPM y 150", "2,000 RPM y 150", "2,000 RPM y 175", "2,300 RPM y 100"], correcta: 1 },
+  { id: "seneca-n4", area: "Procedimientos normales", pregunta: "¿Qué potencia se usa en el ascenso de crucero?", opciones: ["2,600 RPM y 38 in Hg", "2,500 RPM y 32 in Hg", "2,300 RPM y 30 in Hg", "2,200 RPM y 25 in Hg"], correcta: 1 },
+  { id: "seneca-n5", area: "Procedimientos normales", pregunta: "¿Qué se revisa para confirmar que la rueda de nariz bajó?", opciones: ["Solo la luz roja", "Las 3 luces verdes y el espejo de la góndola", "La bocina", "El amperímetro"], correcta: 1 },
+  { id: "seneca-n6", area: "Procedimientos normales", pregunta: "En un motor y al aire con los dos motores, ¿a qué velocidad se busca la actitud de ascenso?", opciones: ["66 KIAS", "79 KIAS", "85 KIAS", "110 KIAS"], correcta: 2 },
+  { id: "seneca-n7", area: "Procedimientos normales", pregunta: "¿Qué se hace antes de apagar la calefacción al final del vuelo?", opciones: ["Nada", "Dejar el ventilador 2 minutos y luego apagarla", "Apagarla con el master", "Cerrar los cowl flaps"], correcta: 1 },
+  { id: "seneca-n8", area: "Procedimientos normales", pregunta: "Con calor y ralentí largo se interrumpe el flujo de combustible. ¿Qué haces?", opciones: ["Apagar el motor", "Encender la bomba de respaldo", "Usar el crossfeed", "Mezcla en CORTE"], correcta: 1 },
+
+  // ---------- Motor inoperativo ----------
+  { id: "seneca-m1", area: "Motor inoperativo", pregunta: "Falla un motor. ¿Cómo identificas cuál fue?", opciones: ["Por el ruido", "Pie muerto, motor muerto: el pie que no trabaja señala el motor que falló", "Por la luz del alternador", "Por el lado al que se inclina la bola"], correcta: 1 },
+  { id: "seneca-m2", area: "Motor inoperativo", pregunta: "¿Cómo confirmas el motor que falló antes de embanderarlo?", opciones: ["Cortando su mezcla", "Cerrando su acelerador: si no cambia nada, es ese", "Apagando sus magnetos", "Embanderando las dos hélices"], correcta: 1 },
+  { id: "seneca-m3", area: "Motor inoperativo", pregunta: "Con un motor, ¿cómo se vuela para el mejor rendimiento?", opciones: ["Alas niveladas y bola centrada", "88 KIAS con 2° a 3° de alabeo y media bola hacia el motor bueno", "66 KIAS con alabeo hacia el motor que falló", "Velocidad máxima con flaps"], correcta: 1 },
+  { id: "seneca-m4", area: "Motor inoperativo", pregunta: "Falla un motor en el despegue a 80 KIAS. ¿Qué haces?", opciones: ["Seguir el despegue", "Cerrar los aceleradores y detenerse recto", "Subir el tren", "Embanderar y ascender a 88 KIAS"], correcta: 1 },
+  { id: "seneca-m5", area: "Motor inoperativo", pregunta: "¿Qué pasa si bajas de la VMC con un motor a potencia máxima?", opciones: ["Nada", "El timón ya no alcanza para controlar la guiñada", "El avión sube mejor", "Se embandera la hélice sola"], correcta: 1 },
+  { id: "seneca-m6", area: "Motor inoperativo", pregunta: "Pierdes el control direccional bajo la VMC. ¿Qué haces primero?", opciones: ["Subir la potencia del motor bueno", "Timón contra la guiñada y reducir los aceleradores hasta detener el giro", "Bajar el tren", "Subir la nariz"], correcta: 1 },
+  { id: "seneca-m7", area: "Motor inoperativo", pregunta: "¿Cuál es el orden para asegurar un motor?", opciones: ["Mezcla, hélice, acelerador", "Acelerador cerrado, hélice FEATHER, mezcla CORTE", "Magnetos, selector, hélice", "Hélice, acelerador, alternador"], correcta: 1 },
+  { id: "seneca-m8", area: "Motor inoperativo", pregunta: "En una aproximación con un motor, ¿cuándo bajas el tren?", opciones: ["Al iniciar la aproximación", "Cuando el aterrizaje esté asegurado", "A 1,000 ft siempre", "Nunca: se aterriza con el tren arriba"], correcta: 1 },
+  { id: "seneca-m9", area: "Motor inoperativo", pregunta: "¿Qué dice la documentación del motor y al aire con un motor?", opciones: ["Es igual que con dos motores", "Debe evitarse siempre que sea posible", "Es obligatorio practicarlo en cada vuelo", "Se hace con los flaps abajo"], correcta: 1 },
+  { id: "seneca-m10", area: "Motor inoperativo", pregunta: "Con un motor en crucero, ¿cómo se alimenta al motor bueno con el combustible del otro lado?", opciones: ["Selector del bueno en CROSSFEED y el del inoperativo en OFF", "Los dos selectores en ON", "Selector del inoperativo en CROSSFEED", "No se puede"], correcta: 0 },
+
+  // ---------- Emergencias ----------
+  { id: "seneca-e1", area: "Emergencias", pregunta: "¿Bajo qué velocidad se hace la extensión de emergencia del tren?", opciones: ["85 KIAS", "107 KIAS", "113 KIAS", "128 KIAS"], correcta: 0 },
+  { id: "seneca-e2", area: "Emergencias", pregunta: "Después de una extensión de emergencia real, ¿qué haces con la perilla?", opciones: ["La regresas de inmediato", "La dejas afuera hasta que el avión esté en gatos", "La jalas otra vez al aterrizar", "No importa"], correcta: 1 },
+  { id: "seneca-e3", area: "Emergencias", pregunta: "Sospechas en tierra una falla del escape del turbo. ¿Qué haces?", opciones: ["Despegar con cuidado", "No volar el avión", "Despegar con un motor", "Usar el crossfeed"], correcta: 1 },
+  { id: "seneca-e4", area: "Emergencias", pregunta: "La compuerta del turbo falla cerrada y hay sobrepresión. ¿Qué haces?", opciones: ["Acelerador a fondo", "Reducir el acelerador para mantener la admisión dentro de límites y aterrizar pronto", "Embanderar de inmediato", "Mezcla en CORTE"], correcta: 1 },
+  { id: "seneca-e5", area: "Emergencias", pregunta: "Fallan los dos alternadores y ninguno se recupera. ¿Qué implica?", opciones: ["Nada, hay respaldo", "Seguir con la batería, aterrizar en cuanto sea práctico y esperar falla eléctrica total", "Apagar un motor", "Subir de altitud"], correcta: 1 },
+  { id: "seneca-e6", area: "Emergencias", pregunta: "Hay sobrevelocidad de una hélice. ¿Qué NO haces?", opciones: ["Retardar el acelerador", "Embanderarla", "Reducir la velocidad", "Revisar la presión de aceite"], correcta: 1 },
+  { id: "seneca-e7", area: "Emergencias", pregunta: "¿A qué velocidad máxima se hace el descenso de emergencia?", opciones: ["107 KIAS", "113 KIAS", "128 KIAS", "164 KIAS"], correcta: 2 },
+  { id: "seneca-e8", area: "Emergencias", pregunta: "En un aterrizaje con el tren arriba, ya asegurado, ¿qué haces con las hélices?", opciones: ["FULL FORWARD", "FEATHER", "Las dejas igual", "Ralentí"], correcta: 1 },
+];
+
 export const EXAMENES_TIPO: ExamenTipo[] = [
   { clave: "c152", modelo: "Cessna 152", gratis: true, preguntas: C152 },
   { clave: "c172", modelo: "Cessna 172", gratis: false, preguntas: C172 },
@@ -466,6 +535,7 @@ export const EXAMENES_TIPO: ExamenTipo[] = [
   { clave: "arrow", modelo: "Piper PA-28R-201 Arrow", corto: "Arrow", gratis: false, preguntas: ARROW },
   { clave: "v35", modelo: "Beechcraft V35B Bonanza", corto: "Bonanza V35", gratis: false, preguntas: V35 },
   { clave: "a36", modelo: "Beechcraft A36TC Bonanza", corto: "Bonanza A36TC", gratis: false, preguntas: A36 },
+  { clave: "seneca", modelo: "Piper PA-34 Seneca V", corto: "Seneca V", gratis: false, preguntas: SENECA },
   { clave: "c208", modelo: "Cessna 208B Grand Caravan", corto: "Caravan", gratis: false, preguntas: C208 },
 ];
 
