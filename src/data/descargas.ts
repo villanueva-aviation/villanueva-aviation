@@ -239,6 +239,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     soloInteractivo: true,
   },
   {
+    id: "checklist-a36",
+    categoria: "Checklists",
+    nombre: "Checklist Beechcraft A36TC Bonanza — Normal y emergencia",
+    descripcion: "Seis plazas con turbo: checklist con manejo del turbo y la TIT, bomba auxiliar LOW/HI, tren eléctrico con manivela y emergencias, con datos de su manual.",
+    version: "v1.0",
+    fecha: "2026-09-29",
+    imagen: "/images/exclusivo-checklist-a36.jpg",
+    interactivoHref: "/checklist/a36",
+    soloInteractivo: true,
+  },
+  {
     id: "formulario-bitacora",
     categoria: "Formularios de práctica",
     nombre: "Bitácora de vuelo editable",

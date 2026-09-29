@@ -398,12 +398,74 @@ const V35: PreguntaTipo[] = [
   { id: "v35-e9", area: "Emergencias", pregunta: "Hay sobrevelocidad de la hélice. ¿Qué haces?", opciones: ["Subir la potencia", "Acelerador atrás hasta la línea roja, reducir la velocidad y revisar la presión de aceite", "Mezcla CORTE", "Bajar el tren"], correcta: 1 },
 ];
 
+// Beechcraft A36TC Bonanza: turbo TSIO-520-UB, tren eléctrico con manivela (AVIONES_CHECKLIST.a36, POH 36-590003-3 con SB 2033).
+const A36: PreguntaTipo[] = [
+  // ---------- Velocidades ----------
+  { id: "a36-v1", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor tasa de ascenso (Vy)?", opciones: ["96 KIAS", "105 KIAS", "110 KIAS", "120 KIAS"], correcta: 2 },
+  { id: "a36-v2", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor ángulo de ascenso (Vx)?", opciones: ["74 KIAS", "77 KIAS", "80 KIAS", "86 KIAS"], correcta: 2 },
+  { id: "a36-v3", area: "Velocidades", pregunta: "¿A qué velocidad se rota con flaps 15°?", opciones: ["62 KIAS", "67 KIAS", "74 KIAS", "81 KIAS"], correcta: 1 },
+  { id: "a36-v4", area: "Velocidades", pregunta: "¿A qué velocidad se rota con flaps 0°?", opciones: ["67 KIAS", "71 KIAS", "74 KIAS", "80 KIAS"], correcta: 2 },
+  { id: "a36-v5", area: "Velocidades", pregunta: "Bajo 20,000 ft, ¿cuál es la velocidad máxima para operar el tren?", opciones: ["123 KIAS", "137 KIAS", "152 KIAS", "165 KIAS"], correcta: 2 },
+  { id: "a36-v6", area: "Velocidades", pregunta: "Sobre 20,000 ft, ¿a cuánto baja la velocidad máxima del tren y de los flaps de aproximación?", opciones: ["123 KIAS", "130 KIAS", "137 KIAS", "145 KIAS"], correcta: 2 },
+  { id: "a36-v7", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima con flaps en 30°?", opciones: ["110 KIAS", "123 KIAS", "137 KIAS", "152 KIAS"], correcta: 1 },
+  { id: "a36-v8", area: "Velocidades", pregunta: "¿Cuál es la Vne al nivel del mar?", opciones: ["183 KIAS", "196 KIAS", "203 KIAS", "210 KIAS"], correcta: 2 },
+  { id: "a36-v9", area: "Velocidades", pregunta: "¿Qué pasa con la Vne sobre 16,000 ft?", opciones: ["No cambia", "Baja 4 KIAS por cada 1,000 ft", "Sube 4 KIAS por cada 1,000 ft", "Baja 10 KIAS en total"], correcta: 1 },
+  { id: "a36-v10", area: "Velocidades", pregunta: "¿Cuál es la velocidad de máximo planeo?", opciones: ["80 KIAS", "96 KIAS", "105 KIAS", "110 KIAS"], correcta: 3 },
+  { id: "a36-v11", area: "Velocidades", pregunta: "¿Cuál es la velocidad de aproximación normal con flaps abajo?", opciones: ["70 KIAS", "77 KIAS", "80 KIAS", "86 KIAS"], correcta: 1 },
+
+  // ---------- Limitaciones ----------
+  { id: "a36-l1", area: "Limitaciones", pregunta: "¿Cuál es la potencia de despegue y máxima continua?", opciones: ["29.6 in Hg a 2,700 RPM", "31.0 in Hg a 2,400 RPM", "36.0 in Hg a 2,700 RPM", "40.0 in Hg a 2,700 RPM"], correcta: 2 },
+  { id: "a36-l2", area: "Limitaciones", pregunta: "¿Cuál es la temperatura máxima de entrada a la turbina (TIT)?", opciones: ["1,450 °F", "1,550 °F", "1,650 °F", "1,750 °F"], correcta: 2 },
+  { id: "a36-l3", area: "Limitaciones", pregunta: "¿Cuál es el peso máximo de despegue del A36TC?", opciones: ["3,400 lb", "3,600 lb", "3,650 lb", "3,850 lb"], correcta: 2 },
+  { id: "a36-l4", area: "Limitaciones", pregunta: "¿Cuál es la altitud máxima de operación?", opciones: ["18,000 ft", "20,000 ft", "25,000 ft", "30,000 ft"], correcta: 2 },
+  { id: "a36-l5", area: "Limitaciones", pregunta: "¿Sobre qué altitud no se debe usar el motor de arranque para reencender en vuelo?", opciones: ["12,500 ft", "16,000 ft", "18,000 ft", "20,000 ft"], correcta: 3 },
+  { id: "a36-l6", area: "Limitaciones", pregunta: "¿Cuál es el flujo máximo de combustible?", opciones: ["24.3 gph", "28.0 gph", "34.2 gph", "40.0 gph"], correcta: 2 },
+  { id: "a36-l7", area: "Limitaciones", pregunta: "¿Cuál es la temperatura mínima de aceite para despegar?", opciones: ["10 °C", "24 °C", "38 °C", "60 °C"], correcta: 1 },
+  { id: "a36-l8", area: "Limitaciones", pregunta: "¿Cuál es el factor de carga con flaps abajo?", opciones: ["+2.0 g", "+3.0 g", "+3.8 g", "+4.4 g"], correcta: 1 },
+  { id: "a36-l9", area: "Limitaciones", pregunta: "¿Cuándo se permite usar la bomba auxiliar en HI durante el vuelo?", opciones: ["En todo ascenso", "Solo si falla la bomba del motor", "En días calurosos", "Siempre en el despegue"], correcta: 1 },
+  { id: "a36-l10", area: "Limitaciones", pregunta: "¿Cuánto peso se puede llevar en el compartimento de popa?", opciones: ["70 lb", "120 lb", "270 lb", "400 lb"], correcta: 0 },
+
+  // ---------- Sistemas ----------
+  { id: "a36-s1", area: "Sistemas", pregunta: "¿Qué mueve la turbina del turbocargador?", opciones: ["Una banda del motor", "Los gases de escape", "Un motor eléctrico", "El aire de impacto"], correcta: 1 },
+  { id: "a36-s2", area: "Sistemas", pregunta: "¿Qué cierra la compuerta (wastegate) del turbo?", opciones: ["Un resorte", "La presión de aceite", "Un motor eléctrico", "El piloto con una palanca"], correcta: 1 },
+  { id: "a36-s3", area: "Sistemas", pregunta: "¿Qué hace el controlador de presión absoluta?", opciones: ["Controla la mezcla", "Ajusta la compuerta para mantener la admisión que fijó el piloto", "Controla las RPM de la hélice", "Enfría el turbo"], correcta: 1 },
+  { id: "a36-s4", area: "Sistemas", pregunta: "¿Qué posiciones tienen los flaps del A36TC?", opciones: ["Cualquier posición entre 0° y 30°", "Solo 0°, 15° y 30°", "0°, 10°, 20° y 30°", "Solo 0° y 30°"], correcta: 1 },
+  { id: "a36-s5", area: "Sistemas", pregunta: "Con el tren arriba, ¿cuándo suena la bocina de aviso?", opciones: ["Al reducir bajo unas 12 in Hg", "Al reducir bajo unas 17 in Hg", "Al pasar de 152 KIAS", "Nunca en vuelo"], correcta: 1 },
+  { id: "a36-s6", area: "Sistemas", pregunta: "¿Qué posiciones tiene la bomba auxiliar de combustible?", opciones: ["ON y OFF", "OFF, LOW y HI", "AUTO y MANUAL", "LEFT y RIGHT"], correcta: 1 },
+  { id: "a36-s7", area: "Sistemas", pregunta: "Si se pierde la presión de aceite, ¿qué hace la hélice?", opciones: ["Se embandera", "Se va a RPM altas", "Se queda en su posición", "Se va a RPM bajas"], correcta: 1 },
+  { id: "a36-s8", area: "Sistemas", pregunta: "¿De cuántos voltios es el sistema eléctrico del A36TC?", opciones: ["12 V", "14 V", "24 V", "28 V de corriente alterna"], correcta: 2 },
+
+  // ---------- Procedimientos normales ----------
+  { id: "a36-n1", area: "Procedimientos normales", pregunta: "¿Cómo se ceba el motor para el arranque?", opciones: ["Con un primer manual", "Bomba auxiliar LOW y OFF, luego HI hasta el máximo de flujo y OFF", "Bomba auxiliar HI durante el arranque", "No se ceba"], correcta: 1 },
+  { id: "a36-n2", area: "Procedimientos normales", pregunta: "¿Qué flujo de combustible se espera en el despegue?", opciones: ["20 a 24 gph", "26 a 28 gph", "32.5 a 34.2 gph", "Más de 36 gph"], correcta: 2 },
+  { id: "a36-n3", area: "Procedimientos normales", pregunta: "¿Por qué nunca se despega con la bomba auxiliar en HI?", opciones: ["Porque se descarga la batería", "Porque el exceso de combustible puede apagar el motor en la carrera", "Porque se sobrecalienta la bomba", "Porque apaga el turbo"], correcta: 1 },
+  { id: "a36-n4", area: "Procedimientos normales", pregunta: "¿Qué potencia se usa en el ascenso de crucero?", opciones: ["36.0 in Hg y 2,700 RPM", "34.0 in Hg y 2,600 RPM", "31.0 in Hg y 2,400 RPM", "25 in Hg y 2,500 RPM"], correcta: 1 },
+  { id: "a36-n5", area: "Procedimientos normales", pregunta: "¿Cuál es la potencia máxima de crucero?", opciones: ["36.0 in Hg y 2,700 RPM", "34.0 in Hg y 2,600 RPM", "31.0 in Hg y 2,400 RPM", "23.0 in Hg y 2,200 RPM"], correcta: 2 },
+  { id: "a36-n6", area: "Procedimientos normales", pregunta: "¿Cómo se empobrece la mezcla en crucero?", opciones: ["Al pico de EGT del lado pobre", "Al pico de TIT sin pasar de 1,650 °F", "Hasta que el motor tosa", "No se empobrece: siempre rica"], correcta: 1 },
+  { id: "a36-n7", area: "Procedimientos normales", pregunta: "Ya empobrecido, antes de subir la potencia, ¿qué haces con la mezcla?", opciones: ["La dejas igual", "La llevas a FULL RICH", "La empobreces más", "La pones en CORTE"], correcta: 1 },
+  { id: "a36-n8", area: "Procedimientos normales", pregunta: "¿Cuánto tiempo en ralentí antes de apagar el motor?", opciones: ["Nada", "1 minuto", "4 minutos (el rodaje cuenta)", "10 minutos"], correcta: 2 },
+  { id: "a36-n9", area: "Procedimientos normales", pregunta: "¿Sobre qué altitud llevar el acelerador a ralentí puede apagar el motor?", opciones: ["10,000 ft", "14,000 ft", "18,000 ft", "25,000 ft"], correcta: 2 },
+  { id: "a36-n10", area: "Procedimientos normales", pregunta: "¿Cómo va el trim del elevador para despegar con cabina completa?", opciones: ["0°", "3° nariz arriba", "6° nariz arriba", "3° nariz abajo"], correcta: 1 },
+
+  // ---------- Emergencias ----------
+  { id: "a36-e1", area: "Emergencias", pregunta: "Flujo de combustible en cero después de despegar, con combustible en el tanque. ¿Qué sospechas y qué haces?", opciones: ["Hielo: calefacción ON", "Falla de la bomba del motor: bomba auxiliar HI", "Falla eléctrica: batería OFF", "Turbo: acelerador a ralentí"], correcta: 1 },
+  { id: "a36-e2", area: "Emergencias", pregunta: "Con la bomba del motor fallada y la auxiliar en HI, ¿cuándo llevas el acelerador a ralentí?", opciones: ["De inmediato", "Solo cuando el aterrizaje esté asegurado", "Nunca", "Al llegar a 1,000 ft"], correcta: 1 },
+  { id: "a36-e3", area: "Emergencias", pregunta: "¿Cómo tratas una sospecha de falla del turbo?", opciones: ["Como algo menor", "Como grave: puede terminar en falla de motor o fuego", "Solo si hay humo", "Solo en tierra"], correcta: 1 },
+  { id: "a36-e4", area: "Emergencias", pregunta: "Sospechas falla del turbo en tierra. ¿Qué haces?", opciones: ["Despegar con cuidado", "No despegar", "Despegar con la bomba en HI", "Despegar con flaps 15°"], correcta: 1 },
+  { id: "a36-e5", area: "Emergencias", pregunta: "¿A qué velocidad se hace el descenso de emergencia bajo 20,000 ft?", opciones: ["110 KIAS", "137 KIAS", "152 KIAS", "165 KIAS"], correcta: 2 },
+  { id: "a36-e6", area: "Emergencias", pregunta: "¿A qué velocidad se hace la aproximación de un aterrizaje sin motor?", opciones: ["77 KIAS", "80 KIAS", "86 KIAS", "110 KIAS"], correcta: 1 },
+  { id: "a36-e7", area: "Emergencias", pregunta: "Pierdes el oxígeno a 25,000 ft. ¿Cuánto tiempo de conciencia útil tienes, aproximadamente?", opciones: ["30 segundos", "3 a 5 minutos", "15 minutos", "30 minutos o más"], correcta: 1 },
+  { id: "a36-e8", area: "Emergencias", pregunta: "Con el filtro de aire tapado y el aire alterno abierto, ¿hasta dónde tienes potencia continua?", opciones: ["Hasta 5,000 ft", "Hasta unos 13,000 ft", "Hasta 25,000 ft", "No hay potencia"], correcta: 1 },
+  { id: "a36-e9", area: "Emergencias", pregunta: "¿Qué es lo primero en la extensión manual del tren?", opciones: ["Girar la manivela", "152 KIAS o menos, breaker LDG GR MOTOR OFF y palanca en DOWN", "Apagar la batería", "Bomba auxiliar HI"], correcta: 1 },
+];
+
 export const EXAMENES_TIPO: ExamenTipo[] = [
   { clave: "c152", modelo: "Cessna 152", gratis: true, preguntas: C152 },
   { clave: "c172", modelo: "Cessna 172", gratis: false, preguntas: C172 },
   { clave: "da40", modelo: "Diamond DA40 NG", gratis: false, preguntas: DA40 },
   { clave: "arrow", modelo: "Piper PA-28R-201 Arrow", corto: "Arrow", gratis: false, preguntas: ARROW },
   { clave: "v35", modelo: "Beechcraft V35B Bonanza", corto: "Bonanza V35", gratis: false, preguntas: V35 },
+  { clave: "a36", modelo: "Beechcraft A36TC Bonanza", corto: "Bonanza A36TC", gratis: false, preguntas: A36 },
   { clave: "c208", modelo: "Cessna 208B Grand Caravan", corto: "Caravan", gratis: false, preguntas: C208 },
 ];
 

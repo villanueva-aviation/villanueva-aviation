@@ -82,6 +82,15 @@ export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
     interactivoHref: "/premium/checklist/v35",
   },
   {
+    id: "checklist-premium-a36",
+    tipo: "Checklist",
+    titulo: "Checklist Premium — Beechcraft A36TC Bonanza",
+    descripcion: "Turbo y tren eléctrico: checklist completo, flujos de memoria (incluida la extensión manual del tren) y velocidades de su manual.",
+    duracion: "3 secciones",
+    imagen: "/images/exclusivo-checklist-a36.jpg",
+    interactivoHref: "/premium/checklist/a36",
+  },
+  {
     id: "agendar-cita",
     tipo: "Agenda",
     titulo: "Agenda tu sesión con el fundador",
