@@ -43,12 +43,11 @@ export const CHECKRIDE_ORAL: PhraseologyCard[] = [
   {
     situacion: "Espacios aéreos — ¿Qué diferencia hay entre el espacio aéreo Clase B y Clase C?",
     callout:
-      "La Clase B requiere autorización EXPLÍCITA de control antes de entrar. La Clase C solo requiere establecer contacto bidireccional — basta con que el controlador confirme tu matrícula de vuelta.",
-    audioUrl: "/audio/fraseologia/checkride-4.mp3",
+      "Con reglas OACI, las dos piden autorización del control para entrar. La diferencia es el servicio: en la B el control separa al VFR de todos los demás vuelos; en la C solo lo separa de los IFR, y de los otros VFR le da información de tránsito.",
     elementos: [
-      { descripcion: "Clase B requiere autorización explícita antes de entrar", palabrasClave: ["autorización explícita", "autorizacion explicita", "clase b"] },
-      { descripcion: "Clase C solo requiere contacto bidireccional establecido", palabrasClave: ["contacto bidireccional", "clase c"] },
-      { descripcion: "Ambos suelen requerir transponder Modo C", palabrasClave: ["transponder", "modo c"] },
+      { descripcion: "Las dos requieren autorización para entrar", palabrasClave: ["autorización", "autorizacion", "autorizado"] },
+      { descripcion: "En la B el control separa al VFR de todos", palabrasClave: ["todos", "separa a todos", "separación de todos"] },
+      { descripcion: "En la C el VFR recibe información de otros VFR", palabrasClave: ["información", "informacion", "tránsito", "transito"] },
     ],
   },
   {

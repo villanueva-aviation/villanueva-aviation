@@ -77,6 +77,16 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     archivoHref: "/downloads/guia-metar-taf.pdf",
   },
   {
+    id: "guia-espacios-aereos",
+    categoria: "Guías",
+    nombre: "Guía de Espacios Aéreos — Clasificación OACI",
+    descripcion: "Las clases A a G, CTR y TMA, mínimos VMC, zonas prohibidas, restringidas y peligrosas, cómo pedir autorización para entrar y las diferencias con la FAA, con preguntas de repaso para el oral.",
+    version: "v1.0",
+    fecha: "2026-09-29",
+    imagen: "/images/descargas-guia-espacios-aereos.jpg",
+    archivoHref: "/downloads/guia-espacios-aereos.pdf",
+  },
+  {
     id: "briefing-piloto",
     categoria: "Herramientas",
     nombre: "Briefing del piloto — METAR y TAF en español",
