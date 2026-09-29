@@ -6,8 +6,7 @@ import { Badge } from "../components/ui/Badge";
 import { ProgressBar } from "../components/ui/ProgressBar";
 import { Reveal } from "../components/ui/Reveal";
 import { ACADEMIA_MODULOS } from "../data/academia";
-import { EXAMENES_TIPO, NIVELES_INSIGNIA, REGLAS_EXAMEN_TIPO } from "../data/examenesTipo";
-import { nivelInsignia } from "../features/examenesTipo/reglas";
+import { EXAMENES_TIPO, NIVELES_INSIGNIA } from "../data/examenesTipo";
 import { FLOTA, fotoFlota } from "../data/flota";
 import { ROUTES } from "../lib/routes";
 import { useProgress, type ModuloEstado } from "../features/progress/ProgressContext";
@@ -25,7 +24,7 @@ const ESTADO_TONE: Record<ModuloEstado, "gold" | "green" | "neutral"> = {
 };
 
 export function Academia() {
-  const { moduloProgreso, examenTipoResultado, loading } = useProgress();
+  const { moduloProgreso, nivelInsigniaAvion, loading } = useProgress();
 
   if (loading) return null;
 
@@ -89,7 +88,7 @@ export function Academia() {
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {FLOTA.flatMap((etapa) => etapa.aviones).map((avion) => {
               const examen = EXAMENES_TIPO.find((e) => e.clave === avion.clave);
-              const nivel = examen ? nivelInsignia(examenTipoResultado(avion.clave), false, REGLAS_EXAMEN_TIPO.dominio) : null;
+              const nivel = examen ? nivelInsigniaAvion(avion.clave) : null;
               const foto = fotoFlota(avion.clave);
               const contenido = (
                 <>

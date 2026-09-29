@@ -7,7 +7,8 @@ import { Button } from "../components/ui/Button";
 import { Quiz } from "../features/academia/Quiz";
 import { useProgress } from "../features/progress/ProgressContext";
 import { usePremiumAccess } from "../features/payments/usePremiumAccess";
-import { areasAReforzar, armarIntento, nivelInsignia, proximoIntento } from "../features/examenesTipo/reglas";
+import { areasAReforzar, armarIntento, proximoIntento, type NivelInsignia } from "../features/examenesTipo/reglas";
+import { VueloPractico } from "../features/examenesTipo/VueloPractico";
 import { examenTipo, nombreCorto, NIVELES_INSIGNIA, REGLAS_EXAMEN_TIPO, type AreaExamen, type PreguntaTipo } from "../data/examenesTipo";
 import { FLOTA, fotoFlota } from "../data/flota";
 import { ROUTES } from "../lib/routes";
@@ -24,7 +25,7 @@ const fechaHora = new Intl.DateTimeFormat("es-MX", { weekday: "long", day: "nume
 export function ExamenTipo() {
   const { clave } = useParams();
   const examen = examenTipo(clave);
-  const { registrarExamenTipo, examenTipoResultado, loading } = useProgress();
+  const { registrarExamenTipo, examenTipoResultado, nivelInsigniaAvion, loading } = useProgress();
   const { hasAccess, loading: accesoCargando } = usePremiumAccess();
   const [fase, setFase] = useState<Fase>({ tipo: "inicio" });
   const respuestas = useRef<boolean[]>([]);
@@ -37,7 +38,7 @@ export function ExamenTipo() {
   const corto = nombreCorto(examen);
   const guardado = examenTipoResultado(examen.clave);
   const espera = proximoIntento(guardado, esperaHoras, dominio);
-  const nivel = nivelInsignia(guardado, false, dominio);
+  const nivel = nivelInsigniaAvion(examen.clave);
   const bloqueado = !examen.gratis && !hasAccess;
 
   function empezar() {
@@ -90,7 +91,7 @@ export function ExamenTipo() {
             }}
           />
         ) : fase.tipo === "resultado" ? (
-          <Resultado corto={corto} {...fase} clave={examen.clave} />
+          <Resultado corto={corto} {...fase} clave={examen.clave} conPlata={nivel === "plata" || nivel === "oro"} onVolver={() => setFase({ tipo: "inicio" })} />
         ) : (
           <div className="grid gap-6">
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
@@ -106,6 +107,8 @@ export function ExamenTipo() {
             </div>
 
             <Niveles corto={corto} nivel={nivel} mejor={guardado?.score ?? null} />
+
+            <VueloPractico modelo={examen.modelo} corto={corto} teoricoAprobado={Boolean(guardado?.passed)} />
 
             {espera ? (
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-center">
@@ -131,11 +134,11 @@ export function ExamenTipo() {
 
 const PASOS = [
   { nivel: "bronce", requisito: `Aprobar el examen teórico con ${aprobacion} %` },
-  { nivel: "plata", requisito: "Aprobar el vuelo práctico evaluado en el simulador (próximamente)" },
+  { nivel: "plata", requisito: "Aprobar el vuelo práctico evaluado en el simulador" },
   { nivel: "oro", requisito: `Tener la Plata y el teórico con ${dominio} % o más` },
 ] as const;
 
-function Niveles({ corto, nivel, mejor }: { corto: string; nivel: ReturnType<typeof nivelInsignia>; mejor: number | null }) {
+function Niveles({ corto, nivel, mejor }: { corto: string; nivel: NivelInsignia | null; mejor: number | null }) {
   const alcanzado = nivel ? PASOS.findIndex((p) => p.nivel === nivel) : -1;
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
@@ -165,7 +168,7 @@ function Niveles({ corto, nivel, mejor }: { corto: string; nivel: ReturnType<typ
   );
 }
 
-function Resultado({ corto, clave, score, passed, mejor, reforzar }: { corto: string; clave: string; score: number; passed: boolean; mejor: number; reforzar: AreaExamen[] }) {
+function Resultado({ corto, clave, score, passed, mejor, reforzar, conPlata, onVolver }: { corto: string; clave: string; score: number; passed: boolean; mejor: number; reforzar: AreaExamen[]; conPlata: boolean; onVolver: () => void }) {
   if (passed) {
     return (
       <div className="animate-result-in rounded-2xl border border-gold-500/30 bg-gold-500/[0.06] p-8 text-center">
@@ -174,15 +177,15 @@ function Resultado({ corto, clave, score, passed, mejor, reforzar }: { corto: st
         </div>
         <h2 className="mt-5 font-display text-2xl font-semibold text-white">¡Aprobado con {score}%!</h2>
         <p className="mt-2 text-white/70">
-          Tienes el nivel Bronce: {NIVELES_INSIGNIA.bronce.titulo(corto)}.{" "}
+          {conPlata ? "Tu insignia sigue en su nivel." : `Tienes el nivel Bronce: ${NIVELES_INSIGNIA.bronce.titulo(corto)}.`}{" "}
           {mejor >= dominio
-            ? `Y con ${mejor} % ya cumples el teórico que pide el Oro.`
-            : `Para el Oro necesitarás ${dominio} % en el teórico; puedes volver a intentarlo en ${esperaHoras} horas.`}{" "}
-          El nivel Plata, un vuelo evaluado en el simulador, llega pronto.
+            ? `Con ${mejor} % ya cumples el teórico que pide el Oro.`
+            : `Para el Oro necesitas ${dominio} % en el teórico; puedes volver a intentarlo en ${esperaHoras} horas.`}
+          {!conPlata && " Ya puedes solicitar tu vuelo práctico para la Plata."}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Button to={ROUTES.perfil}>Ver mis logros</Button>
-          <Button to={ROUTES.academia} variant="secondary">Volver a la Academia</Button>
+          {!conPlata && <Button onClick={onVolver}>Solicitar mi vuelo práctico</Button>}
+          <Button to={ROUTES.perfil} variant={conPlata ? "primary" : "secondary"}>Ver mis logros</Button>
         </div>
       </div>
     );

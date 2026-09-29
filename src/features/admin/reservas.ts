@@ -1,5 +1,5 @@
 import { supabase } from "../../lib/supabaseClient";
-import { PREFIJO_PROYECTO_FINAL } from "../payments/reglasSesiones";
+import { PREFIJO_INSIGNIA_PRACTICA, PREFIJO_PROYECTO_FINAL } from "../payments/reglasSesiones";
 
 export interface Reserva {
   id: string;
@@ -33,6 +33,19 @@ export async function rechazarReserva(id: string, motivo: string) {
 }
 
 export const temaProyectoFinal = (moduloTitulo: string) => `${PREFIJO_PROYECTO_FINAL} ${moduloTitulo}`;
+
+export const temaInsigniaPractica = (modelo: string) => `${PREFIJO_INSIGNIA_PRACTICA} ${modelo}`;
+
+/** Temas de los vuelos prácticos que el fundador ya aprobó (estado "completada") a este cadete. */
+export async function fetchPracticosAprobados(userId: string): Promise<string[]> {
+  const { data } = await supabase
+    .from("reservas")
+    .select("tema")
+    .eq("user_id", userId) // el fundador puede leer todas las filas; aquí solo cuentan las suyas
+    .eq("estado", "completada")
+    .like("tema", `${PREFIJO_INSIGNIA_PRACTICA}%`);
+  return (data ?? []).map((r) => r.tema as string);
+}
 
 /** Reservas propias (cadete) que coinciden con un tema exacto, más recientes primero. RLS ya limita a las del usuario actual. */
 export async function fetchMisReservasPorTema(tema: string): Promise<Reserva[]> {

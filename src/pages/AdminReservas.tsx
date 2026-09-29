@@ -10,7 +10,7 @@ import { FOUNDER_EMAIL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 import { actualizarEstadoReserva, rechazarReserva, fetchTodasReservas, type Reserva } from "../features/admin/reservas";
 import { fetchTodosPagosSesiones } from "../features/payments/sesiones";
-import { esSesionCobrable, sesionesIncluidasPorCadete } from "../features/payments/reglasSesiones";
+import { esInsigniaPractica, esSesionCobrable, sesionesIncluidasPorCadete } from "../features/payments/reglasSesiones";
 
 const ESTADOS = ["pendiente", "confirmada", "completada"] as const;
 
@@ -117,7 +117,7 @@ export function AdminReservas() {
                           <FileText size={14} className="text-gold-400" />
                         )}
                         <p className="text-sm font-medium text-white">
-                          {r.tipo === "examen" ? "Simulacro de examen práctico" : r.tema || "Revisión de tema"}
+                          {r.tipo === "examen" ? r.tema || "Simulacro de examen práctico" : r.tema || "Revisión de tema"}
                         </p>
                         <Badge tone={ESTADO_TONE[r.estado] ?? "neutral"}>{r.estado}</Badge>
                         {esSesionCobrable(r) &&
@@ -149,6 +149,11 @@ export function AdminReservas() {
                           <> · {r.fecha_preferida} {r.horario_preferido}</>
                         )}
                       </p>
+                      {esInsigniaPractica(r.tema) && (
+                        <p className="mt-1 text-xs text-gold-400/80">
+                          Gratis. Confirmada = vuelo agendado · Completada = aprobó (gana la Plata) · Rechazar = no aprobó, explica qué practicar.
+                        </p>
+                      )}
                       {r.comentarios && (
                         <p className="mt-2 whitespace-pre-wrap rounded-lg bg-white/[0.03] p-3 text-xs text-white/65">
                           {r.comentarios}

@@ -27,6 +27,10 @@ test("un proyecto final de Academia nunca se cobra", () => {
   assert.equal(esSesionCobrable(cita({ tema: "Proyecto final — Navegación" })), false);
 });
 
+test("el vuelo práctico de una insignia de avión nunca se cobra", () => {
+  assert.equal(esSesionCobrable(cita({ tipo: "examen", tema: "Insignia práctica — Cessna 152", estado: "completada" })), false);
+});
+
 test("la sesión incluida es la primera cobrable del cadete, no la más reciente", () => {
   const reservas = [
     cita({ id: "nueva", created_at: "2026-09-10T10:00:00Z" }),

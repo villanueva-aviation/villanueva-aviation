@@ -3,7 +3,8 @@ import { ACADEMIA_MODULOS } from "../../data/academia";
 import { Plane } from "lucide-react";
 import { CADETE_BASE, CERTIFICADOS_BASE, LOGROS_BASE, type Certificado, type Logro } from "../../data/cadete";
 import { EXAMENES_TIPO, NIVELES_INSIGNIA, REGLAS_EXAMEN_TIPO, nombreCorto } from "../../data/examenesTipo";
-import { combinarResultado, nivelInsignia } from "../examenesTipo/reglas";
+import { combinarResultado, nivelInsignia, type NivelInsignia } from "../examenesTipo/reglas";
+import { fetchPracticosAprobados, temaInsigniaPractica } from "../admin/reservas";
 import { readStorage } from "../../lib/storage";
 import { useAuth } from "../auth/AuthContext";
 import { fetchProgresoRemoto, guardarProgresoRemoto, type ProgresoRemoto, type QuizResult } from "./academiaProgresoRemoto";
@@ -42,6 +43,8 @@ interface ProgressContextValue {
   /** Exámenes teóricos por avión (insignias "Experto en …"). */
   registrarExamenTipo: (clave: string, score: number, passed: boolean) => void;
   examenTipoResultado: (clave: string) => QuizResult | null;
+  /** Nivel de la insignia de un avión: teórico guardado aquí + vuelo práctico aprobado por el fundador. */
+  nivelInsigniaAvion: (clave: string) => NivelInsignia | null;
   progresoGeneralPct: number;
   temasDebiles: TemaDebil[];
   xp: number;
@@ -70,6 +73,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const [state, setState] = useState<ProgressState>(ESTADO_VACIO);
   const [loading, setLoading] = useState(true);
+  const [practicos, setPracticos] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!user) return setPracticos([]);
+    fetchPracticosAprobados(user.id).then(setPracticos);
+  }, [user]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -156,15 +165,26 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const vfrCompletado = modulos.find((m) => m.slug === "vfr")?.estado === "completado";
     const algunaPerfecta = Object.values(state.examenes).some((r) => r.score === 100);
 
-    // Una insignia por avión que sube de nivel. El práctico aún no existe, así que por ahora llega hasta Bronce.
+    const nivelInsigniaAvion = (clave: string) => {
+      const ex = EXAMENES_TIPO.find((e) => e.clave === clave);
+      const practico = Boolean(ex && practicos.includes(temaInsigniaPractica(ex.modelo)));
+      return nivelInsignia(state.examenes[`${PREFIJO_TIPO}${clave}`] ?? null, practico, REGLAS_EXAMEN_TIPO.dominio);
+    };
+
+    // Una insignia por avión que sube de nivel: Bronce, Plata, Oro.
+    const SIGUIENTE: Record<NivelInsignia, string> = {
+      bronce: "Siguiente: Plata, con el vuelo práctico evaluado.",
+      plata: `Siguiente: Oro, con ${REGLAS_EXAMEN_TIPO.dominio} % en el teórico.`,
+      oro: "Nivel máximo.",
+    };
     const logrosTipo: Logro[] = EXAMENES_TIPO.map((ex) => {
       const avion = nombreCorto(ex);
-      const nivel = nivelInsignia(state.examenes[`${PREFIJO_TIPO}${ex.clave}`] ?? null, false, REGLAS_EXAMEN_TIPO.dominio);
+      const nivel = nivelInsigniaAvion(ex.clave);
       return {
         id: `${PREFIJO_TIPO}${ex.clave}`,
         titulo: NIVELES_INSIGNIA[nivel ?? "bronce"].titulo(avion),
         descripcion: nivel
-          ? `Nivel ${NIVELES_INSIGNIA[nivel].medalla}. Siguiente: Plata, con el vuelo práctico (próximamente).`
+          ? `Nivel ${NIVELES_INSIGNIA[nivel].medalla}. ${SIGUIENTE[nivel]}`
           : `Aprueba el examen teórico del ${ex.modelo} para el nivel Bronce (simulador).`,
         icon: Plane,
         desbloqueado: nivel !== null,
@@ -224,6 +244,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         persist({ ...state, examenes: { ...state.examenes, [llave]: resultado } });
       },
       examenTipoResultado: (clave: string) => state.examenes[`${PREFIJO_TIPO}${clave}`] ?? null,
+      nivelInsigniaAvion,
       progresoGeneralPct,
       temasDebiles,
       xp,
@@ -235,7 +256,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       loading,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state, loading]);
+  }, [state, loading, practicos]);
 
   useEffect(() => {
     if (!loading && user && value.progresoGeneralPct === 100) {

@@ -241,7 +241,7 @@ export function AgendarCita() {
                 <div key={r.id} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-sm font-medium text-white">
-                      {r.tipo === "revision" ? `Revisión: ${r.tema || "tema general"}` : "Simulacro de examen práctico"}
+                      {r.tipo === "revision" ? `Revisión: ${r.tema || "tema general"}` : r.tema || "Simulacro de examen práctico"}
                     </span>
                     <Badge tone={ESTADO_TONE[r.estado] ?? "neutral"}>{r.estado}</Badge>
                   </div>

@@ -3,6 +3,9 @@
 /** Prefijo del tema con el que Academia envía los proyectos finales a la misma tabla. */
 export const PREFIJO_PROYECTO_FINAL = "Proyecto final —";
 
+/** Prefijo del tema de las solicitudes de vuelo práctico de las insignias de avión (nivel Plata). */
+export const PREFIJO_INSIGNIA_PRACTICA = "Insignia práctica —";
+
 /** Estados en los que la cita ya tiene fecha acordada y por tanto se cobra. */
 const ESTADOS_COBRABLES = ["confirmada", "completada"];
 
@@ -11,8 +14,13 @@ export function esProyectoFinal(tema: string | null): boolean {
   return Boolean(tema?.startsWith(PREFIJO_PROYECTO_FINAL));
 }
 
+/** Los vuelos prácticos de las insignias de avión también son gratis. */
+export function esInsigniaPractica(tema: string | null): boolean {
+  return Boolean(tema?.startsWith(PREFIJO_INSIGNIA_PRACTICA));
+}
+
 export function esSesionCobrable(r: { tipo: string; tema: string | null; estado: string }): boolean {
-  return ESTADOS_COBRABLES.includes(r.estado) && !esProyectoFinal(r.tema);
+  return ESTADOS_COBRABLES.includes(r.estado) && !esProyectoFinal(r.tema) && !esInsigniaPractica(r.tema);
 }
 
 /**

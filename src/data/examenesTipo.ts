@@ -37,6 +37,16 @@ export const NIVELES_INSIGNIA = {
   oro: { medalla: "Oro", titulo: (avion: string) => `Experto en ${avion}` },
 } as const;
 
+/** Lo que el fundador evalúa en el vuelo práctico (nivel Plata), igual para todos los aviones. */
+export const EVALUACION_PRACTICA = [
+  "Prevuelo y arranque siguiendo el checklist del avión",
+  "Rodaje y prueba de motor antes del despegue",
+  "Despegue a la velocidad de rotación y ascenso a Vy",
+  "Circuito de tráfico con sus comunicaciones",
+  "Una emergencia sorpresa elegida por el instructor (falla de motor, fuego o falla eléctrica), resuelta de memoria",
+  "Aproximación estabilizada y aterrizaje",
+];
+
 export function nombreCorto(examen: ExamenTipo) {
   return examen.modelo.replace(/^Cessna /, "C");
 }
