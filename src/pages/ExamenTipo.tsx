@@ -9,6 +9,7 @@ import { useProgress } from "../features/progress/ProgressContext";
 import { usePremiumAccess } from "../features/payments/usePremiumAccess";
 import { areasAReforzar, armarIntento, proximoIntento, type NivelInsignia } from "../features/examenesTipo/reglas";
 import { VueloPractico } from "../features/examenesTipo/VueloPractico";
+import { GuiaEstudio } from "../features/examenesTipo/GuiaEstudio";
 import { examenTipo, nombreCorto, NIVELES_INSIGNIA, REGLAS_EXAMEN_TIPO, type AreaExamen, type PreguntaTipo } from "../data/examenesTipo";
 import { FLOTA, fotoFlota } from "../data/flota";
 import { ROUTES } from "../lib/routes";
@@ -105,6 +106,8 @@ export function ExamenTipo() {
                 Reconocimiento interno de Villanueva Aviation para entrenamiento en simulador. No es una habilitación oficial ni sustituye una licencia.
               </p>
             </div>
+
+            <GuiaEstudio clave={examen.clave} preguntas={examen.preguntas} checklistHref={CHECKLIST[examen.clave]} />
 
             <Niveles corto={corto} nivel={nivel} mejor={guardado?.score ?? null} />
 
@@ -203,8 +206,8 @@ function Resultado({ corto, clave, score, passed, mejor, reforzar, conPlata, onV
         </div>
       )}
       <div className="mt-7 flex flex-wrap gap-3">
-        {CHECKLIST[clave] && <Button to={CHECKLIST[clave]}>Repasar con el checklist del {corto}</Button>}
-        <Button to={ROUTES.academia} variant="secondary">Volver a la Academia</Button>
+        <Button onClick={onVolver}>Ver la guía de estudio</Button>
+        {CHECKLIST[clave] && <Button to={CHECKLIST[clave]} variant="secondary">Repasar con el checklist del {corto}</Button>}
       </div>
     </div>
   );
