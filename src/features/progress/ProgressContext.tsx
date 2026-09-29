@@ -2,8 +2,8 @@ import { createContext, useContext, useEffect, useMemo, useState, type ReactNode
 import { ACADEMIA_MODULOS } from "../../data/academia";
 import { Plane } from "lucide-react";
 import { CADETE_BASE, CERTIFICADOS_BASE, LOGROS_BASE, type Certificado, type Logro } from "../../data/cadete";
-import { EXAMENES_TIPO } from "../../data/examenesTipo";
-import { combinarResultado } from "../examenesTipo/reglas";
+import { EXAMENES_TIPO, NIVELES_INSIGNIA, REGLAS_EXAMEN_TIPO, nombreCorto } from "../../data/examenesTipo";
+import { combinarResultado, nivelInsignia } from "../examenesTipo/reglas";
 import { readStorage } from "../../lib/storage";
 import { useAuth } from "../auth/AuthContext";
 import { fetchProgresoRemoto, guardarProgresoRemoto, type ProgresoRemoto, type QuizResult } from "./academiaProgresoRemoto";
@@ -156,13 +156,21 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const vfrCompletado = modulos.find((m) => m.slug === "vfr")?.estado === "completado";
     const algunaPerfecta = Object.values(state.examenes).some((r) => r.score === 100);
 
-    const logrosTipo: Logro[] = EXAMENES_TIPO.map((ex) => ({
-      id: `${PREFIJO_TIPO}${ex.clave}`,
-      titulo: `Experto en ${ex.modelo.replace(/^Cessna /, "C")} · Teórico`,
-      descripcion: `Aprueba el examen teórico del ${ex.modelo} (simulador).`,
-      icon: Plane,
-      desbloqueado: Boolean(state.examenes[`${PREFIJO_TIPO}${ex.clave}`]?.passed),
-    }));
+    // Una insignia por avión que sube de nivel. El práctico aún no existe, así que por ahora llega hasta Bronce.
+    const logrosTipo: Logro[] = EXAMENES_TIPO.map((ex) => {
+      const avion = nombreCorto(ex);
+      const nivel = nivelInsignia(state.examenes[`${PREFIJO_TIPO}${ex.clave}`] ?? null, false, REGLAS_EXAMEN_TIPO.dominio);
+      return {
+        id: `${PREFIJO_TIPO}${ex.clave}`,
+        titulo: NIVELES_INSIGNIA[nivel ?? "bronce"].titulo(avion),
+        descripcion: nivel
+          ? `Nivel ${NIVELES_INSIGNIA[nivel].medalla}. Siguiente: Plata, con el vuelo práctico (próximamente).`
+          : `Aprueba el examen teórico del ${ex.modelo} para el nivel Bronce (simulador).`,
+        icon: Plane,
+        desbloqueado: nivel !== null,
+        nivel: nivel ?? undefined,
+      };
+    });
 
     const logrosBase = LOGROS_BASE.map((logro) => {
       switch (logro.id) {

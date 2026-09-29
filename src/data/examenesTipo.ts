@@ -24,9 +24,22 @@ export const REGLAS_EXAMEN_TIPO = {
   preguntasPorIntento: 20,
   /** Porcentaje mínimo para aprobar. */
   aprobacion: 80,
-  /** Tras reprobar se espera un día: así se estudia el tema en vez de memorizar las opciones. */
+  /** Entre intentos se espera un día (hasta llegar al dominio): así se estudia el tema en vez de memorizar las opciones. */
   esperaHoras: 24,
+  /** Calificación del teórico que pide el nivel Oro. */
+  dominio: 95,
 };
+
+/** Cómo se llama cada nivel de la insignia, a partir del nombre corto del avión ("C152"). */
+export const NIVELES_INSIGNIA = {
+  bronce: { medalla: "Bronce", titulo: (avion: string) => `${avion} · Teórico` },
+  plata: { medalla: "Plata", titulo: (avion: string) => `${avion} · Práctico` },
+  oro: { medalla: "Oro", titulo: (avion: string) => `Experto en ${avion}` },
+} as const;
+
+export function nombreCorto(examen: ExamenTipo) {
+  return examen.modelo.replace(/^Cessna /, "C");
+}
 
 const C152: PreguntaTipo[] = [
   // ---------- Velocidades ----------

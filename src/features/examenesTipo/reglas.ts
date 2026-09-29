@@ -59,15 +59,27 @@ export function areasAReforzar(preguntas: PreguntaTipo[], aciertos: boolean[], m
     .map((a) => a.area);
 }
 
-/** Cuándo puede volver a presentar: null si ya puede. Aprobado no tiene espera (puede repasar cuando quiera). */
-export function proximoIntento(guardado: ResultadoGuardado | null, esperaHoras: number, ahora = new Date()): Date | null {
-  if (!guardado || guardado.passed || !guardado.fecha) return null;
+/**
+ * Cuándo puede volver a presentar: null si ya puede. Mientras la mejor calificación no llegue al dominio
+ * (reprobado, o aprobado pero abajo del nivel Oro) se espera entre intentos, para estudiar en vez de memorizar.
+ */
+export function proximoIntento(guardado: ResultadoGuardado | null, esperaHoras: number, dominio: number, ahora = new Date()): Date | null {
+  if (!guardado || guardado.score >= dominio || !guardado.fecha) return null;
   const libre = new Date(new Date(guardado.fecha).getTime() + esperaHoras * 3_600_000);
   return libre > ahora ? libre : null;
 }
 
-/** Lo que se guarda tras un intento: la insignia aprobada no se pierde por un repaso con menos puntos. */
+/** Lo que se guarda tras un intento: la mejor calificación, y la insignia aprobada no se pierde por un repaso con menos puntos. */
 export function combinarResultado(anterior: ResultadoGuardado | null, score: number, passed: boolean, fecha: string): ResultadoGuardado {
-  if (anterior?.passed) return { score: Math.max(anterior.score, score), passed: true, fecha: anterior.fecha };
+  if (anterior?.passed) return { score: Math.max(anterior.score, score), passed: true, fecha };
   return { score, passed, fecha };
+}
+
+export type NivelInsignia = "bronce" | "plata" | "oro";
+
+/** Bronce: teórico aprobado. Plata: además el vuelo práctico. Oro: además el teórico con el porcentaje de dominio. */
+export function nivelInsignia(guardado: ResultadoGuardado | null, practico: boolean, dominio: number): NivelInsignia | null {
+  if (!guardado?.passed) return null;
+  if (!practico) return "bronce";
+  return guardado.score >= dominio ? "oro" : "plata";
 }

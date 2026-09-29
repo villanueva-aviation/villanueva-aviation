@@ -6,7 +6,8 @@ import { Badge } from "../components/ui/Badge";
 import { ProgressBar } from "../components/ui/ProgressBar";
 import { Reveal } from "../components/ui/Reveal";
 import { ACADEMIA_MODULOS } from "../data/academia";
-import { EXAMENES_TIPO } from "../data/examenesTipo";
+import { EXAMENES_TIPO, NIVELES_INSIGNIA, REGLAS_EXAMEN_TIPO } from "../data/examenesTipo";
+import { nivelInsignia } from "../features/examenesTipo/reglas";
 import { FLOTA, fotoFlota } from "../data/flota";
 import { ROUTES } from "../lib/routes";
 import { useProgress, type ModuloEstado } from "../features/progress/ProgressContext";
@@ -83,20 +84,20 @@ export function Academia() {
           <h2 className="font-display text-xl font-semibold text-white">Insignias de avión</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/60">
             Demuestra que conoces a fondo cada avión de la flota: velocidades, limitaciones, sistemas y emergencias.
-            Aprueba su examen y gana la insignia "Experto en…". El del Cessna 152 es gratis.
+            Cada insignia sube de nivel: Bronce con el examen teórico, Plata con el vuelo práctico y Oro, "Experto en…", con los dos y el teórico en 95 % o más. El del Cessna 152 es gratis.
           </p>
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {FLOTA.flatMap((etapa) => etapa.aviones).map((avion) => {
               const examen = EXAMENES_TIPO.find((e) => e.clave === avion.clave);
-              const ganada = examen ? examenTipoResultado(avion.clave)?.passed : false;
+              const nivel = examen ? nivelInsignia(examenTipoResultado(avion.clave), false, REGLAS_EXAMEN_TIPO.dominio) : null;
               const foto = fotoFlota(avion.clave);
               const contenido = (
                 <>
                   <img src={foto.src} srcSet={foto.srcSet} sizes="(min-width: 1024px) 20vw, 50vw" alt="" loading="lazy" className="aspect-[16/9] w-full rounded-lg object-cover" />
                   <p className="mt-3 font-display text-sm font-semibold text-white">{avion.modelo}</p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    {ganada ? (
-                      <Badge tone="green"><Award size={11} className="mr-1" />Teórico</Badge>
+                    {nivel ? (
+                      <Badge tone={nivel}><Award size={11} className="mr-1" />{NIVELES_INSIGNIA[nivel].medalla}</Badge>
                     ) : examen ? (
                       <Badge tone={examen.gratis ? "gold" : "neutral"}>{examen.gratis ? "Gratis" : "Exclusivo"}</Badge>
                     ) : (

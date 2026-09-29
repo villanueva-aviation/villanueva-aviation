@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { EXAMENES_TIPO, REGLAS_EXAMEN_TIPO } from "../../data/examenesTipo.ts";
-import { areasAReforzar, armarIntento, combinarResultado, proximoIntento } from "./reglas.ts";
+import { areasAReforzar, armarIntento, combinarResultado, nivelInsignia, proximoIntento } from "./reglas.ts";
 
 // Aleatorio con semilla, para que la prueba sea repetible.
 function semilla(s: number) {
@@ -47,18 +47,27 @@ test("las áreas a reforzar son las que quedan bajo el mínimo, la peor primero"
   assert.deepEqual(areasAReforzar(preguntas, aciertos, 80), ["Emergencias", "Velocidades"]);
 });
 
-test("tras reprobar hay que esperar; aprobado no espera", () => {
+test("hay que esperar entre intentos hasta llegar al dominio", () => {
   const ahora = new Date("2026-09-29T12:00:00Z");
   const reprobado = { score: 60, passed: false, fecha: "2026-09-29T10:00:00Z" };
-  assert.deepEqual(proximoIntento(reprobado, 24, ahora), new Date("2026-09-30T10:00:00Z"));
-  assert.equal(proximoIntento({ ...reprobado, fecha: "2026-09-28T11:00:00Z" }, 24, ahora), null);
-  assert.equal(proximoIntento({ score: 90, passed: true, fecha: "2026-09-29T11:00:00Z" }, 24, ahora), null);
-  assert.equal(proximoIntento(null, 24, ahora), null);
+  assert.deepEqual(proximoIntento(reprobado, 24, 95, ahora), new Date("2026-09-30T10:00:00Z"));
+  assert.equal(proximoIntento({ ...reprobado, fecha: "2026-09-28T11:00:00Z" }, 24, 95, ahora), null);
+  assert.deepEqual(proximoIntento({ score: 90, passed: true, fecha: "2026-09-29T11:00:00Z" }, 24, 95, ahora), new Date("2026-09-30T11:00:00Z"));
+  assert.equal(proximoIntento({ score: 95, passed: true, fecha: "2026-09-29T11:00:00Z" }, 24, 95, ahora), null);
+  assert.equal(proximoIntento(null, 24, 95, ahora), null);
 });
 
-test("un repaso reprobado no quita la insignia", () => {
+test("un repaso reprobado no quita la insignia y se guarda la mejor calificación", () => {
   const aprobado = { score: 85, passed: true, fecha: "2026-09-29T10:00:00Z" };
-  assert.deepEqual(combinarResultado(aprobado, 60, false, "2026-09-30T10:00:00Z"), aprobado);
-  assert.deepEqual(combinarResultado(aprobado, 95, true, "2026-09-30T10:00:00Z"), { ...aprobado, score: 95 });
+  assert.deepEqual(combinarResultado(aprobado, 60, false, "2026-09-30T10:00:00Z"), { ...aprobado, fecha: "2026-09-30T10:00:00Z" });
+  assert.deepEqual(combinarResultado(aprobado, 95, true, "2026-09-30T10:00:00Z"), { score: 95, passed: true, fecha: "2026-09-30T10:00:00Z" });
   assert.deepEqual(combinarResultado(null, 60, false, "x"), { score: 60, passed: false, fecha: "x" });
+});
+
+test("niveles: bronce con el teórico, plata con el práctico, oro con práctico y dominio", () => {
+  assert.equal(nivelInsignia(null, false, 95), null);
+  assert.equal(nivelInsignia({ score: 70, passed: false }, true, 95), null);
+  assert.equal(nivelInsignia({ score: 100, passed: true }, false, 95), "bronce");
+  assert.equal(nivelInsignia({ score: 85, passed: true }, true, 95), "plata");
+  assert.equal(nivelInsignia({ score: 95, passed: true }, true, 95), "oro");
 });

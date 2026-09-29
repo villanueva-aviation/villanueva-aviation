@@ -80,7 +80,13 @@ export function Perfil() {
             >
               <div
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                  logro.desbloqueado ? "bg-gold-500/15 text-gold-400" : "bg-white/5 text-white/30"
+                  !logro.desbloqueado
+                    ? "bg-white/5 text-white/30"
+                    : logro.nivel === "bronce"
+                      ? "bg-[#b87333]/15 text-[#e3a46f]"
+                      : logro.nivel === "plata"
+                        ? "bg-slate-300/10 text-slate-200"
+                        : "bg-gold-500/15 text-gold-400"
                 }`}
               >
                 {logro.desbloqueado ? <logro.icon size={18} /> : <Lock size={16} />}

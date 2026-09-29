@@ -1,3 +1,4 @@
+import type { NivelInsignia } from "../features/examenesTipo/reglas";
 import type { LucideIcon } from "lucide-react";
 import { Award, Compass, Radio, Rocket, ShieldCheck, Target } from "lucide-react";
 
@@ -7,6 +8,8 @@ export interface Logro {
   descripcion: string;
   icon: LucideIcon;
   desbloqueado: boolean;
+  /** Solo las insignias de avión: el nivel alcanzado, para pintarlas de su color. */
+  nivel?: NivelInsignia;
 }
 
 export interface Certificado {
