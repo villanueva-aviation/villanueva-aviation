@@ -48,7 +48,7 @@ export const EVALUACION_PRACTICA = [
 ];
 
 export function nombreCorto(examen: ExamenTipo) {
-  return examen.modelo.replace(/^Cessna /, "C");
+  return examen.modelo.replace(/^Cessna /, "C").replace(/^Diamond /, "");
 }
 
 const C152: PreguntaTipo[] = [
@@ -159,9 +159,68 @@ const C172: PreguntaTipo[] = [
   { id: "c172-e8", area: "Emergencias", pregunta: "Hay fuego durante el arranque en tierra. ¿Qué haces primero?", opciones: ["Soltar la llave y bajar de inmediato", "Seguir girando el motor de arranque para que aspire las llamas", "Encender la bomba auxiliar", "Poner la mezcla en RICA"], correcta: 1 },
 ];
 
+// DA40 NG: diésel Austro E4 con FADEC y G1000 (AVIONES_CHECKLIST.da40 en checklistAviones.ts). Pesos en kg y presiones en bar, como su AFM.
+const DA40: PreguntaTipo[] = [
+  // ---------- Velocidades ----------
+  { id: "da40-v1", area: "Velocidades", pregunta: "Con la masa máxima de 1,280 kg, ¿a qué velocidad se rota con flaps T/O?", opciones: ["56 KIAS", "62 KIAS", "67 KIAS", "72 KIAS"], correcta: 2 },
+  { id: "da40-v2", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor tasa de ascenso (Vy) con flaps T/O?", opciones: ["67 KIAS", "72 KIAS", "80 KIAS", "88 KIAS"], correcta: 1 },
+  { id: "da40-v3", area: "Velocidades", pregunta: "¿A qué velocidad se hace el ascenso de crucero, con flaps arriba?", opciones: ["72 KIAS", "80 KIAS", "88 KIAS", "101 KIAS"], correcta: 2 },
+  { id: "da40-v4", area: "Velocidades", pregunta: "¿Cuál es la velocidad de mejor planeo, con flaps arriba?", opciones: ["68 KIAS", "73 KIAS", "80 KIAS", "88 KIAS"], correcta: 3 },
+  { id: "da40-v5", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima con flaps en T/O?", opciones: ["98 KIAS", "110 KIAS", "113 KIAS", "130 KIAS"], correcta: 1 },
+  { id: "da40-v6", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima con flaps en LDG?", opciones: ["85 KIAS", "92 KIAS", "98 KIAS", "110 KIAS"], correcta: 2 },
+  { id: "da40-v7", area: "Velocidades", pregunta: "¿Cuál es la velocidad que nunca debe excederse (Vne)?", opciones: ["149 KIAS", "163 KIAS", "172 KIAS", "178 KIAS"], correcta: 2 },
+  { id: "da40-v8", area: "Velocidades", pregunta: "¿Cuál es la velocidad máxima estructural normal (Vno)?", opciones: ["120 KIAS", "129 KIAS", "130 KIAS", "140 KIAS"], correcta: 2 },
+  { id: "da40-v9", area: "Velocidades", pregunta: "Con más de 1,180 kg, ¿cuál es la velocidad de maniobra (Va)?", opciones: ["101 KIAS", "105 KIAS", "108 KIAS", "113 KIAS"], correcta: 3 },
+  { id: "da40-v10", area: "Velocidades", pregunta: "A 1,200 kg, ¿cuál es la velocidad de pérdida con flaps en LDG?", opciones: ["49 KIAS", "55 KIAS", "59 KIAS", "64 KIAS"], correcta: 2 },
+
+  // ---------- Limitaciones ----------
+  { id: "da40-l1", area: "Limitaciones", pregunta: "¿Cuál es la masa máxima de despegue estándar del DA40 NG?", opciones: ["940 kg", "1,150 kg", "1,280 kg", "1,500 kg"], correcta: 2 },
+  { id: "da40-l2", area: "Limitaciones", pregunta: "¿Cuánto equipaje admite como máximo (estándar)?", opciones: ["20 kg", "30 kg", "45 kg", "54 kg"], correcta: 1 },
+  { id: "da40-l3", area: "Limitaciones", pregunta: "¿Cuál es la RPM máxima continua?", opciones: ["2,100 RPM", "2,300 RPM", "2,500 RPM", "2,700 RPM"], correcta: 0 },
+  { id: "da40-l4", area: "Limitaciones", pregunta: "¿Cuánto tiempo se permite la RPM máxima de despegue de 2,300 RPM?", opciones: ["1 minuto", "5 minutos", "10 minutos", "Sin límite"], correcta: 1 },
+  { id: "da40-l5", area: "Limitaciones", pregunta: "¿Cuál es la temperatura máxima del refrigerante?", opciones: ["95 °C", "105 °C", "120 °C", "140 °C"], correcta: 1 },
+  { id: "da40-l6", area: "Limitaciones", pregunta: "¿Cuál es la temperatura máxima del aceite?", opciones: ["105 °C", "118 °C", "135 °C", "140 °C"], correcta: 3 },
+  { id: "da40-l7", area: "Limitaciones", pregunta: "¿Cuál es la altitud máxima de operación?", opciones: ["12,500 ft", "14,000 ft", "16,400 ft", "18,000 ft"], correcta: 2 },
+  { id: "da40-l8", area: "Limitaciones", pregunta: "¿Cuál es el factor de carga límite (a Vo)?", opciones: ["+4.4 g / -1.76 g", "+3.8 g / -1.52 g", "+3.0 g / -1.2 g", "+6.0 g / -3.0 g"], correcta: 1 },
+  { id: "da40-l9", area: "Limitaciones", pregunta: "¿Se permiten las maniobras negativas intencionales?", opciones: ["Sí, sin límite", "Sí, hasta -1.52 g", "No: están prohibidas", "Solo con flaps arriba"], correcta: 2 },
+
+  // ---------- Sistemas ----------
+  { id: "da40-s1", area: "Sistemas", pregunta: "¿Qué motor lleva el DA40 NG?", opciones: ["Lycoming IO-360 a gasolina", "Austro E4, diésel con FADEC", "Continental O-200 a carburador", "Rotax 912 a gasolina"], correcta: 1 },
+  { id: "da40-s2", area: "Sistemas", pregunta: "¿Cómo se controla la potencia del motor?", opciones: ["Gases, mezcla y hélice por separado", "Una sola palanca de potencia; el FADEC hace el resto", "Gases y mezcla, con hélice fija", "Gases y calentador de carburador"], correcta: 1 },
+  { id: "da40-s3", area: "Sistemas", pregunta: "¿En qué posición va normalmente el interruptor VOTER?", opciones: ["ECU A", "ECU B", "AUTO", "OFF"], correcta: 2 },
+  { id: "da40-s4", area: "Sistemas", pregunta: "¿De qué tanque toma combustible el motor?", opciones: ["De los dos tanques a la vez", "Solo del tanque principal; el auxiliar se transfiere con una bomba", "Solo del auxiliar", "Del que elija el selector IZQUIERDA/DERECHA"], correcta: 1 },
+  { id: "da40-s5", area: "Sistemas", pregunta: "¿Por qué una falla eléctrica total también es una emergencia de motor?", opciones: ["Porque se apaga la bomba de aceite", "Porque el FADEC necesita electricidad para controlar el motor", "Porque se traba la hélice", "No lo es: el motor es independiente"], correcta: 1 },
+  { id: "da40-s6", area: "Sistemas", pregunta: "¿Qué tres interruptores maestros tiene el DA40 NG?", opciones: ["Batería, alternador y aviónica", "Eléctrico, Motor y Aviónica", "Master, magnetos y aviónica", "Batería, FADEC y combustible"], correcta: 1 },
+  { id: "da40-s7", area: "Sistemas", pregunta: "¿Para qué sirve la luz GLOW antes de arrancar?", opciones: ["Indica que el aceite está caliente", "Es el precalentamiento del diésel: se espera a que se apague para arrancar", "Avisa que la batería está baja", "Indica que el FADEC está en prueba"], correcta: 1 },
+  { id: "da40-s8", area: "Sistemas", pregunta: "¿Por qué se deja el canopy en posición 1 o 2 en tierra antes de arrancar?", opciones: ["Para entrar más rápido", "Deja un hueco de ventilación para no sobrecalentar motor y aviónica en tierra", "Para escuchar la hélice", "Es obligatorio para la prueba de ECU"], correcta: 1 },
+
+  // ---------- Procedimientos normales ----------
+  { id: "da40-n1", area: "Procedimientos normales", pregunta: "¿Cuánto tiempo máximo puede operar seguido el motor de arranque?", opciones: ["3 segundos", "10 segundos", "30 segundos", "Sin límite"], correcta: 1 },
+  { id: "da40-n2", area: "Procedimientos normales", pregunta: "Después del arranque, ¿en cuánto tiempo debe salir la presión de aceite del rango rojo?", opciones: ["3 segundos", "15 segundos", "30 segundos", "1 minuto"], correcta: 0 },
+  { id: "da40-n3", area: "Procedimientos normales", pregunta: "¿Qué verifica la prueba de ECU antes del despegue?", opciones: ["Que la hélice gire libre", "Que los dos canales del FADEC (A y B) funcionen", "Que haya combustible en el auxiliar", "Que el G1000 tenga la base de datos vigente"], correcta: 1 },
+  { id: "da40-n4", area: "Procedimientos normales", pregunta: "En el chequeo de potencia con la palanca en MAX, ¿qué RPM debe estabilizar?", opciones: ["1,800–1,900 RPM", "2,000–2,100 RPM", "2,200–2,300 RPM", "2,400–2,500 RPM"], correcta: 2 },
+  { id: "da40-n5", area: "Procedimientos normales", pregunta: "Al terminar la prueba de ECU, una luz ECU A FAIL sigue encendida. ¿Qué haces?", opciones: ["Despegar con el VOTER en ECU B", "No volar", "Reiniciar el G1000 y despegar", "Despegar y vigilarla en vuelo"], correcta: 1 },
+  { id: "da40-n6", area: "Procedimientos normales", pregunta: "Ya en altura segura tras el despegue, ¿a qué carga se reduce la potencia?", opciones: ["75 %", "85 %", "92 %", "100 %"], correcta: 2 },
+  { id: "da40-n7", area: "Procedimientos normales", pregunta: "¿Qué se hace antes de apagar el motor?", opciones: ["Nada: se apaga de inmediato", "1 minuto a 10 % de carga para enfriar el turbocompresor", "5 minutos a 50 % de carga", "Subir a MAX un momento"], correcta: 1 },
+  { id: "da40-n8", area: "Procedimientos normales", pregunta: "¿Cómo se apaga correctamente el motor?", opciones: ["Cerrando la válvula de combustible", "Con el interruptor Motor (ENGINE MASTER) en OFF", "Con la palanca de potencia en IDLE", "Con el Eléctrico en OFF"], correcta: 1 },
+  { id: "da40-n9", area: "Procedimientos normales", pregunta: "¿Cómo se verifica la cantidad de combustible en el prevuelo?", opciones: ["Mirando por la tapa del tanque", "Con un medio alterno, no por la tapa", "Solo con el indicador del G1000", "No hace falta: el FADEC lo calcula"], correcta: 1 },
+
+  // ---------- Emergencias ----------
+  { id: "da40-e1", area: "Emergencias", pregunta: "Falla el motor en el despegue y ya no puedes abortar. ¿Qué haces primero?", opciones: ["Virar de regreso a la pista", "Picar de inmediato para no perder velocidad", "Subir la nariz para ganar altura", "Cambiar el VOTER a ECU A"], correcta: 1 },
+  { id: "da40-e2", area: "Emergencias", pregunta: "Falla de motor en vuelo. ¿Qué velocidad y flaps buscas?", opciones: ["72 KIAS, flaps T/O", "80 KIAS, flaps LDG", "88 KIAS, flaps arriba", "101 KIAS, flaps arriba"], correcta: 2 },
+  { id: "da40-e3", area: "Emergencias", pregunta: "¿Por qué el reencendido deja de ser confiable después de unos 2 minutos?", opciones: ["Porque se descarga la batería", "Porque el motor se enfría demasiado", "Porque el FADEC se bloquea", "Porque se vacía el tanque principal"], correcta: 1 },
+  { id: "da40-e4", area: "Emergencias", pregunta: "El motor sigue sin encender con la válvula en NORMAL. ¿Qué intentas?", opciones: ["Válvula de combustible en EMERGENCY", "Mezcla en RICA", "Calentador de carburador ON", "VOTER en OFF"], correcta: 0 },
+  { id: "da40-e5", area: "Emergencias", pregunta: "Avisan ECU A y ECU B a la vez y el motor va áspero. ¿Qué haces con la potencia?", opciones: ["MAX y dejarla así", "IDLE 1 segundo y luego subir despacio sin pasar de 1,975 RPM", "Apagar el motor de inmediato", "No tocarla"], correcta: 1 },
+  { id: "da40-e6", area: "Emergencias", pregunta: "La hélice entra en sobrevelocidad. ¿Qué RPM no debes pasar?", opciones: ["2,100 RPM", "2,300 RPM", "2,500 RPM", "2,700 RPM"], correcta: 1 },
+  { id: "da40-e7", area: "Emergencias", pregunta: "Falla la bomba de transferencia y pusiste la válvula en EMERGENCY. ¿Cuándo la regresas a NORMAL?", opciones: ["Nunca, hasta aterrizar", "Antes de que el tanque auxiliar llegue a cero", "Cuando el principal esté vacío", "Después de 10 minutos"], correcta: 1 },
+  { id: "da40-e8", area: "Emergencias", pregunta: "Fuego de motor en vuelo. Con el sitio de aterrizaje seleccionado, ¿qué haces?", opciones: ["Válvula de combustible OFF, potencia MAX y aterrizar de inmediato", "Encender la calefacción de cabina", "Subir a 16,400 ft", "Seguir al aeropuerto de destino"], correcta: 0 },
+  { id: "da40-e9", area: "Emergencias", pregunta: "Hay fuego al arrancar en tierra. ¿Qué haces?", opciones: ["Seguir girando el arrancador", "Cortar combustible, Motor y Eléctrico, abrir el canopy y evacuar", "Subir la potencia a MAX", "Esperar a que se apague solo"], correcta: 1 },
+];
+
 export const EXAMENES_TIPO: ExamenTipo[] = [
   { clave: "c152", modelo: "Cessna 152", gratis: true, preguntas: C152 },
   { clave: "c172", modelo: "Cessna 172", gratis: false, preguntas: C172 },
+  { clave: "da40", modelo: "Diamond DA40 NG", gratis: false, preguntas: DA40 },
 ];
 
 export function examenTipo(clave: string | undefined) {
