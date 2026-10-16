@@ -6,6 +6,9 @@ import { Container } from "../components/ui/Container";
 import { HotspotDiagram } from "../features/academia/HotspotDiagram";
 import { useAuth } from "../features/auth/AuthContext";
 import { PruebaVOR } from "../features/landing/PruebaVOR";
+import { FondoHero } from "../features/home/FondoHero";
+import { EtapasConFoto, type Etapa } from "../features/home/EtapasRuta";
+import { fotoFlota } from "../data/flota";
 import { ROUTES } from "../lib/routes";
 
 /**
@@ -14,27 +17,36 @@ import { ROUTES } from "../lib/routes";
  * un video de 30 segundos; cada enlace extra es una salida.
  */
 
-const TEMAS = [
+const TEMAS: Etapa[] = [
   {
-    nombre: "Navegación",
-    detalle:
-      "VOR, radiales, CDI y OBS; interceptación y tracking; DME, HSI, ADF, arcos DME y patrones de espera.",
+    titulo: "Navegación",
+    texto: "VOR, radiales, CDI y OBS; interceptación y tracking; DME, HSI, ADF, arcos DME y patrones de espera.",
+    img: fotoFlota("c152"),
+    alt: "Cessna 152 en vuelo, captura de simulador",
   },
   {
-    nombre: "Comunicaciones",
-    detalle: "Fraseología de radio con audio para practicar en voz alta, y el circuito de tráfico paso a paso.",
+    titulo: "Comunicaciones",
+    texto: "Fraseología de radio con audio para practicar en voz alta, y el circuito de tráfico paso a paso.",
+    img: fotoFlota("da40"),
+    alt: "Diamond DA40 en vuelo, captura de simulador",
   },
   {
-    nombre: "Instrumentos",
-    detalle: "El Six Pack instrumento por instrumento, y qué pasa cuando falla el vacío, el pitot o la estática.",
+    titulo: "Instrumentos",
+    texto: "El Six Pack instrumento por instrumento, y qué pasa cuando falla el vacío, el pitot o la estática.",
+    img: { src: "/images/paneles/c172-panel.webp" },
+    alt: "Panel de instrumentos de un Cessna 172, captura de simulador",
   },
   {
-    nombre: "Meteorología",
-    detalle: "Leer un METAR y un TAF, y decidir si vuelas o no vuelas.",
+    titulo: "Meteorología",
+    texto: "Leer un METAR y un TAF, y decidir si vuelas o no vuelas.",
+    img: { src: "/images/msfs-sunset-wing.jpg" },
+    alt: "Ala de avión sobre las nubes al atardecer, captura de simulador",
   },
   {
-    nombre: "IFR",
-    detalle: "Aproximaciones, mínimos, y qué hacer cuando llegas a la altura de decisión sin ver la pista.",
+    titulo: "IFR",
+    texto: "Aproximaciones, mínimos, y qué hacer cuando llegas a la altura de decisión sin ver la pista.",
+    img: fotoFlota("c90"),
+    alt: "King Air C90 en vuelo, captura de simulador",
   },
 ];
 
@@ -80,22 +92,10 @@ export function Empieza() {
     <div className="pb-24 md:pb-0">
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0" aria-hidden="true">
-          <img
-            src="/images/msfs-xbvla-farmland-1280.jpg"
-            srcSet="/images/msfs-xbvla-farmland-1280.jpg 1280w, /images/msfs-xbvla-farmland.jpg 1920w"
-            sizes="100vw"
-            alt=""
-            fetchPriority="high"
-            className="h-full w-full object-cover opacity-60"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-navy-950/60 via-navy-950/50 to-navy-950" />
-          <div className="absolute inset-0 bg-gradient-to-r from-navy-950/70 via-navy-950/25 to-transparent" />
-          <div className="absolute inset-0 bg-grid opacity-30" />
-        </div>
+        <FondoHero />
 
         <div className="relative">
-          <Container className="pt-6 sm:pt-8">
+          <div className="mx-auto w-full max-w-[100rem] px-6 pt-6 sm:pt-8 md:px-8 lg:px-10">
             <img
               src="/images/logo-horizontal-sm.png"
               alt="Villanueva Aviation"
@@ -103,9 +103,9 @@ export function Empieza() {
               height="166"
               className="h-auto w-40 sm:w-48"
             />
-          </Container>
+          </div>
 
-          <Container className="grid gap-10 pb-16 pt-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-14 lg:pb-24 lg:pt-14">
+          <div className="mx-auto grid w-full max-w-[100rem] gap-10 px-6 pb-16 pt-10 md:px-8 lg:grid-cols-[1.05fr_minmax(0,30rem)] lg:items-start lg:gap-16 lg:px-10 lg:pb-24 lg:pt-14">
             <div className="lg:pt-8">
               <h1
                 className="animate-fade-up font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-white text-balance sm:text-5xl lg:text-6xl"
@@ -146,28 +146,16 @@ export function Empieza() {
             <div ref={tarjeta} className="animate-fade-up" style={{ animationDelay: "180ms" }}>
               <PruebaVOR href={irEmpezar} />
             </div>
-          </Container>
+          </div>
         </div>
       </section>
 
       {/* QUÉ VAS A APRENDER */}
-      <section className="border-t border-white/10 py-16 md:py-24">
-        <Container>
-          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-            <h2 className="font-display text-3xl font-bold leading-tight text-white text-balance sm:text-4xl">
-              Del primer radial a la aproximación IFR
-            </h2>
-            <ul className="divide-y divide-white/10 border-y border-white/10">
-              {TEMAS.map((t) => (
-                <li key={t.nombre} className="grid gap-1 py-5 sm:grid-cols-[11rem_1fr] sm:gap-6">
-                  <h3 className="font-display text-lg font-semibold text-white">{t.nombre}</h3>
-                  <p className="text-sm leading-relaxed text-white/70">{t.detalle}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Container>
-      </section>
+      <EtapasConFoto
+        titulo="Del primer radial a la aproximación IFR"
+        descripcion="Lo que vas a aprender, en el orden en que lo vas a necesitar en la cabina."
+        etapas={TEMAS}
+      />
 
       {/* PRÁCTICA REAL */}
       <section className="border-t border-white/10 py-16 md:py-24">

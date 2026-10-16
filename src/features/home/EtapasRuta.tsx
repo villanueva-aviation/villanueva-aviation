@@ -7,42 +7,61 @@ import { ACADEMIA_MODULOS } from "../../data/academia";
 import { EXAMENES_TIPO } from "../../data/examenesTipo";
 import { TOTAL_AVIONES, fotoFlota } from "../../data/flota";
 
-const ETAPAS = [
+export interface Etapa {
+  titulo: string;
+  texto: string;
+  img: { src: string; srcSet?: string };
+  alt: string;
+  cta?: { label: string; to: string };
+}
+
+const ETAPAS_INICIO: Etapa[] = [
   {
     titulo: "Descubre tu nivel",
     texto: "Doce preguntas de seis áreas, en unos tres minutos y sin crear cuenta. Ves tu nivel, tus puntos fuertes y por dónde te conviene seguir.",
     cta: { label: "Hacer el test", to: ROUTES.testNivel },
-    foto: "c152",
+    img: fotoFlota("c152"),
     alt: "Cessna 152 XB-CDT en vuelo, captura de simulador",
   },
   {
     titulo: "Aprende la teoría",
     texto: `${ACADEMIA_MODULOS.length} módulos, de Fundamentos a IFR: lecciones, ejercicios interactivos y un proyecto final que el fundador revisa en persona. Gratis.`,
     cta: { label: "Ver la Academia", to: ROUTES.academia },
-    foto: "c172",
+    img: fotoFlota("c172"),
     alt: "Cessna 172 XB-VNA en vuelo, captura de simulador",
   },
   {
     titulo: "Practica en tu simulador",
     texto: `Checklists de ${TOTAL_AVIONES} aviones, exámenes de ${EXAMENES_TIPO.length} modelos, rutas de México con su plan de vuelo listo para cargar y un briefing con el METAR real.`,
     cta: { label: "Ver la flota", to: ROUTES.flota },
-    foto: "seneca",
+    img: fotoFlota("seneca"),
     alt: "Piper Seneca XB-SNV en vuelo, captura de simulador",
   },
   {
     titulo: "Vuela con acompañamiento",
     texto: "Asesorías 1 a 1 por Discord, con un plan escrito para ti. Empiezas con un diagnóstico gratis de 30 minutos.",
     cta: { label: "Ver asesorías", to: ROUTES.asesorias },
-    foto: "c90",
+    img: fotoFlota("c90"),
     alt: "King Air C90 XB-KNG en vuelo, captura de simulador",
   },
 ];
 
 const n = (i: number) => String(i + 1).padStart(2, "0");
-const TOTAL = n(ETAPAS.length - 1);
 
-/** La ruta del cadete en cuatro etapas: en escritorio la foto se queda fija y cambia al bajar. */
+/** La ruta del cadete en el inicio. */
 export function EtapasRuta() {
+  return (
+    <EtapasConFoto
+      titulo="Tu ruta, etapa por etapa"
+      descripcion="Del primer test a volar con un plan hecho para ti. Cada etapa se puede hacer por separado y a tu ritmo."
+      etapas={ETAPAS_INICIO}
+    />
+  );
+}
+
+/** Etapas con foto: en escritorio la foto se queda fija y cambia al bajar; en celular cada etapa trae la suya. */
+export function EtapasConFoto({ titulo, descripcion, etapas }: { titulo: string; descripcion?: string; etapas: Etapa[] }) {
+  const TOTAL = n(etapas.length - 1);
   const [activa, setActiva] = useState(0);
   const bloques = useRef<(HTMLElement | null)[]>([]);
 
@@ -61,23 +80,19 @@ export function EtapasRuta() {
     <section className="border-t border-white/10 py-20 md:py-28">
       <Container>
         <div className="max-w-2xl">
-          <h2 className="font-display text-3xl font-bold leading-tight text-white text-balance sm:text-4xl">
-            Tu ruta, etapa por etapa
-          </h2>
-          <p className="mt-4 text-base leading-relaxed text-white/65">
-            Del primer test a volar con un plan hecho para ti. Cada etapa se puede hacer por separado y a tu ritmo.
-          </p>
+          <h2 className="font-display text-3xl font-bold leading-tight text-white text-balance sm:text-4xl">{titulo}</h2>
+          {descripcion && <p className="mt-4 text-base leading-relaxed text-white/65">{descripcion}</p>}
         </div>
 
         <div className="mt-12 grid gap-10 lg:mt-4 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
           {/* Foto fija (escritorio) */}
           <div className="hidden lg:block">
             <div className="sticky top-24 h-[min(72vh,640px)] overflow-hidden rounded-3xl border border-white/10">
-              {ETAPAS.map((e, i) => (
+              {etapas.map((e, i) => (
                 <img
-                  key={e.foto}
-                  src={fotoFlota(e.foto).src}
-                  srcSet={fotoFlota(e.foto).srcSet}
+                  key={e.titulo}
+                  src={e.img.src}
+                  srcSet={e.img.srcSet}
                   sizes="55vw"
                   alt={i === activa ? e.alt : ""}
                   aria-hidden={i !== activa}
@@ -92,9 +107,9 @@ export function EtapasRuta() {
                 <p className="font-display text-sm font-semibold tabular-nums tracking-[0.2em] text-gold-400">
                   ETAPA {n(activa)} <span className="text-white/45">/ {TOTAL}</span>
                 </p>
-                <div className="mt-3 grid grid-cols-4 gap-2" aria-hidden="true">
-                  {ETAPAS.map((e, i) => (
-                    <span key={e.foto} className="h-[3px] overflow-hidden rounded-full bg-white/20">
+                <div className="mt-3 grid gap-2" style={{ gridTemplateColumns: `repeat(${etapas.length}, minmax(0, 1fr))` }} aria-hidden="true">
+                  {etapas.map((e, i) => (
+                    <span key={e.titulo} className="h-[3px] overflow-hidden rounded-full bg-white/20">
                       <span
                         className={`block h-full origin-left bg-gold-500 transition-transform duration-500 ease-out motion-reduce:transition-none ${i <= activa ? "scale-x-100" : "scale-x-0"}`}
                       />
@@ -107,9 +122,9 @@ export function EtapasRuta() {
 
           {/* Texto de cada etapa */}
           <div>
-            {ETAPAS.map((e, i) => (
+            {etapas.map((e, i) => (
               <article
-                key={e.foto}
+                key={e.titulo}
                 ref={(el) => {
                   bloques.current[i] = el;
                 }}
@@ -117,8 +132,8 @@ export function EtapasRuta() {
                 className="flex flex-col justify-center border-t border-white/10 py-10 first:border-t-0 lg:min-h-[min(72vh,640px)] lg:border-t-0 lg:py-0"
               >
                 <img
-                  src={fotoFlota(e.foto).src}
-                  srcSet={fotoFlota(e.foto).srcSet}
+                  src={e.img.src}
+                  srcSet={e.img.srcSet}
                   sizes="100vw"
                   alt={e.alt}
                   loading="lazy"
@@ -133,11 +148,13 @@ export function EtapasRuta() {
                 </p>
                 <h3 className="mt-3 font-display text-2xl font-bold text-white sm:text-3xl">{e.titulo}</h3>
                 <p className="mt-4 max-w-md text-base leading-relaxed text-white/65">{e.texto}</p>
-                <div className="mt-6">
-                  <Button to={e.cta.to} variant="secondary">
-                    {e.cta.label} <ArrowRight size={16} />
-                  </Button>
-                </div>
+                {e.cta && (
+                  <div className="mt-6">
+                    <Button to={e.cta.to} variant="secondary">
+                      {e.cta.label} <ArrowRight size={16} />
+                    </Button>
+                  </div>
+                )}
               </article>
             ))}
           </div>

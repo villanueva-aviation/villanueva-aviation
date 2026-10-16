@@ -89,7 +89,7 @@ export function PruebaVOR({
       <PFD rumbo={vuelo.rumbo} desviacion={vuelo.desviacion} marcador={vuelo.marcador} alabeo={vuelo.alabeo} />
     </div>
   ) : (
-    <div className="mx-auto mt-4 w-full max-w-[17rem]">
+    <div className="mx-auto mt-4 w-full max-w-[20rem]">
       <HSI rumbo={vuelo.rumbo} desviacion={vuelo.desviacion} marcador={vuelo.marcador} />
     </div>
   );
