@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
@@ -6,7 +6,8 @@ import { SuscribirseForm } from "../features/newsletter/SuscribirseForm";
 import { PREGUNTAS_TEST } from "../data/testNivel";
 import { areaMasDebil, MODULO_DE_AREA, nivelTest, resumenPorArea, type NivelTest, type RespuestaTest } from "../features/testNivel/reglas";
 import { ROUTES } from "../lib/routes";
-import { AREAS_TEST } from "../features/testNivel/reglas";
+import { AREAS_TEST, filaResultado, fuenteDeEnlace } from "../features/testNivel/reglas";
+import { supabase } from "../lib/supabaseClient";
 import { Medidor, type Banda } from "../features/testNivel/Medidor";
 
 const TOTAL = PREGUNTAS_TEST.length;
@@ -44,6 +45,18 @@ export function TestNivel() {
     window.scrollTo({ top: 0 });
   }, [paso]);
 
+  // Al terminar, se guarda el resultado anónimo una sola vez por intento. Si falla, la persona no se entera.
+  const guardado = useRef(false);
+  useEffect(() => {
+    if (paso !== TOTAL || guardado.current) return;
+    guardado.current = true;
+    // El builder de Supabase no se ejecuta hasta que se le pide el resultado: por eso el .then.
+    supabase
+      .from("resultados_test_nivel")
+      .insert(filaResultado(respuestas, TOTAL, fuenteDeEnlace(window.location.search)))
+      .then(() => {});
+  }, [paso, respuestas]);
+
   function responder(opcion: number) {
     const p = PREGUNTAS_TEST[paso];
     setRespuestas([...respuestas, { area: p.area, acierto: opcion === p.correcta }]);
@@ -51,6 +64,7 @@ export function TestNivel() {
   }
 
   function reiniciar() {
+    guardado.current = false;
     setRespuestas([]);
     setPaso(-1);
   }

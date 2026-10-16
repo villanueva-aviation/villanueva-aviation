@@ -46,3 +46,20 @@ export function areaMasDebil(resumen: { area: AreaTest; aciertos: number; total:
   }
   return peor?.area ?? null;
 }
+
+/** `?ref=` del enlace, limpio para la columna `fuente` (minúsculas, números, guion; máximo 40). Si no sirve, null. */
+export function fuenteDeEnlace(busqueda: string): string | null {
+  const ref = new URLSearchParams(busqueda).get("ref")?.trim().toLowerCase() ?? "";
+  return /^[a-z0-9_-]{1,40}$/.test(ref) ? ref : null;
+}
+
+/** La fila anónima que se guarda al terminar el test: sin datos de la persona, solo aciertos. */
+export function filaResultado(respuestas: RespuestaTest[], total: number, fuente: string | null) {
+  const aciertos = respuestas.filter((r) => r.acierto).length;
+  return {
+    aciertos,
+    nivel: nivelTest(aciertos, total),
+    areas: Object.fromEntries(resumenPorArea(respuestas).map((r) => [r.area, r.aciertos])),
+    fuente,
+  };
+}
