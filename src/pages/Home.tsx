@@ -8,6 +8,8 @@ import { ROUTES } from "../lib/routes";
 import { PanelAventura } from "../features/aventura/PanelAventura";
 import { NavDisplay } from "../features/home/NavDisplay";
 import { EtapasRuta } from "../features/home/EtapasRuta";
+import { MetarEnVivo } from "../features/home/MetarEnVivo";
+import { FondoHero } from "../features/home/FondoHero";
 import { FLOTA, TOTAL_AVIONES, fotoFlota } from "../data/flota";
 
 // Uno por categoría: el primer vuelo, el salto a multimotor y el turbohélice.
@@ -19,11 +21,11 @@ export function Home() {
   return (
     <div>
       {/* HERO */}
-      <section className="relative overflow-hidden bg-radar">
-        <div className="absolute inset-0 bg-grid opacity-40" aria-hidden="true" />
-        <Container className="relative grid items-center gap-12 pb-16 pt-10 sm:pt-16 lg:min-h-[calc(100vh-6rem)] lg:py-12 lg:grid-cols-[1fr_1.05fr] lg:gap-14 lg:pb-20">
-          <div>
-            <h1 className="animate-fade-up font-display text-4xl font-extrabold leading-[1.04] tracking-tight text-white text-balance sm:text-5xl xl:text-6xl">
+      <section className="relative overflow-hidden bg-navy-950">
+        <FondoHero />
+        <div className="relative mx-auto grid w-full max-w-[100rem] items-center gap-12 px-6 pb-10 pt-10 sm:pt-16 md:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16 lg:px-10 lg:pb-6 lg:pt-6">
+          <div className="lg:max-w-xl">
+            <h1 className="animate-fade-up font-display text-4xl font-extrabold leading-[1.04] tracking-tight text-white text-balance sm:text-5xl xl:text-6xl 2xl:text-7xl">
               Aprende a volar <span className="text-gold-400">de verdad</span> en tu simulador
             </h1>
             <p className="animate-fade-up mt-6 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg" style={{ animationDelay: "60ms" }}>
@@ -43,10 +45,13 @@ export function Home() {
               El test es gratis, sin cuenta y toma unos 3 minutos.
             </p>
           </div>
-          <div className="animate-fade-up" style={{ animationDelay: "200ms" }}>
+          <div className="animate-fade-up w-full lg:max-w-[min(860px,calc((100svh-23rem)*1.25))] lg:justify-self-end" style={{ animationDelay: "200ms" }}>
             <NavDisplay />
           </div>
-        </Container>
+        </div>
+        <div className="relative mx-auto w-full max-w-[100rem] px-6 pb-6 md:px-8 lg:px-10">
+          <MetarEnVivo />
+        </div>
       </section>
 
       <EtapasRuta />

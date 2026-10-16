@@ -56,6 +56,11 @@ async function pedir<T>(tipo: "metar" | "taf", icao: string): Promise<T[]> {
   return Array.isArray(datos) ? (datos as T[]) : [];
 }
 
+/** Solo el METAR más reciente, o null si no hay reporte. */
+export async function consultarMetar(icao: string): Promise<Metar | null> {
+  return (await pedir<Metar>("metar", icao))[0] ?? null;
+}
+
 export async function consultarClima(icao: string) {
   const [m, t] = await Promise.allSettled([pedir<Metar>("metar", icao), pedir<Taf>("taf", icao)]);
   if (m.status === "rejected" && t.status === "rejected") throw new Error("servicio");
