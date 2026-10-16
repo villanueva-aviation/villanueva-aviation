@@ -23,6 +23,14 @@ export const PRECIO_CONTENIDO_EXCLUSIVO = "29.00";
 // Se cobran por PayPal al confirmar la cita, no desde el sitio.
 export const PRECIO_SESION_1A1 = "15.99";
 
+// Página de Asesorías: solo informativos (el cobro real sigue siendo por PayPal al confirmar la cita).
+// El precio de la sesión de 2 h es el doble de PRECIO_SESION_1A1, redondeado hacia abajo.
+export const PRECIO_SESION_2H = "32";
+export const PRECIO_PAQUETE_4_SESIONES = "120";
+// Cupos que se muestran en la página; deben ser ciertos, ajústalos a tus horas reales.
+export const DIAGNOSTICOS_POR_SEMANA = 3;
+export const ALUMNOS_NUEVOS_POR_MES = 5;
+
 export const CONTACT_EMAIL = "villanuevaaviation@gmail.com";
 
 // Horas registradas por el fundador en IVAO (6884 h 7 min al 25 sep 2026). Se ponen a mano: actualizar de vez en cuando.

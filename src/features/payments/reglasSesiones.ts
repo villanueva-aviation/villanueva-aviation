@@ -6,6 +6,9 @@ export const PREFIJO_PROYECTO_FINAL = "Proyecto final —";
 /** Prefijo del tema de las solicitudes de vuelo práctico de las insignias de avión (nivel Plata). */
 export const PREFIJO_INSIGNIA_PRACTICA = "Insignia práctica —";
 
+/** Prefijo del tema del diagnóstico gratuito de la página de Asesorías. */
+export const PREFIJO_DIAGNOSTICO = "Diagnóstico gratuito";
+
 /** Estados en los que la cita ya tiene fecha acordada y por tanto se cobra. */
 const ESTADOS_COBRABLES = ["confirmada", "completada"];
 
@@ -19,8 +22,15 @@ export function esInsigniaPractica(tema: string | null): boolean {
   return Boolean(tema?.startsWith(PREFIJO_INSIGNIA_PRACTICA));
 }
 
+/** El diagnóstico de Asesorías es gratis y no gasta la sesión incluida en Contenido Exclusivo. */
+export function esDiagnostico(tema: string | null): boolean {
+  return Boolean(tema?.startsWith(PREFIJO_DIAGNOSTICO));
+}
+
 export function esSesionCobrable(r: { tipo: string; tema: string | null; estado: string }): boolean {
-  return ESTADOS_COBRABLES.includes(r.estado) && !esProyectoFinal(r.tema) && !esInsigniaPractica(r.tema);
+  return (
+    ESTADOS_COBRABLES.includes(r.estado) && !esProyectoFinal(r.tema) && !esInsigniaPractica(r.tema) && !esDiagnostico(r.tema)
+  );
 }
 
 /**

@@ -1,4 +1,4 @@
-import { BookOpen, ClipboardCheck, Compass, Download, Home, Plane, PlaneTakeoff, Sparkles, UserCircle, Users, Waypoints } from "lucide-react";
+import { BookOpen, ClipboardCheck, Compass, Download, GraduationCap, Home, Plane, PlaneTakeoff, Sparkles, UserCircle, Users, Waypoints } from "lucide-react";
 
 export const ROUTES = {
   home: "/",
@@ -30,6 +30,9 @@ export const ROUTES = {
   simulacroVuelo: "/premium/simulacro-vuelo",
   practicaVuelo: "/premium/practica-de-vuelo",
   agendarCita: "/agendar-cita",
+  asesorias: "/asesorias",
+  testNivel: "/nivel",
+  diagnostico: "/asesorias/diagnostico",
   guiaVFR: "/guia-vfr",
   comunidad: "/comunidad",
   perfil: "/perfil",
@@ -59,6 +62,7 @@ export const NAV_LINKS = [
   { label: "Aventura", to: ROUTES.aventura, icon: Plane },
   // Fuera de la barra superior (ya no cabe en escritorio): aparece en el menú móvil y en el pie.
   { label: "Flota", to: ROUTES.flota, icon: PlaneTakeoff, soloMenus: true },
+  { label: "Asesorías", to: ROUTES.asesorias, icon: GraduationCap, soloMenus: true },
   { label: "Comunidad", to: ROUTES.comunidad, icon: Users },
 ];
 

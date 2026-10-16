@@ -129,8 +129,14 @@ export function Empieza() {
                 </div>
                 <p className="mt-3 text-sm text-white/65">Sin tarjeta. Entras con Google o con un enlace a tu correo.</p>
                 <Link
+                  to={ROUTES.testNivel}
+                  className="mt-6 block rounded text-sm text-gold-400 underline decoration-gold-400/40 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60 [@media(hover:hover)_and_(pointer:fine)]:hover:decoration-gold-400"
+                >
+                  ¿No sabes por dónde empezar? Descubre tu nivel en 3 minutos
+                </Link>
+                <Link
                   to={irNavegacion}
-                  className="mt-6 inline-block rounded text-sm text-white/70 underline decoration-white/30 underline-offset-4 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60 [@media(hover:hover)_and_(pointer:fine)]:hover:text-white [@media(hover:hover)_and_(pointer:fine)]:hover:decoration-gold-400"
+                  className="mt-3 inline-block rounded text-sm text-white/70 underline decoration-white/30 underline-offset-4 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60 [@media(hover:hover)_and_(pointer:fine)]:hover:text-white [@media(hover:hover)_and_(pointer:fine)]:hover:decoration-gold-400"
                 >
                   ¿Ya dominas lo básico? Empieza por Navegación (VOR)
                 </Link>

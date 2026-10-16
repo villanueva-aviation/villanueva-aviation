@@ -56,6 +56,9 @@ const AdminCadetes = lazy(() => import("./pages/AdminCadetes").then((m) => ({ de
 const Feedback = lazy(() => import("./pages/Feedback").then((m) => ({ default: m.Feedback })));
 const Legal = lazy(() => import("./pages/Legal").then((m) => ({ default: m.Legal })));
 const Empieza = lazy(() => import("./pages/Empieza").then((m) => ({ default: m.Empieza })));
+const TestNivel = lazy(() => import("./pages/TestNivel").then((m) => ({ default: m.TestNivel })));
+const Asesorias = lazy(() => import("./pages/Asesorias").then((m) => ({ default: m.Asesorias })));
+const Diagnostico = lazy(() => import("./pages/Diagnostico").then((m) => ({ default: m.Diagnostico })));
 const Ingresar = lazy(() => import("./pages/Ingresar").then((m) => ({ default: m.Ingresar })));
 const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m.NotFound })));
 
@@ -286,6 +289,16 @@ function RoutedContent() {
             }
           />
           <Route path={ROUTES.empieza} element={<Empieza />} />
+          <Route path={ROUTES.testNivel} element={<TestNivel />} />
+          <Route path={ROUTES.asesorias} element={<Asesorias />} />
+          <Route
+            path={ROUTES.diagnostico}
+            element={
+              <ProtectedRoute>
+                <Diagnostico />
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
