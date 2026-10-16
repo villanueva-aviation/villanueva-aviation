@@ -8,6 +8,7 @@ import { ROUTES } from "../lib/routes";
 import { PanelAventura } from "../features/aventura/PanelAventura";
 import { NavDisplay } from "../features/home/NavDisplay";
 import { EtapasRuta } from "../features/home/EtapasRuta";
+import { PruebaVOR } from "../features/landing/PruebaVOR";
 import { MetarEnVivo } from "../features/home/MetarEnVivo";
 import { FondoHero } from "../features/home/FondoHero";
 import { FLOTA, TOTAL_AVIONES, fotoFlota } from "../data/flota";
@@ -52,6 +53,13 @@ export function Home() {
         <div className="relative mx-auto w-full max-w-[100rem] px-6 pb-6 md:px-8 lg:px-10">
           <MetarEnVivo />
         </div>
+      </section>
+
+      {/* PRUEBA DEL HSI */}
+      <section className="border-t border-white/10 py-20 md:py-28">
+        <Container>
+          <PruebaVOR href={ROUTES.testNivel} cta="Haz el test completo" titulo="Pruébate: ¿hacia dónde viras?" ancho />
+        </Container>
       </section>
 
       <EtapasRuta />

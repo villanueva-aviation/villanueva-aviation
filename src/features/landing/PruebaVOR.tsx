@@ -1,111 +1,109 @@
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "../../components/ui/Button";
-import {
-  OPCIONES,
-  PUNTOS_POR_LADO,
-  SITUACION,
-  desviacionTras,
-  type Eleccion,
-} from "./datosPruebaVor";
+import { OPCIONES, SITUACION, desviacionTras, type Eleccion } from "./datosPruebaVor";
+import { HSI, useTransicion } from "./HSI";
+import { PFD } from "./PFD";
 
-const PASO = 14; // unidades del SVG por cada punto del CDI
-const CENTRO_X = 150;
-const CENTRO_Y = 92;
-
-/**
- * El CDI de la pregunta. La aguja es lo único que se mueve: parte dos puntos a
- * la derecha y termina donde dejaría el instrumento la decisión que tomes.
- */
-function CDI({ desviacion }: { desviacion: number }) {
-  const id = useId();
-  const centrada = desviacion === 0;
-  const puntos = Array.from({ length: PUNTOS_POR_LADO }, (_, i) => i + 1);
-
-  return (
-    <svg
-      viewBox="0 0 300 184"
-      className="h-auto w-full max-w-[17rem]"
-      role="img"
-      aria-label={
-        centrada
-          ? "CDI con la aguja centrada"
-          : `CDI con la aguja desviada ${desviacion} puntos a la derecha`
-      }
-    >
-      <defs>
-        <linearGradient id={`${id}-bisel`} x1="0" y1="0" x2="0.4" y2="1">
-          <stop offset="0" stopColor="#f0dfa4" />
-          <stop offset="0.45" stopColor="#D4AF37" />
-          <stop offset="1" stopColor="#6d5a1f" />
-        </linearGradient>
-        <clipPath id={`${id}-cara`}>
-          <circle cx={CENTRO_X} cy={CENTRO_Y} r="78" />
-        </clipPath>
-      </defs>
-
-      <circle cx={CENTRO_X} cy={CENTRO_Y} r="86" fill="#0c0f13" stroke={`url(#${id}-bisel)`} strokeWidth="7" />
-      <circle cx={CENTRO_X} cy={CENTRO_Y} r="78" fill="#12151a" />
-
-      <g clipPath={`url(#${id}-cara)`}>
-        <text x={CENTRO_X} y="38" textAnchor="middle" fontSize="15" letterSpacing="2" fill="#9aa4b2" fontFamily="Inter, sans-serif">
-          OBS 360
-        </text>
-
-        {puntos.flatMap((k) =>
-          [-1, 1].map((lado) => (
-            <circle key={`${k}${lado}`} cx={CENTRO_X + lado * k * PASO} cy={CENTRO_Y} r="3.6" fill="#8d97a6" />
-          )),
-        )}
-
-        <circle cx={CENTRO_X} cy={CENTRO_Y} r="8" fill="none" stroke="#D4AF37" strokeWidth="2" />
-
-        {/* La bandera va a la izquierda: la aguja solo se desvía hacia la derecha y nunca la cruza. */}
-        <path d="M 96 116 l 8 -12 l 8 12 Z" fill="#9aa4b2" />
-        <text x="104" y="135" textAnchor="middle" fontSize="15" letterSpacing="1.5" fill="#9aa4b2" fontFamily="Inter, sans-serif">
-          TO
-        </text>
-
-        <g
-          className="transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
-          style={{ transform: `translateX(${desviacion * PASO}px)` }}
-        >
-          <line
-            x1={CENTRO_X}
-            y1="50"
-            x2={CENTRO_X}
-            y2="134"
-            strokeWidth="5"
-            strokeLinecap="round"
-            className="transition-[stroke] duration-500 motion-reduce:transition-none"
-            stroke={centrada ? "#D4AF37" : "#F6F4EF"}
-          />
-        </g>
-      </g>
-    </svg>
-  );
+interface Objetivo {
+  valor: number;
+  ms: number;
 }
 
-export function PruebaVOR({ href }: { href: string }) {
+/**
+ * Anima el HSI según la decisión: al cargar el avión se va desviando a la izquierda del curso
+ * (la aguja se corre a la derecha); virar a la derecha intercepta y centra, virar a la izquierda
+ * la aleja, y el OBS no mueve al avión.
+ */
+function useVuelo(elegida: Eleccion | null) {
+  const [rumbo, setRumbo] = useState<Objetivo>({ valor: 2, ms: 0 });
+  const [desv, setDesv] = useState<Objetivo>({ valor: 0.5, ms: 0 });
+  const [marcador, setMarcador] = useState(360);
+  const [alabeo, setAlabeo] = useState(0); // grados, positivo = ala derecha abajo
+  const relojes = useRef<number[]>([]);
+
+  useEffect(() => {
+    const despues = (ms: number, f: () => void) => relojes.current.push(window.setTimeout(f, ms));
+    relojes.current.forEach(clearTimeout);
+    relojes.current = [];
+    const final = desviacionTras(elegida);
+
+    if (elegida === null || elegida === "obs") {
+      despues(elegida === null ? 400 : 0, () => {
+        setRumbo({ valor: 352, ms: elegida === null ? 2600 : 900 });
+        setDesv({ valor: final, ms: elegida === null ? 2600 : 900 });
+        setMarcador(360);
+        setAlabeo(-5);
+      });
+      despues(elegida === null ? 2400 : 700, () => setAlabeo(0));
+    } else if (elegida === "derecha") {
+      setRumbo({ valor: 30, ms: 1300 });
+      setMarcador(30);
+      setAlabeo(20);
+      despues(950, () => setAlabeo(0));
+      despues(1100, () => setDesv({ valor: final, ms: 1800 }));
+      despues(2900, () => {
+        setRumbo({ valor: 360, ms: 1300 });
+        setMarcador(360);
+        setAlabeo(-20);
+      });
+      despues(3850, () => setAlabeo(0));
+    } else {
+      setRumbo({ valor: 330, ms: 1300 });
+      setMarcador(330);
+      setAlabeo(-20);
+      despues(950, () => setAlabeo(0));
+      despues(900, () => setDesv({ valor: final, ms: 2000 }));
+    }
+    return () => relojes.current.forEach(clearTimeout);
+  }, [elegida]);
+
+  return {
+    rumbo: useTransicion(rumbo.valor, rumbo.ms, true),
+    desviacion: useTransicion(desv.valor, desv.ms),
+    marcador: useTransicion(marcador, 600, true),
+    alabeo: useTransicion(alabeo, 450),
+  };
+}
+
+export function PruebaVOR({
+  href,
+  cta = "Sigue con la lección 1",
+  titulo = "Prueba de 20 segundos",
+  ancho = false,
+}: {
+  href: string;
+  cta?: string;
+  titulo?: string;
+  /** Instrumento a la derecha y texto a la izquierda (inicio); si no, todo apilado (tarjeta de /empieza). */
+  ancho?: boolean;
+}) {
   const id = useId();
   const [elegida, setElegida] = useState<Eleccion | null>(null);
   const opcion = OPCIONES.find((o) => o.clave === elegida);
+  const vuelo = useVuelo(elegida);
 
-  return (
-    <section
-      aria-labelledby={`${id}-titulo`}
-      className="w-full rounded-2xl border border-white/10 bg-navy-950/85 p-5 sm:p-6"
-    >
-      <h2 id={`${id}-titulo`} className="font-display text-lg font-semibold text-white">
-        Prueba de 20 segundos
+  // Versión ancha: la pantalla de vuelo completa (se ve el alabeo); tarjeta angosta: solo el HSI.
+  const instrumento = ancho ? (
+    <div className="mx-auto w-full max-w-[40rem]">
+      <PFD rumbo={vuelo.rumbo} desviacion={vuelo.desviacion} marcador={vuelo.marcador} alabeo={vuelo.alabeo} />
+    </div>
+  ) : (
+    <div className="mx-auto mt-4 w-full max-w-[17rem]">
+      <HSI rumbo={vuelo.rumbo} desviacion={vuelo.desviacion} marcador={vuelo.marcador} />
+    </div>
+  );
+
+  const pregunta = (
+    <>
+      <h2 id={`${id}-titulo`} className={`font-display font-semibold text-white ${ancho ? "text-3xl sm:text-4xl" : "text-lg"}`}>
+        {titulo}
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-white/75">{SITUACION}</p>
+      <p className={`mt-3 leading-relaxed text-white/75 ${ancho ? "max-w-xl text-base" : "text-sm"}`}>{SITUACION}</p>
+      {/* En la versión ancha el instrumento va a la derecha; en pantallas chicas, aquí, antes de las opciones. */}
+      {ancho ? <div className="mt-6 lg:hidden">{instrumento}</div> : instrumento}
 
-      <div className="mt-4 flex justify-center">
-        <CDI desviacion={desviacionTras(elegida)} />
-      </div>
-
-      <p className="mt-2 font-display text-sm font-semibold text-white">¿Qué haces?</p>
+      <p className={`font-display text-sm font-semibold text-white ${ancho ? "mt-6" : "mt-2"}`}>¿Qué haces?</p>
       <div className="mt-3 flex flex-col gap-2" role="group" aria-label="¿Qué haces?">
         {OPCIONES.map((o) => {
           const activa = elegida === o.clave;
@@ -137,12 +135,27 @@ export function PruebaVOR({ href }: { href: string }) {
             </p>
             <p className="mt-1 text-sm leading-relaxed text-white/75">{opcion.explicacion}</p>
             <Button to={href} className="mt-4 w-full sm:w-auto">
-              Sigue con la lección 1
+              {cta}
               <ArrowRight size={16} />
             </Button>
           </div>
         )}
       </div>
+    </>
+  );
+
+  if (ancho) {
+    return (
+      <section aria-labelledby={`${id}-titulo`} className="grid items-center gap-10 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:gap-14">
+        <div className="max-w-xl">{pregunta}</div>
+        <div className="hidden lg:block">{instrumento}</div>
+      </section>
+    );
+  }
+
+  return (
+    <section aria-labelledby={`${id}-titulo`} className="w-full rounded-2xl border border-white/10 bg-navy-950/85 p-5 sm:p-6">
+      {pregunta}
     </section>
   );
 }
