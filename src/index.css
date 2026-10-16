@@ -129,6 +129,17 @@ body {
   color: transparent;
 }
 
+/* Aguja del test de nivel en espera: oscila alrededor de su posición (--giro). */
+@keyframes medidor-espera {
+  0%,
+  100% {
+    transform: rotate(calc(var(--giro) - 9deg));
+  }
+  50% {
+    transform: rotate(calc(var(--giro) + 9deg));
+  }
+}
+
 @keyframes fade-up {
   from {
     opacity: 0;
