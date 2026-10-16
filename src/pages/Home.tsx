@@ -1,143 +1,55 @@
-import { ArrowRight, Gauge, MessageCircle, PlayCircle, ShieldCheck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
 import { SectionHeading } from "../components/ui/SectionHeading";
-import { FeatureCard } from "../components/ui/FeatureCard";
 import { Reveal } from "../components/ui/Reveal";
-import { TrackerLine, type TrackerStage } from "../components/tracker/TrackerLine";
-import { DISCORD_URL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
-import { ACADEMIA_MODULOS } from "../data/academia";
 import { PanelAventura } from "../features/aventura/PanelAventura";
+import { NavDisplay } from "../features/home/NavDisplay";
+import { EtapasRuta } from "../features/home/EtapasRuta";
 import { FLOTA, TOTAL_AVIONES, fotoFlota } from "../data/flota";
-
-const RUTA_DEMO: TrackerStage[] = [
-  { id: "fundamentos", label: "Fundamentos", status: "bloqueado" },
-  { id: "teoria", label: "Teoría y meteorología", status: "bloqueado" },
-  { id: "simulacion", label: "Simulación práctica", status: "bloqueado" },
-  { id: "operacion", label: "Operación y procedimientos", status: "bloqueado" },
-  { id: "evaluacion", label: "Evaluación final", status: "bloqueado" },
-];
 
 // Uno por categoría: el primer vuelo, el salto a multimotor y el turbohélice.
 const ADELANTO_FLOTA = ["c152", "seneca", "c90"].map((clave) =>
   FLOTA.flatMap((etapa) => etapa.aviones).find((a) => a.clave === clave)!,
 );
 
-const POR_QUE_SIMULACION = [
-  {
-    icon: ShieldCheck,
-    titulo: "Practica sin riesgo",
-    descripcion: "Comete errores y aprende de ellos en un entorno controlado, antes de subir a una aeronave real.",
-  },
-  {
-    icon: PlayCircle,
-    titulo: "Aprende haciendo",
-    descripcion: "Diagramas interactivos, quizzes y simulaciones visuales en cada módulo.",
-  },
-  {
-    icon: Gauge,
-    titulo: "Seguimiento real de tu progreso",
-    descripcion: "Tracker, XP, logros y certificados que documentan tu avance como cadete.",
-  },
-];
-
 export function Home() {
   return (
     <div>
       {/* HERO */}
-      <section className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <video className="h-full w-full object-cover opacity-50" autoPlay muted loop playsInline poster="/images/msfs-xbvla-farmland.jpg">
-            <source src="/media/hero-xbvla-kingair.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-b from-navy-950/60 via-navy-950/55 to-navy-950" />
-          <div className="absolute inset-0 bg-grid opacity-30" />
-        </div>
-
-        <div className="relative z-10 flex flex-col items-center px-6 text-center">
-          <span className="animate-fade-up inline-flex items-center gap-1.5 rounded-full border border-gold-500/30 bg-gold-500/10 px-3 py-1 font-display text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-400 sm:gap-2 sm:px-4 sm:py-1.5 sm:text-xs sm:tracking-[0.25em]">
-            Academia aeronáutica digital
-          </span>
-
-          <h1
-            className="animate-fade-up mt-2 max-w-5xl font-display text-4xl font-extrabold uppercase leading-[0.95] tracking-tight text-white sm:mt-8 sm:text-5xl md:text-7xl lg:text-8xl"
-            style={{ animationDelay: "50ms" }}
-          >
-            Tu camino para ser <span className="text-shine">piloto</span>, antes de subirte al avión real
-          </h1>
-
-          <p
-            className="animate-fade-up mt-4 max-w-2xl text-sm leading-relaxed text-white/70 sm:mt-7 sm:text-base md:text-lg"
-            style={{ animationDelay: "100ms" }}
-          >
-            Te dijeron que ser piloto era caro, lejano y complicado. Aquí empiezas a construir la base
-            real —teoría y simulación— antes de pisar una escuela de vuelo.
-          </p>
-
-          <div className="animate-fade-up mt-6 flex flex-col items-center gap-3 sm:mt-10 sm:flex-row sm:gap-4" style={{ animationDelay: "150ms" }}>
-            <Button to={ROUTES.academia} variant="primary" className="group">
-              Comenzar formación
-              <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" />
-            </Button>
-            <Button href={DISCORD_URL} variant="secondary">
-              <MessageCircle size={16} />
-              Unirse a Discord
-            </Button>
+      <section className="relative overflow-hidden bg-radar">
+        <div className="absolute inset-0 bg-grid opacity-40" aria-hidden="true" />
+        <Container className="relative grid items-center gap-12 pb-16 pt-10 sm:pt-16 lg:min-h-[calc(100vh-6rem)] lg:py-12 lg:grid-cols-[1fr_1.05fr] lg:gap-14 lg:pb-20">
+          <div>
+            <h1 className="animate-fade-up font-display text-4xl font-extrabold leading-[1.04] tracking-tight text-white text-balance sm:text-5xl xl:text-6xl">
+              Aprende a volar <span className="text-gold-400">de verdad</span> en tu simulador
+            </h1>
+            <p className="animate-fade-up mt-6 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg" style={{ animationDelay: "60ms" }}>
+              Teoría real, procedimientos y radio, en español y con el simulador que ya tienes en casa. Cuando quieras ir más
+              rápido, el fundador te arma un plan a tu medida.
+            </p>
+            <div className="animate-fade-up mt-9 flex flex-col gap-3 sm:flex-row sm:items-center" style={{ animationDelay: "120ms" }}>
+              <Button to={ROUTES.testNivel} variant="primary" className="group">
+                Descubre tu nivel
+                <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+              </Button>
+              <Button to={ROUTES.asesorias} variant="secondary">
+                Asesorías 1 a 1
+              </Button>
+            </div>
+            <p className="animate-fade-up mt-4 text-sm text-white/55" style={{ animationDelay: "160ms" }}>
+              El test es gratis, sin cuenta y toma unos 3 minutos.
+            </p>
           </div>
-
-          <p
-            className="animate-fade-up mt-4 text-sm font-medium tracking-wide text-white/70 sm:mt-5"
-            style={{ animationDelay: "190ms" }}
-          >
-            <span className="font-display font-semibold uppercase tracking-wider text-gold-400">Crear tu cuenta es gratis</span>
-            {" "}— empieza a aprender en menos de un minuto
-          </p>
-
-          <div className="mt-8 flex justify-center sm:hidden">
-            <span className="inline-flex max-w-md items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-center font-sans text-[10px] font-normal text-white/70">
-              Captura real de simulador — Villanueva Aviation
-            </span>
-          </div>
-        </div>
-
-        <div className="absolute inset-x-0 bottom-8 z-10 hidden justify-center px-6 sm:flex">
-          <span className="inline-flex max-w-md items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-1.5 text-center font-sans text-xs font-normal text-white/70">
-            Captura real de simulador — Villanueva Aviation
-          </span>
-        </div>
-      </section>
-
-      {/* QUÉ ES */}
-      <section className="py-20 md:py-28">
-        <Container>
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-            <Reveal>
-              <SectionHeading
-                eyebrow="Qué es Villanueva Aviation"
-                title="Una academia digital para quienes sueñan con volar"
-                description="Villanueva Aviation es una plataforma de formación teórico-práctica pensada para futuros pilotos: fundamentos de aviación, meteorología, aerodinámica, navegación, VFR e IFR, con simulación de vuelo integrada a cada módulo."
-              />
-              <p className="mt-5 max-w-lg text-sm leading-relaxed text-white/55">
-                No es solo un curso: es un espacio donde puedes medir tu progreso, poner a prueba
-                tus conocimientos y llegar mejor preparado a tu escuela de vuelo.
-              </p>
-            </Reveal>
-            <Reveal delay={150} className="relative aspect-square overflow-hidden rounded-3xl border border-white/10">
-              <img
-                src={fotoFlota("c172").src}
-                srcSet={fotoFlota("c172").srcSet}
-                sizes="(min-width: 1024px) 40vw, 100vw"
-                alt="Cessna 172S XB-VNA en vuelo, captura de simulador"
-                loading="lazy"
-                className="h-full w-full object-cover object-[60%_50%]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-transparent to-transparent" />
-            </Reveal>
+          <div className="animate-fade-up" style={{ animationDelay: "200ms" }}>
+            <NavDisplay />
           </div>
         </Container>
       </section>
+
+      <EtapasRuta />
 
       {/* EL FUNDADOR */}
       <section className="relative overflow-hidden border-t border-white/10 py-20 md:py-28">
@@ -152,13 +64,10 @@ export function Home() {
               <div className="absolute inset-0 bg-gradient-to-t from-navy-950/80 via-transparent to-transparent" />
             </Reveal>
             <Reveal delay={150}>
-              <span className="mb-4 inline-block font-display text-xs font-semibold uppercase tracking-[0.25em] text-gold-500">
-                El piloto detrás de la academia
-              </span>
               <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
-                Un sueño. Un plan. <span className="text-shine">Una ruta.</span>
+                Un sueño. Un plan. <span className="text-gold-400">Una ruta.</span>
               </h2>
-              <div className="mt-6 border-l-2 border-gold-500 pl-5">
+              <div className="mt-6 border-l border-gold-500/60 pl-5">
                 <p className="font-display text-xl font-semibold leading-snug text-white sm:text-2xl">
                   "No es solo volar. Es vivir la aviación."
                 </p>
@@ -174,61 +83,6 @@ export function Home() {
               </p>
             </Reveal>
           </div>
-        </Container>
-      </section>
-
-      {/* POR QUÉ SIMULACIÓN */}
-      <section className="relative overflow-hidden border-t border-white/10 py-24 md:py-32">
-        <div className="absolute inset-0">
-          <img src="/images/msfs-sunset-wing.jpg" alt="" className="h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-navy-950/85" />
-          <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/60 to-navy-950/40" />
-        </div>
-        <Container className="relative z-10">
-          <Reveal>
-            <SectionHeading
-              eyebrow="Por qué simulación"
-              title="Aprende volando, antes de volar"
-              description="La simulación te permite convertir la teoría en experiencia práctica desde el primer día."
-              align="center"
-            />
-          </Reveal>
-          <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {POR_QUE_SIMULACION.map((f, i) => (
-              <Reveal key={f.titulo} delay={i * 120}>
-                <FeatureCard icon={f.icon} title={f.titulo} description={f.descripcion} />
-              </Reveal>
-            ))}
-          </div>
-          <Reveal delay={360} className="mt-14 flex justify-center">
-            <Button to={ROUTES.academia} variant="ghost">
-              Ver los {ACADEMIA_MODULOS.length} módulos <ArrowRight size={16} />
-            </Button>
-          </Reveal>
-        </Container>
-      </section>
-
-      {/* RUTA DE FORMACIÓN */}
-      <section className="relative overflow-hidden border-t border-white/10 py-20 md:py-28">
-        <div className="absolute inset-0">
-          <img src="/images/msfs-aeromexico-clouds.jpg" alt="" className="h-full w-full object-cover opacity-20" />
-          <div className="absolute inset-0 bg-navy-900/90" />
-        </div>
-        <Container className="relative z-10">
-          <Reveal>
-            <SectionHeading
-              eyebrow="Ruta de formación"
-              title="Un camino claro, de principio a fin"
-              description={`Un resumen de tus ${ACADEMIA_MODULOS.length} módulos, de Fundamentos a la evaluación final.`}
-              align="center"
-            />
-          </Reveal>
-          <Reveal delay={150} className="relative mx-auto mt-14 max-w-4xl rounded-3xl border border-white/10 bg-white/[0.02] p-8 md:p-12">
-            <span className="absolute right-6 top-6 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-display text-[10px] font-semibold uppercase tracking-[0.15em] text-white/40">
-              Vista de ejemplo
-            </span>
-            <TrackerLine stages={RUTA_DEMO} />
-          </Reveal>
         </Container>
       </section>
 
@@ -284,13 +138,15 @@ export function Home() {
                 Aquí empieza tu camino hacia la cabina
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-white/65">
-                Crea tu cuenta de cadete, explora la Academia y comienza a construir tu camino hacia
-                la cabina.
+                Descubre tu nivel en tres minutos y, cuando quieras, pide tu diagnóstico gratis para armar tu plan.
               </p>
-              <div className="mt-8 flex justify-center">
-                <Button to={ROUTES.academia} variant="primary" className="group">
-                  Comenzar formación
+              <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                <Button to={ROUTES.testNivel} variant="primary" className="group">
+                  Descubre tu nivel
                   <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+                </Button>
+                <Button to={ROUTES.diagnostico} variant="secondary">
+                  Pedir mi diagnóstico gratis
                 </Button>
               </div>
             </div>

@@ -315,11 +315,11 @@ function App() {
       <ProgressProvider>
         <div className="flex min-h-screen flex-col bg-navy-950">
           <ScrollToTop />
-          {!aterrizaje && <div className="print:hidden"><Navbar /></div>}
+          {!aterrizaje && <div className="contents print:hidden"><Navbar /></div>}
           <main className="flex-1">
             <RoutedContent />
           </main>
-          {!aterrizaje && <div className="print:hidden"><Footer /></div>}
+          {!aterrizaje && <div className="contents print:hidden"><Footer /></div>}
         </div>
       </ProgressProvider>
     </AuthProvider>

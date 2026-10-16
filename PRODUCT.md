@@ -8,48 +8,54 @@ web
 
 ## Users
 
-Aspiring pilots across Latin America (Spanish-speaking, not limited to Mexico), before they've enrolled in a physical flight school. The audience is a mix: total beginners with no aviation background, and people who already tinker with a home flight simulator (MSFS/X-Plane) or have picked up some theory on their own and want real structure. What they share is the job-to-be-done: decide whether they're actually ready to spend real money on flight-school hours ($150-250 USD/hour is typical), without having to guess.
+Two groups, both Spanish-speaking (Mexico first, then the rest of Latin America and Spain):
+
+- **Flight-sim enthusiasts (the real audience today).** Social data (Oct 2026): ~93% men, two thirds aged 35-64, following on Facebook (31.5k), Instagram (11.4k) and TikTok. They fly MSFS/X-Plane at home, often on IVAO/VATSIM, and want to fly *like a real pilot*: IFR, radio, procedures, a specific aircraft. They pay to fix a concrete thing they want to do now, not for "an academy".
+- **Aspiring pilots** before (or during) real ground school, who want structure and a way to check whether they are ready, including people preparing for a real theory exam.
+
+Most visitors arrive from a short Reel on their phone, curious, with no account and little patience.
 
 ## Product Purpose
 
-Villanueva Aviation is a digital ground-school academy that pairs structured theory (13 modules, from Fundamentos through IFR) with integrated flight-simulation practice and visible progress tracking, so a cadet arrives at a real flight school already prepared — spending fewer real-airplane hours on material they could master on the ground first. Success is a cadet completing a module's full arc (Lección → Interactividad → Práctica → Evaluación → Proyecto final) and feeling genuinely ready — backed by a personal review from the founder, not just a self-graded quiz.
+Villanueva Aviation is an independent digital academy that teaches real aviation theory through flight simulation, in Spanish. The free core (Academia of 14 modules, guides, checklists, tools, Discord) builds trust; the business is **personal guidance from the founder**: 1-on-1 sessions with a written plan made for each cadet. Success is a visitor discovering their level, starting to learn, and booking a free diagnostic that turns into paid sessions.
 
 ## Positioning
 
-Unlike Eddie Aviation Services (a Spanish-language recorded video course with no integrated simulator practice) and Sporty's Pilot Training (English-language, built for the US/FAA context), Villanueva Aviation requires a cadet to demonstrate what they learned — through simulator-integrated interactivities and a capstone project the founder personally reviews — before they ever pay for an hour of real flight time.
+Unlike recorded video courses (Eddie Aviation Services) and English/FAA-centred platforms (Sporty's), and unlike exam-bank platforms (FlightPath), Villanueva Aviation puts a real person in the loop: the founder reviews projects, runs sessions over Discord, and builds each cadet's plan, all inside the simulator the cadet already owns.
 
 ## Operating Context
 
-- **Academia**: 13 modules (Fundamentos, Meteorología, Aerodinámica, Navegación, Cartografía, Comunicaciones, Instrumentos, Rendimiento, VFR, Operación, Espacios Aéreos, Reglamentación, IFR), each stepping through Lección → Interactividad → Práctica → Evaluación → Proyecto final (a capstone the founder personally reviews).
-- **Contenido Exclusivo**: premium C172/C152 checklists with emergency memory flows and V-speeds, oral and in-flight checkride simulators mapped against the real FAA/ACS Areas of Operation, and a founder-review booking flow (Supabase-backed, RLS-scoped per cadet).
-- **Centro de Descargas**: branded PDF checklists (C172/C152), a VFR flight-planning guide, a real weight-and-balance calculator, an editable flight logbook.
-- **Mi Formación / Tracker / Evaluaciones**: dashboards showing a cadete's level, XP, progress, and exam history.
-- **Comunidad**: a Discord server that complements, not replaces, the Academia.
-- Auth is Supabase (magic link + Google OAuth); there is no payment or billing flow anywhere in the product today.
+- **Academia**: 14 modules (Fundamentos, Meteorología, Aerodinámica, Navegación 1 and 2, Cartografía, Comunicaciones, Instrumentos, Rendimiento, VFR, Operación, Espacios Aéreos, Reglamentación, IFR), each Lección → Interactividad → Práctica → Evaluación → Proyecto final (founder-reviewed).
+- **Funnel pages**: `/nivel` (public 12-question level test, no account), `/asesorias` (1-on-1 offer), `/asesorias/diagnostico` (free 30-min diagnostic request), `/empieza` (landing for social traffic).
+- **Aircraft**: a fleet of 10 aircraft flown in sim with the academy's XB- registrations (real in-sim photos exist for each); per-aircraft checklists and badge exams (Bronce/Plata/Oro) for 9 of them.
+- **Tools**: pilot briefing with live METAR/TAF, Mexican VFR route packs with .pln files, controls and cockpit-panel guides, Discord bot (/metar, /taf), an "Aventura" log of the founder's real sim flights.
+- **Contenido Exclusivo**: premium checklists, checkride simulators, paid aircraft exams, one included founder session.
+- Auth: Supabase (magic link + Google). Payments: PayPal.
 
 ## Capabilities and Constraints
 
-- Fully free today. No pricing, checkout, or subscription logic exists in the codebase. Whether to ever charge is an open, undecided business question — future work must not imply pricing, a "free plan" vs. "paid plan" distinction, or any monetization claim that doesn't exist yet.
-- Content must work for both total beginners and self-taught simulator hobbyists — it can't assume zero prior exposure, but also can't assume none of them have already picked up basics on their own.
-- Geographic/regulatory scope is Latin America broadly, not Mexico-only. Where content references a specific regulator (e.g. AFAC/RAC 61), treat it as one example among Latin American authorities, not the assumed default for every cadet.
-- Pre-launch: zero real, active cadets as of this writing. No usage data, completion rates, or retention numbers exist yet.
-- The founder (Erik Villanueva) is not a certified flight instructor and his real-world private pilot license has lapsed; his authority comes from serious self-directed study of real Private and (partial) Commercial pilot material, verified through IVAO's Senior Private Pilot exams (a virtual-aviation network, not a real-world certifying body). Nothing on the site may say or imply "instructor," "certified," or "CFI" about the founder's review role — use "the founder personally reviews" / "founder review" instead. This applies to capstone review, the AgendarCita booking flow, and any future content describing who evaluates a cadet's work.
+- **Pricing that exists (USD):** Contenido Exclusivo $29 one-time; extra 1-on-1 session $15.99/hour; asesorías shown as $32 per 2-hour session or $120 for 4 sessions; diagnostic free. Do not invent other prices, plans or discounts.
+- **Capacity is real and small:** the founder gives sessions ~2 hours a day. Scarcity copy (limited spots) must match the constants in `src/lib/constants.ts`.
+- Content must work for total beginners and for experienced simmers at once.
+- Regulatory scope is Latin America broadly; AFAC/RAC is one example, not the default.
+- **Never imply official status.** Villanueva Aviation is not a certified flight school and grants no licences. The founder is not a certified instructor (lapsed real-world PPL; 6,884 h on IVAO). Use "el fundador revisa personalmente", "asesoría", "preparación"; never "instructor certificado", "CFI", "licencia", or "piloto" as a title the site confers.
 
 ## Brand Commitments
 
 - Name: **Villanueva Aviation**. Founder: Erik Villanueva ("No es solo volar. Es vivir la aviación." / "El cielo no es el límite, es el comienzo.").
-- Tagline: "Aprende. Practica. Comunica. Vuela." (site); the logo mark itself carries "LEARN. NAVIGATE. FLY."
-- Palette: navy (`--color-navy-950 #060e1a`, `--color-navy-900 #0b1d34`) and gold (`--color-gold-500 #d4af37`). Typefaces: Sora (display/headings) and Inter (body).
-- Logo: compass + "V" + climbing-plane mark, transparent PNG, sits directly on the dark navbar/footer background (no card behind it).
+- Tagline: "Aprende. Practica. Comunica. Vuela."; the logo carries "LEARN. NAVIGATE. FLY."
+- Palette: navy (`#060e1a`, `#0b1d34`) and gold (`#d4af37`). Typefaces: Sora (display) and Inter (body).
+- Logo: compass + "V" + climbing plane, transparent PNG on the dark background.
+- Imagery: the founder's own in-sim captures of the XB- fleet. Prefer them over stock photos; label them as simulator captures.
 
 ## Evidence on Hand
 
-Real, shipped content exists: 13 modules with real quiz banks (221 questions total, hand-classified across Bloom's taxonomy levels), real branded PDF checklists and a VFR guide, a real weight-and-balance calculator, and checkride simulators whose coverage was audited against the actual FAA/ACS Areas of Operation. What does **not** exist yet: any real cadet testimonial, usage statistic, completion rate, or paying customer. Future work must not fabricate any of these — no invented quotes, no invented "X cadetes ya se unieron" numbers.
+Real (Oct 2026): 41 registered accounts, 19 started a lesson, 6 submitted a final project, 2 paid the $29 pack, and a first paying 1-on-1 IFR client from Spain (2 hours, $33). 6,884 h logged on IVAO. Social reach ~250k viewers/28 days on Facebook. No testimonial is approved for publication yet; use one only with the person's written permission. Never fabricate quotes, counts or results.
 
 ## Product Principles
 
-1. Prove readiness in simulation before spending real money on flight-school hours — that's the whole reason to exist.
-2. A real person closing the loop beats a self-graded quiz or a passive video — every capstone project is personally reviewed by the founder, not just scored.
-3. Built in Spanish for Latin America first, not a translated afterthought of an English-language product.
-4. Meet cadets wherever they start — total beginners and self-taught simulator hobbyists both belong here, without the content assuming either.
-5. Stay free until a deliberate decision says otherwise; don't let the product's identity quietly bake in a pricing model nobody has chosen yet.
+1. A real person closing the loop beats a self-graded quiz or a passive video.
+2. Meet people where they already are: in their own simulator, on their phone, curious after a Reel.
+3. Give real value free first (level test, Academia, tools); charge for personal time.
+4. Built in Spanish first, not a translation.
+5. Honest by default: real photos, real numbers, no implied certification.
