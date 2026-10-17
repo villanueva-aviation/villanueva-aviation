@@ -85,8 +85,9 @@ export function EtapasConFoto({ titulo, descripcion, etapas }: { titulo: string;
         </div>
 
         <div className="mt-12 grid gap-10 lg:mt-4 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-          {/* Foto fija (escritorio) */}
-          <div className="hidden lg:block">
+          {/* Foto fija (escritorio). Se sale del contenedor hacia el margen izquierdo (queda a 1.5rem de la orilla):
+              en su columna quedaba más alta que ancha y el recorte dejaba fuera la nariz de los aviones. */}
+          <div className="hidden lg:-ml-[calc(max(0px,(100vw_-_80rem)/2)_+_2.5rem)] lg:block">
             <div className="sticky top-24 h-[min(72vh,640px)] overflow-hidden rounded-3xl border border-white/10">
               {etapas.map((e, i) => (
                 <img
