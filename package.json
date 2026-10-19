@@ -8,23 +8,27 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test src/features/academia/phraseologyEvaluator.test.ts src/lib/clima.test.ts src/lib/discord.test.ts src/features/payments/reglasSesiones.test.ts src/data/checkpoints.test.ts src/data/widgetSets.test.ts src/features/progress/migrarProgreso.test.ts src/features/admin/contactoCadete.test.ts src/features/landing/datosPruebaVor.test.ts src/features/aventura/aventura.test.ts src/features/entrenador/esperas.test.ts src/features/examenesTipo/reglas.test.ts src/features/testNivel/reglas.test.ts src/features/home/navGeo.test.ts"
+    "test": "node --experimental-strip-types --test src/features/academia/phraseologyEvaluator.test.ts src/lib/clima.test.ts src/lib/discord.test.ts src/features/payments/reglasSesiones.test.ts src/data/checkpoints.test.ts src/data/widgetSets.test.ts src/features/progress/migrarProgreso.test.ts src/features/admin/contactoCadete.test.ts src/features/landing/datosPruebaVor.test.ts src/features/aventura/aventura.test.ts src/features/entrenador/esperas.test.ts src/features/examenesTipo/reglas.test.ts src/features/testNivel/reglas.test.ts src/features/home/navGeo.test.ts src/data/redRutas.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
+    "d3-geo": "^3.1.1",
     "framer-motion": "^13.2.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.37.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "react-router-dom": "^7.18.3"
+    "react-router-dom": "^7.18.3",
+    "topojson-client": "^3.1.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/d3-geo": "^3.1.0",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
+    "@types/topojson-client": "^3.1.5",
     "@vitejs/plugin-react": "^6.1.0",
     "autoprefixer": "^10.5.4",
     "oxlint": "^1.79.0",

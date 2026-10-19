@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { ArrowRight, Plane } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
@@ -5,6 +6,9 @@ import { Button } from "../components/ui/Button";
 import { Reveal } from "../components/ui/Reveal";
 import { ROUTES } from "../lib/routes";
 import { FLOTA, TOTAL_AVIONES, fotoFlota, type AvionFlota } from "../data/flota";
+
+// El mapa trae d3-geo y su propio mapa base: se carga aparte para no pesar en el resto de la página.
+const RedRutas = lazy(() => import("../features/flota/RedRutas").then((m) => ({ default: m.RedRutas })));
 
 function TarjetaAvion({ avion }: { avion: AvionFlota }) {
   const foto = fotoFlota(avion.clave);
@@ -101,6 +105,28 @@ export function Flota() {
             </li>
           ))}
         </ol>
+
+        <section id="rutas" aria-labelledby="rutas-titulo" className="mt-24 scroll-mt-28 border-t border-white/10 pt-12 md:mt-32">
+          <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-gold-400">
+            Aerolínea virtual · Próximamente
+          </p>
+          <h2 id="rutas-titulo" className="mt-3 font-display text-3xl font-bold text-white text-balance sm:text-4xl">
+            Red de rutas
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60 sm:text-base">
+            Así volaría la aerolínea virtual de Villanueva Aviation: base en Guadalajara, del C408 en rutas regionales al
+            737-800 alrededor del mundo. Es una propuesta y puede cambiar; el 737 todavía no forma parte de la flota.
+          </p>
+          <div className="mt-8">
+            <Suspense fallback={<div className="aspect-[960/560] w-full rounded-2xl border border-white/10 bg-navy-950" />}>
+              <RedRutas />
+            </Suspense>
+          </div>
+          <p className="mt-4 max-w-3xl text-xs leading-relaxed text-white/40">
+            Distancias en línea recta (ortodrómicas). El tiempo de bloque es una estimación con velocidades de crucero
+            típicas (C408 200 kt, C90 240 kt, 737 450 kt) más rodaje y ascenso.
+          </p>
+        </section>
 
         <Reveal className="mt-24 flex flex-col items-start gap-6 border-t border-white/10 pt-12 md:mt-32 md:flex-row md:items-center md:justify-between">
           <p className="max-w-xl text-sm leading-relaxed text-white/55">
