@@ -86,6 +86,11 @@ export function AdminReservas() {
       />
 
       <Container className="py-12 md:py-16">
+        <div className="mb-6">
+          <Button to={ROUTES.adminPruebasRed} variant="secondary" className="!px-4 !py-2 text-xs">
+            Prueba de red
+          </Button>
+        </div>
         {loading ? (
           <p className="text-sm text-white/50">Cargando...</p>
         ) : reservas.length === 0 ? (

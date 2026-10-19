@@ -38,6 +38,7 @@ export const ROUTES = {
   perfil: "/perfil",
   adminVuelosPractica: "/admin/vuelos-practica",
   adminReservas: "/admin/agenda-y-proyectos",
+  adminPruebasRed: "/admin/pruebas-red",
   adminFeedback: "/admin/feedback",
   adminGraduados: "/admin/graduados",
   adminCadetes: "/admin/cadetes",

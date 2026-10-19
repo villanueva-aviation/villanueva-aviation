@@ -50,6 +50,7 @@ const Comunidad = lazy(() => import("./pages/Comunidad").then((m) => ({ default:
 const Perfil = lazy(() => import("./pages/Perfil").then((m) => ({ default: m.Perfil })));
 const AdminVuelosPractica = lazy(() => import("./pages/AdminVuelosPractica").then((m) => ({ default: m.AdminVuelosPractica })));
 const AdminReservas = lazy(() => import("./pages/AdminReservas").then((m) => ({ default: m.AdminReservas })));
+const AdminPruebasRed = lazy(() => import("./pages/AdminPruebasRed").then((m) => ({ default: m.AdminPruebasRed })));
 const AdminFeedback = lazy(() => import("./pages/AdminFeedback").then((m) => ({ default: m.AdminFeedback })));
 const AdminGraduados = lazy(() => import("./pages/AdminGraduados").then((m) => ({ default: m.AdminGraduados })));
 const AdminCadetes = lazy(() => import("./pages/AdminCadetes").then((m) => ({ default: m.AdminCadetes })));
@@ -253,6 +254,14 @@ function RoutedContent() {
             element={
               <ProtectedRoute>
                 <AdminReservas />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.adminPruebasRed}
+            element={
+              <ProtectedRoute>
+                <AdminPruebasRed />
               </ProtectedRoute>
             }
           />
