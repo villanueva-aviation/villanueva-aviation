@@ -6,7 +6,7 @@ import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "../features/auth/AuthContext";
-import { FOUNDER_EMAIL } from "../lib/constants";
+import { FOUNDER_EMAIL, INTENTOS_POR_BLOQUE } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 import { supabase } from "../lib/supabaseClient";
 import { NOMBRE_PARTE, PARTES_RED, estadoBloque, intentosUsados, type EstadoBloque, type IntentoRed, type ParteRed } from "../features/rutaRed/reglas";
@@ -213,7 +213,7 @@ export function AdminPruebasRed() {
                         <Badge tone={TONO_BLOQUE[estado]}>{estado}</Badge>
                       </div>
                       <p className="mt-1 text-xs text-white/55">
-                        Etapa {p.etapa} · Bloque {p.bloque} · ${p.monto} USD · {intentosUsados(p.intentos)} de 3 intentos usados ·
+                        Etapa {p.etapa} · Bloque {p.bloque} · ${p.monto} USD · {intentosUsados(p.intentos)} de {INTENTOS_POR_BLOQUE} intentos usados ·
                         Vence {new Date(p.vence_at).toLocaleDateString("es-MX")}
                       </p>
                     </div>
