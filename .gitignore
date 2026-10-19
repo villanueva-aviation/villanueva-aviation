@@ -30,3 +30,6 @@ dist-ssr
 .netlify
 
 __pycache__/
+
+# Espacio de trabajo local de los agentes (no se versiona)
+.superpowers/
