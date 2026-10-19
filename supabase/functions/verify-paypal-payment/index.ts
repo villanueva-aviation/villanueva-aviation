@@ -8,7 +8,7 @@
 //     - producción: https://api-m.paypal.com
 //   PRECIO_CONTENIDO_EXCLUSIVO (ej. "29.00")
 
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 // Las Edge Functions de Supabase no agregan headers CORS por defecto -- sin
 // esto, el navegador bloquea la petición (preflight OPTIONS) antes de que
@@ -50,6 +50,27 @@ async function obtenerTokenPayPal(): Promise<string> {
   return data.access_token;
 }
 
+// COPIA en verify-paypal-payment, verify-paypal-session y verify-paypal-prueba-red:
+// una orden de PayPal paga UN solo producto; si ya está en la tabla de otro, no sirve aquí.
+async function ordenUsadaEn(admin: SupabaseClient, orderId: string, tablas: string[]): Promise<boolean> {
+  for (const tabla of tablas) {
+    const { data, error } = await admin.from(tabla).select("paypal_order_id").eq("paypal_order_id", orderId).maybeSingle();
+    if (error) throw new Error(`Falló la búsqueda de la orden en ${tabla}: ${error.message}`);
+    if (data) return true;
+  }
+  return false;
+}
+
+// COPIA en las tres funciones: el dinero solo está cobrado si la orden es intent
+// CAPTURE y su primera captura está COMPLETED. El "COMPLETED" de la orden no basta
+// (una orden AUTHORIZE también lo reporta). Monto y moneda salen de la captura.
+// deno-lint-ignore no-explicit-any
+function capturaCompletada(order: any): { monto: string; moneda: string } | null {
+  const captura = order?.purchase_units?.[0]?.payments?.captures?.[0];
+  if (order?.intent !== "CAPTURE" || captura?.status !== "COMPLETED") return null;
+  return { monto: captura.amount?.value, moneda: captura.amount?.currency_code };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -81,6 +102,19 @@ Deno.serve(async (req) => {
     }
     console.log("Verificando orden PayPal", orderId, "para", user.email);
 
+    // service_role: escribe sin pasar por RLS -- por eso esta verificación vive
+    // en el servidor y no en el navegador.
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
+    if (await ordenUsadaEn(supabaseAdmin, orderId, ["pagos_sesiones", "pruebas_red"])) {
+      // Queda en el log: puede ser una orden ya cobrada que no se registró aquí.
+      console.warn("Contenido Exclusivo rechazado (409): orden ya usada en otro producto", { orderId, email: user.email });
+      return jsonResponse({ ok: false, motivo: "Esta orden ya se usó" }, 409);
+    }
+
     const accessToken = await obtenerTokenPayPal();
     const orderRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -91,22 +125,18 @@ Deno.serve(async (req) => {
     }
     const order = await orderRes.json();
 
-    const unidad = order?.purchase_units?.[0];
-    const monto = unidad?.amount?.value;
-    const moneda = unidad?.amount?.currency_code;
-    const completado = order?.status === "COMPLETED";
-
-    if (!completado || moneda !== "USD" || Number(monto) < Number(PRECIO_ESPERADO)) {
-      console.error("Orden inválida:", { estado: order?.status, monto, moneda, esperado: PRECIO_ESPERADO });
+    const cobro = capturaCompletada(order);
+    if (!cobro || cobro.moneda !== "USD" || !(Number(cobro.monto) >= Number(PRECIO_ESPERADO))) {
+      console.error("Orden inválida:", {
+        orderId,
+        estado: order?.status,
+        intent: order?.intent,
+        captura: order?.purchase_units?.[0]?.payments?.captures?.[0]?.status,
+        cobro,
+        esperado: PRECIO_ESPERADO,
+      });
       return jsonResponse({ ok: false, motivo: "Orden inválida o incompleta" }, 400);
     }
-
-    // service_role: escribe sin pasar por RLS -- por eso esta verificación vive
-    // en el servidor y no en el navegador.
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
 
     const { error: upsertError } = await supabaseAdmin.from("pagos").upsert(
       {
@@ -114,8 +144,8 @@ Deno.serve(async (req) => {
         email: user.email,
         proveedor: "paypal",
         paypal_order_id: orderId,
-        monto: Number(monto),
-        moneda,
+        monto: Number(cobro.monto),
+        moneda: cobro.moneda,
         estado: "completado",
         completado_at: new Date().toISOString(),
       },

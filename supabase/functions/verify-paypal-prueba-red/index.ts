@@ -14,7 +14,7 @@
 //   PRECIO_PRUEBA_RED_REPETICION (bloque de repetición, ej. "16")
 //   supabase secrets set PRECIO_PRUEBA_RED=32 PRECIO_PRUEBA_RED_REPETICION=16
 
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -80,6 +80,27 @@ async function obtenerTokenPayPal(): Promise<string> {
   return data.access_token;
 }
 
+// COPIA en verify-paypal-payment, verify-paypal-session y verify-paypal-prueba-red:
+// una orden de PayPal paga UN solo producto; si ya está en la tabla de otro, no sirve aquí.
+async function ordenUsadaEn(admin: SupabaseClient, orderId: string, tablas: string[]): Promise<boolean> {
+  for (const tabla of tablas) {
+    const { data, error } = await admin.from(tabla).select("paypal_order_id").eq("paypal_order_id", orderId).maybeSingle();
+    if (error) throw new Error(`Falló la búsqueda de la orden en ${tabla}: ${error.message}`);
+    if (data) return true;
+  }
+  return false;
+}
+
+// COPIA en las tres funciones: el dinero solo está cobrado si la orden es intent
+// CAPTURE y su primera captura está COMPLETED. El "COMPLETED" de la orden no basta
+// (una orden AUTHORIZE también lo reporta). Monto y moneda salen de la captura.
+// deno-lint-ignore no-explicit-any
+function capturaCompletada(order: any): { monto: string; moneda: string } | null {
+  const captura = order?.purchase_units?.[0]?.payments?.captures?.[0];
+  if (order?.intent !== "CAPTURE" || captura?.status !== "COMPLETED") return null;
+  return { monto: captura.amount?.value, moneda: captura.amount?.currency_code };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -105,13 +126,25 @@ Deno.serve(async (req) => {
     }
     const user = userData.user;
 
-    const { orderId, etapa } = await req.json();
+    let cuerpo;
+    try {
+      cuerpo = await req.json();
+    } catch {
+      return jsonResponse({ ok: false, motivo: "Cuerpo inválido" }, 400);
+    }
+    const { orderId, etapa } = cuerpo ?? {};
     if (!orderId || typeof orderId !== "string") {
       return jsonResponse({ ok: false, motivo: "Falta orderId" }, 400);
     }
     if (etapa !== 1 && etapa !== 2) {
       return jsonResponse({ ok: false, motivo: "Etapa inválida" }, 400);
     }
+
+    // Todo 409 queda en el log: puede ser una orden ya cobrada que no se registró.
+    const conflicto = (motivo: string) => {
+      console.warn("Prueba en red rechazada (409):", { orderId, email: user.email, etapa, motivo });
+      return jsonResponse({ ok: false, motivo }, 409);
+    };
 
     // service_role: el cadete no puede insertar en pruebas_red (RLS), y así leemos
     // sus bloques e intentos sin depender de su sesión.
@@ -132,25 +165,12 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: false, motivo: existenteError.message }, 500);
     }
     if (existente) {
-      if (existente.user_id !== user.id) {
-        return jsonResponse({ ok: false, motivo: "Esta orden ya se usó" }, 409);
-      }
+      if (existente.user_id !== user.id) return conflicto("Esta orden ya se usó");
       return jsonResponse({ ok: true, pruebaId: existente.id }, 200);
     }
 
-    // Una orden que ya pagó Contenido Exclusivo o una sesión 1 a 1 no puede
-    // reutilizarse para comprar un bloque.
-    for (const tabla of ["pagos", "pagos_sesiones"]) {
-      const { data: usada, error } = await supabaseAdmin
-        .from(tabla)
-        .select("paypal_order_id")
-        .eq("paypal_order_id", orderId)
-        .maybeSingle();
-      if (error) {
-        console.error(`Falló la búsqueda de la orden en ${tabla}:`, error.message);
-        return jsonResponse({ ok: false, motivo: error.message }, 500);
-      }
-      if (usada) return jsonResponse({ ok: false, motivo: "Esta orden ya se usó" }, 409);
+    if (await ordenUsadaEn(supabaseAdmin, orderId, ["pagos", "pagos_sesiones"])) {
+      return conflicto("Esta orden ya se usó");
     }
 
     const { data: bloques, error: bloquesError } = await supabaseAdmin
@@ -177,9 +197,7 @@ Deno.serve(async (req) => {
     }
 
     const regla = precioEsperado(bloques, intentos, new Date());
-    if ("motivo" in regla) {
-      return jsonResponse({ ok: false, motivo: regla.motivo }, 409);
-    }
+    if ("motivo" in regla) return conflicto(regla.motivo);
 
     console.log("Verificando orden PayPal", orderId, "de prueba en red etapa", etapa, "para", user.email);
 
@@ -193,13 +211,16 @@ Deno.serve(async (req) => {
     }
     const order = await orderRes.json();
 
-    const unidad = order?.purchase_units?.[0];
-    const monto = unidad?.amount?.value;
-    const moneda = unidad?.amount?.currency_code;
-    const completado = order?.status === "COMPLETED";
-
-    if (!completado || moneda !== "USD" || !(Number(monto) >= Number(regla.precio))) {
-      console.error("Orden inválida:", { estado: order?.status, monto, moneda, esperado: regla.precio });
+    const cobro = capturaCompletada(order);
+    if (!cobro || cobro.moneda !== "USD" || !(Number(cobro.monto) >= Number(regla.precio))) {
+      console.error("Orden inválida:", {
+        orderId,
+        estado: order?.status,
+        intent: order?.intent,
+        captura: order?.purchase_units?.[0]?.payments?.captures?.[0]?.status,
+        cobro,
+        esperado: regla.precio,
+      });
       return jsonResponse({ ok: false, motivo: "Orden inválida o incompleta" }, 400);
     }
 
@@ -217,7 +238,7 @@ Deno.serve(async (req) => {
         bloque: siguiente,
         proveedor: "paypal",
         paypal_order_id: orderId,
-        monto: Number(monto),
+        monto: Number(cobro.monto),
         moneda: "USD",
         estado: "activa",
         pagado_at: ahora.toISOString(),
@@ -227,15 +248,17 @@ Deno.serve(async (req) => {
       .single();
 
     if (insertError) {
-      // 23505 = unique: otra solicitud con la misma orden ganó la carrera.
+      // 23505 = unique. Si la orden ya está, otra solicitud con la misma orden ganó
+      // la carrera; si no, otra orden distinta tomó este número de bloque al mismo tiempo.
       if (insertError.code === "23505") {
-        const { data: ganador } = await supabaseAdmin
+        const { data: ganador, error: ganadorError } = await supabaseAdmin
           .from("pruebas_red")
-          .select("id")
+          .select("id, user_id")
           .eq("paypal_order_id", orderId)
-          .eq("user_id", user.id)
           .maybeSingle();
-        if (ganador) return jsonResponse({ ok: true, pruebaId: ganador.id }, 200);
+        if (!ganadorError && !ganador) return conflicto("Ya tienes intentos activos");
+        if (ganadorError || ganador!.user_id !== user.id) return conflicto("Esta orden ya se usó");
+        return jsonResponse({ ok: true, pruebaId: ganador!.id }, 200);
       }
       console.error("Falló el insert en pruebas_red:", insertError.message);
       return jsonResponse({ ok: false, motivo: insertError.message }, 500);

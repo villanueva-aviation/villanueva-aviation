@@ -30,6 +30,11 @@ create table if not exists public.pruebas_red (
 
 create index if not exists pruebas_red_user_id_idx on public.pruebas_red(user_id);
 
+-- Un número de bloque por cadete y etapa: si dos órdenes distintas llegan a la vez,
+-- la segunda falla aquí en vez de crear un segundo bloque activo.
+create unique index if not exists pruebas_red_user_etapa_bloque
+  on public.pruebas_red(user_id, etapa, bloque);
+
 alter table public.pruebas_red enable row level security;
 
 drop policy if exists "pruebas_red: leer propio" on public.pruebas_red;
@@ -191,6 +196,7 @@ begin
     new.aprobadas := '{}';
     new.criterio_fallado := null;
     new.notas := null;
+    new.created_at := now();
   else
     new.numero := coalesce(new.numero, total + 1);
   end if;
