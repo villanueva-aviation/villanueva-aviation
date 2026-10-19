@@ -35,3 +35,14 @@ export const CONTACT_EMAIL = "villanuevaaviation@gmail.com";
 
 // Horas registradas por el fundador en IVAO (6884 h 7 min al 25 sep 2026). Se ponen a mano: actualizar de vez en cuando.
 export const HORAS_IVAO = 6884;
+
+// Prueba en red (ruta Listo para la red): bloque de 3 intentos, vigencia en días, repetición a mitad de precio.
+// Los precios son texto por consistencia con el resto de constantes de precio (PayPal los pide así).
+export const PRECIO_PRUEBA_RED = "32";
+export const PRECIO_PRUEBA_RED_REPETICION = "16";
+export const INTENTOS_POR_BLOQUE = 3;
+export const DIAS_VIGENCIA_PRUEBA = 30;
+// Horas de la semana que se abren para agendar pruebas en red.
+export const HORAS_SEMANA_PRUEBAS = 2;
+// Cancelar con menos de estas horas de anticipación cuenta como intento usado.
+export const HORAS_CANCELACION = 24;
