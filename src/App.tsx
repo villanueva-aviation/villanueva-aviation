@@ -60,7 +60,9 @@ const Empieza = lazy(() => import("./pages/Empieza").then((m) => ({ default: m.E
 const TestNivel = lazy(() => import("./pages/TestNivel").then((m) => ({ default: m.TestNivel })));
 const Asesorias = lazy(() => import("./pages/Asesorias").then((m) => ({ default: m.Asesorias })));
 const Diagnostico = lazy(() => import("./pages/Diagnostico").then((m) => ({ default: m.Diagnostico })));
-const Ingresar = lazy(() => import("./pages/Ingresar").then((m) => ({ default: m.Ingresar })));
+const RutaRed = lazy(() => import("./pages/RutaRed").then((m) => ({ default: m.RutaRed })));
+const RutaRedLeccion = lazy(() => import("./pages/RutaRedLeccion").then((m) => ({ default: m.RutaRedLeccion })));
+const Ingresar =lazy(() => import("./pages/Ingresar").then((m) => ({ default: m.Ingresar })));
 const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m.NotFound })));
 
 function ScrollToTop() {
@@ -308,6 +310,8 @@ function RoutedContent() {
               </ProtectedRoute>
             }
           />
+          <Route path={ROUTES.rutaRed} element={<RutaRed />} />
+          <Route path={ROUTES.rutaRedLeccion(":id")} element={<RutaRedLeccion />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
