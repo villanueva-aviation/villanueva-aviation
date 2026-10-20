@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
@@ -224,6 +225,14 @@ export function TestNivel() {
               </Button>
             </div>
           </>
+        )}
+        {(nivel === "Intermedio" || nivel === "Avanzado") && (
+          <p className="mt-5 text-sm text-white/65">
+            ¿Listo para volar en red?{" "}
+            <Link to={ROUTES.rutaRed} className="font-semibold text-gold-400 underline-offset-4 hover:underline">
+              Empieza la ruta gratis
+            </Link>
+          </p>
         )}
       </div>
 

@@ -7,7 +7,9 @@ import {
   ALUMNOS_NUEVOS_POR_MES,
   DIAGNOSTICOS_POR_SEMANA,
   HORAS_IVAO,
+  INTENTOS_POR_BLOQUE,
   PRECIO_PAQUETE_4_SESIONES,
+  PRECIO_PRUEBA_RED,
   PRECIO_SESION_2H,
 } from "../lib/constants";
 import { fotoFlota } from "../data/flota";
@@ -213,6 +215,25 @@ export function Asesorias() {
                 ${PRECIO_PAQUETE_4_SESIONES} <span className="text-base font-semibold text-white/50">USD</span>
               </p>
               <p className="mt-3 text-sm text-white/60">8 horas en total. Pago por PayPal cuando confirmamos tus fechas.</p>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* RUTA LISTO PARA VOLAR EN RED */}
+      <section className="border-t border-white/10 py-20 md:py-28">
+        <Container>
+          <div className="max-w-2xl">
+            <h2 className="font-display text-3xl font-bold leading-tight text-white text-balance sm:text-4xl">Listo para volar en red</h2>
+            <p className="mt-4 text-base leading-relaxed text-white/70">
+              Una ruta gratuita de 8 lecciones para volar con control aéreo en VATSIM o IVAO. Cuando te sientas listo, puedes
+              presentar una prueba en vivo con Erik: ${PRECIO_PRUEBA_RED} USD por {INTENTOS_POR_BLOQUE} intentos. No es una
+              evaluación oficial de IVAO, VATSIM ni de la AFAC.
+            </p>
+            <div className="mt-6">
+              <Button to={ROUTES.rutaRed} variant="secondary">
+                Ver la ruta gratis <ArrowRight size={16} />
+              </Button>
             </div>
           </div>
         </Container>

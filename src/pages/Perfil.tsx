@@ -1,4 +1,6 @@
-import { Award, BadgeCheck, Gauge, Lock, Plane, Timer } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Award, BadgeCheck, Gauge, Lock, Plane, Radio, Timer } from "lucide-react";
 import { CadetTabs } from "../components/layout/CadetTabs";
 import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
@@ -10,16 +12,44 @@ import { useProgress } from "../features/progress/ProgressContext";
 import { contarExamenesAprobados } from "../data/evaluaciones";
 import { useHorasVueloConfirmadas } from "../features/practica/vuelosPractica";
 import { useRango } from "../features/progress/rango";
+import { fetchMisIntentos, fetchMisPruebas } from "../features/rutaRed/pruebasRed";
+import { insigniaGanada } from "../features/rutaRed/reglas";
+import { LECCIONES_RED, SLUG_RUTA_RED } from "../data/rutaRed";
+import { ROUTES } from "../lib/routes";
+import type { Logro } from "../data/cadete";
 
 export function Perfil() {
   const { user } = useAuth();
-  const { nivel, xp, horasSimulador, progresoGeneralPct, logros, certificados, examenResultado, loading } =
+  const { nivel, xp, horasSimulador, progresoGeneralPct, logros, certificados, examenResultado, isActividadCompletada, loading } =
     useProgress();
   const examenesAprobados = contarExamenesAprobados(examenResultado);
   const horasVueloConfirmadas = useHorasVueloConfirmadas();
   const rango = useRango();
 
+  // Ruta "Listo para volar en red": sin sesión o con error se trata como "sin datos", nunca rompe el perfil.
+  const [red, setRed] = useState({ insignia: false, tieneBloque: false });
+  useEffect(() => {
+    let vivo = true;
+    Promise.all([fetchMisIntentos(1), fetchMisPruebas(1)])
+      .then(([intentos, pruebas]) => vivo && setRed({ insignia: insigniaGanada(intentos), tieneBloque: pruebas.length > 0 }))
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
   if (loading) return null;
+
+  const pendientesRed = LECCIONES_RED.filter((l) => !isActividadCompletada(SLUG_RUTA_RED, l.id));
+  const empezoRed = pendientesRed.length < LECCIONES_RED.length;
+  const logroRed: Logro = {
+    id: "listo-para-red-1",
+    titulo: "Listo para volar en red · Etapa 1 (español)",
+    descripcion: "Se gana al aprobar la prueba en vivo con Erik. No es una evaluación oficial de IVAO, VATSIM ni de la AFAC.",
+    icon: Radio,
+    desbloqueado: red.insignia,
+  };
+  const todosLogros = [...logros, logroRed];
 
   return (
     <div>
@@ -68,9 +98,23 @@ export function Perfil() {
           </div>
         </Reveal>
 
+        {(empezoRed || red.tieneBloque) && pendientesRed.length > 0 && (
+          <Reveal className="mt-6 rounded-2xl border border-gold-500/30 bg-gold-500/5 p-6">
+            <p className="font-display text-sm font-semibold text-white">
+              Te faltan {pendientesRed.length} {pendientesRed.length === 1 ? "lección" : "lecciones"} de la ruta Listo para volar en red
+            </p>
+            <Link
+              to={ROUTES.rutaRedLeccion(pendientesRed[0].id)}
+              className="mt-2 inline-block text-sm font-semibold text-gold-400 underline-offset-4 hover:underline"
+            >
+              Seguir con: {pendientesRed[0].titulo}
+            </Link>
+          </Reveal>
+        )}
+
         <h2 className="mt-14 font-display text-xl font-semibold text-white">Logros</h2>
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {logros.map((logro, i) => (
+          {todosLogros.map((logro, i) => (
             <Reveal
               key={logro.id}
               delay={i * 80}
