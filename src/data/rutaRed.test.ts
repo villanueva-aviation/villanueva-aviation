@@ -5,7 +5,7 @@ import { AUDIO_SETS, FRASEOLOGIA_AUTORIZACION_IFR } from "./fraseologiaATC.ts";
 
 const IDS = ["antes-de-conectarte", "plan-de-vuelo", "carta-sid", "autorizacion", "sid-garmin", "sid-fms", "ruta-llegada", "aproximacion"];
 
-const sinAcentos = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const sinAcentos = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 // "garmin": el sitio no usa la marca (regla vigente de instrumentos sin marca).
 const PROHIBIDAS = /habilitacion|licencia|certificad[oa]|certificacion|horas validas|garmin/;
 
@@ -41,6 +41,15 @@ test("cada lección tiene al menos 3 temas y 3 preguntas válidas", () => {
   const preguntaIds = LECCIONES_RED.flatMap((l) => l.practica.map((q) => q.id));
   assert.equal(new Set(temaIds).size, temaIds.length, "ids de tema repetidos");
   assert.equal(new Set(preguntaIds).size, preguntaIds.length, "ids de pregunta repetidos");
+});
+
+test("las respuestas correctas no se cargan a una sola posición", () => {
+  const indices = LECCIONES_RED.flatMap((l) => l.practica.map((q) => q.correcta));
+  const cuenta = new Map<number, number>();
+  indices.forEach((i) => cuenta.set(i, (cuenta.get(i) ?? 0) + 1));
+  for (const [i, n] of cuenta) {
+    assert.ok(n <= indices.length / 2, `la opción ${i} es la correcta en ${n} de ${indices.length} preguntas`);
+  }
 });
 
 test("videoId es null o un id de YouTube", () => {

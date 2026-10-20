@@ -118,6 +118,16 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     archivoHref: "/downloads/guia-comunicaciones-ifr.pdf",
   },
   {
+    id: "hoja-atis-craft",
+    categoria: "Guías",
+    nombre: "Hoja ATIS y CRAFT",
+    descripcion: "Notas de cabina imprimibles, dos por hoja: ATIS, autorización IFR en orden CRAFT con casillas de colación, y frecuencias del vuelo.",
+    version: "v1.0",
+    fecha: "2026-10-19",
+    imagen: "/images/descargas-guia-comunicaciones-ifr.jpg",
+    archivoHref: "/downloads/hoja-atis-craft.pdf",
+  },
+  {
     id: "guia-controles",
     categoria: "Guías",
     nombre: "Configura tus controles en MSFS",
