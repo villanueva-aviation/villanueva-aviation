@@ -119,6 +119,11 @@ export function cancelacionTardia(fecha: string, horario: string, ahora: Date): 
   return horaCita(fecha, horario) - ahora.getTime() < HORAS_CANCELACION * 3600_000;
 }
 
+/** La hora de la cita ya llegó: ya no se cancela, queda pendiente de calificación. */
+export function citaPasada(fecha: string, horario: string, ahora: Date): boolean {
+  return horaCita(fecha, horario) <= ahora.getTime();
+}
+
 /** La cita (hora de México) cae antes de que venza el bloque; el trigger de la base revisa lo mismo. */
 export function antesDeVencer(fecha: string, horario: string, prueba: Pick<PruebaRed, "vence_at">): boolean {
   return horaCita(fecha, horario) < new Date(prueba.vence_at).getTime();

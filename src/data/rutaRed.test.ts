@@ -2,6 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { CARTAS_RED, LECCIONES_RED, SLUG_RUTA_RED, leccionRed } from "./rutaRed.ts";
 import { AUDIO_SETS, FRASEOLOGIA_AUTORIZACION_IFR } from "./fraseologiaATC.ts";
+import { ACADEMIA_MODULOS } from "./academia.ts";
+import { reindexarLecciones } from "../features/progress/migrarProgreso.ts";
 
 const IDS = ["antes-de-conectarte", "plan-de-vuelo", "carta-sid", "autorizacion", "sid-g1000", "sid-fms", "ruta-llegada", "aproximacion"];
 
@@ -101,4 +103,16 @@ test("la lección de autorización usa la tanda de audios de autorización IFR",
     c.elementos.forEach((e) => assert.ok(e.palabrasClave.length > 0, e.descripcion));
   }
   assert.equal(leccionRed("no-existe"), undefined);
+});
+
+// El avance se guarda como completadas["listo-para-red"] = [ids de lección], y
+// reindexarLecciones mueve cualquier id que sea una lección de la Academia a ese
+// módulo. Un id repetido haría desaparecer el avance de la ruta.
+test("los ids de lección no chocan con los de la Academia", () => {
+  const academia = new Set(ACADEMIA_MODULOS.flatMap((m) => m.actividades.filter((a) => a.tipo === "leccion").map((a) => a.id)));
+  for (const l of LECCIONES_RED) assert.ok(!academia.has(l.id), `${l.id} ya es una lección de la Academia`);
+  const ids = LECCIONES_RED.map((l) => l.id);
+  const { completadas, cambio } = reindexarLecciones({ [SLUG_RUTA_RED]: ids });
+  assert.equal(cambio, false);
+  assert.deepEqual(completadas[SLUG_RUTA_RED], ids);
 });

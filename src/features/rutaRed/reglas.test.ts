@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   antesDeVencer,
   cancelacionTardia,
+  citaPasada,
   estadoBloque,
   insigniaGanada,
   intentosUsados,
@@ -112,4 +113,10 @@ test("antesDeVencer compara la cita en hora de México con vence_at", () => {
   assert.equal(antesDeVencer("2026-11-10", "17:00", prueba), true);
   assert.equal(antesDeVencer("2026-11-10", "18:00", prueba), false);
   assert.equal(antesDeVencer("2026-11-10", "21:00", prueba), false);
+});
+
+test("citaPasada: hora de México, la cita ya llegó", () => {
+  // 18:00 en México (UTC-6) = 00:00 UTC del día siguiente.
+  assert.equal(citaPasada("2026-11-10", "18:00", new Date("2026-11-10T23:59:00Z")), false);
+  assert.equal(citaPasada("2026-11-10", "18:00", new Date("2026-11-11T00:00:00Z")), true);
 });

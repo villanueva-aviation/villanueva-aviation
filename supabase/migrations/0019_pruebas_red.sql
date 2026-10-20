@@ -78,7 +78,9 @@ create table if not exists public.intentos_prueba_red (
     cardinality(partes) between 1 and 4
     and partes <@ array['autorizacion', 'salida', 'ruta_llegada', 'aproximacion']::text[]
   ),
-  enlace_seguimiento text not null,
+  enlace_seguimiento text not null check (
+    char_length(enlace_seguimiento) between 1 and 300 and btrim(enlace_seguimiento) <> ''
+  ),
   estado text not null default 'pendiente' check (estado in (
     'pendiente', 'confirmado', 'realizado', 'no_se_presento', 'cancelado', 'cancelado_tarde'
   )),

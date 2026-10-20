@@ -15,6 +15,7 @@ import {
   REGLAS_PRUEBA_RED,
   antesDeVencer,
   cancelacionTardia,
+  citaPasada,
   estadoBloque,
   insigniaGanada,
   intentosUsados,
@@ -197,7 +198,7 @@ export function PruebaRed() {
               <div className="mt-4 flex flex-col gap-3">
                 {intentos.length === 0 && <p className="text-sm text-white/45">Aún no has agendado ningún intento.</p>}
                 {[...intentos].reverse().map((i) => (
-                  <TarjetaIntento key={i.id} intento={i} bloque={bloquePorId.get(i.prueba_id)} onCambio={cargar} />
+                  <TarjetaIntento key={i.id} intento={i} bloque={bloquePorId.get(i.prueba_id)} ahora={ahora} onCambio={cargar} />
                 ))}
               </div>
             </section>
@@ -431,19 +432,37 @@ function FormularioAgenda({
   );
 }
 
-function TarjetaIntento({ intento, bloque, onCambio }: { intento: IntentoRed; bloque?: number; onCambio: () => void }) {
+function TarjetaIntento({
+  intento,
+  bloque,
+  ahora,
+  onCambio,
+}: {
+  intento: IntentoRed;
+  bloque?: number;
+  ahora: Date;
+  onCambio: () => void;
+}) {
   // null = sin confirmación abierta; si no, si la cancelación es tardía al momento de pulsar "Cancelar".
   const [tardia, setTardia] = useState<boolean | null>(null);
   const [cancelando, setCancelando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const estado = ESTADO_INTENTO[intento.estado];
-  const cancelable = intento.estado === "pendiente" || intento.estado === "confirmado";
+  const abierto = intento.estado === "pendiente" || intento.estado === "confirmado";
+  // Ya pasó la hora de la cita: no se cancela, Erik la califica.
+  const porCalificar = abierto && citaPasada(intento.fecha, intento.horario, ahora);
+  const cancelable = abierto && !porCalificar;
   const confirmando = tardia !== null;
   const esTardia = () => cancelacionTardia(intento.fecha, intento.horario, new Date());
 
   async function cancelar() {
     // Si cruzó las 24 h con el aviso abierto, se actualiza el aviso y se pide confirmar otra vez.
     if (esTardia() !== tardia) return setTardia(esTardia());
+    // Si llegó la hora de la cita con el aviso abierto, se recarga y queda "Pendiente de calificación".
+    if (citaPasada(intento.fecha, intento.horario, new Date())) {
+      setTardia(null);
+      return onCambio();
+    }
     setCancelando(true);
     setError(null);
     const { error: err } = await cancelarIntento(intento, new Date());
@@ -479,6 +498,7 @@ function TarjetaIntento({ intento, bloque, onCambio }: { intento: IntentoRed; bl
           <span className="font-semibold text-white">Notas de Erik:</span> {intento.notas}
         </p>
       )}
+      {porCalificar && <p className="mt-3 text-sm text-white/60">Pendiente de calificación</p>}
       {cancelable && !confirmando && (
         <button
           type="button"

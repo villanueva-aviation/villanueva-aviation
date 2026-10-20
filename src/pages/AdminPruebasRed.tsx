@@ -9,8 +9,9 @@ import { useAuth } from "../features/auth/AuthContext";
 import { FOUNDER_EMAIL, INTENTOS_POR_BLOQUE } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 import { supabase } from "../lib/supabaseClient";
-import { NOMBRE_PARTE, PARTES_RED, estadoBloque, intentosUsados, type EstadoBloque, type IntentoRed, type ParteRed } from "../features/rutaRed/reglas";
+import { CRITERIOS_RED, NOMBRE_PARTE, PARTES_RED, estadoBloque, intentosUsados, type EstadoBloque, type IntentoRed, type ParteRed } from "../features/rutaRed/reglas";
 import {
+  cancelarSinCosto,
   confirmarIntento,
   darBloqueSinPago,
   fetchTodasPruebasRed,
@@ -19,12 +20,6 @@ import {
   registrarResultado,
   type PruebaRedAdmin,
 } from "../features/rutaRed/pruebasRed";
-
-const CRITERIOS_FALLADOS = [
-  "Colacionó mal la autorización",
-  "Se salió de la SID",
-  "Comunicaciones poco claras o imprecisas",
-] as const;
 
 const TONO_BLOQUE: Record<EstadoBloque, "gold" | "green" | "red" | "neutral"> = {
   activa: "gold",
@@ -74,8 +69,9 @@ export function AdminPruebasRed() {
   const [pruebas, setPruebas] = useState<PruebaRedAdmin[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorCarga, setErrorCarga] = useState(false);
   const [ocupado, setOcupado] = useState(false);
-  // Confirmación en la página (sin confirm()): "noshow:<id>" o "reembolso:<id>".
+  // Confirmación en la página (sin confirm()): "noshow:<id>", "cancelar:<id>" o "reembolso:<id>".
   const [confirmando, setConfirmando] = useState<string | null>(null);
   // Formulario de resultado abierto.
   const [resultadoId, setResultadoId] = useState<string | null>(null);
@@ -87,17 +83,29 @@ export function AdminPruebasRed() {
   const [etapaRegalo, setEtapaRegalo] = useState<1 | 2>(1);
   const [mensajeRegalo, setMensajeRegalo] = useState<string | null>(null);
 
+  // Si la lectura falla se muestra el error con "Reintentar", no "No hay bloques todavía".
   const recargar = useCallback(async () => {
-    setPruebas(await fetchTodasPruebasRed());
+    try {
+      setPruebas(await fetchTodasPruebasRed());
+      setErrorCarga(false);
+    } catch {
+      setErrorCarga(true);
+    }
     setLoading(false);
   }, []);
 
   useEffect(() => {
     if (authLoading || !esFundador) return;
-    fetchTodasPruebasRed().then((data) => {
-      setPruebas(data);
-      setLoading(false);
-    });
+    fetchTodasPruebasRed().then(
+      (data) => {
+        setPruebas(data);
+        setLoading(false);
+      },
+      () => {
+        setErrorCarga(true);
+        setLoading(false);
+      },
+    );
   }, [authLoading, esFundador]);
 
   if (authLoading) return null;
@@ -195,6 +203,20 @@ export function AdminPruebasRed() {
 
         {loading ? (
           <p className="text-sm text-white/50">Cargando...</p>
+        ) : errorCarga ? (
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-red-500/20 bg-red-500/[0.06] px-6 py-10 text-center">
+            <p className="text-sm text-red-300">No se pudieron cargar los bloques.</p>
+            <Button
+              variant="secondary"
+              className={BOTON}
+              onClick={() => {
+                setLoading(true);
+                void recargar();
+              }}
+            >
+              Reintentar
+            </Button>
+          </div>
         ) : pruebas.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-14 text-center">
             <ClipboardList size={22} className="text-white/30" />
@@ -275,6 +297,26 @@ export function AdminPruebasRed() {
                                 <Button variant="secondary" className={BOTON} disabled={ocupado} onClick={() => abrirResultado(i)}>
                                   Registrar resultado
                                 </Button>
+                                {confirmando === `cancelar:${i.id}` ? (
+                                  <>
+                                    <span className="self-center text-xs text-white/70">No cuenta como intento.</span>
+                                    <Button variant="secondary" className={BOTON} onClick={() => setConfirmando(null)}>
+                                      No
+                                    </Button>
+                                    <Button className={BOTON} disabled={ocupado} onClick={() => ejecutar(() => cancelarSinCosto(i.id))}>
+                                      Sí, cancelar sin costo
+                                    </Button>
+                                  </>
+                                ) : (
+                                  <Button
+                                    variant="secondary"
+                                    className={BOTON}
+                                    disabled={ocupado}
+                                    onClick={() => setConfirmando(`cancelar:${i.id}`)}
+                                  >
+                                    Cancelar sin costo
+                                  </Button>
+                                )}
                                 {confirmando === `noshow:${i.id}` ? (
                                   <>
                                     <Button variant="secondary" className={BOTON} onClick={() => setConfirmando(null)}>
@@ -323,7 +365,7 @@ export function AdminPruebasRed() {
                                   <option value="" style={{ backgroundColor: "#0b1d34" }}>
                                     Sin criterio fallado
                                   </option>
-                                  {CRITERIOS_FALLADOS.map((c) => (
+                                  {CRITERIOS_RED.map((c) => (
                                     <option key={c} value={c} style={{ backgroundColor: "#0b1d34" }}>
                                       {c}
                                     </option>

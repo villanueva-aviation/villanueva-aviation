@@ -83,12 +83,13 @@ export async function cancelarIntento(intento: IntentoRed, ahora: Date): Promise
 
 export type PruebaRedAdmin = PruebaRed & { email: string; intentos: IntentoRed[] };
 
-/** Todos los bloques con el correo del cadete y sus intentos (por número); los más recientes primero. */
+/** Todos los bloques con el correo del cadete y sus intentos (por número); los más recientes primero. Lanza si falla la lectura. */
 export async function fetchTodasPruebasRed(): Promise<PruebaRedAdmin[]> {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("pruebas_red")
     .select(`${COLUMNAS_PRUEBA}, email, intentos_prueba_red(${COLUMNAS_INTENTO})`)
     .order("pagado_at", { ascending: false });
+  if (error) throw error;
   type Fila = PruebaRed & { email: string | null; intentos_prueba_red: IntentoRed[] | null };
   return ((data as unknown as Fila[]) ?? []).map(({ intentos_prueba_red, email, ...prueba }) => ({
     ...prueba,
@@ -110,6 +111,12 @@ export async function registrarResultado(
     .from("intentos_prueba_red")
     .update({ estado: "realizado", aprobadas: r.aprobadas, criterio_fallado: r.criterio_fallado, notas: r.notas })
     .eq("id", id);
+  return aResultado(error);
+}
+
+/** El fundador cancela sin que cuente el intento (el trigger de cancelación no lo revisa a él). */
+export async function cancelarSinCosto(id: string): Promise<Resultado> {
+  const { error } = await supabase.from("intentos_prueba_red").update({ estado: "cancelado" }).eq("id", id);
   return aResultado(error);
 }
 

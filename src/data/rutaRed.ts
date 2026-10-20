@@ -105,7 +105,7 @@ export const LECCIONES_RED: LeccionRed[] = [
         id: "red-2-3",
         titulo: "Altitudes y el C172",
         clave: "Si tu avión no puede cumplir las altitudes de una llegada, no puedes aceptarla.",
-        texto: "La llegada DARAN 3A está hecha para jets: cruza DARAN entre FL210 y FL230. Un C172 no llega ahí, y esas altitudes existen por el terreno: alrededor de MMMX las altitudes mínimas de sector son de 12 100, 14 800 y 19 400 ft, y el controlador no puede llevarte por debajo de ellas. Si tu avión no puede cumplir las restricciones de una llegada, no puedes aceptarla: contestas «imposible». Recuerda que en MMGL la altitud de transición es 18 500 ft y en MMMX el nivel de transición es FL195: abajo de eso vuelas con el altímetro en QNH. En la prueba eliges tu avión; si es un jet, vuelas la STAR con sus altitudes publicadas.",
+        texto: "La llegada DARAN 3A está hecha para jets: cruza DARAN entre FL210 y FL230. Un C172 no llega ahí. Las restricciones de altitud publicadas en una STAR o una SID son parte del procedimiento: si la aceptas, las cumples. Si tu avión no puede cumplirlas, no puedes aceptar ese procedimiento: contestas «imposible». Entonces el controlador puede darte vectores y altitudes que él asigna con sus altitudes mínimas de vectoreo. Recuerda que en MMGL la altitud de transición es 18 500 ft y en MMMX el nivel de transición es FL195: abajo de eso vuelas con el altímetro en QNH. En la prueba eliges tu avión; si es un jet, vuelas la STAR con sus altitudes publicadas.",
       },
       {
         id: "red-2-4",
@@ -118,7 +118,7 @@ export const LECCIONES_RED: LeccionRed[] = [
       { id: "red-q2-1", pregunta: "¿Dónde termina la salida LONKU 1D?", opciones: ["En el punto LONKU", "En DARAN", "En UKTEN", "En la pista 05R"], correcta: 0 },
       { id: "red-q2-2", pregunta: "En el plan aparece «DARA3A». ¿Qué es?", opciones: ["Un error de SimBrief", "El alterno", "Una aerovía", "La llegada DARAN 3A abreviada"], correcta: 3 },
       { id: "red-q2-3", pregunta: "¿Por qué el ciclo AIRAC de tu simulador debe coincidir con el de tus cartas?", opciones: ["No importa", "Para que los puntos y procedimientos existan igual en tu GPS", "Para que SimBrief cobre menos", "Para que el controlador te vea"], correcta: 1 },
-      { id: "red-q2-4", pregunta: "Vuelas un C172 y la llegada pide FL210 en DARAN. ¿Qué haces?", opciones: ["Intentas subir de todos modos", "Pides que te bajen de las altitudes mínimas", "Contestas «imposible»: no puedes aceptar esa llegada", "No presentas plan"], correcta: 2 },
+      { id: "red-q2-4", pregunta: "Vuelas un C172 y la llegada pide FL210 en DARAN. ¿Qué haces?", opciones: ["Intentas subir de todos modos", "Vuelas la llegada más bajo sin avisar", "Contestas «imposible»: no puedes aceptar esa llegada", "No presentas plan"], correcta: 2 },
     ],
   },
   {
@@ -337,7 +337,7 @@ export const LECCIONES_RED: LeccionRed[] = [
         id: "red-7-4",
         titulo: "Vectores y cambios del controlador",
         clave: "Con vectores vuelas el rumbo exacto y no regresas a la llegada hasta que te lo digan.",
-        texto: "La carta de la DARAN 3A dibuja una zona de posibles trayectorias hacia ALMIS: ahí el controlador puede sacarte de la llegada con vectores para ordenar el tránsito. Si te da un rumbo, colaciónalo, vuélalo exacto (en el piloto automático, modo HDG) y mantén la altitud asignada. No vuelvas a la llegada por tu cuenta: espera «proceda directo a ALMIS» o que te diga que reanudes la llegada. En un C172 no llegas a las altitudes de la DARAN 3A, y esas altitudes existen por el terreno (altitudes mínimas de sector de 12 100, 14 800 y 19 400 ft): el controlador no puede darte vectores por debajo de las altitudes mínimas. Si tu avión no puede cumplir las restricciones, contestas «imposible» y no puedes aceptar esa llegada.",
+        texto: "La carta de la DARAN 3A dibuja una zona de posibles trayectorias hacia ALMIS: ahí el controlador puede sacarte de la llegada con vectores para ordenar el tránsito. Si te da un rumbo, colaciónalo, vuélalo exacto (en el piloto automático, modo HDG) y mantén la altitud asignada. No vuelvas a la llegada por tu cuenta: espera «proceda directo a ALMIS» o que te diga que reanudes la llegada. En un C172 no llegas a las altitudes de la DARAN 3A: sus restricciones son parte de la llegada publicada, y si tu avión no puede cumplirlas contestas «imposible» y no puedes aceptarla. En ese caso el controlador puede llevarte con vectores y altitudes que asigna según sus altitudes mínimas de vectoreo.",
       },
     ],
     practica: [
