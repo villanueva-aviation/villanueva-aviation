@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { CARTAS_RED, LECCIONES_RED, SLUG_RUTA_RED, leccionRed } from "./rutaRed.ts";
 import { AUDIO_SETS, FRASEOLOGIA_AUTORIZACION_IFR } from "./fraseologiaATC.ts";
 
-const IDS = ["antes-de-conectarte", "plan-de-vuelo", "carta-sid", "autorizacion", "sid-garmin", "sid-fms", "ruta-llegada", "aproximacion"];
+const IDS = ["antes-de-conectarte", "plan-de-vuelo", "carta-sid", "autorizacion", "sid-g1000", "sid-fms", "ruta-llegada", "aproximacion"];
 
 const sinAcentos = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 // "garmin": el sitio no usa la marca (regla vigente de instrumentos sin marca).

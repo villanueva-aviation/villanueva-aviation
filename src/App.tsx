@@ -62,7 +62,7 @@ const Asesorias = lazy(() => import("./pages/Asesorias").then((m) => ({ default:
 const Diagnostico = lazy(() => import("./pages/Diagnostico").then((m) => ({ default: m.Diagnostico })));
 const RutaRed = lazy(() => import("./pages/RutaRed").then((m) => ({ default: m.RutaRed })));
 const RutaRedLeccion = lazy(() => import("./pages/RutaRedLeccion").then((m) => ({ default: m.RutaRedLeccion })));
-const Ingresar =lazy(() => import("./pages/Ingresar").then((m) => ({ default: m.Ingresar })));
+const Ingresar = lazy(() => import("./pages/Ingresar").then((m) => ({ default: m.Ingresar })));
 const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m.NotFound })));
 
 function ScrollToTop() {

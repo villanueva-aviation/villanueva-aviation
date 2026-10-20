@@ -68,7 +68,7 @@ export function RutaRed() {
                     <span className="flex-1">
                       <span className="flex items-start justify-between gap-3">
                         <span className="font-display text-base font-semibold text-white">{l.titulo}</span>
-                        {hecha && <CheckCircle2 size={18} className="shrink-0 text-gold-400" aria-label="Completada" />}
+                        {hecha && <CheckCircle2 size={18} className="shrink-0 text-gold-400" role="img" aria-label="Completada" />}
                       </span>
                       <span className="mt-1.5 block text-sm leading-relaxed text-white/60">{l.resumen}</span>
                     </span>

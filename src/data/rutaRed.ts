@@ -218,7 +218,7 @@ export const LECCIONES_RED: LeccionRed[] = [
     ],
   },
   {
-    id: "sid-garmin",
+    id: "sid-g1000",
     numero: 5,
     titulo: "Volar la SID con el G1000",
     resumen: "En el C172 XB-VNA: carga la salida en el GPS, revísala contra la carta y vuélala con y sin piloto automático.",

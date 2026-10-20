@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
@@ -17,6 +17,7 @@ const CARD = "rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8";
 
 export function RutaRedLeccion() {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const leccion = id ? leccionRed(id) : undefined;
   const { isAuthenticated } = useAuth();
   const { isActividadCompletada, completarActividad } = useProgress();
@@ -44,14 +45,14 @@ export function RutaRedLeccion() {
         </span>
         <h1 className="mt-3 flex items-start gap-3 font-display text-3xl font-bold leading-tight text-white sm:text-4xl">
           {leccion.titulo}
-          {hecha && <CheckCircle2 size={24} className="mt-2 shrink-0 text-gold-400" aria-label="Completada" />}
+          {hecha && <CheckCircle2 size={24} className="mt-2 shrink-0 text-gold-400" role="img" aria-label="Completada" />}
         </h1>
         <p className="mt-4 text-base leading-relaxed text-white/65">{leccion.resumen}</p>
       </div>
 
       {!isAuthenticated && (
         <p className="mt-6 max-w-3xl rounded-2xl border border-gold-500/25 bg-gold-500/[0.06] px-5 py-3 text-sm text-white/75">
-          <Link to={ROUTES.ingresar} className="font-semibold text-gold-400 underline-offset-2 hover:underline">
+          <Link to={`${ROUTES.ingresar}?from=${encodeURIComponent(location.pathname)}`} className="font-semibold text-gold-400 underline-offset-2 hover:underline">
             Crea tu cuenta gratis para guardar tu avance
           </Link>
         </p>
@@ -61,6 +62,7 @@ export function RutaRedLeccion() {
         {leccion.videoId && <VideoYouTube id={leccion.videoId} titulo={leccion.titulo} />}
 
         <div className={CARD}>
+          <h2 className="sr-only">Contenido de la lección</h2>
           <LessonFlow key={leccion.id} temas={leccion.temas} isCompleted={() => hecha} onAdvance={() => {}} />
         </div>
 
