@@ -80,9 +80,14 @@ export function PayPalButton({
               setVerificando(false);
               if (fnError || !resultado?.ok) {
                 // Con status no-2xx supabase-js devuelve data=null; el `motivo` viene en el cuerpo de la respuesta.
+                // Solo se muestra el de un 4xx (rechazo esperado); un 5xx lleva el mensaje genérico.
                 let motivo: unknown = resultado?.motivo;
                 if (fnError?.context instanceof Response) {
-                  motivo = await fnError.context.json().then((b: { motivo?: unknown }) => b?.motivo, () => undefined);
+                  const respuesta = fnError.context;
+                  motivo =
+                    respuesta.status < 500
+                      ? await respuesta.json().then((b: { motivo?: unknown }) => b?.motivo, () => undefined)
+                      : undefined;
                 }
                 setError(
                   typeof motivo === "string" && motivo

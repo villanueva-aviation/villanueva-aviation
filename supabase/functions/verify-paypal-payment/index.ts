@@ -30,6 +30,9 @@ const PAYPAL_API_BASE = Deno.env.get("PAYPAL_API_BASE")!;
 const PAYPAL_CLIENT_ID = Deno.env.get("PAYPAL_CLIENT_ID")!;
 const PAYPAL_CLIENT_SECRET = Deno.env.get("PAYPAL_CLIENT_SECRET")!;
 const PRECIO_ESPERADO = Deno.env.get("PRECIO_CONTENIDO_EXCLUSIVO") ?? "29.00";
+// COPIA en las tres funciones: los ids de orden de PayPal son mayúsculas y dígitos.
+// Sin esto, "ABC?x=1" pasaría la llave única y PayPal devolvería la misma orden ABC.
+const ORDER_ID = /^[A-Z0-9]{10,30}$/;
 
 async function obtenerTokenPayPal(): Promise<string> {
   const credenciales = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`);
@@ -59,6 +62,13 @@ async function ordenUsadaEn(admin: SupabaseClient, orderId: string, tablas: stri
     if (data) return true;
   }
   return false;
+}
+
+// Fila de "pagos" que ya registró esta orden, o null.
+async function duenoDeOrden(admin: SupabaseClient, orderId: string): Promise<{ user_id: string } | null> {
+  const { data, error } = await admin.from("pagos").select("user_id").eq("paypal_order_id", orderId).maybeSingle();
+  if (error) throw new Error(`Falló la búsqueda de la orden en pagos: ${error.message}`);
+  return data;
 }
 
 // COPIA en las tres funciones: el dinero solo está cobrado si la orden es intent
@@ -97,8 +107,8 @@ Deno.serve(async (req) => {
     const user = userData.user;
 
     const { orderId } = await req.json();
-    if (!orderId || typeof orderId !== "string") {
-      return jsonResponse({ ok: false, motivo: "Falta orderId" }, 400);
+    if (typeof orderId !== "string" || !ORDER_ID.test(orderId)) {
+      return jsonResponse({ ok: false, motivo: "orderId inválido" }, 400);
     }
     console.log("Verificando orden PayPal", orderId, "para", user.email);
 
@@ -109,6 +119,15 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    // Idempotencia: la misma orden del mismo cadete ya registrada (reintento tras un
+    // fallo de red) es ok; de otro cadete, nunca se le pasa la fila.
+    const dueno = await duenoDeOrden(supabaseAdmin, orderId);
+    if (dueno) {
+      if (dueno.user_id === user.id) return jsonResponse({ ok: true }, 200);
+      console.warn("Contenido Exclusivo rechazado (409): orden de otro cadete", { orderId, email: user.email });
+      return jsonResponse({ ok: false, motivo: "Esta orden ya se usó" }, 409);
+    }
+
     if (await ordenUsadaEn(supabaseAdmin, orderId, ["pagos_sesiones", "pruebas_red"])) {
       // Queda en el log: puede ser una orden ya cobrada que no se registró aquí.
       console.warn("Contenido Exclusivo rechazado (409): orden ya usada en otro producto", { orderId, email: user.email });
@@ -116,7 +135,7 @@ Deno.serve(async (req) => {
     }
 
     const accessToken = await obtenerTokenPayPal();
-    const orderRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}`, {
+    const orderRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${encodeURIComponent(orderId)}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!orderRes.ok) {
@@ -124,6 +143,10 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: false, motivo: "Orden de PayPal no encontrada" }, 400);
     }
     const order = await orderRes.json();
+    if (order?.id !== orderId) {
+      console.error("PayPal devolvió otra orden:", { pedida: orderId, devuelta: order?.id });
+      return jsonResponse({ ok: false, motivo: "Orden inválida o incompleta" }, 400);
+    }
 
     const cobro = capturaCompletada(order);
     if (!cobro || cobro.moneda !== "USD" || !(Number(cobro.monto) >= Number(PRECIO_ESPERADO))) {
@@ -138,29 +161,33 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: false, motivo: "Orden inválida o incompleta" }, 400);
     }
 
-    const { error: upsertError } = await supabaseAdmin.from("pagos").upsert(
-      {
-        user_id: user.id,
-        email: user.email,
-        proveedor: "paypal",
-        paypal_order_id: orderId,
-        monto: Number(cobro.monto),
-        moneda: cobro.moneda,
-        estado: "completado",
-        completado_at: new Date().toISOString(),
-      },
-      { onConflict: "paypal_order_id" },
-    );
+    const { error: insertError } = await supabaseAdmin.from("pagos").insert({
+      user_id: user.id,
+      email: user.email,
+      proveedor: "paypal",
+      paypal_order_id: order.id,
+      monto: Number(cobro.monto),
+      moneda: cobro.moneda,
+      estado: "completado",
+      completado_at: new Date().toISOString(),
+    });
 
-    if (upsertError) {
-      console.error("Falló el upsert en pagos:", upsertError.message);
-      return jsonResponse({ ok: false, motivo: upsertError.message }, 500);
+    if (insertError) {
+      // 23505 = unique: otra solicitud con la misma orden ganó la carrera.
+      if (insertError.code === "23505") {
+        const ganador = await duenoDeOrden(supabaseAdmin, orderId);
+        if (ganador?.user_id === user.id) return jsonResponse({ ok: true }, 200);
+        console.warn("Contenido Exclusivo rechazado (409): carrera con otra solicitud", { orderId, email: user.email });
+        return jsonResponse({ ok: false, motivo: "Esta orden ya se usó" }, 409);
+      }
+      console.error("Falló el insert en pagos:", insertError.message);
+      return jsonResponse({ ok: false, motivo: "No se pudo registrar el pago" }, 500);
     }
 
     console.log("Pago confirmado y guardado para", user.email);
     return jsonResponse({ ok: true }, 200);
   } catch (err) {
     console.error("Error no manejado en verify-paypal-payment:", err);
-    return jsonResponse({ ok: false, motivo: String(err) }, 500);
+    return jsonResponse({ ok: false, motivo: "No se pudo registrar el pago" }, 500);
   }
 });

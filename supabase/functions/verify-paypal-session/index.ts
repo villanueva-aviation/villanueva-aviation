@@ -31,6 +31,9 @@ const PAYPAL_API_BASE = Deno.env.get("PAYPAL_API_BASE")!;
 const PAYPAL_CLIENT_ID = Deno.env.get("PAYPAL_CLIENT_ID")!;
 const PAYPAL_CLIENT_SECRET = Deno.env.get("PAYPAL_CLIENT_SECRET")!;
 const PRECIO_ESPERADO = Deno.env.get("PRECIO_SESION_1A1") ?? "15.99";
+// COPIA en las tres funciones: los ids de orden de PayPal son mayúsculas y dígitos.
+// Sin esto, "ABC?x=1" pasaría la llave única y PayPal devolvería la misma orden ABC.
+const ORDER_ID = /^[A-Z0-9]{10,30}$/;
 
 async function obtenerTokenPayPal(): Promise<string> {
   const credenciales = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`);
@@ -60,6 +63,20 @@ async function ordenUsadaEn(admin: SupabaseClient, orderId: string, tablas: stri
     if (data) return true;
   }
   return false;
+}
+
+// Fila de "pagos_sesiones" que ya registró esta orden, o null.
+async function filaDeOrden(
+  admin: SupabaseClient,
+  orderId: string,
+): Promise<{ user_id: string; reserva_id: string } | null> {
+  const { data, error } = await admin
+    .from("pagos_sesiones")
+    .select("user_id, reserva_id")
+    .eq("paypal_order_id", orderId)
+    .maybeSingle();
+  if (error) throw new Error(`Falló la búsqueda de la orden en pagos_sesiones: ${error.message}`);
+  return data;
 }
 
 // COPIA en las tres funciones: el dinero solo está cobrado si la orden es intent
@@ -98,8 +115,8 @@ Deno.serve(async (req) => {
     const user = userData.user;
 
     const { orderId, reservaId } = await req.json();
-    if (!orderId || typeof orderId !== "string") {
-      return jsonResponse({ ok: false, motivo: "Falta orderId" }, 400);
+    if (typeof orderId !== "string" || !ORDER_ID.test(orderId)) {
+      return jsonResponse({ ok: false, motivo: "orderId inválido" }, 400);
     }
     if (!reservaId || typeof reservaId !== "string") {
       return jsonResponse({ ok: false, motivo: "Falta reservaId" }, 400);
@@ -124,6 +141,16 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    // Idempotencia: la misma orden del mismo cadete para la MISMA reserva ya registrada
+    // (reintento tras un fallo de red) es ok. Para otra reserva o de otro cadete, no:
+    // si no, una sola orden pagaría varias sesiones o se pasaría a otra cuenta.
+    const previa = await filaDeOrden(supabaseAdmin, orderId);
+    if (previa) {
+      if (previa.user_id === user.id && previa.reserva_id === reservaId) return jsonResponse({ ok: true }, 200);
+      console.warn("Sesión 1 a 1 rechazada (409): orden ya usada", { orderId, reservaId, email: user.email });
+      return jsonResponse({ ok: false, motivo: "Esta orden ya se usó" }, 409);
+    }
+
     if (await ordenUsadaEn(supabaseAdmin, orderId, ["pagos", "pruebas_red"])) {
       // Queda en el log: puede ser una orden ya cobrada que no se registró aquí.
       console.warn("Sesión 1 a 1 rechazada (409): orden ya usada en otro producto", { orderId, email: user.email });
@@ -131,7 +158,7 @@ Deno.serve(async (req) => {
     }
 
     const accessToken = await obtenerTokenPayPal();
-    const orderRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${orderId}`, {
+    const orderRes = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${encodeURIComponent(orderId)}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!orderRes.ok) {
@@ -139,6 +166,10 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: false, motivo: "Orden de PayPal no encontrada" }, 400);
     }
     const order = await orderRes.json();
+    if (order?.id !== orderId) {
+      console.error("PayPal devolvió otra orden:", { pedida: orderId, devuelta: order?.id });
+      return jsonResponse({ ok: false, motivo: "Orden inválida o incompleta" }, 400);
+    }
 
     const cobro = capturaCompletada(order);
     if (!cobro || cobro.moneda !== "USD" || !(Number(cobro.monto) >= Number(PRECIO_ESPERADO))) {
@@ -153,30 +184,36 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: false, motivo: "Orden inválida o incompleta" }, 400);
     }
 
-    const { error: upsertError } = await supabaseAdmin.from("pagos_sesiones").upsert(
-      {
-        user_id: user.id,
-        email: user.email,
-        reserva_id: reservaId,
-        proveedor: "paypal",
-        paypal_order_id: orderId,
-        monto: Number(cobro.monto),
-        moneda: cobro.moneda,
-        estado: "completado",
-        completado_at: new Date().toISOString(),
-      },
-      { onConflict: "paypal_order_id" },
-    );
+    const { error: insertError } = await supabaseAdmin.from("pagos_sesiones").insert({
+      user_id: user.id,
+      email: user.email,
+      reserva_id: reservaId,
+      proveedor: "paypal",
+      paypal_order_id: order.id,
+      monto: Number(cobro.monto),
+      moneda: cobro.moneda,
+      estado: "completado",
+      completado_at: new Date().toISOString(),
+    });
 
-    if (upsertError) {
-      console.error("Falló el upsert en pagos_sesiones:", upsertError.message);
-      return jsonResponse({ ok: false, motivo: upsertError.message }, 500);
+    if (insertError) {
+      // 23505 = unique. Si la orden ya está, otra solicitud con la misma orden ganó la
+      // carrera; si no, esta reserva ya estaba pagada con otra orden.
+      if (insertError.code === "23505") {
+        const ganador = await filaDeOrden(supabaseAdmin, orderId);
+        if (ganador?.user_id === user.id && ganador.reserva_id === reservaId) return jsonResponse({ ok: true }, 200);
+        const motivo = ganador ? "Esta orden ya se usó" : "Esta sesión ya está pagada";
+        console.warn("Sesión 1 a 1 rechazada (409):", { orderId, reservaId, email: user.email, motivo });
+        return jsonResponse({ ok: false, motivo }, 409);
+      }
+      console.error("Falló el insert en pagos_sesiones:", insertError.message);
+      return jsonResponse({ ok: false, motivo: "No se pudo registrar el pago" }, 500);
     }
 
     console.log("Sesión pagada y registrada para", user.email);
     return jsonResponse({ ok: true }, 200);
   } catch (err) {
     console.error("Error no manejado en verify-paypal-session:", err);
-    return jsonResponse({ ok: false, motivo: String(err) }, 500);
+    return jsonResponse({ ok: false, motivo: "No se pudo registrar el pago" }, 500);
   }
 });

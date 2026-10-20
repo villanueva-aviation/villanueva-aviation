@@ -39,6 +39,11 @@ const PARTES_RED = ["autorizacion", "salida", "ruta_llegada", "aproximacion"];
 const ESTADOS_QUE_CUENTAN = ["realizado", "no_se_presento", "cancelado_tarde"];
 const INTENTOS_POR_BLOQUE = 3;
 const DIAS_VIGENCIA = 30;
+// COPIA en las tres funciones: los ids de orden de PayPal son mayúsculas y dígitos.
+// Sin esto, "ABC?x=1" pasaría la llave única y PayPal devolvería la misma orden ABC.
+const ORDER_ID = /^[A-Z0-9]{10,30}$/;
+// Los 500 no muestran el error de la base ni de PayPal al navegador (va al log).
+const ERROR_INTERNO = "No se pudo registrar el pago";
 
 type Bloque = { id: string; bloque: number; estado: string; vence_at: string };
 type Intento = { prueba_id: string; estado: string; aprobadas: string[] };
@@ -133,8 +138,8 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: false, motivo: "Cuerpo inválido" }, 400);
     }
     const { orderId, etapa } = cuerpo ?? {};
-    if (!orderId || typeof orderId !== "string") {
-      return jsonResponse({ ok: false, motivo: "Falta orderId" }, 400);
+    if (typeof orderId !== "string" || !ORDER_ID.test(orderId)) {
+      return jsonResponse({ ok: false, motivo: "orderId inválido" }, 400);
     }
     if (etapa !== 1 && etapa !== 2) {
       return jsonResponse({ ok: false, motivo: "Etapa inválida" }, 400);
@@ -157,15 +162,15 @@ Deno.serve(async (req) => {
     // red), devolvemos el mismo bloque sin volver a revisar el precio.
     const { data: existente, error: existenteError } = await supabaseAdmin
       .from("pruebas_red")
-      .select("id, user_id")
+      .select("id, user_id, etapa")
       .eq("paypal_order_id", orderId)
       .maybeSingle();
     if (existenteError) {
       console.error("Falló la búsqueda de la orden en pruebas_red:", existenteError.message);
-      return jsonResponse({ ok: false, motivo: existenteError.message }, 500);
+      return jsonResponse({ ok: false, motivo: ERROR_INTERNO }, 500);
     }
     if (existente) {
-      if (existente.user_id !== user.id) return conflicto("Esta orden ya se usó");
+      if (existente.user_id !== user.id || existente.etapa !== etapa) return conflicto("Esta orden ya se usó");
       return jsonResponse({ ok: true, pruebaId: existente.id }, 200);
     }
 
@@ -180,7 +185,7 @@ Deno.serve(async (req) => {
       .eq("etapa", etapa);
     if (bloquesError) {
       console.error("Falló la lectura de pruebas_red:", bloquesError.message);
-      return jsonResponse({ ok: false, motivo: bloquesError.message }, 500);
+      return jsonResponse({ ok: false, motivo: ERROR_INTERNO }, 500);
     }
 
     let intentos: Intento[] = [];
@@ -191,7 +196,7 @@ Deno.serve(async (req) => {
         .in("prueba_id", bloques.map((b) => b.id));
       if (intentosError) {
         console.error("Falló la lectura de intentos_prueba_red:", intentosError.message);
-        return jsonResponse({ ok: false, motivo: intentosError.message }, 500);
+        return jsonResponse({ ok: false, motivo: ERROR_INTERNO }, 500);
       }
       intentos = data;
     }
@@ -210,6 +215,10 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: false, motivo: "Orden de PayPal no encontrada" }, 400);
     }
     const order = await orderRes.json();
+    if (order?.id !== orderId) {
+      console.error("PayPal devolvió otra orden:", { pedida: orderId, devuelta: order?.id });
+      return jsonResponse({ ok: false, motivo: "Orden inválida o incompleta" }, 400);
+    }
 
     const cobro = capturaCompletada(order);
     if (!cobro || cobro.moneda !== "USD" || !(Number(cobro.monto) >= Number(regla.precio))) {
@@ -237,7 +246,7 @@ Deno.serve(async (req) => {
         etapa,
         bloque: siguiente,
         proveedor: "paypal",
-        paypal_order_id: orderId,
+        paypal_order_id: order.id,
         monto: Number(cobro.monto),
         moneda: "USD",
         estado: "activa",
@@ -253,21 +262,21 @@ Deno.serve(async (req) => {
       if (insertError.code === "23505") {
         const { data: ganador, error: ganadorError } = await supabaseAdmin
           .from("pruebas_red")
-          .select("id, user_id")
+          .select("id, user_id, etapa")
           .eq("paypal_order_id", orderId)
           .maybeSingle();
         if (!ganadorError && !ganador) return conflicto("Ya tienes intentos activos");
-        if (ganadorError || ganador!.user_id !== user.id) return conflicto("Esta orden ya se usó");
+        if (ganadorError || ganador!.user_id !== user.id || ganador!.etapa !== etapa) return conflicto("Esta orden ya se usó");
         return jsonResponse({ ok: true, pruebaId: ganador!.id }, 200);
       }
       console.error("Falló el insert en pruebas_red:", insertError.message);
-      return jsonResponse({ ok: false, motivo: insertError.message }, 500);
+      return jsonResponse({ ok: false, motivo: ERROR_INTERNO }, 500);
     }
 
     console.log("Bloque", siguiente, "de prueba en red etapa", etapa, "registrado para", user.email);
     return jsonResponse({ ok: true, pruebaId: insertado.id }, 200);
   } catch (err) {
     console.error("Error no manejado en verify-paypal-prueba-red:", err);
-    return jsonResponse({ ok: false, motivo: String(err) }, 500);
+    return jsonResponse({ ok: false, motivo: ERROR_INTERNO }, 500);
   }
 });
