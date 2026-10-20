@@ -115,8 +115,64 @@ export const FRASEOLOGIA_EMERGENCIAS_APROXIMACION: PhraseologyCard[] = [
   },
 ];
 
+const XB_VNA = ["xb vna", "xb-vna", "xbvna", "x-ray bravo", "x ray bravo", "xray bravo", "victor november alfa", "victor noviembre alfa", "november alfa", "noviembre alfa"];
+
+// Ruta "Listo para volar en red": SID reales de MMGL (Jeppesen 10-3D y 10-3E vía Navigraph).
+// Frecuencia de salida, altitud y código son de ejemplo; GUADALAJARA Clearance 132.8 es real.
+export const FRASEOLOGIA_AUTORIZACION_IFR: PhraseologyCard[] = [
+  {
+    situacion: "Estás en MMGL con el C172 XB-VNA, pista 11R en uso. En 132.8 (GUADALAJARA Clearance) te leen tu autorización IFR a Ciudad de México. Colaciónala completa, en orden CRAFT. Frecuencia de salida, altitud y código son de ejemplo.",
+    callout: "Autorizado a Ciudad de México, salida LONKU 1D, luego ruta del plan de vuelo, ascienda y mantenga 12 000 pies, frecuencia de salida 124.5, transpondedor 4521, XB-VNA.",
+    elementos: [
+      { descripcion: "Límite de la autorización (Ciudad de México)", palabrasClave: ["ciudad de mexico", "mexico", "mmmx"] },
+      { descripcion: "Ruta: la SID LONKU 1D", palabrasClave: ["lonku 1d", "lonku uno delta", "lonku 1 delta", "uno delta", "1 delta", "1d"] },
+      { descripcion: "Altitud: 12 000 pies", palabrasClave: ["12 000", "12000", "12,000", "doce mil"] },
+      { descripcion: "Frecuencia de salida: 124.5", palabrasClave: ["124.5", "124 5", "1245", "uno dos cuatro decimal cinco", "ciento veinticuatro punto cinco"] },
+      { descripcion: "Transpondedor: 4521", palabrasClave: ["4521", "45 21", "cuatro cinco dos uno"] },
+      { descripcion: "Tu identificación", palabrasClave: XB_VNA },
+    ],
+  },
+  {
+    situacion: "Mismo vuelo en otro día: pista 11L en uso. La autorización cambia de altitud, frecuencia y código. Colaciónala completa. Frecuencia de salida, altitud y código son de ejemplo.",
+    callout: "Autorizado a Ciudad de México, salida LONKU 1D, luego ruta del plan de vuelo, ascienda y mantenga 11 000 pies, frecuencia de salida 120.8, transpondedor 3164, XB-VNA.",
+    elementos: [
+      { descripcion: "Límite de la autorización (Ciudad de México)", palabrasClave: ["ciudad de mexico", "mexico", "mmmx"] },
+      { descripcion: "Ruta: la SID LONKU 1D", palabrasClave: ["lonku 1d", "lonku uno delta", "lonku 1 delta", "uno delta", "1 delta", "1d"] },
+      { descripcion: "Altitud: 11 000 pies", palabrasClave: ["11 000", "11000", "11,000", "once mil"] },
+      { descripcion: "Frecuencia de salida: 120.8", palabrasClave: ["120.8", "120 8", "1208", "uno dos cero decimal ocho", "ciento veinte punto ocho"] },
+      { descripcion: "Transpondedor: 3164", palabrasClave: ["3164", "31 64", "tres uno seis cuatro"] },
+      { descripcion: "Tu identificación", palabrasClave: XB_VNA },
+    ],
+  },
+  {
+    situacion: "Vuelas un jet (lección 6) desde MMGL con pistas 29L/R en uso; tu callsign de ejemplo es XB-VNA. Te autorizan con la SID de las pistas 29. Colaciónala completa. Frecuencia de salida, nivel y código son de ejemplo.",
+    callout: "Autorizado a Ciudad de México, salida LONKU 1E, luego ruta del plan de vuelo, ascienda y mantenga nivel de vuelo 200, frecuencia de salida 124.5, transpondedor 5612, XB-VNA.",
+    elementos: [
+      { descripcion: "Límite de la autorización (Ciudad de México)", palabrasClave: ["ciudad de mexico", "mexico", "mmmx"] },
+      { descripcion: "Ruta: la SID LONKU 1E", palabrasClave: ["lonku 1e", "lonku uno eco", "lonku 1 eco", "uno eco", "1 eco", "1e"] },
+      { descripcion: "Nivel: nivel de vuelo 200", palabrasClave: ["nivel de vuelo 200", "nivel 200", "nivel de vuelo dos cero cero", "fl200"] },
+      { descripcion: "Frecuencia de salida: 124.5", palabrasClave: ["124.5", "124 5", "1245", "uno dos cuatro decimal cinco", "ciento veinticuatro punto cinco"] },
+      { descripcion: "Transpondedor: 5612", palabrasClave: ["5612", "56 12", "cinco seis uno dos"] },
+      { descripcion: "Tu identificación", palabrasClave: XB_VNA },
+    ],
+  },
+  {
+    situacion: "De vuelta en el C172, pista 11R. El controlador te autoriza al aeropuerto de destino por su indicativo OACI y te pide esperar un nivel mayor más tarde. Colaciónala completa. Frecuencia de salida, altitudes y código son de ejemplo.",
+    callout: "Autorizado a MMMX, salida LONKU 1D, luego ruta del plan de vuelo, ascienda y mantenga 10 000 pies, espere 12 000 pies diez minutos después de la salida, frecuencia de salida 120.8, transpondedor 2207, XB-VNA.",
+    elementos: [
+      { descripcion: "Límite de la autorización (MMMX)", palabrasClave: ["mmmx", "mike mike mike x-ray", "ciudad de mexico", "mexico"] },
+      { descripcion: "Ruta: la SID LONKU 1D", palabrasClave: ["lonku 1d", "lonku uno delta", "lonku 1 delta", "uno delta", "1 delta", "1d"] },
+      { descripcion: "Altitud: 10 000 pies, y esperar 12 000", palabrasClave: ["10 000", "10000", "10,000", "diez mil"] },
+      { descripcion: "Frecuencia de salida: 120.8", palabrasClave: ["120.8", "120 8", "1208", "uno dos cero decimal ocho", "ciento veinte punto ocho"] },
+      { descripcion: "Transpondedor: 2207", palabrasClave: ["2207", "22 07", "dos dos cero siete"] },
+      { descripcion: "Tu identificación", palabrasClave: XB_VNA },
+    ],
+  },
+];
+
 /** Tandas de fraseología que puede pedir una actividad de la Academia. */
 export const AUDIO_SETS: Record<string, PhraseologyCard[]> = {
   "rodaje-despegue": FRASEOLOGIA_RODAJE_DESPEGUE,
   "emergencias-aproximacion": FRASEOLOGIA_EMERGENCIAS_APROXIMACION,
+  "autorizacion-ifr": FRASEOLOGIA_AUTORIZACION_IFR,
 };
