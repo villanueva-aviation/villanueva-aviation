@@ -62,6 +62,7 @@ const Asesorias = lazy(() => import("./pages/Asesorias").then((m) => ({ default:
 const Diagnostico = lazy(() => import("./pages/Diagnostico").then((m) => ({ default: m.Diagnostico })));
 const RutaRed = lazy(() => import("./pages/RutaRed").then((m) => ({ default: m.RutaRed })));
 const RutaRedLeccion = lazy(() => import("./pages/RutaRedLeccion").then((m) => ({ default: m.RutaRedLeccion })));
+const PruebaRed = lazy(() => import("./pages/PruebaRed").then((m) => ({ default: m.PruebaRed })));
 const Ingresar = lazy(() => import("./pages/Ingresar").then((m) => ({ default: m.Ingresar })));
 const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m.NotFound })));
 
@@ -311,6 +312,14 @@ function RoutedContent() {
             }
           />
           <Route path={ROUTES.rutaRed} element={<RutaRed />} />
+          <Route
+            path={ROUTES.pruebaRed}
+            element={
+              <ProtectedRoute>
+                <PruebaRed />
+              </ProtectedRoute>
+            }
+          />
           <Route path={ROUTES.rutaRedLeccion(":id")} element={<RutaRedLeccion />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
