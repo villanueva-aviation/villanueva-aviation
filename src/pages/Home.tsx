@@ -94,6 +94,9 @@ export function Home() {
               <p className="mt-4 font-display text-sm font-semibold uppercase tracking-wide text-gold-400">
                 El cielo no es el límite, es el comienzo.
               </p>
+              <Button to={ROUTES.quienesSomos} variant="ghost" className="mt-6">
+                Quiénes somos <ArrowRight size={16} />
+              </Button>
             </Reveal>
           </div>
         </Container>

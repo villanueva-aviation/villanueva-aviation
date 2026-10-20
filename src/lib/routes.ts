@@ -1,4 +1,4 @@
-import { BookOpen, ClipboardCheck, Compass, Download, GraduationCap, Home, Plane, PlaneTakeoff, Sparkles, UserCircle, Users, Waypoints } from "lucide-react";
+import { BookOpen, Info, ClipboardCheck, Compass, Download, GraduationCap, Home, Plane, PlaneTakeoff, Sparkles, UserCircle, Users, Waypoints } from "lucide-react";
 
 export const ROUTES = {
   home: "/",
@@ -51,6 +51,7 @@ export const ROUTES = {
   empieza: "/empieza",
   aventura: "/aventura",
   flota: "/flota",
+  quienesSomos: "/quienes-somos",
   entrenadorEsperas: "/entrenador-esperas",
   adminAventura: "/admin/aventura",
 } as const;
@@ -68,6 +69,7 @@ export const NAV_LINKS = [
   { label: "Flota", to: ROUTES.flota, icon: PlaneTakeoff, soloMenus: true },
   { label: "Asesorías", to: ROUTES.asesorias, icon: GraduationCap, soloMenus: true },
   { label: "Comunidad", to: ROUTES.comunidad, icon: Users },
+  { label: "Quiénes somos", to: ROUTES.quienesSomos, icon: Info, soloMenus: true },
 ];
 
 export const CADET_TABS = [

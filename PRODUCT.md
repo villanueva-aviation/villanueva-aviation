@@ -38,7 +38,7 @@ Unlike recorded video courses (Eddie Aviation Services) and English/FAA-centred 
 - **Capacity is real and small:** the founder gives sessions ~2 hours a day. Scarcity copy (limited spots) must match the constants in `src/lib/constants.ts`.
 - Content must work for total beginners and for experienced simmers at once.
 - Regulatory scope is Latin America broadly; AFAC/RAC is one example, not the default.
-- **Never imply official status.** Villanueva Aviation is not a certified flight school and grants no licences. The founder is not a certified instructor (lapsed real-world PPL; 6,884 h on IVAO). Use "el fundador revisa personalmente", "asesoría", "preparación"; never "instructor certificado", "CFI", "licencia", or "piloto" as a title the site confers.
+- **Never imply official status.** Villanueva Aviation is not a certified flight school and grants no licences. The founder is not a certified instructor (real-world Private Pilot licence with 120 h, currently expired; plans to renew it, then go for Commercial; 6,884 h on IVAO). His own licence may be stated as a personal fact (as on `/quienes-somos`), never as something the academy confers. Use "el fundador revisa personalmente", "asesoría", "preparación"; never "instructor certificado", "CFI", "licencia", or "piloto" as a title the site confers.
 
 ## Brand Commitments
 

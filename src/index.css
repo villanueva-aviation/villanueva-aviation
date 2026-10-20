@@ -269,6 +269,26 @@ body {
   animation: shimmer 3.5s ease-in-out infinite;
 }
 
+/* /quienes-somos: acercamiento lento de la foto de portada. */
+@keyframes ken-burns {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.animate-ken-burns {
+  animation: ken-burns 18s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ken-burns {
+    animation: none;
+  }
+}
+
 /* Mapa de /aventura: invierte los mosaicos claros de OpenStreetMap para que casen con el fondo navy. */
 .tiles-oscuros {
   filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(0.95) saturate(0.6);
