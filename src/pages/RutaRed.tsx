@@ -5,20 +5,15 @@ import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { CARTAS_RED, LECCIONES_RED, SLUG_RUTA_RED } from "../data/rutaRed";
-import { NOMBRE_PARTE, PARTES_RED } from "../features/rutaRed/reglas";
+import { CRITERIOS_RED, NOMBRE_PARTE, PARTES_RED, REGLAS_PRUEBA_RED } from "../features/rutaRed/reglas";
 import { useProgress } from "../features/progress/ProgressContext";
 import { useAuth } from "../features/auth/AuthContext";
 import {
-  DIAS_VIGENCIA_PRUEBA,
-  HORAS_CANCELACION,
-  HORAS_SEMANA_PRUEBAS,
   INTENTOS_POR_BLOQUE,
   PRECIO_PRUEBA_RED,
   PRECIO_PRUEBA_RED_REPETICION,
 } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
-
-const CRITERIOS = ["Colacionó mal la autorización", "Se salió de la SID", "Comunicaciones poco claras o imprecisas"];
 
 export function RutaRed() {
   const { isAuthenticated } = useAuth();
@@ -132,7 +127,7 @@ export function RutaRed() {
               </ol>
               <p className="mt-5 font-display text-sm font-semibold text-white">No apruebas una parte si</p>
               <ul className="mt-2 flex flex-col gap-1.5 text-sm text-white/75">
-                {CRITERIOS.map((c) => (
+                {CRITERIOS_RED.map((c) => (
                   <li key={c} className="flex gap-2">
                     <span aria-hidden="true" className="text-gold-400">
                       ·
@@ -147,17 +142,9 @@ export function RutaRed() {
           <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-6">
             <p className="font-display text-sm font-semibold text-white">Reglas</p>
             <ul className="mt-3 flex flex-col gap-2 text-sm leading-relaxed text-white/70">
-              <li>
-                Si no te presentas, o cancelas con menos de {HORAS_CANCELACION} horas de anticipación, se usa el intento.
-              </li>
-              <li>Los intentos vencen {DIAS_VIGENCIA_PRUEBA} días después del pago.</li>
-              <li>
-                Si Erik no puede darte una fecha dentro de esos {DIAS_VIGENCIA_PRUEBA} días, te devolvemos el pago.
-              </li>
-              <li>Erik dedica {HORAS_SEMANA_PRUEBAS} horas a la semana a las pruebas.</li>
-              <li>
-                Para agendar necesitas tu callsign de IVAO o VATSIM, o tu enlace de Volanta, para que Erik pueda ver tu vuelo.
-              </li>
+              {REGLAS_PRUEBA_RED.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
               <li>Pagar y agendar requiere una cuenta gratis.</li>
             </ul>
           </div>

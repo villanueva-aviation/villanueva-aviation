@@ -1,4 +1,11 @@
-import { HORAS_CANCELACION, INTENTOS_POR_BLOQUE, PRECIO_PRUEBA_RED, PRECIO_PRUEBA_RED_REPETICION } from "../../lib/constants.ts";
+import {
+  DIAS_VIGENCIA_PRUEBA,
+  HORAS_CANCELACION,
+  HORAS_SEMANA_PRUEBAS,
+  INTENTOS_POR_BLOQUE,
+  PRECIO_PRUEBA_RED,
+  PRECIO_PRUEBA_RED_REPETICION,
+} from "../../lib/constants.ts";
 
 export const PARTES_RED = ["autorizacion", "salida", "ruta_llegada", "aproximacion"] as const;
 export type ParteRed = (typeof PARTES_RED)[number];
@@ -9,6 +16,18 @@ export const NOMBRE_PARTE: Record<ParteRed, string> = {
   ruta_llegada: "En ruta y llegada (STAR)",
   aproximacion: "Aproximación",
 };
+
+/** Criterios de no aprobación de una parte (texto visible). */
+export const CRITERIOS_RED = ["Colacionó mal la autorización", "Se salió de la SID", "Comunicaciones poco claras o imprecisas"] as const;
+
+/** Reglas de la prueba que se muestran en la ruta y en la página de la prueba. */
+export const REGLAS_PRUEBA_RED = [
+  `Si no te presentas, o cancelas con menos de ${HORAS_CANCELACION} horas de anticipación, se usa el intento.`,
+  `Los intentos vencen ${DIAS_VIGENCIA_PRUEBA} días después del pago.`,
+  `Si Erik no puede darte una fecha dentro de esos ${DIAS_VIGENCIA_PRUEBA} días, te devolvemos el pago.`,
+  `Erik dedica ${HORAS_SEMANA_PRUEBAS} horas a la semana a las pruebas.`,
+  "Para agendar necesitas tu callsign de IVAO o VATSIM, o tu enlace de Volanta, para que Erik pueda ver tu vuelo.",
+];
 
 export type EstadoIntento = "pendiente" | "confirmado" | "realizado" | "no_se_presento" | "cancelado" | "cancelado_tarde";
 
@@ -94,7 +113,13 @@ export function partesDelSiguienteIntento(intentosEtapa: IntentoRed[]): ParteRed
 }
 
 /** fecha "YYYY-MM-DD", horario "HH:00" en hora de México (UTC-6 fijo, sin horario de verano). */
+const horaCita = (fecha: string, horario: string) => new Date(`${fecha}T${horario}:00-06:00`).getTime();
+
 export function cancelacionTardia(fecha: string, horario: string, ahora: Date): boolean {
-  const cita = new Date(`${fecha}T${horario}:00-06:00`).getTime();
-  return cita - ahora.getTime() < HORAS_CANCELACION * 3600_000;
+  return horaCita(fecha, horario) - ahora.getTime() < HORAS_CANCELACION * 3600_000;
+}
+
+/** La cita (hora de México) cae antes de que venza el bloque; el trigger de la base revisa lo mismo. */
+export function antesDeVencer(fecha: string, horario: string, prueba: Pick<PruebaRed, "vence_at">): boolean {
+  return horaCita(fecha, horario) < new Date(prueba.vence_at).getTime();
 }

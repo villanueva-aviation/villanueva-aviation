@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  antesDeVencer,
   cancelacionTardia,
   estadoBloque,
   insigniaGanada,
@@ -104,4 +105,11 @@ test("cancelación tardía: menos de 24 h para la cita (hora de México, UTC-6)"
   // 18:00 en México = 2026-11-11T00:00Z
   assert.equal(cancelacionTardia("2026-11-10", "18:00", new Date("2026-11-10T00:30:00Z")), true);
   assert.equal(cancelacionTardia("2026-11-10", "18:00", new Date("2026-11-08T23:00:00Z")), false);
+});
+
+test("antesDeVencer compara la cita en hora de México con vence_at", () => {
+  const prueba = { vence_at: "2026-11-11T00:00:00Z" }; // 10 nov 18:00 en México
+  assert.equal(antesDeVencer("2026-11-10", "17:00", prueba), true);
+  assert.equal(antesDeVencer("2026-11-10", "18:00", prueba), false);
+  assert.equal(antesDeVencer("2026-11-10", "21:00", prueba), false);
 });

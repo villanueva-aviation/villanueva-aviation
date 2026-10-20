@@ -16,28 +16,31 @@ async function miUserId(): Promise<string | null> {
   return data.user?.id ?? null;
 }
 
+/** Lanza si falla la lectura o no hay sesión: un [] por error haría parecer que no hay bloque y mostraría el pago. */
 export async function fetchMisPruebas(etapa: 1 | 2): Promise<PruebaRed[]> {
   const userId = await miUserId();
-  if (!userId) return [];
-  const { data } = await supabase
+  if (!userId) throw new Error("Sin sesión");
+  const { data, error } = await supabase
     .from("pruebas_red")
     .select(COLUMNAS_PRUEBA)
     .eq("user_id", userId)
     .eq("etapa", etapa)
     .order("bloque", { ascending: true });
+  if (error) throw error;
   return (data as PruebaRed[]) ?? [];
 }
 
-/** Intentos de todos los bloques de la etapa (join por prueba_id); se quita el objeto del join y se devuelven IntentoRed planos. */
+/** Intentos de todos los bloques de la etapa (join por prueba_id); lanza si falla. Se quita el objeto del join y se devuelven IntentoRed planos. */
 export async function fetchMisIntentos(etapa: 1 | 2): Promise<IntentoRed[]> {
   const userId = await miUserId();
-  if (!userId) return [];
-  const { data } = await supabase
+  if (!userId) throw new Error("Sin sesión");
+  const { data, error } = await supabase
     .from("intentos_prueba_red")
     .select(`${COLUMNAS_INTENTO}, pruebas_red!inner(etapa)`)
     .eq("user_id", userId)
     .eq("pruebas_red.etapa", etapa)
     .order("created_at", { ascending: true });
+  if (error) throw error;
   return ((data as unknown as (IntentoRed & { pruebas_red?: unknown })[]) ?? []).map((fila) => {
     const { pruebas_red: _join, ...intento } = fila;
     return intento;

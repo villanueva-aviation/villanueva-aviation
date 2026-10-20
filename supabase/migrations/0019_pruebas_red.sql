@@ -157,6 +157,7 @@ declare
   p public.pruebas_red%rowtype;
   total integer;
   usados integer;
+  cita timestamptz;
 begin
   -- Bloquea el bloque para que dos solicitudes simultáneas se cuenten en orden.
   select * into p from public.pruebas_red where id = new.prueba_id for update;
@@ -180,6 +181,14 @@ begin
     end if;
     if p.vence_at <= now() then
       raise exception 'Este bloque ya venció.';
+    end if;
+    -- fecha + horario es hora de México (UTC-6 fijo): se lee como UTC y se suman 6 h.
+    cita := ((new.fecha + new.horario::time) at time zone 'UTC') + interval '6 hours';
+    if cita <= now() then
+      raise exception 'Esa fecha y hora ya pasaron.';
+    end if;
+    if cita >= p.vence_at then
+      raise exception 'La cita tiene que ser antes de que venza tu bloque.';
     end if;
     if usados >= 3 then
       raise exception 'Ya usaste los 3 intentos de este bloque.';

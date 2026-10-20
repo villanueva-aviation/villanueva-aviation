@@ -79,7 +79,16 @@ export function PayPalButton({
               );
               setVerificando(false);
               if (fnError || !resultado?.ok) {
-                setError("No pudimos confirmar tu pago con PayPal. Si el cargo se realizó, contáctanos.");
+                // Con status no-2xx supabase-js devuelve data=null; el `motivo` viene en el cuerpo de la respuesta.
+                let motivo: unknown = resultado?.motivo;
+                if (fnError?.context instanceof Response) {
+                  motivo = await fnError.context.json().then((b: { motivo?: unknown }) => b?.motivo, () => undefined);
+                }
+                setError(
+                  typeof motivo === "string" && motivo
+                    ? `No pudimos confirmar tu pago: ${motivo.replace(/\.$/, "")}. Si el cargo se realizó, contáctanos.`
+                    : "No pudimos confirmar tu pago con PayPal. Si el cargo se realizó, contáctanos.",
+                );
                 return;
               }
               propsRef.current.onSuccess();

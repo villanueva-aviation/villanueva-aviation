@@ -9,8 +9,11 @@ import { PayPalButton } from "../features/payments/PayPalButton";
 import { useProgress } from "../features/progress/ProgressContext";
 import { LECCIONES_RED, SLUG_RUTA_RED } from "../data/rutaRed";
 import {
+  CRITERIOS_RED,
   NOMBRE_PARTE,
   PARTES_RED,
+  REGLAS_PRUEBA_RED,
+  antesDeVencer,
   cancelacionTardia,
   estadoBloque,
   insigniaGanada,
@@ -29,14 +32,12 @@ import { fechaMinima, horariosDisponibles } from "../lib/agendaSlots";
 import {
   DIAS_VIGENCIA_PRUEBA,
   HORAS_CANCELACION,
-  HORAS_SEMANA_PRUEBAS,
   INTENTOS_POR_BLOQUE,
   PRECIO_PRUEBA_RED_REPETICION,
 } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 
 const ETAPA = 1;
-const CRITERIOS = ["Colacionó mal la autorización", "Se salió de la SID", "Comunicaciones poco claras o imprecisas"];
 
 const ESTADO_INTENTO: Record<EstadoIntento, { texto: string; tone: "gold" | "green" | "red" | "neutral" }> = {
   pendiente: { texto: "Por confirmar", tone: "gold" },
@@ -70,12 +71,25 @@ export function PruebaRed() {
   const { isActividadCompletada } = useProgress();
   const [pruebas, setPruebas] = useState<Prueba[] | null>(null);
   const [intentos, setIntentos] = useState<IntentoRed[]>([]);
+  const [falloCarga, setFalloCarga] = useState(false);
 
+  // Si la lectura falla no se muestra nada del bloque: un "sin bloque" falso pondría el botón de pago
+  // a alguien con un bloque activo, y PayPal cobra antes de que el servidor lo rechace.
   const cargar = () =>
-    Promise.all([fetchMisPruebas(ETAPA), fetchMisIntentos(ETAPA)]).then(([p, i]) => {
-      setIntentos(i);
-      setPruebas(p);
-    });
+    Promise.all([fetchMisPruebas(ETAPA), fetchMisIntentos(ETAPA)]).then(
+      ([p, i]) => {
+        setIntentos(i);
+        setPruebas(p);
+        setFalloCarga(false);
+      },
+      () => setFalloCarga(true),
+    );
+
+  function reintentar() {
+    setFalloCarga(false);
+    setPruebas(null);
+    void cargar();
+  }
 
   useEffect(() => {
     void cargar();
@@ -108,7 +122,14 @@ export function PruebaRed() {
       </PageHero>
 
       <Container className="flex flex-col gap-8 py-12 md:py-16">
-        {pruebas === null ? (
+        {falloCarga ? (
+          <div role="alert" className="rounded-2xl border border-red-500/30 bg-red-500/[0.06] p-5">
+            <p className="text-sm text-white/80">No pudimos cargar tu prueba. Revisa tu conexión e intenta de nuevo.</p>
+            <Button variant="secondary" className="mt-3" onClick={reintentar}>
+              Reintentar
+            </Button>
+          </div>
+        ) : pruebas === null ? (
           <p className="text-sm text-white/50">Cargando tu prueba…</p>
         ) : (
           <>
@@ -202,7 +223,7 @@ function Reglas() {
         </ol>
         <p className="mt-5 font-display text-sm font-semibold text-white">No apruebas una parte si</p>
         <ul className="mt-2 flex flex-col gap-1.5 text-sm text-white/75">
-          {CRITERIOS.map((c) => (
+          {CRITERIOS_RED.map((c) => (
             <li key={c} className="flex gap-2">
               <span aria-hidden="true" className="text-gold-400">
                 ·
@@ -216,13 +237,9 @@ function Reglas() {
         <p className="font-display text-sm font-semibold text-white">Reglas</p>
         <ul className="mt-3 flex flex-col gap-2 text-sm leading-relaxed text-white/70">
           <li>El primer intento es el vuelo completo (unas 2 h). Los siguientes repiten solo las partes pendientes (20 a 30 min).</li>
-          <li>Si no te presentas, o cancelas con menos de {HORAS_CANCELACION} horas de anticipación, se usa el intento.</li>
-          <li>Los intentos vencen {DIAS_VIGENCIA_PRUEBA} días después del pago.</li>
-          <li>Si Erik no puede darte una fecha dentro de esos {DIAS_VIGENCIA_PRUEBA} días, te devolvemos el pago.</li>
-          <li>Erik dedica {HORAS_SEMANA_PRUEBAS} horas a la semana a las pruebas.</li>
-          <li>
-            Para agendar necesitas tu callsign de IVAO o VATSIM, o tu enlace de Volanta, para que Erik pueda ver tu vuelo.
-          </li>
+          {REGLAS_PRUEBA_RED.map((r) => (
+            <li key={r}>{r}</li>
+          ))}
         </ul>
       </div>
     </section>
@@ -316,7 +333,16 @@ function FormularioAgenda({
   const [enviando, setEnviando] = useState(false);
   const minFecha = fechaMinima();
   const maxFecha = fechaMexico(bloque.vence_at);
-  const slots = horariosDisponibles(fecha);
+  // El último día solo valen los horarios antes de que venza el bloque (el trigger de la base revisa lo mismo).
+  const slots = horariosDisponibles(fecha).filter((s) => antesDeVencer(fecha, s.value, bloque));
+
+  if (maxFecha < minFecha) {
+    return (
+      <p className="text-sm text-white/70">
+        Tu bloque vence antes de la siguiente fecha disponible; escríbenos para reprogramar.
+      </p>
+    );
+  }
 
   async function enviar(e: FormEvent) {
     e.preventDefault();
@@ -338,8 +364,11 @@ function FormularioAgenda({
       partes,
       enlaceSeguimiento: enlaceLimpio,
     });
-    setEnviando(false);
-    if (err) return setError(err);
+    // Si salió bien, el botón queda deshabilitado mientras la página recarga y quita el formulario.
+    if (err) {
+      setEnviando(false);
+      return setError(err);
+    }
     onAgendado();
   }
 
@@ -366,7 +395,7 @@ function FormularioAgenda({
           Horario (hora de México)
           <select value={horario} onChange={(e) => setHorario(e.target.value)} disabled={!fecha} className={campo}>
             <option value="" style={opcion}>
-              {fecha ? "Elige un horario" : "Elige primero una fecha"}
+              {!fecha ? "Elige primero una fecha" : slots.length ? "Elige un horario" : "No hay horarios ese día"}
             </option>
             {slots.map((s) => (
               <option key={s.value} value={s.value} style={opcion}>
@@ -377,8 +406,7 @@ function FormularioAgenda({
         </label>
       </div>
       <p className="-mt-2 text-xs text-white/45">
-        Al menos 2 días de anticipación y antes de que venza tu bloque. Horarios: lunes a viernes 5pm-10pm, sábado y
-        domingo 8am-10pm.
+        Puedes agendar del {fechaLarga(minFecha)} al {fechaLarga(maxFecha)}.
       </p>
       <label className="flex flex-col gap-1.5 text-sm text-white/70">
         Callsign de IVAO o VATSIM, o enlace de Volanta
@@ -391,7 +419,11 @@ function FormularioAgenda({
           className={campo}
         />
       </label>
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && (
+        <p role="alert" className="text-sm text-red-400">
+          {error}
+        </p>
+      )}
       <Button type="submit" variant="primary" className="w-full sm:w-auto" disabled={enviando}>
         <CalendarClock size={16} /> {enviando ? "Agendando..." : "Agendar intento"}
       </Button>
@@ -400,20 +432,24 @@ function FormularioAgenda({
 }
 
 function TarjetaIntento({ intento, bloque, onCambio }: { intento: IntentoRed; bloque?: number; onCambio: () => void }) {
-  const [confirmando, setConfirmando] = useState(false);
+  // null = sin confirmación abierta; si no, si la cancelación es tardía al momento de pulsar "Cancelar".
+  const [tardia, setTardia] = useState<boolean | null>(null);
   const [cancelando, setCancelando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const estado = ESTADO_INTENTO[intento.estado];
   const cancelable = intento.estado === "pendiente" || intento.estado === "confirmado";
-  const tardia = cancelacionTardia(intento.fecha, intento.horario, new Date());
+  const confirmando = tardia !== null;
+  const esTardia = () => cancelacionTardia(intento.fecha, intento.horario, new Date());
 
   async function cancelar() {
+    // Si cruzó las 24 h con el aviso abierto, se actualiza el aviso y se pide confirmar otra vez.
+    if (esTardia() !== tardia) return setTardia(esTardia());
     setCancelando(true);
     setError(null);
     const { error: err } = await cancelarIntento(intento, new Date());
     setCancelando(false);
     if (err) return setError(err);
-    setConfirmando(false);
+    setTardia(null);
     onCambio();
   }
 
@@ -446,7 +482,7 @@ function TarjetaIntento({ intento, bloque, onCambio }: { intento: IntentoRed; bl
       {cancelable && !confirmando && (
         <button
           type="button"
-          onClick={() => setConfirmando(true)}
+          onClick={() => setTardia(esTardia())}
           className="mt-3 text-sm font-medium text-white/60 underline-offset-4 hover:text-red-400 hover:underline"
         >
           Cancelar
@@ -470,7 +506,7 @@ function TarjetaIntento({ intento, bloque, onCambio }: { intento: IntentoRed; bl
             </button>
             <button
               type="button"
-              onClick={() => setConfirmando(false)}
+              onClick={() => setTardia(null)}
               disabled={cancelando}
               className="rounded-full border border-white/15 px-4 py-1.5 text-sm font-medium text-white/70 hover:text-white"
             >
