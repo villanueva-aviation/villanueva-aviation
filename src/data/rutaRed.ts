@@ -87,7 +87,7 @@ export const LECCIONES_RED: LeccionRed[] = [
         id: "red-2-1",
         titulo: "Armarlo en SimBrief",
         clave: "SimBrief propone la ruta; tú revisas que tenga sentido con las cartas del mismo ciclo.",
-        texto: "En SimBrief pon origen MMGL, destino MMMX, el avión que vas a volar (para las lecciones, el C172) y un alterno. SimBrief propone una ruta con aerovías del ciclo AIRAC actual. Antes de generar, revisa que tu simulador y tus cartas usen el mismo ciclo: si no coinciden, puede que un punto o una SID no existan en tu GPS. Revisa también el equipo del avión: las SID LONKU piden RNAV 1 con GNSS, así que el plan debe decir que tienes GPS.",
+        texto: "En SimBrief pon origen MMGL, destino MMMX, el avión que vas a volar (en las lecciones, el C172 para la salida y el C408 para la llegada y la aproximación) y un alterno. SimBrief propone una ruta con aerovías del ciclo AIRAC actual. Antes de generar, revisa que tu simulador y tus cartas usen el mismo ciclo: si no coinciden, puede que un punto o una SID no existan en tu GPS. Revisa también el equipo del avión: las SID LONKU piden RNAV 1 con GNSS, así que el plan debe decir que tienes GPS.",
       },
       {
         id: "red-2-2",
@@ -103,9 +103,9 @@ export const LECCIONES_RED: LeccionRed[] = [
       },
       {
         id: "red-2-3",
-        titulo: "Altitudes y el C172",
-        clave: "Si tu avión no puede cumplir las altitudes de una llegada, no puedes aceptarla.",
-        texto: "La llegada DARAN 3A está hecha para jets: cruza DARAN entre FL210 y FL230. Un C172 no llega ahí. Las restricciones de altitud publicadas en una STAR o una SID son parte del procedimiento: si la aceptas, las cumples. Si tu avión no puede cumplirlas, no puedes aceptar ese procedimiento: contestas «imposible». Entonces el controlador puede darte vectores y altitudes que él asigna con sus altitudes mínimas de vectoreo. Recuerda que en MMGL la altitud de transición es 18 500 ft y en MMMX el nivel de transición es FL195: abajo de eso vuelas con el altímetro en QNH. En la prueba eliges tu avión; si es un jet, vuelas la STAR con sus altitudes publicadas.",
+        titulo: "Altitudes y tu avión",
+        clave: "Vuela cada procedimiento en un avión que pueda cumplir todas sus restricciones; si no puede, contesta «imposible».",
+        texto: "La llegada DARAN 3A cruza DARAN entre FL210 y FL230 y sigue a 17 000 ft: un C172 no llega ahí. Por eso la ruta se divide: las lecciones de la salida (3 a 5) se vuelan en el C172 XB-VNA, y las de llegada y aproximación (7 y 8) en el C408 SkyCourier XB-SKY, un bimotor turbohélice de la flota que sí cumple la llegada y la aproximación publicadas. Las restricciones de altitud publicadas en una STAR o una SID son parte del procedimiento: si la aceptas, las cumples. Si tu avión no puede cumplirlas, no puedes aceptar ese procedimiento: contestas «imposible». Entonces el controlador puede darte vectores y altitudes que él asigna con sus altitudes mínimas de vectoreo. Recuerda que en MMGL la altitud de transición es 18 500 ft y en MMMX el nivel de transición es FL195: abajo de eso vuelas con el altímetro en QNH. En la prueba eliges tu avión, el que quieras, siempre que pueda cumplir todas las restricciones de la salida, la llegada y la aproximación que te asignen.",
       },
       {
         id: "red-2-4",
@@ -305,7 +305,7 @@ export const LECCIONES_RED: LeccionRed[] = [
     id: "ruta-llegada",
     numero: 7,
     titulo: "En ruta y llegada",
-    resumen: "Cambios de frecuencia, la llegada DARAN 3A a MMMX y qué hacer cuando el controlador te da vectores o cambia algo.",
+    resumen: "En el C408 XB-SKY: cambios de frecuencia, la llegada DARAN 3A a MMMX y qué hacer cuando el controlador te da vectores o cambia algo.",
     videoId: null,
     temas: [
       {
@@ -318,7 +318,7 @@ export const LECCIONES_RED: LeccionRed[] = [
         id: "red-7-2",
         titulo: "La llegada DARAN 3A",
         clave: "De DARAN a UKTEN, bajando y frenando punto por punto.",
-        texto: `La DARAN 3A sirve a las pistas 05L/R de MMMX y pide RNAV 1, GNSS y radar. Empieza en DARAN, que se cruza entre FL210 y FL230. Sigue a MX750 (máximo 250 kt, 17 000 ft), MX752 (máximo 230 kt, 17 000 ft), MX754 y MX756 (17 000 ft), ALMIS (máximo 210 kt, 14 000 ft) y termina en UKTEN (máximo 210 kt, 12 500 ft), donde empieza la aproximación. En la carta revisa si cada altitud es «a», «a o arriba» o «a o abajo». ${carta("DARAN 3A")}`,
+        texto: `Esta lección y la siguiente se vuelan en el C408 SkyCourier XB-SKY, un bimotor turbohélice de la flota: a diferencia del C172, puede cumplir la ventana de DARAN, los tramos a 17 000 ft, los límites de 210 y 185 kt y los 160 kt mínimos en MX962. Su GPS funciona igual que el del C172: en el menú de procedimientos eliges la llegada, MMMX, la DARA3A y la pista 05R, y la revisas contra la carta. La DARAN 3A sirve a las pistas 05L/R de MMMX y pide RNAV 1, GNSS y radar. Empieza en DARAN, que se cruza entre FL210 y FL230. Sigue a MX750 (máximo 250 kt, 17 000 ft), MX752 (máximo 230 kt, 17 000 ft), MX754 y MX756 (17 000 ft), ALMIS (máximo 210 kt, 14 000 ft) y termina en UKTEN (máximo 210 kt, 12 500 ft), donde empieza la aproximación. En la carta revisa si cada altitud es «a», «a o arriba» o «a o abajo». ${carta("DARAN 3A")}`,
         puntos: [
           { titulo: "DARAN", texto: "Entre FL210 y FL230." },
           { titulo: "MX750 · MX752", texto: "17 000 ft; máximo 250 kt y luego 230 kt." },
@@ -337,7 +337,7 @@ export const LECCIONES_RED: LeccionRed[] = [
         id: "red-7-4",
         titulo: "Vectores y cambios del controlador",
         clave: "Con vectores vuelas el rumbo exacto y no regresas a la llegada hasta que te lo digan.",
-        texto: "La carta de la DARAN 3A dibuja una zona de posibles trayectorias hacia ALMIS: ahí el controlador puede sacarte de la llegada con vectores para ordenar el tránsito. Si te da un rumbo, colaciónalo, vuélalo exacto (en el piloto automático, modo HDG) y mantén la altitud asignada. No vuelvas a la llegada por tu cuenta: espera «proceda directo a ALMIS» o que te diga que reanudes la llegada. En un C172 no llegas a las altitudes de la DARAN 3A: sus restricciones son parte de la llegada publicada, y si tu avión no puede cumplirlas contestas «imposible» y no puedes aceptarla. En ese caso el controlador puede llevarte con vectores y altitudes que asigna según sus altitudes mínimas de vectoreo.",
+        texto: "La carta de la DARAN 3A dibuja una zona de posibles trayectorias hacia ALMIS: ahí el controlador puede sacarte de la llegada con vectores para ordenar el tránsito. Si te da un rumbo, colaciónalo, vuélalo exacto (en el piloto automático, modo HDG) y mantén la altitud asignada. No vuelvas a la llegada por tu cuenta: espera «proceda directo a ALMIS» o que te diga que reanudes la llegada. Las restricciones de la DARAN 3A son parte de la llegada publicada: el C408 las cumple, pero si en la prueba vuelas un avión que no puede cumplirlas, contestas «imposible» y no puedes aceptarla. En ese caso el controlador puede llevarte con vectores y altitudes que asigna según sus altitudes mínimas de vectoreo.",
       },
     ],
     practica: [
@@ -351,20 +351,20 @@ export const LECCIONES_RED: LeccionRed[] = [
     id: "aproximacion",
     numero: 8,
     titulo: "La aproximación sin ILS",
-    resumen: "Vuela la RNP Y Rwy 05R a MMMX: recorrido, altitud obligatoria, mínimos LNAV/VNAV y LNAV, y la aproximación frustrada.",
+    resumen: "En el C408 XB-SKY, vuela la RNP Y Rwy 05R a MMMX: recorrido, altitud obligatoria, mínimos LNAV/VNAV y LNAV, y la aproximación frustrada.",
     videoId: null,
     temas: [
       {
         id: "red-8-1",
         titulo: "Qué es la RNP Y Rwy 05R",
         clave: "Una aproximación por GPS a la 05R, sin ILS; su guía vertical LNAV/VNAV se calcula con el altímetro.",
-        texto: `La RNP Y Rwy 05R es una aproximación por satélite a la pista 05R de MMMX. Pide GNSS y tramos curvos (RF), y no usa antenas de ILS en la pista: la guía lateral sale del GPS. La guía vertical de los mínimos LNAV/VNAV es baro-VNAV: el sistema la calcula con el altímetro, así que depende de que tengas el QNH correcto y de la temperatura. En el simulador el GPS puede mostrarte una senda igual; la regla de la carta es la que manda. La «Y» indica que hay otra aproximación del mismo tipo a esa pista. En el C172 la cargas desde el menú de procedimientos, en la opción de aproximación: MMMX, RNP Y Rwy 05R, con UKTEN como punto de inicio, y la revisas contra la carta igual que la salida. ${carta("RNP Y Rwy 05R")}`,
+        texto: `La RNP Y Rwy 05R es una aproximación por satélite a la pista 05R de MMMX. Pide GNSS y tramos curvos (RF), y no usa antenas de ILS en la pista: la guía lateral sale del GPS. La guía vertical de los mínimos LNAV/VNAV es baro-VNAV: el sistema la calcula con el altímetro, así que depende de que tengas el QNH correcto y de la temperatura. En el simulador el GPS puede mostrarte una senda igual; la regla de la carta es la que manda. La «Y» indica que hay otra aproximación del mismo tipo a esa pista. En el C408 XB-SKY la cargas como en el C172, desde el menú de procedimientos, en la opción de aproximación: MMMX, RNP Y Rwy 05R, con UKTEN como punto de inicio, y la revisas contra la carta igual que la salida. ${carta("RNP Y Rwy 05R")}`,
       },
       {
         id: "red-8-2",
         titulo: "El recorrido",
         clave: "UKTEN a 12 500 ft, MX960 a 10 000 ft, y MX900 a 8900 ft obligatorios.",
-        texto: "Desde UKTEN (inicio de la aproximación, máximo 210 kt, 12 500 ft) vas con derrota 175° a MX960 (máximo 185 kt, 10 000 ft); revisa en la carta si esas dos altitudes son «a» o «a o arriba». Ahí viras a la derrota final de 055° y vuelas 4.6 NM a MX962, que se cruza entre 8900 y 9300 ft y a 160 kt o más. 1.4 NM después está MX900, el punto de aproximación final, a 8900 ft: la altitud es obligatoria. De ahí faltan 4.7 NM a la pista con una senda de 3.09°. Si tu avión no puede cumplir una velocidad (un C172 no llega a 160 kt), avísale al controlador.",
+        texto: "Desde UKTEN (inicio de la aproximación, máximo 210 kt, 12 500 ft) vas con derrota 175° a MX960 (máximo 185 kt, 10 000 ft); revisa en la carta si esas dos altitudes son «a» o «a o arriba». Ahí viras a la derrota final de 055° y vuelas 4.6 NM a MX962, que se cruza entre 8900 y 9300 ft y a 160 kt o más. 1.4 NM después está MX900, el punto de aproximación final, a 8900 ft: la altitud es obligatoria. De ahí faltan 4.7 NM a la pista con una senda de 3.09°. El C408 cumple estos límites; un C172 no llega a los 160 kt de MX962, por eso esta lección no se vuela en él. Si en la prueba tu avión no puede cumplir una velocidad o una altitud de la aproximación, contesta «imposible» antes de aceptarla.",
         puntos: [
           { titulo: "UKTEN", texto: "12 500 ft, máximo 210 kt. Derrota 175°." },
           { titulo: "MX960", texto: "10 000 ft, máximo 185 kt. Viraje a 055°." },
