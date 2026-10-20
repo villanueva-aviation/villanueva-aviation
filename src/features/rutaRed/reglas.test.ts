@@ -5,6 +5,7 @@ import {
   cancelacionTardia,
   citaPasada,
   estadoBloque,
+  fuenteRuta,
   insigniaGanada,
   intentosUsados,
   partesAprobadas,
@@ -119,4 +120,12 @@ test("citaPasada: hora de México, la cita ya llegó", () => {
   // 18:00 en México (UTC-6) = 00:00 UTC del día siguiente.
   assert.equal(citaPasada("2026-11-10", "18:00", new Date("2026-11-10T23:59:00Z")), false);
   assert.equal(citaPasada("2026-11-10", "18:00", new Date("2026-11-11T00:00:00Z")), true);
+});
+
+test("fuenteRuta: el ?ref del enlace gana; si no hay, la guardada; nada inválido pasa", () => {
+  assert.equal(fuenteRuta("?ref=FB-Ruta", "ig-ruta"), "fb-ruta");
+  assert.equal(fuenteRuta("", "ig-ruta"), "ig-ruta");
+  assert.equal(fuenteRuta("?ref=<script>", null), null);
+  assert.equal(fuenteRuta("", "no válida"), null);
+  assert.equal(fuenteRuta("", null), null);
 });

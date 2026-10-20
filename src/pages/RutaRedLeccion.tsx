@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Container } from "../components/ui/Container";
@@ -10,6 +11,7 @@ import { AUDIO_SETS } from "../data/fraseologiaATC";
 import { LECCIONES_RED, SLUG_RUTA_RED, leccionRed } from "../data/rutaRed";
 import { useAuth } from "../features/auth/AuthContext";
 import { useProgress } from "../features/progress/ProgressContext";
+import { registrarVisitaRuta } from "../features/rutaRed/fuente";
 import { ROUTES } from "../lib/routes";
 import { NotFound } from "./NotFound";
 
@@ -18,6 +20,7 @@ const CARD = "rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8";
 export function RutaRedLeccion() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
+  useEffect(() => registrarVisitaRuta(id ?? "leccion", location.search), [id, location.search]);
   const leccion = id ? leccionRed(id) : undefined;
   const { isAuthenticated } = useAuth();
   const { isActividadCompletada, completarActividad } = useProgress();

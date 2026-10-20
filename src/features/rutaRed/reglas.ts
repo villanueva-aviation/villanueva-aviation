@@ -6,6 +6,7 @@ import {
   PRECIO_PRUEBA_RED,
   PRECIO_PRUEBA_RED_REPETICION,
 } from "../../lib/constants.ts";
+import { fuenteDeEnlace } from "../testNivel/reglas.ts";
 
 export const PARTES_RED = ["autorizacion", "salida", "ruta_llegada", "aproximacion"] as const;
 export type ParteRed = (typeof PARTES_RED)[number];
@@ -127,4 +128,9 @@ export function citaPasada(fecha: string, horario: string, ahora: Date): boolean
 /** La cita (hora de México) cae antes de que venza el bloque; el trigger de la base revisa lo mismo. */
 export function antesDeVencer(fecha: string, horario: string, prueba: Pick<PruebaRed, "vence_at">): boolean {
   return horaCita(fecha, horario) < new Date(prueba.vence_at).getTime();
+}
+
+/** De qué publicación llegó (?ref=fb-ruta…): la del enlace actual gana; si no trae ?ref, la última guardada. */
+export function fuenteRuta(busqueda: string, guardada: string | null): string | null {
+  return fuenteDeEnlace(busqueda) ?? (guardada && /^[a-z0-9_-]{1,40}$/.test(guardada) ? guardada : null);
 }

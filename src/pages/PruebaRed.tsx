@@ -37,6 +37,7 @@ import {
   PRECIO_PRUEBA_RED_REPETICION,
 } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
+import { fuenteGuardadaRuta } from "../features/rutaRed/fuente";
 
 const ETAPA = 1;
 
@@ -174,7 +175,7 @@ export function PruebaRed() {
                       <PayPalButton
                         monto={precio}
                         funcion="verify-paypal-prueba-red"
-                        cuerpo={{ etapa: ETAPA }}
+                        cuerpo={{ etapa: ETAPA, fuente: fuenteGuardadaRuta() }}
                         descripcion={`Prueba Listo para volar en red · Etapa 1 (${INTENTOS_POR_BLOQUE} intentos)`}
                         onSuccess={cargar}
                       />

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
@@ -8,6 +9,7 @@ import { CARTAS_RED, LECCIONES_RED, SLUG_RUTA_RED } from "../data/rutaRed";
 import { CRITERIOS_RED, NOMBRE_PARTE, PARTES_RED, REGLAS_PRUEBA_RED } from "../features/rutaRed/reglas";
 import { useProgress } from "../features/progress/ProgressContext";
 import { useAuth } from "../features/auth/AuthContext";
+import { registrarVisitaRuta } from "../features/rutaRed/fuente";
 import {
   INTENTOS_POR_BLOQUE,
   PRECIO_PRUEBA_RED,
@@ -16,6 +18,7 @@ import {
 import { ROUTES } from "../lib/routes";
 
 export function RutaRed() {
+  useEffect(() => registrarVisitaRuta("ruta", window.location.search), []);
   const { isAuthenticated } = useAuth();
   const { isActividadCompletada } = useProgress();
   const hechas = LECCIONES_RED.filter((l) => isAuthenticated && isActividadCompletada(SLUG_RUTA_RED, l.id)).length;

@@ -138,6 +138,8 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: false, motivo: "Cuerpo inválido" }, 400);
     }
     const { orderId, etapa } = cuerpo ?? {};
+    // De qué publicación llegó (?ref=fb-ruta…): solo para medir; si no es válida se ignora, nunca bloquea el pago.
+    const fuente = typeof cuerpo?.fuente === "string" && /^[a-z0-9_-]{1,40}$/.test(cuerpo.fuente) ? cuerpo.fuente : null;
     if (typeof orderId !== "string" || !ORDER_ID.test(orderId)) {
       return jsonResponse({ ok: false, motivo: "orderId inválido" }, 400);
     }
@@ -252,6 +254,7 @@ Deno.serve(async (req) => {
         estado: "activa",
         pagado_at: ahora.toISOString(),
         vence_at: venceAt.toISOString(),
+        fuente,
       })
       .select("id")
       .single();
