@@ -27,6 +27,7 @@
   .toggles label { flex-direction: row; align-items: center; gap: 6px; color: var(--ink); }
   button.cine { background: transparent; border-color: var(--gold); color: var(--gold); }
   button.cine.activo { background: var(--gold); color: #060e1a; }
+  .nota { margin: 0; color: var(--muted); font-size: 12px; }
   #estado { color: var(--muted); font-size: 12px; min-height: 1em; }
 </style>
 </head>
@@ -72,6 +73,7 @@
 
   <section>
     <h2>Aterrizaje</h2>
+    <p id="puente-estado" class="nota">Revisando el aterrizaje automático…</p>
     <label>Tasa de descenso al tocar pista (fpm) <input id="fpm" type="number" min="0" max="2000" step="1" placeholder="142" /></label>
     <div class="fila">
       <button class="primario" id="mostrar-aterrizaje">Mostrar</button>
@@ -191,6 +193,17 @@
     enviar({ aterrizaje: { fpm, visible: true } }, "Aterrizaje en pantalla.");
   };
   $("ocultar-aterrizaje").onclick = () => enviar({ aterrizaje: { ...(leer().aterrizaje || {}), visible: false } }, "Aterrizaje oculto.");
+
+  // ¿Está abierto tools/puente-aterrizaje.py en esta PC?
+  async function revisarPuente() {
+    let ok = false;
+    try { ok = (await fetch("http://127.0.0.1:8765/aterrizaje", { cache: "no-store" })).ok; } catch {}
+    $("puente-estado").textContent = ok
+      ? "🟢 Automático: al tocar pista la tarjeta sale sola."
+      : "⚪ Automático apagado: abre puente-aterrizaje.py, o escribe la tasa aquí.";
+  }
+  revisarPuente();
+  setInterval(revisarPuente, 5000);
 
   // Modo cine
   function pintarCine(activo) {

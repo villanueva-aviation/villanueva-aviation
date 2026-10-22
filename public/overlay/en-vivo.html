@@ -615,6 +615,30 @@
   }
   setInterval(cargarSimbrief, 5 * 60 * 1000);
 
+  // ---------- Aterrizaje automático ----------
+  // tools/puente-aterrizaje.py corre en la PC del simulador y da la tasa de descenso del último toque.
+  // Si no está abierto, la consulta falla en silencio y el aterrizaje se sigue poniendo a mano desde el panel.
+  const PUENTE = "http://127.0.0.1:8765/aterrizaje";
+  let aterrizajeVisto = 0, aterrizajeTimer = 0;
+  function guardarEstado(e) {
+    try { localStorage.setItem(CLAVE, JSON.stringify(e)); } catch {}
+    aplicar(e);
+  }
+  async function puente() {
+    let r;
+    try { r = await (await fetch(PUENTE, { cache: "no-store" })).json(); } catch { return; }
+    if (!r.vez || r.vez === aterrizajeVisto) return;
+    aterrizajeVisto = r.vez;
+    if (!r.fpm || Date.now() - r.vez > 60000) return; // al abrir el overlay no repite un aterrizaje viejo
+    guardarEstado({ ...leerEstado(), aterrizaje: { fpm: r.fpm, visible: true } });
+    clearTimeout(aterrizajeTimer);
+    aterrizajeTimer = setTimeout(() => {
+      const e = leerEstado();
+      guardarEstado({ ...e, aterrizaje: { ...(e.aterrizaje || {}), visible: false } });
+    }, 45000);
+  }
+  setInterval(puente, 2000);
+
   listo = true;
   cargarSimbrief();
   (function ciclo() { actualizar().finally(() => setTimeout(ciclo, DEMO ? 2000 : 15000)); })();
