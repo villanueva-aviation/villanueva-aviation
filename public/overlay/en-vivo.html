@@ -106,9 +106,11 @@
   #cta b { color: var(--gold-300); font-family: var(--mono); font-weight: 700; }
 
   /* Pregunta del día */
-  #pregunta { left: 548px; right: 464px; bottom: 214px; padding: 22px 26px; border-color: var(--gold); display: flex; flex-direction: column; gap: 10px; }
-  #pregunta .q { font: 700 26px/1.3 var(--display); }
-  #pregunta .r { font-size: 19px; line-height: 1.45; color: var(--gold-300); border-top: 1px solid var(--line); padding-top: 10px; }
+  /* Abajo a la derecha, para no tapar la cabina; mientras está en pantalla ocupa el lugar del plan y del control en línea. */
+  #pregunta { right: 40px; bottom: 32px; width: 400px; padding: 20px 22px; border-color: var(--gold); display: flex; flex-direction: column; gap: 10px; }
+  #pregunta .q { font: 700 21px/1.32 var(--display); }
+  #columna.con-pregunta #plan, #columna.con-pregunta #atc { display: none; }
+  #pregunta .r { font-size: 16px; line-height: 1.45; color: var(--gold-300); border-top: 1px solid var(--line); padding-top: 10px; }
   #pregunta .chip { align-self: flex-start; background: var(--gold); color: var(--navy-950); font: 800 12px var(--display); letter-spacing: .14em; padding: 4px 12px; border-radius: 999px; }
 
   @media (prefers-reduced-motion: reduce) { .anim, .barra i { transition: none; } .vivo i { animation: none; } }
@@ -231,6 +233,7 @@
     $("p-resp").textContent = q.respuesta;
     $("p-resp").hidden = !q.revelada;
     $("pregunta").classList.toggle("oculto", !(q.visible && q.texto));
+    $("columna").classList.toggle("con-pregunta", !!(q.visible && q.texto));
   }
   aplicar(leerEstado());
   try { new BroadcastChannel("va-overlay").onmessage = (ev) => aplicar(ev.data); } catch {}
