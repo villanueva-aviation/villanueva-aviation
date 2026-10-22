@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="robots" content="noindex" />
+<title>Overlay en vivo · Villanueva Aviation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+  /*
+    Overlay de 1920×1080 para OBS (fuente de Navegador). Fondo transparente: el simulador va debajo
+    y la cámara se coloca dentro del marco de abajo a la izquierda.
+    URL: /overlay/en-vivo.html?red=ivao&callsign=XBVNA   (red=vatsim también funciona)
+         &demo   → datos de prueba para acomodar las fuentes sin estar conectado.
+  */
+  :root {
+    --navy-950: #060e1a;
+    --navy-900: #0b1d34;
+    --panel: rgba(6, 14, 26, 0.8);
+    --line: rgba(212, 175, 55, 0.35);
+    --gold: #d4af37;
+    --gold-300: #f0d78c;
+    --ink: #ffffff;
+    --muted: #9fb0c6;
+    --vfr: #3ccf7e;
+    --mvfr: #4aa3ff;
+    --ifr: #ff5a5a;
+    --lifr: #d46bff;
+    --display: "Sora", ui-sans-serif, system-ui, sans-serif;
+    --body: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: transparent; font-family: var(--body); color: var(--ink); }
+  .panel { position: absolute; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; backdrop-filter: blur(6px); }
+  .label { font: 600 11px var(--body); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+  .oculto { opacity: 0 !important; transform: translateY(12px); pointer-events: none; }
+  .anim { transition: opacity 400ms cubic-bezier(.23,1,.32,1), transform 400ms cubic-bezier(.23,1,.32,1); }
+
+  /* Barra superior */
+  #marca { top: 32px; left: 40px; display: flex; align-items: center; gap: 14px; padding: 10px 20px 10px 12px; }
+  #marca img { width: 40px; height: 40px; object-fit: contain; }
+  #marca b { font: 700 17px var(--display); letter-spacing: .04em; }
+  .vivo { display: flex; align-items: center; gap: 8px; margin-left: 10px; padding: 5px 12px; border-radius: 999px; background: var(--gold); color: var(--navy-950); font: 800 13px var(--display); letter-spacing: .12em; }
+  .vivo i { width: 8px; height: 8px; border-radius: 50%; background: var(--navy-950); animation: pulso 1.6s ease-in-out infinite; }
+  @keyframes pulso { 50% { opacity: .25; } }
+  #titulo { top: 32px; left: 50%; transform: translateX(-50%); padding: 12px 28px; text-align: center; max-width: 900px; }
+  #titulo .t { font: 700 22px var(--display); }
+  #titulo .s { font-size: 15px; color: var(--gold-300); margin-top: 2px; }
+  #reloj { top: 32px; right: 40px; display: flex; gap: 22px; padding: 12px 22px; font-family: var(--mono); }
+  #reloj div { display: flex; flex-direction: column; align-items: flex-end; }
+  #reloj b { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* Columna derecha: mapa, datos y control en línea */
+  #mapa-panel { top: 104px; right: 40px; width: 400px; height: 300px; overflow: hidden; padding: 0; }
+  #mapa { position: absolute; inset: 0; background: var(--navy-950); }
+  #mapa-panel .label { position: absolute; top: 10px; left: 12px; z-index: 500; background: var(--panel); padding: 4px 8px; border-radius: 6px; }
+  .leaflet-control-attribution { font-size: 8px !important; background: rgba(6,14,26,.6) !important; color: #6b7c93 !important; }
+  .leaflet-control-attribution a { color: #6b7c93 !important; }
+  .tiles-oscuros { filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(0.95) saturate(0.6); }
+  .avion { width: 34px; height: 34px; filter: drop-shadow(0 0 6px rgba(212,175,55,.8)); }
+  .apt { font: 700 11px var(--mono); color: var(--gold-300); text-shadow: 0 0 4px #000; white-space: nowrap; }
+
+  #datos { top: 420px; right: 40px; width: 400px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+  .cab { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .cab b { font: 800 26px var(--display); letter-spacing: .02em; }
+  .cab span { color: var(--muted); font-size: 14px; }
+  .fase { align-self: flex-start; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--gold); color: var(--gold-300); font: 600 13px var(--body); letter-spacing: .06em; text-transform: uppercase; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .grid div { display: flex; flex-direction: column; gap: 2px; }
+  .grid b { font: 700 22px var(--mono); font-variant-numeric: tabular-nums; }
+  .ruta { display: flex; flex-direction: column; gap: 6px; }
+  .ruta .ext { display: flex; justify-content: space-between; font: 700 15px var(--mono); }
+  .barra { height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); overflow: hidden; }
+  .barra i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), var(--gold-300)); transition: width 1s ease-out; }
+  .ruta small { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  #sin-datos { color: var(--muted); font-size: 14px; line-height: 1.4; }
+
+  #atc { top: 690px; right: 40px; width: 400px; padding: 14px 20px; display: flex; flex-direction: column; gap: 8px; }
+  #atc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+  #atc li { display: flex; justify-content: space-between; font: 500 15px var(--mono); }
+  #atc li span { color: var(--gold-300); }
+
+  /* Cámara: el marco queda vacío; la fuente de cámara va debajo, en 40,744 de 480×270 */
+  #camara { left: 40px; top: 744px; width: 480px; height: 270px; background: transparent; backdrop-filter: none; border: 2px solid var(--gold); border-radius: 18px; box-shadow: 0 0 0 4px rgba(6,14,26,.55); }
+  #camara .nombre { position: absolute; left: 14px; bottom: -18px; background: var(--navy-950); border: 1px solid var(--gold); border-radius: 10px; padding: 6px 14px; display: flex; flex-direction: column; }
+  #camara .nombre b { font: 700 16px var(--display); }
+  #camara .nombre span { font-size: 12px; color: var(--gold-300); }
+
+  /* Franja inferior: METAR y llamado al test */
+  #metar { left: 548px; right: 464px; bottom: 32px; padding: 12px 18px; display: flex; flex-direction: column; gap: 6px; }
+  #metar .fila { display: flex; align-items: center; gap: 10px; font: 500 14px var(--mono); white-space: nowrap; overflow: hidden; }
+  #metar .fila span:last-child { overflow: hidden; text-overflow: ellipsis; }
+  .cat { flex: none; font: 700 11px var(--body); letter-spacing: .08em; padding: 2px 8px; border-radius: 6px; color: var(--navy-950); background: var(--muted); }
+  .cat.VFR { background: var(--vfr); } .cat.MVFR { background: var(--mvfr); } .cat.IFR { background: var(--ifr); } .cat.LIFR { background: var(--lifr); }
+  #cta { left: 548px; right: 464px; bottom: 150px; padding: 10px 18px; display: flex; align-items: center; gap: 12px; font-size: 16px; }
+  #cta b { color: var(--gold-300); font-family: var(--mono); font-weight: 700; }
+
+  /* Pregunta del día */
+  #pregunta { left: 548px; right: 464px; bottom: 214px; padding: 22px 26px; border-color: var(--gold); display: flex; flex-direction: column; gap: 10px; }
+  #pregunta .q { font: 700 26px/1.3 var(--display); }
+  #pregunta .r { font-size: 19px; line-height: 1.45; color: var(--gold-300); border-top: 1px solid var(--line); padding-top: 10px; }
+  #pregunta .chip { align-self: flex-start; background: var(--gold); color: var(--navy-950); font: 800 12px var(--display); letter-spacing: .14em; padding: 4px 12px; border-radius: 999px; }
+
+  @media (prefers-reduced-motion: reduce) { .anim, .barra i { transition: none; } .vivo i { animation: none; } }
+</style>
+</head>
+<body>
+  <div id="marca" class="panel">
+    <img src="/images/logo-mark.png" alt="" />
+    <b>VILLANUEVA AVIATION</b>
+    <span class="vivo"><i></i>EN VIVO</span>
+  </div>
+
+  <div id="titulo" class="panel"><div class="t" id="t-titulo">Vuelo en vivo</div><div class="s" id="t-sub"></div></div>
+
+  <div id="reloj" class="panel">
+    <div><span class="label">UTC</span><b id="utc">--:--Z</b></div>
+    <div><span class="label">CDMX</span><b id="local">--:--</b></div>
+  </div>
+
+  <div id="mapa-panel" class="panel anim"><div id="mapa"></div><span class="label">Mapa en vivo</span></div>
+
+  <div id="datos" class="panel anim">
+    <div class="cab"><b id="d-callsign">—</b><span id="d-avion"></span></div>
+    <span class="fase" id="d-fase">Esperando conexión</span>
+    <div class="grid">
+      <div><span class="label">Altitud</span><b id="d-alt">—</b></div>
+      <div><span class="label">Vel. suelo</span><b id="d-gs">—</b></div>
+      <div><span class="label">Rumbo</span><b id="d-hdg">—</b></div>
+      <div><span class="label">Squawk</span><b id="d-sqk">—</b></div>
+    </div>
+    <div class="ruta">
+      <div class="ext"><span id="d-dep">----</span><span id="d-arr">----</span></div>
+      <div class="barra"><i id="d-barra"></i></div>
+      <small id="d-resto"></small>
+    </div>
+    <div id="sin-datos" hidden></div>
+  </div>
+
+  <div id="atc" class="panel anim"><span class="label">Control en línea</span><ul id="atc-lista"><li>Buscando…</li></ul></div>
+
+  <div id="camara" class="panel anim">
+    <div class="nombre"><b>Erik Villanueva</b><span>Fundador · 6,884 h en IVAO</span></div>
+  </div>
+
+  <div id="pregunta" class="panel anim oculto">
+    <span class="chip" id="p-cat">PREGUNTA DEL DÍA</span>
+    <div class="q" id="p-texto"></div>
+    <div class="r" id="p-resp" hidden></div>
+  </div>
+
+  <div id="cta" class="panel anim"><span id="cta-texto"></span></div>
+
+  <div id="metar" class="panel anim"><div class="fila"><span class="label">METAR</span><span>Cargando…</span></div></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script>
+  const P = new URLSearchParams(location.search);
+  const RED = (P.get("red") || "ivao").toLowerCase() === "vatsim" ? "vatsim" : "ivao";
+  const CALLSIGN = (P.get("callsign") || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const DEMO = P.has("demo");
+  const WX = "https://villanueva-aviation.pages.dev/api/wx/metar";
+  const $ = (id) => document.getElementById(id);
+
+  // ---------- Estado que manda el panel de control (pregunta, títulos, paneles visibles) ----------
+  const CLAVE = "va-overlay-estado";
+  const BASE = {
+    titulo: P.get("titulo") || "Vuelo en vivo",
+    subtitulo: P.get("subtitulo") || "",
+    mostrar: { mapa: true, datos: true, atc: true, camara: true, metar: true, cta: true },
+    pregunta: { visible: false, revelada: false, categoria: "Pregunta del día", texto: "", respuesta: "" },
+  };
+  function leerEstado() {
+    try { return { ...BASE, ...JSON.parse(localStorage.getItem(CLAVE) || "{}") }; } catch { return BASE; }
+  }
+  function aplicar(e) {
+    $("t-titulo").textContent = e.titulo || "Vuelo en vivo";
+    $("t-sub").textContent = e.subtitulo || "";
+    const m = { ...BASE.mostrar, ...(e.mostrar || {}) };
+    $("mapa-panel").classList.toggle("oculto", !m.mapa);
+    $("datos").classList.toggle("oculto", !m.datos);
+    $("atc").classList.toggle("oculto", !m.atc);
+    $("camara").classList.toggle("oculto", !m.camara);
+    $("metar").classList.toggle("oculto", !m.metar);
+    $("cta").classList.toggle("oculto", !m.cta);
+    const q = { ...BASE.pregunta, ...(e.pregunta || {}) };
+    $("p-cat").textContent = (q.categoria || "Pregunta del día").toUpperCase();
+    $("p-texto").textContent = q.texto;
+    $("p-resp").textContent = q.respuesta;
+    $("p-resp").hidden = !q.revelada;
+    $("pregunta").classList.toggle("oculto", !(q.visible && q.texto));
+  }
+  aplicar(leerEstado());
+  try { new BroadcastChannel("va-overlay").onmessage = (ev) => aplicar(ev.data); } catch {}
+  addEventListener("storage", (ev) => { if (ev.key === CLAVE) aplicar(leerEstado()); });
+
+  // Respaldo sin panel: en OBS, clic derecho → Interactuar, y las teclas P (mostrar/ocultar) y R (revelar).
+  addEventListener("keydown", (ev) => {
+    const e = leerEstado();
+    if (ev.key === "p" || ev.key === "P") e.pregunta = { ...e.pregunta, visible: !e.pregunta.visible, revelada: false };
+    else if (ev.key === "r" || ev.key === "R") e.pregunta = { ...e.pregunta, revelada: !e.pregunta.revelada };
+    else return;
+    try { localStorage.setItem(CLAVE, JSON.stringify(e)); } catch {}
+    aplicar(e);
+  });
+
+  // ---------- Relojes ----------
+  const dos = (n) => String(n).padStart(2, "0");
+  function relojes() {
+    const d = new Date();
+    $("utc").textContent = `${dos(d.getUTCHours())}:${dos(d.getUTCMinutes())}Z`;
+    $("local").textContent = d.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Mexico_City" });
+  }
+  relojes(); setInterval(relojes, 10000);
+
+  // ---------- Llamado al test / ruta, rotando ----------
+  const CTAS = [
+    ["Test de nivel gratis, 3 minutos:", "villanueva-aviation.pages.dev/nivel"],
+    ["Aprende a volar en red, gratis:", "villanueva-aviation.pages.dev/ruta/listo-para-red"],
+    ["Diagnóstico 1 a 1 gratis:", "villanueva-aviation.pages.dev/asesorias"],
+  ];
+  let ctaI = 0;
+  function cta() {
+    const [a, b] = CTAS[ctaI++ % CTAS.length];
+    $("cta-texto").innerHTML = "";
+    $("cta-texto").append(a + " ", Object.assign(document.createElement("b"), { textContent: b }));
+  }
+  cta(); setInterval(cta, 30000);
+
+  // ---------- Mapa ----------
+  const mapa = L.map("mapa", { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, attributionControl: true })
+    .setView([23.6, -102.5], 5);
+  // ponytail: mosaicos públicos de OpenStreetMap oscurecidos con CSS, como el mapa de /aventura.
+  // Sirven para el tráfico de un en vivo; con mucho uso, cambiar a un proveedor con clave.
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 12, attribution: "© OpenStreetMap", className: "tiles-oscuros",
+  }).addTo(mapa);
+  const SVG_AVION = `<svg class="avion" viewBox="0 0 24 24"><path fill="#f0d78c" stroke="#060e1a" stroke-width=".6" d="M12 1.5c.8 0 1.4.9 1.4 2.2v5.6l8.1 4.7v2.1l-8.1-2.4v4.7l2.3 1.7v1.7L12 21l-3.7.9v-1.7l2.3-1.7v-4.7l-8.1 2.4v-2.1l8.1-4.7V3.7c0-1.3.6-2.2 1.4-2.2z"/></svg>`;
+  let marcaAvion = null, rumboAvion = 0;
+  const estela = L.polyline([], { color: "#d4af37", weight: 3, opacity: .9 }).addTo(mapa);
+  const lineaRuta = L.polyline([], { color: "#9fb0c6", weight: 1.5, dashArray: "6 6", opacity: .8 }).addTo(mapa);
+  const aeropuertos = {}; // ICAO -> { lat, lon, cat, raw }
+  const marcasApt = {};
+
+  function iconoAvion(hdg) {
+    return L.divIcon({ className: "", iconSize: [34, 34], iconAnchor: [17, 17], html: `<div style="transform: rotate(${hdg}deg)">${SVG_AVION}</div>` });
+  }
+  function encuadrar(dep, arr, pos) {
+    const pts = [dep, arr].map((c) => aeropuertos[c]).filter(Boolean).map((a) => [a.lat, a.lon]);
+    if (pos) pts.push(pos);
+    if (pts.length >= 2) mapa.fitBounds(pts, { padding: [36, 36], maxZoom: 9, animate: false });
+    else if (pos) mapa.setView(pos, 8, { animate: false });
+  }
+
+  // ---------- Datos del vuelo ----------
+  const FASES = {
+    "Boarding": "Embarque", "Departing": "Salida", "Initial Climb": "Ascenso inicial", "En Route": "En ruta",
+    "Approach": "Aproximación", "Landed": "Aterrizado", "On Blocks": "En plataforma", "Taxiing": "Rodaje",
+  };
+  const radianes = (g) => (g * Math.PI) / 180;
+  function millas(a, b) {
+    const R = 3440.065, dLat = radianes(b[0] - a[0]), dLon = radianes(b[1] - a[1]);
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(radianes(a[0])) * Math.cos(radianes(b[0])) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+  const fmtAlt = (ft) => (ft >= 18500 ? `FL${String(Math.round(ft / 100)).padStart(3, "0")}` : `${Math.round(ft / 10) * 10}`.replace(/\B(?=(\d{3})+(?!\d))/, ",") + " ft");
+
+  async function vueloIVAO() {
+    const d = await (await fetch("https://api.ivao.aero/v2/tracker/whazzup", { cache: "no-store" })).json();
+    const p = d.clients.pilots.find((x) => x.callsign.toUpperCase() === CALLSIGN);
+    const atcs = d.clients.atcs.map((a) => ({ callsign: a.callsign, frecuencia: a.atcSession?.frequency }));
+    if (!p) return { atcs };
+    const t = p.lastTrack || {}, fp = p.flightPlan || {};
+    return {
+      atcs,
+      vuelo: {
+        callsign: p.callsign, avion: fp.aircraftId || fp.aircraft?.icaoCode || "", dep: fp.departureId, arr: fp.arrivalId,
+        lat: t.latitude, lon: t.longitude, alt: t.altitude, gs: t.groundSpeed, hdg: t.heading, sqk: t.transponder,
+        fase: FASES[t.state] || t.state || "", faltan: t.arrivalDistance, recorrido: t.departureDistance,
+      },
+    };
+  }
+  async function vueloVATSIM() {
+    const d = await (await fetch("https://data.vatsim.net/v3/vatsim-data.json", { cache: "no-store" })).json();
+    const p = d.pilots.find((x) => x.callsign.toUpperCase() === CALLSIGN);
+    const atcs = d.controllers.map((a) => ({ callsign: a.callsign, frecuencia: a.frequency }));
+    if (!p) return { atcs };
+    const fp = p.flight_plan || {};
+    return {
+      atcs,
+      vuelo: {
+        callsign: p.callsign, avion: fp.aircraft_short || "", dep: fp.departure, arr: fp.arrival,
+        lat: p.latitude, lon: p.longitude, alt: p.altitude, gs: p.groundspeed, hdg: p.heading, sqk: p.transponder,
+        fase: p.groundspeed < 40 ? "En tierra" : "En vuelo",
+      },
+    };
+  }
+  // Modo de prueba: un 737 que va de MMMX a MMRX en 6 minutos, para acomodar las fuentes en OBS.
+  function vueloDemo() {
+    const k = ((Date.now() / 1000) % 360) / 360;
+    const a = [19.436, -99.072], b = [26.009, -98.229];
+    const alt = k < .15 ? 7300 + (k / .15) * 27700 : k > .8 ? 35000 - ((k - .8) / .2) * 34900 : 35000;
+    return {
+      atcs: [{ callsign: "MMMX_TWR", frecuencia: 118.1 }, { callsign: "MMFR_CTR", frecuencia: 127.5 }, { callsign: "MMRX_TWR", frecuencia: 118.4 }],
+      vuelo: {
+        callsign: CALLSIGN || "DEMO123", avion: "B738", dep: "MMMX", arr: "MMRX",
+        lat: a[0] + (b[0] - a[0]) * k, lon: a[1] + (b[1] - a[1]) * k, alt, gs: k < .05 || k > .97 ? 18 : 445, hdg: 7, sqk: 4721,
+        fase: k < .15 ? "Ascenso inicial" : k > .8 ? "Aproximación" : "En ruta",
+      },
+    };
+  }
+
+  function pintarATC(atcs, v) {
+    const ul = $("atc-lista");
+    ul.innerHTML = "";
+    if (!v) { ul.append(Object.assign(document.createElement("li"), { textContent: "Sin vuelo conectado" })); return; }
+    const pref = [v.dep, v.arr].filter(Boolean).map((c) => c.toUpperCase() + "_");
+    const region = (v.dep || "").slice(0, 2).toUpperCase();
+    const lista = atcs.filter((a) => {
+      const c = a.callsign.toUpperCase();
+      return pref.some((p) => c.startsWith(p)) || (region && c.startsWith(region) && /_(CTR|FSS)$/.test(c));
+    }).slice(0, 6);
+    if (!lista.length) { ul.append(Object.assign(document.createElement("li"), { textContent: "Sin control en tu ruta ahora" })); return; }
+    for (const a of lista) {
+      const li = document.createElement("li");
+      li.append(a.callsign, Object.assign(document.createElement("span"), { textContent: Number(a.frecuencia).toFixed(3) }));
+      ul.append(li);
+    }
+  }
+
+  let ultimaRuta = "";
+  async function actualizar() {
+    let r;
+    try {
+      r = DEMO ? vueloDemo() : !CALLSIGN ? { atcs: [] } : RED === "vatsim" ? await vueloVATSIM() : await vueloIVAO();
+    } catch { return; } // si la red no responde, se queda lo último que se mostró
+    const v = r.vuelo;
+    $("sin-datos").hidden = !!v;
+    if (!v) {
+      $("d-fase").textContent = "Esperando conexión";
+      $("sin-datos").textContent = CALLSIGN ? `${CALLSIGN} todavía no aparece en ${RED.toUpperCase()}. Se actualiza cada 15 segundos.` : "Falta el callsign en la URL (&callsign=...).";
+      pintarATC(r.atcs, null);
+      return;
+    }
+    $("d-callsign").textContent = v.callsign;
+    $("d-avion").textContent = v.avion;
+    $("d-fase").textContent = v.fase || "En línea";
+    $("d-alt").textContent = fmtAlt(v.alt || 0);
+    $("d-gs").textContent = `${Math.round(v.gs || 0)}`;
+    $("d-hdg").textContent = `${String(Math.round(v.hdg || 0) % 360).padStart(3, "0")}°`;
+    $("d-sqk").textContent = String(v.sqk ?? "—").padStart(4, "0");
+    $("d-dep").textContent = v.dep || "----";
+    $("d-arr").textContent = v.arr || "----";
+
+    const pos = [v.lat, v.lon];
+    const ruta = `${v.dep}-${v.arr}`;
+    if (ruta !== ultimaRuta) { ultimaRuta = ruta; estela.setLatLngs([]); metar(v.dep, v.arr); }
+
+    // Distancia: IVAO la da; en VATSIM se calcula con las coordenadas del METAR.
+    let faltan = v.faltan, recorrido = v.recorrido;
+    const A = aeropuertos[v.dep], B = aeropuertos[v.arr];
+    if (faltan == null && B) faltan = millas(pos, [B.lat, B.lon]);
+    if (recorrido == null && A) recorrido = millas([A.lat, A.lon], pos);
+    if (faltan != null && recorrido != null) {
+      $("d-barra").style.width = `${Math.min(100, (recorrido / Math.max(1, recorrido + faltan)) * 100)}%`;
+      const ete = v.gs > 60 ? faltan / v.gs : null;
+      $("d-resto").textContent = `Faltan ${Math.round(faltan)} NM` + (ete ? ` · llegada en ${Math.floor(ete)}:${dos(Math.round((ete % 1) * 60))} h` : "");
+    } else $("d-resto").textContent = "";
+
+    if (!marcaAvion) marcaAvion = L.marker(pos, { icon: iconoAvion(v.hdg), interactive: false, zIndexOffset: 1000 }).addTo(mapa);
+    else marcaAvion.setLatLng(pos);
+    if (Math.abs((v.hdg || 0) - rumboAvion) > 1) { rumboAvion = v.hdg || 0; marcaAvion.setIcon(iconoAvion(rumboAvion)); }
+    estela.addLatLng(pos);
+    encuadrar(v.dep, v.arr, pos);
+    pintarATC(r.atcs, v);
+  }
+
+  // ---------- METAR de salida y llegada ----------
+  async function metar(dep, arr) {
+    const ids = [...new Set([dep, arr].filter((c) => /^[A-Z0-9]{4}$/.test(c || "")))];
+    if (!ids.length) return;
+    const caja = $("metar");
+    const filas = [];
+    for (const id of ids) {
+      try {
+        const [m] = await (await fetch(`${WX}?ids=${id}&format=json`)).json();
+        if (!m) continue;
+        aeropuertos[id] = { lat: m.lat, lon: m.lon, cat: m.fltCat, raw: m.rawOb };
+        filas.push(m);
+      } catch {}
+    }
+    if (!filas.length) return;
+    caja.innerHTML = "";
+    for (const m of filas) {
+      const f = document.createElement("div");
+      f.className = "fila";
+      f.append(
+        Object.assign(document.createElement("span"), { className: `cat ${m.fltCat || ""}`, textContent: m.fltCat || "—" }),
+        Object.assign(document.createElement("span"), { textContent: m.rawOb.replace(/^METAR\s+/, "") }),
+      );
+      caja.append(f);
+    }
+    // Aeropuertos y línea de la ruta en el mapa
+    const pts = [];
+    for (const c of ids) {
+      const a = aeropuertos[c];
+      if (!a) continue;
+      pts.push([a.lat, a.lon]);
+      marcasApt[c]?.remove();
+      marcasApt[c] = L.marker([a.lat, a.lon], { interactive: false, icon: L.divIcon({ className: "", html: `<span class="apt">● ${c}</span>`, iconAnchor: [5, 7] }) }).addTo(mapa);
+    }
+    lineaRuta.setLatLngs(pts.length === 2 ? pts : []);
+  }
+  setInterval(() => { const [d, a] = ultimaRuta.split("-"); if (d) metar(d, a); }, 10 * 60 * 1000);
+
+  actualizar();
+  setInterval(actualizar, DEMO ? 2000 : 15000);
+  </script>
+</body>
+</html>

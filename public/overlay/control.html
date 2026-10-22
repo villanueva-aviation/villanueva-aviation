@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="robots" content="noindex" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Control del overlay · Villanueva Aviation</title>
+<style>
+  /* Panel para un "Dock de navegador" de OBS (Ver → Docks → Docks de navegador personalizados).
+     Manda los cambios al overlay /overlay/en-vivo.html, que debe estar abierto en el mismo OBS. */
+  :root { --bg: #0b1d34; --card: #102847; --ink: #eef2f7; --muted: #9aa8bb; --gold: #d4af37; --line: #1d3557; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 12px; background: var(--bg); color: var(--ink); font: 13px/1.4 "Segoe UI", Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 12px; }
+  h2 { margin: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  label { display: flex; flex-direction: column; gap: 3px; color: var(--muted); font-size: 12px; }
+  input, textarea, select { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+  textarea { resize: vertical; min-height: 54px; }
+  .fila { display: flex; gap: 6px; flex-wrap: wrap; }
+  button { font: 600 13px inherit; font-family: inherit; flex: 1 1 auto; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
+  button.primario { background: var(--gold); color: #060e1a; border-color: var(--gold); }
+  button:active { transform: scale(.97); }
+  .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .toggles label { flex-direction: row; align-items: center; gap: 6px; color: var(--ink); }
+  #estado { color: var(--muted); font-size: 12px; min-height: 1em; }
+</style>
+</head>
+<body>
+  <section>
+    <h2>Pregunta del día</h2>
+    <label>Preguntas listas
+      <select id="preset"><option value="">Escribir una nueva…</option></select>
+    </label>
+    <label>Tema <input id="categoria" value="Pregunta del día" /></label>
+    <label>Pregunta <textarea id="texto"></textarea></label>
+    <label>Respuesta <textarea id="respuesta"></textarea></label>
+    <div class="fila">
+      <button class="primario" id="mostrar">Mostrar</button>
+      <button id="revelar">Revelar respuesta</button>
+      <button id="ocultar">Ocultar</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Título del vuelo</h2>
+    <label>Título <input id="titulo" placeholder="737-800 · MMMX → MMRX" /></label>
+    <label>Subtítulo <input id="subtitulo" placeholder="Tour de México IVAO · Tramo 1" /></label>
+    <button id="guardar-titulo">Actualizar título</button>
+  </section>
+
+  <section>
+    <h2>Qué se ve</h2>
+    <div class="toggles">
+      <label><input type="checkbox" data-panel="mapa" checked /> Mapa</label>
+      <label><input type="checkbox" data-panel="datos" checked /> Datos de vuelo</label>
+      <label><input type="checkbox" data-panel="atc" checked /> Control en línea</label>
+      <label><input type="checkbox" data-panel="camara" checked /> Marco de cámara</label>
+      <label><input type="checkbox" data-panel="metar" checked /> METAR</label>
+      <label><input type="checkbox" data-panel="cta" checked /> Invitación al test</label>
+    </div>
+  </section>
+  <div id="estado"></div>
+
+<script>
+  const PRESETS = [
+    { categoria: "Rendimiento", texto: "¿Por qué despegar de la Ciudad de México es más difícil que despegar de Cancún?",
+      respuesta: "Por la altitud: MMMX está a unos 7,300 ft. El aire es menos denso, los motores y el ala rinden menos: se usa más pista y se sube más lento." },
+    { categoria: "Descenso", texto: "Voy a FL350. ¿A cuántas millas del destino empiezo a bajar?",
+      respuesta: "Regla del 3: miles de pies a perder × 3. Unos 35 × 3 = 105 NM antes, y luego ajustas por viento y velocidad." },
+    { categoria: "VOR", texto: "Vas TO la estación y la aguja se va a la derecha. ¿Hacia dónde viras?",
+      respuesta: "A la derecha: hacia la aguja. Tu curso está del lado al que se va la aguja." },
+    { categoria: "Radio", texto: "¿Qué significa CRAFT en una autorización IFR?",
+      respuesta: "Clearance limit, Route, Altitude, Frequency, Transponder: el orden para copiar y colacionar tu autorización." },
+    { categoria: "Altímetro", texto: "¿Para qué sirve poner el QNH en el altímetro?",
+      respuesta: "Para que marque tu altitud sobre el nivel del mar con la presión real del día. Cerca de 30 ft de error por cada hPa mal puesto." },
+  ];
+  const CLAVE = "va-overlay-estado";
+  const $ = (id) => document.getElementById(id);
+  let canal = null;
+  try { canal = new BroadcastChannel("va-overlay"); } catch {}
+
+  function leer() {
+    try { return JSON.parse(localStorage.getItem(CLAVE) || "{}"); } catch { return {}; }
+  }
+  function enviar(cambios, aviso) {
+    const e = { ...leer(), ...cambios };
+    try { localStorage.setItem(CLAVE, JSON.stringify(e)); } catch {}
+    canal?.postMessage(e);
+    $("estado").textContent = aviso;
+  }
+  const pregunta = (extra) => ({ pregunta: { categoria: $("categoria").value, texto: $("texto").value, respuesta: $("respuesta").value, ...extra } });
+
+  PRESETS.forEach((p, i) => $("preset").append(new Option(`${p.categoria}: ${p.texto.slice(0, 48)}…`, i)));
+  $("preset").addEventListener("change", (ev) => {
+    const p = PRESETS[ev.target.value];
+    $("categoria").value = p ? p.categoria : "Pregunta del día";
+    $("texto").value = p ? p.texto : "";
+    $("respuesta").value = p ? p.respuesta : "";
+  });
+  $("mostrar").onclick = () => enviar(pregunta({ visible: true, revelada: false }), "Pregunta en pantalla.");
+  $("revelar").onclick = () => enviar(pregunta({ visible: true, revelada: true }), "Respuesta revelada.");
+  $("ocultar").onclick = () => enviar(pregunta({ visible: false, revelada: false }), "Pregunta oculta.");
+  $("guardar-titulo").onclick = () => enviar({ titulo: $("titulo").value, subtitulo: $("subtitulo").value }, "Título actualizado.");
+  document.querySelectorAll("[data-panel]").forEach((c) => c.addEventListener("change", () => {
+    const mostrar = {};
+    document.querySelectorAll("[data-panel]").forEach((x) => (mostrar[x.dataset.panel] = x.checked));
+    enviar({ mostrar }, "Listo.");
+  }));
+
+  // Al abrir, recupera lo último que se mandó.
+  const e = leer();
+  $("titulo").value = e.titulo || "";
+  $("subtitulo").value = e.subtitulo || "";
+  if (e.pregunta) { $("categoria").value = e.pregunta.categoria || ""; $("texto").value = e.pregunta.texto || ""; $("respuesta").value = e.pregunta.respuesta || ""; }
+  if (e.mostrar) document.querySelectorAll("[data-panel]").forEach((x) => (x.checked = e.mostrar[x.dataset.panel] !== false));
+</script>
+</body>
+</html>
