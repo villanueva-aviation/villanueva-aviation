@@ -163,11 +163,21 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <script>
   const P = new URLSearchParams(location.search);
-  const RED = (P.get("red") || "ivao").toLowerCase() === "vatsim" ? "vatsim" : "ivao";
-  const CALLSIGN = (P.get("callsign") || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-  const DEMO = P.has("demo");
-  // &ruta=MMAS-MMMY: METAR y ruta en el mapa desde antes de conectarse a la red.
-  const RUTA_URL = (P.get("ruta") || "").toUpperCase().split(/[^A-Z0-9]+/).filter((c) => /^[A-Z0-9]{4}$/.test(c)).slice(0, 2);
+  // El vuelo (red, callsign, ruta, modo prueba) llega del panel de control; los parámetros de la URL
+  // (?red=&callsign=&ruta=MMAS-MMMY&demo) solo sirven de respaldo si el panel no ha mandado nada.
+  let RED, CALLSIGN, DEMO, RUTA_URL, llaveVuelo = "", listo = false;
+  function configurarVuelo(e) {
+    const v = e.vuelo || {};
+    RED = (v.red || P.get("red") || "ivao").toLowerCase() === "vatsim" ? "vatsim" : "ivao";
+    CALLSIGN = (v.callsign || P.get("callsign") || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    DEMO = v.demo ?? P.has("demo");
+    const ruta = v.dep || v.arr ? `${v.dep || ""}-${v.arr || ""}` : P.get("ruta") || "";
+    RUTA_URL = ruta.toUpperCase().split(/[^A-Z0-9]+/).filter((c) => /^[A-Z0-9]{4}$/.test(c)).slice(0, 2);
+    const llave = [RED, CALLSIGN, DEMO, RUTA_URL.join("-")].join("|");
+    if (llave === llaveVuelo) return;
+    llaveVuelo = llave;
+    if (listo) reiniciarVuelo();
+  }
   const WX = "https://villanueva-aviation.pages.dev/api/wx/metar";
   const $ = (id) => document.getElementById(id);
 
@@ -183,6 +193,7 @@
     try { return { ...BASE, ...JSON.parse(localStorage.getItem(CLAVE) || "{}") }; } catch { return BASE; }
   }
   function aplicar(e) {
+    configurarVuelo(e);
     $("t-titulo").textContent = e.titulo || "Vuelo en vivo";
     $("t-sub").textContent = e.subtitulo || "";
     const m = { ...BASE.mostrar, ...(e.mostrar || {}) };
@@ -353,7 +364,7 @@
         metar(RUTA_URL[0], RUTA_URL[1]);
       }
       $("d-fase").textContent = "Esperando conexión";
-      $("sin-datos").textContent = CALLSIGN ? `${CALLSIGN} todavía no aparece en ${RED.toUpperCase()}. Se actualiza cada 15 segundos.` : "Falta el callsign en la URL (&callsign=...).";
+      $("sin-datos").textContent = CALLSIGN ? `${CALLSIGN} todavía no aparece en ${RED.toUpperCase()}. Se actualiza cada 15 segundos.` : "Escribe tu callsign en el panel de control.";
       pintarATC(r.atcs, null);
       return;
     }
@@ -391,9 +402,11 @@
   }
 
   // ---------- METAR de salida y llegada ----------
+  let metarVez = 0; // si cambias de vuelo a media consulta, gana la consulta más reciente
   async function metar(dep, arr) {
     const ids = [...new Set([dep, arr].filter((c) => /^[A-Z0-9]{4}$/.test(c || "")))];
     if (!ids.length) return;
+    const vez = ++metarVez;
     const caja = $("metar");
     const filas = [];
     for (const id of ids) {
@@ -404,7 +417,7 @@
         filas.push(m);
       } catch {}
     }
-    if (!filas.length) return;
+    if (!filas.length || vez !== metarVez) return;
     caja.innerHTML = "";
     for (const m of filas) {
       const f = document.createElement("div");
@@ -429,8 +442,26 @@
   }
   setInterval(() => { const [d, a] = ultimaRuta.split("-"); if (d) metar(d, a); }, 10 * 60 * 1000);
 
-  actualizar();
-  setInterval(actualizar, DEMO ? 2000 : 15000);
+  // Cambio de vuelo desde el panel: se borra el anterior (estela, ruta, METAR) y se busca el nuevo.
+  function reiniciarVuelo() {
+    ultimaRuta = "";
+    metarVez++;
+    estela.setLatLngs([]);
+    lineaRuta.setLatLngs([]);
+    marcaAvion?.remove();
+    marcaAvion = null;
+    for (const c in marcasApt) { marcasApt[c].remove(); delete marcasApt[c]; }
+    for (const id of ["d-callsign", "d-alt", "d-gs", "d-hdg", "d-sqk"]) $(id).textContent = "—";
+    $("d-avion").textContent = "";
+    $("d-dep").textContent = $("d-arr").textContent = "----";
+    $("d-barra").style.width = "0";
+    $("d-resto").textContent = "";
+    $("metar").innerHTML = '<div class="fila"><span class="label">METAR</span><span>Cargando…</span></div>';
+    actualizar();
+  }
+
+  listo = true;
+  (function ciclo() { actualizar().finally(() => setTimeout(ciclo, DEMO ? 2000 : 15000)); })();
   </script>
 </body>
 </html>

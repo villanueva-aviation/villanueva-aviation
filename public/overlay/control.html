@@ -20,6 +20,9 @@
   button { font: 600 13px inherit; font-family: inherit; flex: 1 1 auto; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
   button.primario { background: var(--gold); color: #060e1a; border-color: var(--gold); }
   button:active { transform: scale(.97); }
+  input:not([type="checkbox"]), select, textarea { width: 100%; min-width: 0; }
+  .dos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  .check { flex-direction: row; align-items: center; gap: 6px; color: var(--ink); align-self: end; padding-bottom: 6px; }
   .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .toggles label { flex-direction: row; align-items: center; gap: 6px; color: var(--ink); }
   #estado { color: var(--muted); font-size: 12px; min-height: 1em; }
@@ -42,10 +45,18 @@
   </section>
 
   <section>
-    <h2>Título del vuelo</h2>
-    <label>Título <input id="titulo" placeholder="737-800 · MMMX → MMRX" /></label>
-    <label>Subtítulo <input id="subtitulo" placeholder="Tour de México IVAO · Tramo 1" /></label>
-    <button id="guardar-titulo">Actualizar título</button>
+    <h2>Vuelo</h2>
+    <div class="dos">
+      <label>Red <select id="red"><option value="ivao">IVAO</option><option value="vatsim">VATSIM</option></select></label>
+      <label>Callsign <input id="callsign" placeholder="XBCVN" autocomplete="off" /></label>
+      <label>Salida <input id="dep" placeholder="MMAS" maxlength="4" autocomplete="off" /></label>
+      <label>Llegada <input id="arr" placeholder="MMMY" maxlength="4" autocomplete="off" /></label>
+      <label>Avión <input id="avion" placeholder="C208B" autocomplete="off" /></label>
+      <label class="check"><input type="checkbox" id="demo" /> Modo prueba</label>
+    </div>
+    <label>Subtítulo <input id="subtitulo" placeholder="Tour de México IVAO · Leg 2" /></label>
+    <label>Título (opcional; vacío se arma solo con la ruta y el avión) <input id="titulo" placeholder="MMAS → MMMY · C208B" /></label>
+    <button class="primario" id="cambiar-vuelo">Cambiar de vuelo</button>
   </section>
 
   <section>
@@ -100,7 +111,16 @@
   $("mostrar").onclick = () => enviar(pregunta({ visible: true, revelada: false }), "Pregunta en pantalla.");
   $("revelar").onclick = () => enviar(pregunta({ visible: true, revelada: true }), "Respuesta revelada.");
   $("ocultar").onclick = () => enviar(pregunta({ visible: false, revelada: false }), "Pregunta oculta.");
-  $("guardar-titulo").onclick = () => enviar({ titulo: $("titulo").value, subtitulo: $("subtitulo").value }, "Título actualizado.");
+  const icao = (id) => $(id).value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4);
+  $("cambiar-vuelo").onclick = () => {
+    const dep = icao("dep"), arr = icao("arr"), avion = $("avion").value.trim();
+    const auto = [dep && arr ? `${dep} → ${arr}` : dep || arr, avion].filter(Boolean).join(" · ");
+    enviar({
+      vuelo: { red: $("red").value, callsign: $("callsign").value.toUpperCase().replace(/[^A-Z0-9]/g, ""), dep, arr, avion, demo: $("demo").checked },
+      titulo: $("titulo").value.trim() || auto || "Vuelo en vivo",
+      subtitulo: $("subtitulo").value.trim(),
+    }, "Vuelo cambiado. Los datos aparecen en unos segundos.");
+  };
   document.querySelectorAll("[data-panel]").forEach((c) => c.addEventListener("change", () => {
     const mostrar = {};
     document.querySelectorAll("[data-panel]").forEach((x) => (mostrar[x.dataset.panel] = x.checked));
@@ -109,7 +129,13 @@
 
   // Al abrir, recupera lo último que se mandó.
   const e = leer();
-  $("titulo").value = e.titulo || "";
+  const v = e.vuelo || {};
+  $("red").value = v.red || "ivao";
+  $("callsign").value = v.callsign || "XBCVN";
+  $("dep").value = v.dep || "";
+  $("arr").value = v.arr || "";
+  $("avion").value = v.avion || "";
+  $("demo").checked = !!v.demo;
   $("subtitulo").value = e.subtitulo || "";
   if (e.pregunta) { $("categoria").value = e.pregunta.categoria || ""; $("texto").value = e.pregunta.texto || ""; $("respuesta").value = e.pregunta.respuesta || ""; }
   if (e.mostrar) document.querySelectorAll("[data-panel]").forEach((x) => (x.checked = e.mostrar[x.dataset.panel] !== false));
