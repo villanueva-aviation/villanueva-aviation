@@ -6,6 +6,8 @@ muestre solo la tarjeta del aterrizaje.
 
 Una sola vez:   python -m pip install SimConnect
 Cada en vivo:   python puente-aterrizaje.py   (con el simulador abierto o por abrir; deja la ventana abierta)
+En la PC de Erik arranca solo con Windows, sin ventana: acceso directo "Puente aterrizaje Villanueva Aviation"
+en la carpeta Inicio, que abre con pythonw la copia de %LOCALAPPDATA%\\VillanuevaAviation\\puente.
 """
 import json
 import threading
@@ -15,7 +17,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from SimConnect import AircraftRequests, Request, SimConnect
 
 PUERTO = 8765
-ultimo = {"vez": 0, "fpm": None}
+ultimo = {"vez": 0, "fpm": None, "conectado": False}
 
 
 def es_aterrizaje(en_tierra_antes, en_tierra, nudos, desde_ultimo):
@@ -35,12 +37,19 @@ def leer_simulador():
         aq = AircraftRequests(sm, _time=0)
         # Velocidad vertical guardada por el simulador en el instante del toque (pies por segundo).
         toque = Request((b"PLANE TOUCHDOWN NORMAL VELOCITY", b"Feet per second"), sm, _time=0)
-        en_tierra_antes, vs_aire, ultimo_toque = None, 0.0, 0.0
+        en_tierra_antes, vs_aire, ultimo_toque, sin_datos = None, 0.0, 0.0, 0
+        ultimo["conectado"] = True
         try:
             while True:
                 suelo = aq.get("SIM_ON_GROUND")
                 if suelo is None:
-                    raise ConnectionError("sin datos")
+                    # Un instante sin respuesta (menús, cargas) no es desconexión; 5 s seguidos sí.
+                    sin_datos += 1
+                    if sin_datos > 100:
+                        raise ConnectionError("sin datos")
+                    time.sleep(0.05)
+                    continue
+                sin_datos = 0
                 en_tierra = bool(suelo)
                 vs = aq.get("VERTICAL_SPEED")  # pies por minuto
                 if not en_tierra and vs is not None:
@@ -57,6 +66,7 @@ def leer_simulador():
                 en_tierra_antes = en_tierra
                 time.sleep(0.05)
         except Exception:
+            ultimo["conectado"] = False
             print("Se perdió la conexión con el simulador. Reintentando…")
             try:
                 sm.exit()

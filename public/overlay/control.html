@@ -196,11 +196,13 @@
 
   // ¿Está abierto tools/puente-aterrizaje.py en esta PC?
   async function revisarPuente() {
-    let ok = false;
-    try { ok = (await fetch("http://127.0.0.1:8765/aterrizaje", { cache: "no-store" })).ok; } catch {}
-    $("puente-estado").textContent = ok
-      ? "🟢 Automático: al tocar pista la tarjeta sale sola."
-      : "⚪ Automático apagado: abre puente-aterrizaje.py, o escribe la tasa aquí.";
+    let r = null;
+    try { r = await (await fetch("http://127.0.0.1:8765/aterrizaje", { cache: "no-store" })).json(); } catch {}
+    $("puente-estado").textContent = !r
+      ? "⚪ Automático apagado: abre puente-aterrizaje.py, o escribe la tasa aquí."
+      : r.conectado === false
+        ? "🟡 Puente abierto, esperando al simulador."
+        : "🟢 Automático: al tocar pista la tarjeta sale sola.";
   }
   revisarPuente();
   setInterval(revisarPuente, 5000);
