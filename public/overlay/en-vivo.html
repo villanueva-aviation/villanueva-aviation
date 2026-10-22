@@ -53,8 +53,10 @@
   #reloj div { display: flex; flex-direction: column; align-items: flex-end; }
   #reloj b { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
 
-  /* Columna derecha: mapa, datos y control en línea */
-  #mapa-panel { top: 104px; right: 40px; width: 400px; height: 300px; overflow: hidden; padding: 0; }
+  /* Columna derecha: mapa, datos y control en línea, apilados para que nunca se encimen */
+  #columna { position: absolute; top: 104px; right: 40px; width: 400px; display: flex; flex-direction: column; gap: 16px; }
+  #columna > .panel { position: relative; }
+  #mapa-panel { width: 400px; height: 300px; overflow: hidden; padding: 0; }
   #mapa { position: absolute; inset: 0; background: var(--navy-950); }
   #mapa-panel .label { position: absolute; top: 10px; left: 12px; z-index: 500; background: var(--panel); padding: 4px 8px; border-radius: 6px; }
   .leaflet-control-attribution { font-size: 8px !important; background: rgba(6,14,26,.6) !important; color: #6b7c93 !important; }
@@ -63,14 +65,14 @@
   .avion { width: 34px; height: 34px; filter: drop-shadow(0 0 6px rgba(212,175,55,.8)); }
   .apt { font: 700 11px var(--mono); color: var(--gold-300); text-shadow: 0 0 4px #000; white-space: nowrap; }
 
-  #datos { top: 420px; right: 40px; width: 400px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+  #datos { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
   .cab { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
   .cab b { font: 800 26px var(--display); letter-spacing: .02em; }
   .cab span { color: var(--muted); font-size: 14px; }
   .fase { align-self: flex-start; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--gold); color: var(--gold-300); font: 600 13px var(--body); letter-spacing: .06em; text-transform: uppercase; }
-  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .grid { display: grid; grid-template-columns: 1.45fr 1fr 1fr 1fr; gap: 8px; }
   .grid div { display: flex; flex-direction: column; gap: 2px; }
-  .grid b { font: 700 22px var(--mono); font-variant-numeric: tabular-nums; }
+  .grid b { font: 700 20px var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .ruta { display: flex; flex-direction: column; gap: 6px; }
   .ruta .ext { display: flex; justify-content: space-between; font: 700 15px var(--mono); }
   .barra { height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); overflow: hidden; }
@@ -78,7 +80,7 @@
   .ruta small { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
   #sin-datos { color: var(--muted); font-size: 14px; line-height: 1.4; }
 
-  #atc { top: 690px; right: 40px; width: 400px; padding: 14px 20px; display: flex; flex-direction: column; gap: 8px; }
+  #atc { padding: 14px 20px; display: flex; flex-direction: column; gap: 8px; }
   #atc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
   #atc li { display: flex; justify-content: space-between; font: 500 15px var(--mono); }
   #atc li span { color: var(--gold-300); }
@@ -121,6 +123,7 @@
     <div><span class="label">CDMX</span><b id="local">--:--</b></div>
   </div>
 
+  <div id="columna">
   <div id="mapa-panel" class="panel anim"><div id="mapa"></div><span class="label">Mapa en vivo</span></div>
 
   <div id="datos" class="panel anim">
@@ -128,7 +131,7 @@
     <span class="fase" id="d-fase">Esperando conexión</span>
     <div class="grid">
       <div><span class="label">Altitud</span><b id="d-alt">—</b></div>
-      <div><span class="label">Vel. suelo</span><b id="d-gs">—</b></div>
+      <div><span class="label">Nudos</span><b id="d-gs">—</b></div>
       <div><span class="label">Rumbo</span><b id="d-hdg">—</b></div>
       <div><span class="label">Squawk</span><b id="d-sqk">—</b></div>
     </div>
@@ -141,6 +144,7 @@
   </div>
 
   <div id="atc" class="panel anim"><span class="label">Control en línea</span><ul id="atc-lista"><li>Buscando…</li></ul></div>
+  </div>
 
   <div id="camara" class="panel anim">
     <div class="nombre"><b>Erik Villanueva</b><span>Fundador · 6,884 h en IVAO</span></div>
@@ -162,6 +166,8 @@
   const RED = (P.get("red") || "ivao").toLowerCase() === "vatsim" ? "vatsim" : "ivao";
   const CALLSIGN = (P.get("callsign") || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   const DEMO = P.has("demo");
+  // &ruta=MMAS-MMMY: METAR y ruta en el mapa desde antes de conectarse a la red.
+  const RUTA_URL = (P.get("ruta") || "").toUpperCase().split(/[^A-Z0-9]+/).filter((c) => /^[A-Z0-9]{4}$/.test(c)).slice(0, 2);
   const WX = "https://villanueva-aviation.pages.dev/api/wx/metar";
   const $ = (id) => document.getElementById(id);
 
@@ -340,6 +346,12 @@
     const v = r.vuelo;
     $("sin-datos").hidden = !!v;
     if (!v) {
+      if (RUTA_URL.length && ultimaRuta !== RUTA_URL.join("-")) {
+        ultimaRuta = RUTA_URL.join("-");
+        $("d-dep").textContent = RUTA_URL[0];
+        $("d-arr").textContent = RUTA_URL[1] || "----";
+        metar(RUTA_URL[0], RUTA_URL[1]);
+      }
       $("d-fase").textContent = "Esperando conexión";
       $("sin-datos").textContent = CALLSIGN ? `${CALLSIGN} todavía no aparece en ${RED.toUpperCase()}. Se actualiza cada 15 segundos.` : "Falta el callsign en la URL (&callsign=...).";
       pintarATC(r.atcs, null);
@@ -413,6 +425,7 @@
       marcasApt[c] = L.marker([a.lat, a.lon], { interactive: false, icon: L.divIcon({ className: "", html: `<span class="apt">● ${c}</span>`, iconAnchor: [5, 7] }) }).addTo(mapa);
     }
     lineaRuta.setLatLngs(pts.length === 2 ? pts : []);
+    encuadrar(dep, arr, marcaAvion ? marcaAvion.getLatLng() : null);
   }
   setInterval(() => { const [d, a] = ultimaRuta.split("-"); if (d) metar(d, a); }, 10 * 60 * 1000);
 
