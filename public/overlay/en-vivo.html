@@ -113,6 +113,35 @@
   #pregunta .r { font-size: 16px; line-height: 1.45; color: var(--gold-300); border-top: 1px solid var(--line); padding-top: 10px; }
   #pregunta .chip { align-self: flex-start; background: var(--gold); color: var(--navy-950); font: 800 12px var(--display); letter-spacing: .14em; padding: 4px 12px; border-radius: 999px; }
 
+  #pregunta .ok { font-size: 14px; color: var(--vfr); }
+
+  /* Saludo a quien escribe en el chat, debajo de la marca */
+  #saludo { left: 40px; top: 112px; padding: 12px 20px; display: flex; flex-direction: column; gap: 2px; border-color: var(--gold); max-width: 520px; }
+  #saludo b { font: 700 20px var(--display); }
+  #saludo span { color: var(--gold-300); font-size: 15px; }
+  #saludo.oculto { transform: translateX(-24px); }
+
+  /* De dónde nos ven, arriba del marco de la cámara */
+  #desde { left: 40px; bottom: 352px; width: 480px; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+  #desde ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  #desde li { font-size: 13px; padding: 3px 10px; border-radius: 999px; background: rgba(212,175,55,.14); color: var(--gold-300); }
+
+  /* Tarjeta del aterrizaje */
+  #aterrizaje { top: 124px; left: 50%; transform: translateX(-50%); width: 560px; padding: 20px 26px; text-align: center; border-color: var(--gold); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  #aterrizaje.oculto { transform: translate(-50%, 12px); }
+  #aterrizaje .num { font: 700 64px/1 var(--mono); font-variant-numeric: tabular-nums; }
+  #aterrizaje .num small { font-size: 24px; color: var(--muted); margin-left: 6px; }
+  #aterrizaje .veredicto { font: 700 20px var(--display); }
+  #aterrizaje .pide { color: var(--muted); font-size: 15px; }
+  #aterrizaje.mantequilla .num, #aterrizaje.mantequilla .veredicto { color: var(--vfr); }
+  #aterrizaje.suave .num, #aterrizaje.suave .veredicto { color: #a6e3a1; }
+  #aterrizaje.firme .num, #aterrizaje.firme .veredicto { color: var(--gold-300); }
+  #aterrizaje.duro .num, #aterrizaje.duro .veredicto { color: var(--ifr); }
+  .chip-oro { background: var(--gold); color: var(--navy-950); font: 800 12px var(--display); letter-spacing: .14em; padding: 4px 12px; border-radius: 999px; }
+
+  /* Modo cine: queda la marca, el marco de la cámara (la cámara es otra fuente de OBS) y los momentos */
+  body.cine .panel:not(#marca):not(#saludo):not(#aterrizaje):not(#camara) { opacity: 0 !important; pointer-events: none; }
+
   @media (prefers-reduced-motion: reduce) { .anim, .barra i { transition: none; } .vivo i { animation: none; } }
 </style>
 </head>
@@ -173,6 +202,18 @@
     <span class="chip" id="p-cat">PREGUNTA DEL DÍA</span>
     <div class="q" id="p-texto"></div>
     <div class="r" id="p-resp" hidden></div>
+    <div class="ok" id="p-ok" hidden></div>
+  </div>
+
+  <div id="saludo" class="panel anim oculto"><b id="s-nombre"></b><span id="s-lugar"></span></div>
+
+  <div id="desde" class="panel anim oculto"><span class="label">Nos ven desde</span><ul id="desde-lista"></ul></div>
+
+  <div id="aterrizaje" class="panel anim oculto">
+    <span class="chip-oro">ATERRIZAJE</span>
+    <div class="num" id="a-fpm">—</div>
+    <div class="veredicto" id="a-veredicto"></div>
+    <div class="pide">¿Del 1 al 10? Escribe tu calificación en el chat</div>
   </div>
 
   <div id="cta" class="panel anim"><span id="cta-texto"></span></div>
@@ -208,7 +249,7 @@
   const BASE = {
     titulo: P.get("titulo") || "Vuelo en vivo",
     subtitulo: P.get("subtitulo") || "",
-    mostrar: { mapa: true, datos: true, plan: true, atc: true, camara: true, metar: true, cta: true },
+    mostrar: { mapa: true, datos: true, plan: true, atc: true, camara: true, metar: true, cta: true, desde: true },
     pregunta: { visible: false, revelada: false, categoria: "Pregunta del día", texto: "", respuesta: "" },
   };
   function leerEstado() {
@@ -231,10 +272,46 @@
     $("p-cat").textContent = (q.categoria || "Pregunta del día").toUpperCase();
     $("p-texto").textContent = q.texto;
     $("p-resp").textContent = q.respuesta;
-    $("p-resp").hidden = !q.revelada;
+    $("p-resp").hidden = !q.revelada || !q.respuesta;
+    const ok = (q.acertaron || "").trim();
+    $("p-ok").textContent = ok ? `✅ Acertaron: ${ok}` : "";
+    $("p-ok").hidden = !q.revelada || !ok;
+    momentos(e, m);
     $("pregunta").classList.toggle("oculto", !(q.visible && q.texto));
     $("columna").classList.toggle("con-pregunta", !!(q.visible && q.texto));
   }
+  // ---------- Saludos, "nos ven desde", aterrizaje y modo cine ----------
+  let ultimoSaludo = 0, saludoTimer = 0;
+  function momentos(e, m) {
+    document.body.classList.toggle("cine", !!e.cine);
+
+    const s = e.saludo;
+    if (s?.vez && s.vez !== ultimoSaludo) {
+      ultimoSaludo = s.vez;
+      if (Date.now() - s.vez < 15000) { // al recargar la página no repite un saludo viejo
+        $("s-nombre").textContent = `¡Hola, ${s.nombre}!`;
+        $("s-lugar").textContent = s.lugar ? `Nos ve desde ${s.lugar}` : "Gracias por acompañarnos";
+        $("saludo").classList.remove("oculto");
+        clearTimeout(saludoTimer);
+        saludoTimer = setTimeout(() => $("saludo").classList.add("oculto"), 8000);
+      }
+    }
+
+    const lugares = (e.desde || []).slice(-12);
+    const ul = $("desde-lista");
+    ul.innerHTML = "";
+    for (const l of lugares) ul.append(Object.assign(document.createElement("li"), { textContent: l }));
+    $("desde").classList.toggle("oculto", !lugares.length || m.desde === false);
+
+    const a = e.aterrizaje || {};
+    const fpm = Math.abs(Number(a.fpm) || 0);
+    const tipo = fpm <= 120 ? ["mantequilla", "¡Mantequilla!"] : fpm <= 250 ? ["suave", "Suave"] : fpm <= 400 ? ["firme", "Firme"] : ["duro", "Duro"];
+    $("aterrizaje").className = `panel anim ${tipo[0]}${a.visible && fpm ? "" : " oculto"}`;
+    $("a-fpm").innerHTML = "";
+    $("a-fpm").append(`−${Math.round(fpm)}`, Object.assign(document.createElement("small"), { textContent: "fpm" }));
+    $("a-veredicto").textContent = tipo[1];
+  }
+
   aplicar(leerEstado());
   try { new BroadcastChannel("va-overlay").onmessage = (ev) => aplicar(ev.data); } catch {}
   addEventListener("storage", (ev) => { if (ev.key === CLAVE) aplicar(leerEstado()); });

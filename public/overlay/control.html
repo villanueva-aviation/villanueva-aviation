@@ -25,10 +25,26 @@
   .check { flex-direction: row; align-items: center; gap: 6px; color: var(--ink); align-self: end; padding-bottom: 6px; }
   .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .toggles label { flex-direction: row; align-items: center; gap: 6px; color: var(--ink); }
+  button.cine { background: transparent; border-color: var(--gold); color: var(--gold); }
+  button.cine.activo { background: var(--gold); color: #060e1a; }
   #estado { color: var(--muted); font-size: 12px; min-height: 1em; }
 </style>
 </head>
 <body>
+  <button class="cine" id="cine">🎬 Modo cine: ocultar todo</button>
+
+  <section>
+    <h2>Saludos</h2>
+    <div class="dos">
+      <label>Nombre <input id="s-nombre" placeholder="Juan" autocomplete="off" /></label>
+      <label>Desde <input id="s-lugar" placeholder="Córdoba, Argentina" autocomplete="off" /></label>
+    </div>
+    <div class="fila">
+      <button class="primario" id="saludar">Saludar</button>
+      <button id="borrar-desde">Borrar lista "Nos ven desde"</button>
+    </div>
+  </section>
+
   <section>
     <h2>Pregunta del día</h2>
     <label>Preguntas listas
@@ -37,10 +53,29 @@
     <label>Tema <input id="categoria" value="Pregunta del día" /></label>
     <label>Pregunta <textarea id="texto"></textarea></label>
     <label>Respuesta <textarea id="respuesta"></textarea></label>
+    <label>Acertaron (nombres del chat, separados por coma) <input id="acertaron" placeholder="Juan, Ana, Pedro" autocomplete="off" /></label>
     <div class="fila">
       <button class="primario" id="mostrar">Mostrar</button>
       <button id="revelar">Revelar respuesta</button>
       <button id="ocultar">Ocultar</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Clase en vuelo</h2>
+    <label>Dato para explicar <select id="clase"></select></label>
+    <div class="fila">
+      <button class="primario" id="mostrar-clase">Mostrar</button>
+      <button id="ocultar-clase">Ocultar</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Aterrizaje</h2>
+    <label>Tasa de descenso al tocar pista (fpm) <input id="fpm" type="number" min="0" max="2000" step="1" placeholder="142" /></label>
+    <div class="fila">
+      <button class="primario" id="mostrar-aterrizaje">Mostrar</button>
+      <button id="ocultar-aterrizaje">Ocultar</button>
     </div>
   </section>
 
@@ -73,6 +108,7 @@
       <label><input type="checkbox" data-panel="camara" checked /> Marco de cámara</label>
       <label><input type="checkbox" data-panel="metar" checked /> METAR</label>
       <label><input type="checkbox" data-panel="cta" checked /> Invitación al test</label>
+      <label><input type="checkbox" data-panel="desde" checked /> Nos ven desde</label>
     </div>
   </section>
   <div id="estado"></div>
@@ -90,6 +126,17 @@
     { categoria: "Altímetro", texto: "¿Para qué sirve poner el QNH en el altímetro?",
       respuesta: "Para que marque tu altitud sobre el nivel del mar con la presión real del día. Cerca de 30 ft de error por cada hPa mal puesto." },
   ];
+  // Datos generales para explicar en cada fase. Son de referencia; lo específico va en las cartas del día.
+  const CLASES = [
+    { titulo: "Navegar con VOR", texto: "El OBS elige el curso, la bandera TO/FROM dice si vas hacia la estación o te alejas, y para corregir se vira hacia la aguja." },
+    { titulo: "El circuito de tránsito", texto: "Viento en cara, viento cruzado, viento en cola, base y final: el patrón para entrar y salir de un aeródromo de forma ordenada." },
+    { titulo: "La SID: la salida publicada", texto: "El camino después del despegue hasta la ruta: rumbos, puntos y altitudes. En la red se vuela tal como está en la carta, salvo que el control indique otra cosa." },
+    { titulo: "TOC: fin del ascenso", texto: "Top of Climb: el punto donde llegamos al nivel de crucero. Se pasa a potencia de crucero y se revisan combustible y tiempos." },
+    { titulo: "TOD: aquí empezamos a bajar", texto: "Top of Descent: el punto calculado para descender a tiempo. Regla práctica: miles de pies a perder × 3 = millas antes." },
+    { titulo: "La STAR: la llegada publicada", texto: "Une la ruta con la aproximación: puntos, altitudes y velocidades para ordenar el tráfico que llega al aeropuerto." },
+    { titulo: "Briefing de aproximación", texto: "Antes de bajar se repasa: pista, tipo de aproximación, frecuencias, mínimos y qué hacer si hay que frustrar." },
+    { titulo: "Aproximación estabilizada", texto: "En final el avión va configurado, en la senda y a la velocidad correcta. Si no está estable, se hace una aproximación frustrada: es una maniobra normal, no un fracaso." },
+  ];
   const CLAVE = "va-overlay-estado";
   const $ = (id) => document.getElementById(id);
   let canal = null;
@@ -104,11 +151,12 @@
     canal?.postMessage(e);
     $("estado").textContent = aviso;
   }
-  const pregunta = (extra) => ({ pregunta: { categoria: $("categoria").value, texto: $("texto").value, respuesta: $("respuesta").value, ...extra } });
+  const pregunta = (extra) => ({ pregunta: { categoria: $("categoria").value, texto: $("texto").value, respuesta: $("respuesta").value, acertaron: $("acertaron").value.trim(), ...extra } });
 
   PRESETS.forEach((p, i) => $("preset").append(new Option(`${p.categoria}: ${p.texto.slice(0, 48)}…`, i)));
   $("preset").addEventListener("change", (ev) => {
     const p = PRESETS[ev.target.value];
+    $("acertaron").value = "";
     $("categoria").value = p ? p.categoria : "Pregunta del día";
     $("texto").value = p ? p.texto : "";
     $("respuesta").value = p ? p.respuesta : "";
@@ -116,6 +164,41 @@
   $("mostrar").onclick = () => enviar(pregunta({ visible: true, revelada: false }), "Pregunta en pantalla.");
   $("revelar").onclick = () => enviar(pregunta({ visible: true, revelada: true }), "Respuesta revelada.");
   $("ocultar").onclick = () => enviar(pregunta({ visible: false, revelada: false }), "Pregunta oculta.");
+  // Saludos y "nos ven desde"
+  $("saludar").onclick = () => {
+    const nombre = $("s-nombre").value.trim(), lugar = $("s-lugar").value.trim();
+    if (!nombre) { $("estado").textContent = "Escribe el nombre de quien saluda."; return; }
+    const desde = leer().desde || [];
+    if (lugar && !desde.some((l) => l.toLowerCase() === lugar.toLowerCase())) desde.push(lugar);
+    enviar({ saludo: { nombre, lugar, vez: Date.now() }, desde }, `Saludo a ${nombre} en pantalla.`);
+    $("s-nombre").value = ""; $("s-lugar").value = "";
+    $("s-nombre").focus();
+  };
+  $("borrar-desde").onclick = () => enviar({ desde: [] }, "Lista borrada.");
+
+  // Clase en vuelo: usa el mismo cuadro que la pregunta, con la explicación ya visible
+  CLASES.forEach((c, i) => $("clase").append(new Option(c.titulo, i)));
+  $("mostrar-clase").onclick = () => {
+    const c = CLASES[$("clase").value];
+    enviar({ pregunta: { categoria: "Clase en vuelo", texto: c.titulo, respuesta: c.texto, acertaron: "", visible: true, revelada: true } }, "Clase en pantalla.");
+  };
+  $("ocultar-clase").onclick = () => enviar({ pregunta: { ...(leer().pregunta || {}), visible: false } }, "Clase oculta.");
+
+  // Aterrizaje
+  $("mostrar-aterrizaje").onclick = () => {
+    const fpm = Math.abs(Number($("fpm").value) || 0);
+    if (!fpm) { $("estado").textContent = "Escribe la tasa de descenso en fpm."; return; }
+    enviar({ aterrizaje: { fpm, visible: true } }, "Aterrizaje en pantalla.");
+  };
+  $("ocultar-aterrizaje").onclick = () => enviar({ aterrizaje: { ...(leer().aterrizaje || {}), visible: false } }, "Aterrizaje oculto.");
+
+  // Modo cine
+  function pintarCine(activo) {
+    $("cine").classList.toggle("activo", activo);
+    $("cine").textContent = activo ? "🎬 Modo cine activo: mostrar todo otra vez" : "🎬 Modo cine: ocultar todo";
+  }
+  $("cine").onclick = () => { const activo = !leer().cine; enviar({ cine: activo }, activo ? "Modo cine." : "Overlay completo."); pintarCine(activo); };
+
   const icao = (id) => $(id).value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4);
   function datosVuelo(extra = {}) {
     return {
@@ -167,7 +250,8 @@
   $("demo").checked = !!v.demo;
   $("simbrief").value = v.simbrief || "Piloto4961";
   $("subtitulo").value = e.subtitulo || "";
-  if (e.pregunta) { $("categoria").value = e.pregunta.categoria || ""; $("texto").value = e.pregunta.texto || ""; $("respuesta").value = e.pregunta.respuesta || ""; }
+  if (e.pregunta) { $("categoria").value = e.pregunta.categoria || ""; $("texto").value = e.pregunta.texto || ""; $("respuesta").value = e.pregunta.respuesta || ""; $("acertaron").value = e.pregunta.acertaron || ""; }
+  pintarCine(!!e.cine);
   if (e.mostrar) document.querySelectorAll("[data-panel]").forEach((x) => (x.checked = e.mostrar[x.dataset.panel] !== false));
 </script>
 </body>
