@@ -165,7 +165,7 @@
   $("arr").value = v.arr || "";
   $("avion").value = v.avion || "";
   $("demo").checked = !!v.demo;
-  $("simbrief").value = v.simbrief || "";
+  $("simbrief").value = v.simbrief || "Piloto4961";
   $("subtitulo").value = e.subtitulo || "";
   if (e.pregunta) { $("categoria").value = e.pregunta.categoria || ""; $("texto").value = e.pregunta.texto || ""; $("respuesta").value = e.pregunta.respuesta || ""; }
   if (e.mostrar) document.querySelectorAll("[data-panel]").forEach((x) => (x.checked = e.mostrar[x.dataset.panel] !== false));
