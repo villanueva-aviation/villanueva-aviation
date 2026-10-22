@@ -56,7 +56,7 @@
   /* Columna derecha: mapa, datos y control en línea, apilados para que nunca se encimen */
   #columna { position: absolute; top: 104px; right: 40px; width: 400px; display: flex; flex-direction: column; gap: 16px; }
   #columna > .panel { position: relative; }
-  #mapa-panel { width: 400px; height: 300px; overflow: hidden; padding: 0; }
+  #mapa-panel { width: 400px; height: 270px; overflow: hidden; padding: 0; }
   #mapa { position: absolute; inset: 0; background: var(--navy-950); }
   #mapa-panel .label { position: absolute; top: 10px; left: 12px; z-index: 500; background: var(--panel); padding: 4px 8px; border-radius: 6px; }
   .leaflet-control-attribution { font-size: 8px !important; background: rgba(6,14,26,.6) !important; color: #6b7c93 !important; }
@@ -80,6 +80,11 @@
   .ruta small { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
   #sin-datos { color: var(--muted); font-size: 14px; line-height: 1.4; }
 
+  #plan { padding: 14px 20px; display: flex; flex-direction: column; gap: 10px; }
+  #plan .grid b { font-size: 17px; }
+  #plan .prox { display: flex; justify-content: space-between; align-items: baseline; font: 700 16px var(--mono); }
+  #plan .prox span:last-child { color: var(--gold-300); }
+  #plan .rt { font: 500 12px/1.45 var(--mono); color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   #atc { padding: 14px 20px; display: flex; flex-direction: column; gap: 8px; }
   #atc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
   #atc li { display: flex; justify-content: space-between; font: 500 15px var(--mono); }
@@ -143,6 +148,18 @@
     <div id="sin-datos" hidden></div>
   </div>
 
+  <div id="plan" class="panel anim oculto">
+    <span class="label">Plan de vuelo · SimBrief</span>
+    <div class="grid">
+      <div><span class="label">Crucero</span><b id="pl-crucero">—</b></div>
+      <div><span class="label">Pistas</span><b id="pl-pistas">—</b></div>
+      <div><span class="label">Alterno</span><b id="pl-alterno">—</b></div>
+      <div><span class="label">Combust.</span><b id="pl-fuel">—</b></div>
+    </div>
+    <div class="prox"><span>Próximo punto</span><span id="pl-prox">—</span></div>
+    <div class="rt" id="pl-ruta"></div>
+  </div>
+
   <div id="atc" class="panel anim"><span class="label">Control en línea</span><ul id="atc-lista"><li>Buscando…</li></ul></div>
   </div>
 
@@ -165,15 +182,18 @@
   const P = new URLSearchParams(location.search);
   // El vuelo (red, callsign, ruta, modo prueba) llega del panel de control; los parámetros de la URL
   // (?red=&callsign=&ruta=MMAS-MMMY&demo) solo sirven de respaldo si el panel no ha mandado nada.
-  let RED, CALLSIGN, DEMO, RUTA_URL, llaveVuelo = "", listo = false;
+  let mostrarPlan = true;
+  let RED, CALLSIGN, DEMO, RUTA_URL, SIMBRIEF, llaveVuelo = "", listo = false, ofpVez = 0;
   function configurarVuelo(e) {
     const v = e.vuelo || {};
     RED = (v.red || P.get("red") || "ivao").toLowerCase() === "vatsim" ? "vatsim" : "ivao";
     CALLSIGN = (v.callsign || P.get("callsign") || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
     DEMO = v.demo ?? P.has("demo");
+    SIMBRIEF = (v.simbrief || P.get("simbrief") || "").trim();
+    if (listo && v.ofpVez && v.ofpVez !== ofpVez) { ofpVez = v.ofpVez; cargarSimbrief(); }
     const ruta = v.dep || v.arr ? `${v.dep || ""}-${v.arr || ""}` : P.get("ruta") || "";
     RUTA_URL = ruta.toUpperCase().split(/[^A-Z0-9]+/).filter((c) => /^[A-Z0-9]{4}$/.test(c)).slice(0, 2);
-    const llave = [RED, CALLSIGN, DEMO, RUTA_URL.join("-")].join("|");
+    const llave = [RED, CALLSIGN, DEMO, RUTA_URL.join("-"), SIMBRIEF].join("|");
     if (llave === llaveVuelo) return;
     llaveVuelo = llave;
     if (listo) reiniciarVuelo();
@@ -186,7 +206,7 @@
   const BASE = {
     titulo: P.get("titulo") || "Vuelo en vivo",
     subtitulo: P.get("subtitulo") || "",
-    mostrar: { mapa: true, datos: true, atc: true, camara: true, metar: true, cta: true },
+    mostrar: { mapa: true, datos: true, plan: true, atc: true, camara: true, metar: true, cta: true },
     pregunta: { visible: false, revelada: false, categoria: "Pregunta del día", texto: "", respuesta: "" },
   };
   function leerEstado() {
@@ -203,6 +223,8 @@
     $("camara").classList.toggle("oculto", !m.camara);
     $("metar").classList.toggle("oculto", !m.metar);
     $("cta").classList.toggle("oculto", !m.cta);
+    mostrarPlan = m.plan !== false;
+    if (listo) pintarPlan();
     const q = { ...BASE.pregunta, ...(e.pregunta || {}) };
     $("p-cat").textContent = (q.categoria || "Pregunta del día").toUpperCase();
     $("p-texto").textContent = q.texto;
@@ -397,6 +419,7 @@
     else marcaAvion.setLatLng(pos);
     if (Math.abs((v.hdg || 0) - rumboAvion) > 1) { rumboAvion = v.hdg || 0; marcaAvion.setIcon(iconoAvion(rumboAvion)); }
     estela.addLatLng(pos);
+    proximoPunto(pos);
     encuadrar(v.dep, v.arr, pos);
     pintarATC(r.atcs, v);
   }
@@ -437,7 +460,7 @@
       marcasApt[c]?.remove();
       marcasApt[c] = L.marker([a.lat, a.lon], { interactive: false, icon: L.divIcon({ className: "", html: `<span class="apt">● ${c}</span>`, iconAnchor: [5, 7] }) }).addTo(mapa);
     }
-    lineaRuta.setLatLngs(pts.length === 2 ? pts : []);
+    lineaRuta.setLatLngs(planVale() ? ofp.fixes.map((f) => [f.lat, f.lon]) : pts.length === 2 ? pts : []);
     encuadrar(dep, arr, marcaAvion ? marcaAvion.getLatLng() : null);
   }
   setInterval(() => { const [d, a] = ultimaRuta.split("-"); if (d) metar(d, a); }, 10 * 60 * 1000);
@@ -458,9 +481,62 @@
     $("d-resto").textContent = "";
     $("metar").innerHTML = '<div class="fila"><span class="label">METAR</span><span>Cargando…</span></div>';
     actualizar();
+    cargarSimbrief();
   }
 
+  // ---------- Plan de vuelo de SimBrief (último OFP del usuario) ----------
+  let ofp = null, simbriefVez = 0;
+  const planVale = () => !!ofp && ultimaRuta === `${ofp.dep}-${ofp.arr}`;
+  const lista = (x) => (Array.isArray(x) ? x : x ? [x] : []);
+  async function cargarSimbrief() {
+    const vez = ++simbriefVez;
+    if (!SIMBRIEF) { ofp = null; pintarPlan(); return; }
+    try {
+      const campo = /^\d+$/.test(SIMBRIEF) ? "userid" : "username";
+      const d = await (await fetch(`https://www.simbrief.com/api/xml.fetcher.php?${campo}=${encodeURIComponent(SIMBRIEF)}&json=1`, { cache: "no-store" })).json();
+      if (vez !== simbriefVez) return;
+      if (d.fetch?.status !== "Success") { ofp = null; pintarPlan(); return; }
+      const fix = (id, lat, lon) => ({ id, lat: Number(lat), lon: Number(lon) });
+      ofp = {
+        dep: d.origin.icao_code, arr: d.destination.icao_code,
+        ruta: d.general.route, crucero: Number(d.general.initial_altitude),
+        rwyDep: d.origin.plan_rwy, rwyArr: d.destination.plan_rwy, alterno: d.alternate?.icao_code,
+        fuel: Number(d.fuel.plan_takeoff), unidades: d.params.units === "lbs" ? "lb" : "kg",
+        fixes: [
+          fix(d.origin.icao_code, d.origin.pos_lat, d.origin.pos_long),
+          ...lista(d.navlog?.fix).map((f) => fix(f.ident, f.pos_lat, f.pos_long)),
+          fix(d.destination.icao_code, d.destination.pos_lat, d.destination.pos_long),
+        ].filter((f, k, arr) => Number.isFinite(f.lat) && Number.isFinite(f.lon) && f.id !== arr[k - 1]?.id),
+      };
+    } catch { return; }
+    pintarPlan();
+  }
+  function pintarPlan() {
+    const ok = planVale();
+    $("plan").classList.toggle("oculto", !(ok && mostrarPlan));
+    if (!ok) return;
+    $("pl-crucero").textContent = fmtAlt(ofp.crucero);
+    $("pl-pistas").textContent = `${ofp.rwyDep || "—"}→${ofp.rwyArr || "—"}`;
+    $("pl-alterno").textContent = ofp.alterno || "—";
+    $("pl-fuel").textContent = `${(ofp.fuel / 1000).toFixed(1)}k ${ofp.unidades}`;
+    $("pl-ruta").textContent = ofp.ruta;
+    lineaRuta.setLatLngs(ofp.fixes.map((f) => [f.lat, f.lon]));
+    if (marcaAvion) { const ll = marcaAvion.getLatLng(); proximoPunto([ll.lat, ll.lng]); }
+  }
+  // El punto del plan más cercano; si ya lo dejaste atrás, el siguiente.
+  function proximoPunto(pos) {
+    if (!planVale() || ofp.fixes.length < 2) { $("pl-prox").textContent = "—"; return; }
+    const f = ofp.fixes;
+    let i = 0, mejor = Infinity;
+    f.forEach((x, k) => { const dd = millas(pos, [x.lat, x.lon]); if (dd < mejor) { mejor = dd; i = k; } });
+    if (i < f.length - 1 && millas(pos, [f[i + 1].lat, f[i + 1].lon]) < millas([f[i].lat, f[i].lon], [f[i + 1].lat, f[i + 1].lon])) i++;
+    if (i === 0) i = 1; // ya despegaste: el siguiente es el primer punto, no el aeropuerto de salida
+    $("pl-prox").textContent = `${f[i].id} · ${Math.round(millas(pos, [f[i].lat, f[i].lon]))} NM`;
+  }
+  setInterval(cargarSimbrief, 5 * 60 * 1000);
+
   listo = true;
+  cargarSimbrief();
   (function ciclo() { actualizar().finally(() => setTimeout(ciclo, DEMO ? 2000 : 15000)); })();
   </script>
 </body>

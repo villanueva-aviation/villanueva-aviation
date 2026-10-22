@@ -47,6 +47,10 @@
   <section>
     <h2>Vuelo</h2>
     <div class="dos">
+      <label>Usuario SimBrief <input id="simbrief" placeholder="usuario o Pilot ID" autocomplete="off" /></label>
+      <button id="cargar-simbrief" type="button" style="align-self:end">Cargar de SimBrief</button>
+    </div>
+    <div class="dos">
       <label>Red <select id="red"><option value="ivao">IVAO</option><option value="vatsim">VATSIM</option></select></label>
       <label>Callsign <input id="callsign" placeholder="XBCVN" autocomplete="off" /></label>
       <label>Salida <input id="dep" placeholder="MMAS" maxlength="4" autocomplete="off" /></label>
@@ -64,6 +68,7 @@
     <div class="toggles">
       <label><input type="checkbox" data-panel="mapa" checked /> Mapa</label>
       <label><input type="checkbox" data-panel="datos" checked /> Datos de vuelo</label>
+      <label><input type="checkbox" data-panel="plan" checked /> Plan de SimBrief</label>
       <label><input type="checkbox" data-panel="atc" checked /> Control en línea</label>
       <label><input type="checkbox" data-panel="camara" checked /> Marco de cámara</label>
       <label><input type="checkbox" data-panel="metar" checked /> METAR</label>
@@ -112,11 +117,35 @@
   $("revelar").onclick = () => enviar(pregunta({ visible: true, revelada: true }), "Respuesta revelada.");
   $("ocultar").onclick = () => enviar(pregunta({ visible: false, revelada: false }), "Pregunta oculta.");
   const icao = (id) => $(id).value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4);
+  function datosVuelo(extra = {}) {
+    return {
+      red: $("red").value, callsign: $("callsign").value.toUpperCase().replace(/[^A-Z0-9]/g, ""),
+      dep: icao("dep"), arr: icao("arr"), avion: $("avion").value.trim(), demo: $("demo").checked,
+      simbrief: $("simbrief").value.trim(), ...extra,
+    };
+  }
+  // Trae el último plan de SimBrief, llena los campos y cambia el vuelo de una vez.
+  $("cargar-simbrief").onclick = async () => {
+    const u = $("simbrief").value.trim();
+    if (!u) { $("estado").textContent = "Escribe tu usuario de SimBrief."; return; }
+    $("estado").textContent = "Buscando tu último plan…";
+    try {
+      const campo = /^\d+$/.test(u) ? "userid" : "username";
+      const d = await (await fetch(`https://www.simbrief.com/api/xml.fetcher.php?${campo}=${encodeURIComponent(u)}&json=1`, { cache: "no-store" })).json();
+      if (d.fetch?.status !== "Success") { $("estado").textContent = "SimBrief no encontró ese usuario o no tiene planes."; return; }
+      $("dep").value = d.origin.icao_code;
+      $("arr").value = d.destination.icao_code;
+      $("avion").value = d.aircraft.icaocode || d.aircraft.name || "";
+      if (d.atc?.callsign) $("callsign").value = d.atc.callsign;
+      $("cambiar-vuelo").click();
+      $("estado").textContent = `Plan cargado: ${d.origin.icao_code} → ${d.destination.icao_code}.`;
+    } catch { $("estado").textContent = "No se pudo conectar con SimBrief. Intenta de nuevo."; }
+  };
   $("cambiar-vuelo").onclick = () => {
     const dep = icao("dep"), arr = icao("arr"), avion = $("avion").value.trim();
     const auto = [dep && arr ? `${dep} → ${arr}` : dep || arr, avion].filter(Boolean).join(" · ");
     enviar({
-      vuelo: { red: $("red").value, callsign: $("callsign").value.toUpperCase().replace(/[^A-Z0-9]/g, ""), dep, arr, avion, demo: $("demo").checked },
+      vuelo: datosVuelo({ ofpVez: Date.now() }),
       titulo: $("titulo").value.trim() || auto || "Vuelo en vivo",
       subtitulo: $("subtitulo").value.trim(),
     }, "Vuelo cambiado. Los datos aparecen en unos segundos.");
@@ -136,6 +165,7 @@
   $("arr").value = v.arr || "";
   $("avion").value = v.avion || "";
   $("demo").checked = !!v.demo;
+  $("simbrief").value = v.simbrief || "";
   $("subtitulo").value = e.subtitulo || "";
   if (e.pregunta) { $("categoria").value = e.pregunta.categoria || ""; $("texto").value = e.pregunta.texto || ""; $("respuesta").value = e.pregunta.respuesta || ""; }
   if (e.mostrar) document.querySelectorAll("[data-panel]").forEach((x) => (x.checked = e.mostrar[x.dataset.panel] !== false));
