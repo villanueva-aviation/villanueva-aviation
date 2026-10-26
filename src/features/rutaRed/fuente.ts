@@ -27,3 +27,14 @@ export function registrarVisitaRuta(pagina: string, busqueda: string) {
     // Almacenamiento bloqueado (ventana privada, etc.): la página sigue igual.
   }
 }
+
+/** Una fila anónima la primera vez por sesión que alguien revisa una autorización en el gimnasio. */
+export function registrarUsoGimnasio() {
+  try {
+    if (sessionStorage.getItem("gimnasio_uso")) return;
+    sessionStorage.setItem("gimnasio_uso", "1");
+    void supabase.from("visitas_ruta_red").insert({ fuente: fuenteGuardadaRuta(), pagina: "gimnasio-uso" }).then(() => undefined);
+  } catch {
+    // Igual que arriba: nunca rompe la práctica.
+  }
+}

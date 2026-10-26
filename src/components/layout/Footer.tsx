@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { MessageCircle, MessageSquareText, Timer } from "lucide-react";
+import { Headphones, MessageCircle, MessageSquareText, Timer } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { CONTACT_EMAIL, DISCORD_URL, SITE } from "../../lib/constants";
 import { Logo } from "./Logo";
@@ -48,6 +48,13 @@ export function Footer() {
             >
               <Timer size={16} />
               Entrenador de esperas
+            </Link>
+            <Link
+              to={ROUTES.gimnasioAutorizaciones}
+              className="mt-3 inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:border-gold-500/50 hover:text-gold-400"
+            >
+              <Headphones size={16} />
+              Gimnasio de autorizaciones
             </Link>
             <div className="mt-6">
               <SuscribirseForm origen="footer" titulo="Recibe avisos de clases y guías nuevas" />

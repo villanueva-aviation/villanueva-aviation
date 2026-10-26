@@ -53,6 +53,7 @@ export const ROUTES = {
   flota: "/flota",
   quienesSomos: "/quienes-somos",
   entrenadorEsperas: "/entrenador-esperas",
+  gimnasioAutorizaciones: "/gimnasio-autorizaciones",
   adminAventura: "/admin/aventura",
 } as const;
 

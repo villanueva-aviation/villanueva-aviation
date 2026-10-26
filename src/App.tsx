@@ -47,6 +47,9 @@ const QuienesSomos = lazy(() => import("./pages/QuienesSomos").then((m) => ({ de
 const Flota = lazy(() => import("./pages/Flota").then((m) => ({ default: m.Flota })));
 const AdminAventura = lazy(() => import("./pages/AdminAventura").then((m) => ({ default: m.AdminAventura })));
 const EntrenadorEsperas = lazy(() => import("./pages/EntrenadorEsperas").then((m) => ({ default: m.EntrenadorEsperasPage })));
+const GimnasioAutorizaciones = lazy(() =>
+  import("./pages/GimnasioAutorizacionesPage").then((m) => ({ default: m.GimnasioAutorizacionesPage })),
+);
 const Comunidad = lazy(() => import("./pages/Comunidad").then((m) => ({ default: m.Comunidad })));
 const Perfil = lazy(() => import("./pages/Perfil").then((m) => ({ default: m.Perfil })));
 const AdminVuelosPractica = lazy(() => import("./pages/AdminVuelosPractica").then((m) => ({ default: m.AdminVuelosPractica })));
@@ -228,6 +231,7 @@ function RoutedContent() {
           <Route path={ROUTES.flota} element={<Flota />} />
           <Route path={ROUTES.quienesSomos} element={<QuienesSomos />} />
           <Route path={ROUTES.entrenadorEsperas} element={<EntrenadorEsperas />} />
+          <Route path={ROUTES.gimnasioAutorizaciones} element={<GimnasioAutorizaciones />} />
           <Route
             path={ROUTES.adminAventura}
             element={

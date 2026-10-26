@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Award, Timer } from "lucide-react";
+import { ArrowRight, Award, Headphones, Timer } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
@@ -16,6 +16,21 @@ const ESTADO_LABEL: Record<ModuloEstado, string> = {
   "en-progreso": "En progreso",
   completado: "Completado",
 };
+
+const PRACTICA_EXTRA = [
+  {
+    to: ROUTES.entrenadorEsperas,
+    icono: Timer,
+    titulo: "Entrenador de esperas",
+    texto: "Te damos la espera y tu rumbo de llegada: elige la entrada (directa, gota o paralela) en menos de 15 segundos.",
+  },
+  {
+    to: ROUTES.gimnasioAutorizaciones,
+    icono: Headphones,
+    titulo: "Gimnasio de autorizaciones",
+    texto: "Escucha autorizaciones IFR en inglés, como en EE. UU., y cópialas. Empiezas despacio y subes hasta la velocidad de hora pico.",
+  },
+];
 
 const ESTADO_TONE: Record<ModuloEstado, "gold" | "green" | "neutral"> = {
   disponible: "neutral",
@@ -127,21 +142,24 @@ export function Academia() {
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/60">
             Herramientas cortas para entrenar decisiones.
           </p>
-          <Link
-            to={ROUTES.entrenadorEsperas}
-            className="card-hover group mt-5 flex max-w-xl items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60"
-          >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gold-500/10 text-gold-400">
-              <Timer size={22} strokeWidth={1.75} />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-display text-base font-semibold text-white">Entrenador de esperas</h3>
-              <p className="mt-1 text-sm leading-relaxed text-white/60">
-                Te damos la espera y tu rumbo de llegada: elige la entrada (directa, gota o paralela) en menos de 15 segundos.
-              </p>
-            </div>
-            <ArrowRight size={16} className="shrink-0 text-gold-400 transition-transform duration-200 [@media(hover:hover)_and_(pointer:fine)]:group-hover:translate-x-0.5" />
-          </Link>
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            {PRACTICA_EXTRA.map(({ to, icono: Icono, titulo, texto }) => (
+              <Link
+                key={to}
+                to={to}
+                className="card-hover group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60"
+              >
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gold-500/10 text-gold-400">
+                  <Icono size={22} strokeWidth={1.75} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-display text-base font-semibold text-white">{titulo}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-white/60">{texto}</p>
+                </div>
+                <ArrowRight size={16} className="shrink-0 text-gold-400 transition-transform duration-200 [@media(hover:hover)_and_(pointer:fine)]:group-hover:translate-x-0.5" />
+              </Link>
+            ))}
+          </div>
         </div>
       </Container>
     </div>
