@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Container } from "../../components/ui/Container";
 import { ROUTES } from "../../lib/routes";
@@ -44,6 +44,14 @@ const ETAPAS_INICIO: Etapa[] = [
     img: fotoFlota("c90"),
     alt: "King Air C90 XB-KNG en vuelo, captura de simulador",
   },
+  {
+    titulo: "Vuela en una aerolínea",
+    texto:
+      "Cuando ya te muevas en la red, súmate a Axolojet Virtual, nuestra aerolínea aliada en IVAO: base en Guadalajara, tours en grupo y eventos con ATC, del TBM al 747. Su vuelo de entrada es en Cessna 172 de Guadalajara a Puerto Vallarta y de regreso, justo lo que practicas aquí.",
+    cta: { label: "Conoce Axolojet", to: "https://axolojetva.com" },
+    img: { src: "/images/axolojet-737-max.webp" },
+    alt: "Boeing 737 MAX con los colores de Axolojet Virtual sobre las nubes, captura de simulador",
+  },
 ];
 
 const n = (i: number) => String(i + 1).padStart(2, "0");
@@ -53,7 +61,7 @@ export function EtapasRuta() {
   return (
     <EtapasConFoto
       titulo="Tu ruta, etapa por etapa"
-      descripcion="Del primer test a volar con un plan hecho para ti. Cada etapa se puede hacer por separado y a tu ritmo."
+      descripcion="Del primer test a volar en una aerolínea virtual. Cada etapa se puede hacer por separado y a tu ritmo."
       etapas={ETAPAS_INICIO}
     />
   );
@@ -151,9 +159,15 @@ export function EtapasConFoto({ titulo, descripcion, etapas }: { titulo: string;
                 <p className="mt-4 max-w-md text-base leading-relaxed text-white/65">{e.texto}</p>
                 {e.cta && (
                   <div className="mt-6">
-                    <Button to={e.cta.to} variant="secondary">
-                      {e.cta.label} <ArrowRight size={16} />
-                    </Button>
+                    {e.cta.to.startsWith("http") ? (
+                      <Button href={e.cta.to} target="_blank" rel="noopener" variant="secondary">
+                        {e.cta.label} <ArrowUpRight size={16} />
+                      </Button>
+                    ) : (
+                      <Button to={e.cta.to} variant="secondary">
+                        {e.cta.label} <ArrowRight size={16} />
+                      </Button>
+                    )}
                   </div>
                 )}
               </article>

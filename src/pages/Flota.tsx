@@ -108,14 +108,18 @@ export function Flota() {
 
         <section id="rutas" aria-labelledby="rutas-titulo" className="mt-24 scroll-mt-28 border-t border-white/10 pt-12 md:mt-32">
           <p className="font-display text-xs font-semibold uppercase tracking-[0.2em] text-gold-400">
-            Aerolínea virtual · Próximamente
+            Ideas de rutas desde Guadalajara
           </p>
           <h2 id="rutas-titulo" className="mt-3 font-display text-3xl font-bold text-white text-balance sm:text-4xl">
             Red de rutas
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60 sm:text-base">
-            Así volaría la aerolínea virtual de Villanueva Aviation: base en Guadalajara, del C408 en rutas regionales al
-            737-800 alrededor del mundo. Es una propuesta y puede cambiar; el 737 todavía no forma parte de la flota.
+            Del C408 en rutas regionales al 737-800 alrededor del mundo. El 737 no forma parte de nuestra flota: esos tramos
+            los puedes volar con{" "}
+            <a href="https://axolojetva.com" target="_blank" rel="noopener" className="text-gold-400 underline-offset-4 hover:underline">
+              Axolojet Virtual
+            </a>
+            , nuestra aerolínea aliada en IVAO.
           </p>
           <div className="mt-8">
             <Suspense fallback={<div className="aspect-[960/560] w-full rounded-2xl border border-white/10 bg-navy-950" />}>
