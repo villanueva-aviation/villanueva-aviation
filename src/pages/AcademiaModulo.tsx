@@ -5,46 +5,23 @@ import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
-import { ACADEMIA_MODULOS, type ActividadTipo, type InteractividadTipo, type ModuloActividad } from "../data/academia";
-import {
-  checkpointsDeModulo,
-  flattenTemas,
-  MODULE_TERMS,
-  MODULE_PRACTICA,
-  MODULE_EVALUACION,
-  MODULE_SCENARIOS,
-  MODULE_SLIDERS,
-} from "../data/moduleContent";
+import { ACADEMIA_MODULOS, type ActividadTipo } from "../data/academia";
+import { checkpointsDeModulo, flattenTemas, MODULE_PRACTICA, MODULE_EVALUACION } from "../data/moduleContent";
 import { ROUTES } from "../lib/routes";
 import { CONTENIDO_EXCLUSIVO } from "../data/exclusivo";
 import { useAuth } from "../features/auth/AuthContext";
 import { usePremiumAccess } from "../features/payments/usePremiumAccess";
 import { useProgress } from "../features/progress/ProgressContext";
 import { ModuleStepper, type StepperStage } from "../features/academia/ModuleStepper";
-import { HotspotDiagram } from "../features/academia/HotspotDiagram";
-import { DragDropLabels } from "../features/academia/DragDropLabels";
-import { ScenarioSimulator } from "../features/academia/ScenarioSimulator";
-import { DragSlider } from "../features/academia/DragSlider";
-import { AudioPhraseology } from "../features/academia/AudioPhraseology";
-import { AUDIO_SETS } from "../data/fraseologiaATC";
-import { CircuitoTrafico } from "../features/academia/CircuitoTrafico";
-import { TermMatch } from "../features/academia/TermMatch";
+import { InteractividadWidget, INTERACTIVIDAD_INTRO } from "../features/academia/InteractividadWidget";
 import { LessonFlow } from "../features/academia/LessonFlow";
 import { Quiz } from "../features/academia/Quiz";
 import { ProyectoFinal } from "../features/academia/ProyectoFinal";
 import { ModuloFeedback } from "../features/academia/ModuloFeedback";
 import { useBloqueoPorProyecto, type BloqueoProyecto } from "../features/academia/useBloqueoPorProyecto";
 import { Reveal } from "../components/ui/Reveal";
-
-const INTERACTIVIDAD_INTRO: Record<InteractividadTipo, string> = {
-  diagrama: "Explora el diagrama y haz clic en cada componente para conocer su función.",
-  dragdrop: "Practica una vez más, esta vez arrastrando el nombre correcto a su lugar en la aeronave.",
-  escenario: "Toma decisiones en un escenario de vuelo y descubre las consecuencias de cada una.",
-  slider: "Mueve el control y observa en vivo cómo cambian las variables involucradas.",
-  audio: "Escucha la fraseología correcta y compárala con lo que tú dirías en cada situación.",
-  terminos: "Relaciona cada término con su definición correcta.",
-  circuito: "Recorre el circuito de tráfico paso a paso, luego pon a prueba tu ubicación.",
-};
+import { MisionesModulo } from "../features/academia/MisionesModulo";
+import { MISIONES } from "../data/misiones";
 
 // Sugerencia de Contenido Exclusivo más relacionada con cada módulo, mostrada al completarlo.
 const MODULO_EXCLUSIVO_SUGERIDO: Record<string, string> = {
@@ -113,8 +90,9 @@ function EtapaBloqueada({ bloqueo }: { bloqueo: BloqueoProyecto }) {
   );
 }
 
-const STAGE_LABELS: Record<ActividadTipo | "introduccion", string> = {
+const STAGE_LABELS: Record<ActividadTipo | "introduccion" | "misiones", string> = {
   introduccion: "Introducción",
+  misiones: "Misiones",
   leccion: "Lección",
   interactividad: "Interactividad",
   practica: "Práctica",
@@ -122,78 +100,27 @@ const STAGE_LABELS: Record<ActividadTipo | "introduccion", string> = {
   proyecto: "Proyecto final",
 };
 
-function InteractividadWidget({
-  modulo,
-  actividad,
-  onComplete,
-}: {
-  modulo: (typeof ACADEMIA_MODULOS)[number];
-  actividad: ModuloActividad;
-  onComplete: () => void;
-}) {
-  switch (actividad.widget) {
-    case "dragdrop":
-      return <DragDropLabels onComplete={onComplete} setId={actividad.hotspotSetId} />;
-    case "escenario": {
-      const scenario = MODULE_SCENARIOS[actividad.scenarioId ?? modulo.slug];
-      // Sin árbol no hay nada que simular: antes caía a un escenario de ejemplo
-      // que no tenía que ver con el módulo, y nadie lo notaba.
-      if (!scenario) {
-        return (
-          <p className="flex items-center gap-2 text-sm text-white/45">
-            <Lock size={14} /> Contenido en preparación — se publicará próximamente.
-          </p>
-        );
-      }
-      return <ScenarioSimulator tree={scenario.tree} startId={scenario.startId} />;
-    }
-    case "slider": {
-      const config = MODULE_SLIDERS[modulo.slug];
-      // Sin configuración no hay simulador: antes caía a un ejemplo del
-      // componente que resultaba ser el de otro módulo.
-      if (!config) {
-        return (
-          <p className="flex items-center gap-2 text-sm text-white/45">
-            <Lock size={14} /> Contenido en preparación — se publicará próximamente.
-          </p>
-        );
-      }
-      return <DragSlider config={config} />;
-    }
-    case "audio":
-      return <AudioPhraseology onComplete={onComplete} cards={AUDIO_SETS[actividad.audioSetId ?? ""]} />;
-    case "terminos": {
-      const pairs = MODULE_TERMS[actividad.termSetId ?? modulo.slug] ?? [];
-      return <TermMatch pairs={pairs} onComplete={onComplete} />;
-    }
-    case "circuito":
-      return (
-        <CircuitoTrafico
-          onComplete={onComplete}
-          setId={actividad.circuitoSetId}
-          modoInicial={actividad.circuitoSoloPrueba ? "prueba" : "aprende"}
-        />
-      );
-    case "diagrama":
-    default:
-      return <HotspotDiagram setId={actividad.hotspotSetId} />;
-  }
-}
-
 export function AcademiaModulo() {
   const { slug } = useParams<{ slug: string }>();
   const modulo = ACADEMIA_MODULOS.find((m) => m.slug === slug);
   const { isActividadCompletada, completarActividad, registrarExamen, moduloProgreso, loading: progresoLoading } = useProgress();
 
+  // Los módulos con misiones juntan lección e interactividad en una sola etapa.
+  // ponytail: solo Fundamentos (el primer módulo) usa misiones y nunca está bloqueado por un proyecto
+  // previo; si otro módulo las usa, sus interactivos quedarían fuera del bloqueo de ETAPAS_BLOQUEABLES.
+  const misiones = slug ? MISIONES[slug] : undefined;
   const stageKeys = useMemo(() => {
     if (!modulo) return [];
     const tipos = new Set<ActividadTipo>(modulo.actividades.map((a) => a.tipo));
     const order: ActividadTipo[] = ["leccion", "interactividad", "practica", "evaluacion", "proyecto"];
-    return ["introduccion", ...order.filter((t) => tipos.has(t))];
-  }, [modulo]);
+    const etapas = order.filter((t) => tipos.has(t));
+    return ["introduccion", ...(misiones ? ["misiones", ...etapas.filter((t) => t !== "leccion" && t !== "interactividad")] : etapas)];
+  }, [modulo, misiones]);
 
   const [searchParams] = useSearchParams();
-  const etapaInicial = searchParams.get("etapa");
+  const etapaPedida = searchParams.get("etapa");
+  // Los enlaces viejos (?etapa=leccion, como el de la bienvenida) llevan a las misiones.
+  const etapaInicial = misiones && (etapaPedida === "leccion" || etapaPedida === "interactividad") ? "misiones" : etapaPedida;
   const [activeStage, setActiveStage] = useState<string>(
     etapaInicial && stageKeys.includes(etapaInicial) ? etapaInicial : "introduccion",
   );
@@ -221,7 +148,8 @@ export function AcademiaModulo() {
 
   const stages: StepperStage[] = stageKeys.map((key) => {
     let done = false;
-    if (key === "leccion") done = leccionActividades.every((a) => isActividadCompletada(modulo.slug, a.id));
+    if (key === "misiones") done = leccionDone && interactividadDone;
+    else if (key === "leccion") done = leccionActividades.every((a) => isActividadCompletada(modulo.slug, a.id));
     else if (key === "interactividad") done = interactividadActividades.every((a) => isActividadCompletada(modulo.slug, a.id));
     else if (key === "practica" && practicaActividad) done = isActividadCompletada(modulo.slug, practicaActividad.id);
     else if (key === "evaluacion" && evaluacionActividad) done = isActividadCompletada(modulo.slug, evaluacionActividad.id);
@@ -229,7 +157,7 @@ export function AcademiaModulo() {
     else if (key === "introduccion") done = true;
     return {
       key,
-      label: STAGE_LABELS[key as ActividadTipo | "introduccion"],
+      label: STAGE_LABELS[key as ActividadTipo | "introduccion" | "misiones"],
       done,
       locked: !!bloqueo && ETAPAS_BLOQUEABLES.includes(key),
     };
@@ -262,8 +190,9 @@ export function AcademiaModulo() {
               Bienvenido a Villanueva Aviation{user?.nombre ? `, ${user.nombre}` : ""}
             </p>
             <p className="mt-1 text-sm leading-relaxed text-white/70">
-              Esta es tu primera lección. Léela a tu ritmo: cada tema trae la idea clave y los puntos esenciales, y puedes
-              abrir la explicación completa cuando quieras.
+              {misiones
+                ? `Empieza aquí: ${misiones.length} misiones cortas de unos 10 minutos. En cada una lees lo esencial, practicas con un ejercicio y lo pruebas en tu simulador.`
+                : "Esta es tu primera lección. Léela a tu ritmo: cada tema trae la idea clave y los puntos esenciales, y puedes abrir la explicación completa cuando quieras."}
             </p>
           </div>
         )}
@@ -283,15 +212,27 @@ export function AcademiaModulo() {
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
               <h2 className="font-display text-xl font-semibold text-white">Bienvenido al módulo</h2>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/65">{modulo.resumen}</p>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50">
-                Esta sección te guiará a través de una experiencia estructurada: lección teórica
-                {interactividadActividades.length > 0 ? ", ejercicios interactivos" : ""}, práctica y evaluación final
-                {proyectoActividad ? ", más un proyecto final que debes enviar a revisión para marcar el módulo como completado" : ""}.
-              </p>
-              <Button className="mt-6" onClick={() => setActiveStage("leccion")}>
-                Comenzar lección
+              {misiones ? (
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50">
+                  Son {misiones.length} misiones cortas de unos 10 minutos. Cada una junta lo esencial de la teoría, un ejercicio
+                  interactivo y pasos para hacer en tu simulador. Al final vienen la práctica, la evaluación
+                  {proyectoActividad ? " y un proyecto final que el fundador revisa en persona" : ""}.
+                </p>
+              ) : (
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50">
+                  Esta sección te guiará a través de una experiencia estructurada: lección teórica
+                  {interactividadActividades.length > 0 ? ", ejercicios interactivos" : ""}, práctica y evaluación final
+                  {proyectoActividad ? ", más un proyecto final que debes enviar a revisión para marcar el módulo como completado" : ""}.
+                </p>
+              )}
+              <Button className="mt-6" onClick={() => setActiveStage(misiones ? "misiones" : "leccion")}>
+                {misiones ? "Empezar la misión 1" : "Comenzar lección"}
               </Button>
             </div>
+          )}
+
+          {activeStage === "misiones" && misiones && (
+            <MisionesModulo modulo={modulo} misiones={misiones} onTerminar={() => setActiveStage(practicaActividad ? "practica" : "evaluacion")} />
           )}
 
           {activeStage === "leccion" && (
