@@ -67,6 +67,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     archivoHref: "/downloads/guia-hsi.pdf",
   },
   {
+    id: "resumen-movimientos-hsi",
+    categoria: "Guías",
+    nombre: "Resumen de movimientos HSI",
+    descripcion: "Hoja rápida preparada por Álvaro: interceptaciones, rutas pasadas, arcos DME y entradas a una espera, paso a paso.",
+    version: "v1.0",
+    fecha: "2026-10-31",
+    imagen: "/images/descargas-resumen-hsi.jpg",
+    interactivoHref: "/resumen-hsi",
+    archivoHref: "/downloads/resumen-movimientos-hsi.pdf",
+  },
+  {
     id: "guia-metar-taf",
     categoria: "Guías",
     nombre: "Guía de METAR y TAF — Cómo leer el tiempo aeronáutico",

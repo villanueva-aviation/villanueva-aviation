@@ -50,6 +50,7 @@ const EntrenadorEsperas = lazy(() => import("./pages/EntrenadorEsperas").then((m
 const GimnasioAutorizaciones = lazy(() =>
   import("./pages/GimnasioAutorizacionesPage").then((m) => ({ default: m.GimnasioAutorizacionesPage })),
 );
+const ResumenHsi = lazy(() => import("./pages/ResumenHsi").then((m) => ({ default: m.ResumenHsi })));
 const Comunidad = lazy(() => import("./pages/Comunidad").then((m) => ({ default: m.Comunidad })));
 const Perfil = lazy(() => import("./pages/Perfil").then((m) => ({ default: m.Perfil })));
 const AdminVuelosPractica = lazy(() => import("./pages/AdminVuelosPractica").then((m) => ({ default: m.AdminVuelosPractica })));
@@ -232,6 +233,7 @@ function RoutedContent() {
           <Route path={ROUTES.quienesSomos} element={<QuienesSomos />} />
           <Route path={ROUTES.entrenadorEsperas} element={<EntrenadorEsperas />} />
           <Route path={ROUTES.gimnasioAutorizaciones} element={<GimnasioAutorizaciones />} />
+          <Route path={ROUTES.resumenHsi} element={<ResumenHsi />} />
           <Route
             path={ROUTES.adminAventura}
             element={

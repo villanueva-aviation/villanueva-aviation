@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Award, Headphones, Timer } from "lucide-react";
+import { ArrowRight, Award, Compass, Headphones, Timer } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
@@ -29,6 +29,12 @@ const PRACTICA_EXTRA = [
     icono: Headphones,
     titulo: "Gimnasio de autorizaciones",
     texto: "Escucha autorizaciones IFR en inglés, como en EE. UU., y cópialas. Empiezas despacio y subes hasta la velocidad de hora pico.",
+  },
+  {
+    to: ROUTES.resumenHsi,
+    icono: Compass,
+    titulo: "Resumen de movimientos HSI",
+    texto: "Interceptaciones, arcos DME y entradas a una espera, paso a paso. Preparado por Álvaro, aeromédico y futuro piloto de helicóptero.",
   },
 ];
 
@@ -142,7 +148,7 @@ export function Academia() {
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/60">
             Herramientas cortas para entrenar decisiones.
           </p>
-          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          <div className="mt-5 grid gap-4 lg:grid-cols-3">
             {PRACTICA_EXTRA.map(({ to, icono: Icono, titulo, texto }) => (
               <Link
                 key={to}
