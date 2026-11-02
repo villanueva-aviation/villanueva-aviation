@@ -26,6 +26,16 @@ export const CATEGORIAS_DESCARGAS = [
 
 export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
   {
+    id: "simhub-six-pack-c152",
+    categoria: "SimHub Dashboards",
+    nombre: "Six Pack SimHub — Cessna 152",
+    descripcion: "Los seis instrumentos del C152 de MSFS 2020 en una pantalla extra, con el valor exacto bajo cada uno, dos VOR, tacómetro y una página de motor. Incluye instalador y guía. Requiere SimHub con licencia.",
+    version: "v1.0",
+    fecha: "2026-11-02",
+    imagen: "/images/descargas-simhub-c152.jpg",
+    archivoHref: "/downloads/villanueva-six-pack-c152.zip",
+  },
+  {
     id: "simhub-c172",
     categoria: "SimHub Dashboards",
     nombre: "Dashboard SimHub — Cessna 172",

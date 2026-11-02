@@ -70,7 +70,7 @@ export function Descargas() {
                     download
                     className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-white/20 py-2.5 text-sm font-semibold text-white transition-colors hover:border-gold-500/50 hover:text-gold-400"
                   >
-                    <Download size={15} /> Descargar PDF
+                    <Download size={15} /> Descargar {r.archivoHref.endsWith(".zip") ? "ZIP" : "PDF"}
                   </a>
                 ) : (
                   <button
