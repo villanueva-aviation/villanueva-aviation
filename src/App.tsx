@@ -1,7 +1,9 @@
 import { Route, Routes, useLocation } from "react-router-dom";
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
+import { EnFooter, EnNavbar } from "./components/layout/EnLayout";
+import { RUTAS_EN, esIngles, parDeIdioma } from "./lib/idioma";
 import { PageLoader } from "./components/layout/PageLoader";
 import { ErrorBoundary } from "./components/layout/ErrorBoundary";
 import { AuthProvider } from "./features/auth/AuthContext";
@@ -70,12 +72,53 @@ const RutaRed = lazy(() => import("./pages/RutaRed").then((m) => ({ default: m.R
 const RutaRedLeccion = lazy(() => import("./pages/RutaRedLeccion").then((m) => ({ default: m.RutaRedLeccion })));
 const PruebaRed = lazy(() => import("./pages/PruebaRed").then((m) => ({ default: m.PruebaRed })));
 const Ingresar = lazy(() => import("./pages/Ingresar").then((m) => ({ default: m.Ingresar })));
+const EnHome = lazy(() => import("./pages/en/EnHome").then((m) => ({ default: m.EnHome })));
+const EnCoaching = lazy(() => import("./pages/en/EnCoaching").then((m) => ({ default: m.EnCoaching })));
+const EnLegal = lazy(() => import("./pages/en/EnLegal").then((m) => ({ default: m.EnLegal })));
 const NotFound = lazy(() => import("./pages/NotFound").then((m) => ({ default: m.NotFound })));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
+const TITULO_ES = "Villanueva Aviation — Aprende. Practica. Comunica. Vuela.";
+const TITULOS_EN: Record<string, string> = {
+  [RUTAS_EN.home]: "Villanueva Aviation — Learn to fly for real in your simulator",
+  [RUTAS_EN.coaching]: "One-on-one flight sim coaching — Villanueva Aviation",
+  [RUTAS_EN.assessment]: "Book your free assessment — Villanueva Aviation",
+  [RUTAS_EN.signIn]: "Sign in — Villanueva Aviation",
+  [RUTAS_EN.legal]: "Terms, privacy and refunds — Villanueva Aviation",
+};
+const ORIGEN = "https://villanueva-aviation.pages.dev";
+
+/** lang, título, canónica y hreflang según la página (el index.html es uno solo para todo el sitio). */
+function EtiquetasIdioma() {
+  const { pathname } = useLocation();
+  const anterior = useRef(pathname);
+  useEffect(() => {
+    const ingles = esIngles(pathname);
+    document.documentElement.lang = ingles ? "en" : "es";
+    if (TITULOS_EN[pathname]) document.title = TITULOS_EN[pathname];
+    else if (esIngles(anterior.current)) document.title = TITULO_ES;
+    anterior.current = pathname;
+
+    document.head.querySelectorAll('link[rel="canonical"], link[rel="alternate"][hreflang]').forEach((l) => l.remove());
+    const link = (attrs: Record<string, string>) => {
+      const l = document.createElement("link");
+      Object.entries(attrs).forEach(([k, v]) => l.setAttribute(k, v));
+      document.head.appendChild(l);
+    };
+    link({ rel: "canonical", href: ORIGEN + pathname });
+    const par = parDeIdioma(pathname);
+    if (par) {
+      link({ rel: "alternate", hreflang: "es", href: ORIGEN + par.es });
+      link({ rel: "alternate", hreflang: "en", href: ORIGEN + par.en });
+      link({ rel: "alternate", hreflang: "x-default", href: ORIGEN + par.es });
+    }
   }, [pathname]);
   return null;
 }
@@ -338,6 +381,18 @@ function RoutedContent() {
             }
           />
           <Route path={ROUTES.rutaRedLeccion(":id")} element={<RutaRedLeccion />} />
+          <Route path={RUTAS_EN.home} element={<EnHome />} />
+          <Route path={RUTAS_EN.coaching} element={<EnCoaching />} />
+          <Route
+            path={RUTAS_EN.assessment}
+            element={
+              <ProtectedRoute>
+                <Diagnostico />
+              </ProtectedRoute>
+            }
+          />
+          <Route path={RUTAS_EN.signIn} element={<Ingresar />} />
+          <Route path={RUTAS_EN.legal} element={<EnLegal />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
@@ -349,16 +404,18 @@ function App() {
   // La página de aterrizaje va sin barra ni pie del sitio: cada enlace de más es una salida.
   const { pathname } = useLocation();
   const aterrizaje = pathname === ROUTES.empieza;
+  const ingles = esIngles(pathname);
   return (
     <AuthProvider>
       <ProgressProvider>
         <div className="flex min-h-screen flex-col bg-navy-950">
           <ScrollToTop />
-          {!aterrizaje && <div className="contents print:hidden"><Navbar /></div>}
+          <EtiquetasIdioma />
+          {!aterrizaje && <div className="contents print:hidden">{ingles ? <EnNavbar /> : <Navbar />}</div>}
           <main className="flex-1">
             <RoutedContent />
           </main>
-          {!aterrizaje && <div className="contents print:hidden"><Footer /></div>}
+          {!aterrizaje && <div className="contents print:hidden">{ingles ? <EnFooter /> : <Footer />}</div>}
         </div>
       </ProgressProvider>
     </AuthProvider>

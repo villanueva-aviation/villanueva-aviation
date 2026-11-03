@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { CalendarClock, ClipboardCheck, GraduationCap, LogOut, MessageSquareText, User, Users } from "lucide-react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { CalendarClock, ClipboardCheck, Globe, GraduationCap, LogOut, MessageSquareText, User, Users } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
+import { rutaEnOtroIdioma } from "../../lib/idioma";
 import { useAuth } from "../../features/auth/AuthContext";
 import { usePendientesFundador } from "../../features/admin/usePendientesFundador";
 import { CountBadge } from "../ui/CountBadge";
@@ -135,6 +136,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pendientes = usePendientesFundador();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -206,6 +208,15 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <Link
+              to={rutaEnOtroIdioma(pathname)}
+              lang="en"
+              hrefLang="en"
+              aria-label="English version"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 font-display text-xs font-semibold text-white/70 transition-colors duration-200 hover:border-gold-500/50 hover:text-gold-400"
+            >
+              <Globe size={14} strokeWidth={1.75} /> EN
+            </Link>
             <ProfileControl {...pendientes} />
             <HamburgerButton open={open} onClick={() => setOpen((v) => !v)} />
           </div>

@@ -64,53 +64,72 @@ const PASOS: Etapa[] = [
   },
 ];
 
-const TRAMOS = [
-  "Scan de instrumentos y viraje estándar",
-  "VOR, HSI e interceptación de radiales",
-  "Aproximación ILS y aproximación frustrada",
-  "Vuelo completo MMGL → MMMX en línea",
-];
+const PLAN = {
+  es: {
+    titulo: "PLAN DE ASESORÍA",
+    ejemplo: "Ejemplo",
+    filas: [
+      ["NIVEL", "Intermedio (test 8/12)"],
+      ["META", "Volar IFR en línea"],
+      ["EQUIPO", "MSFS · Cessna 172"],
+      ["SESIONES", "4 × 2 h por Discord"],
+    ],
+    tramos: [
+      "Scan de instrumentos y viraje estándar",
+      "VOR, HSI e interceptación de radiales",
+      "Aproximación ILS y aproximación frustrada",
+      "Vuelo completo MMGL → MMMX en línea",
+    ],
+    entre: "Entre sesiones: módulos de Instrumentos e IFR de la Academia.",
+  },
+  en: {
+    titulo: "COACHING PLAN",
+    ejemplo: "Sample",
+    filas: [
+      ["LEVEL", "Intermediate (test 8/12)"],
+      ["GOAL", "Fly IFR online"],
+      ["SETUP", "MSFS · Cessna 172"],
+      ["SESSIONS", "4 × 2 h on Discord"],
+    ],
+    tramos: [
+      "Instrument scan and standard-rate turns",
+      "VOR, HSI and intercepting radials",
+      "ILS approach and missed approach",
+      "Full online flight, MMGL → MMMX",
+    ],
+    entre: "Between sessions: self-study on instruments and IFR.",
+  },
+};
 
 /** Un ejemplo del plan escrito que recibe el cadete, con forma de plan de vuelo. Ilustrativo, sin datos de nadie. */
-function PlanEjemplo() {
+export function PlanEjemplo({ en = false }: { en?: boolean }) {
+  const p = PLAN[en ? "en" : "es"];
   const fila = "grid grid-cols-[6.5rem_1fr] gap-3 border-t border-dashed border-white/15 py-2.5 text-sm";
   return (
     <div className="relative rounded-2xl border border-white/15 bg-[#05090f]/90 p-6 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.9)] backdrop-blur-sm sm:p-7">
       <div className="flex items-baseline justify-between gap-4">
-        <p className="font-display text-sm font-bold tracking-[0.1em] text-gold-400 sm:tracking-[0.2em]">PLAN DE ASESORÍA</p>
+        <p className="font-display text-sm font-bold tracking-[0.1em] text-gold-400 sm:tracking-[0.2em]">{p.titulo}</p>
         <span className="rounded-full border border-white/20 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-white/60">
-          Ejemplo
+          {p.ejemplo}
         </span>
       </div>
       <dl className="mt-4 font-mono text-[13px]">
-        <div className={fila}>
-          <dt className="text-white/45">NIVEL</dt>
-          <dd className="text-white">Intermedio (test 8/12)</dd>
-        </div>
-        <div className={fila}>
-          <dt className="text-white/45">META</dt>
-          <dd className="text-white">Volar IFR en línea</dd>
-        </div>
-        <div className={fila}>
-          <dt className="text-white/45">EQUIPO</dt>
-          <dd className="text-white">MSFS · Cessna 172</dd>
-        </div>
-        <div className={fila}>
-          <dt className="text-white/45">SESIONES</dt>
-          <dd className="text-white">4 × 2 h por Discord</dd>
-        </div>
+        {p.filas.map(([dt, dd]) => (
+          <div key={dt} className={fila}>
+            <dt className="text-white/45">{dt}</dt>
+            <dd className="text-white">{dd}</dd>
+          </div>
+        ))}
       </dl>
       <ol className="mt-2 border-t border-dashed border-white/15 pt-3">
-        {TRAMOS.map((t, i) => (
+        {p.tramos.map((t, i) => (
           <li key={t} className="flex gap-3 py-1.5 text-sm text-white/85">
             <span className="font-mono text-[13px] font-semibold tabular-nums text-gold-400">S{i + 1}</span>
             {t}
           </li>
         ))}
       </ol>
-      <p className="mt-3 border-t border-dashed border-white/15 pt-3 text-xs text-white/50">
-        Entre sesiones: módulos de Instrumentos e IFR de la Academia.
-      </p>
+      <p className="mt-3 border-t border-dashed border-white/15 pt-3 text-xs text-white/50">{p.entre}</p>
     </div>
   );
 }

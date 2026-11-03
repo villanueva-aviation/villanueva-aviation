@@ -2,6 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import { Compass, Headphones, MessageCircle, MessageSquareText, Timer } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { CONTACT_EMAIL, DISCORD_URL, SITE } from "../../lib/constants";
+import { RUTAS_EN } from "../../lib/idioma";
 import { Logo } from "./Logo";
 import { SuscribirseForm } from "../../features/newsletter/SuscribirseForm";
 
@@ -107,6 +108,9 @@ export function Footer() {
             <p>Academia digital independiente. No somos una escuela de aviación certificada ni otorgamos licencias.</p>
             <Link to={ROUTES.legal} className="shrink-0 transition-colors hover:text-gold-400">
               Legal
+            </Link>
+            <Link to={RUTAS_EN.home} lang="en" hrefLang="en" className="shrink-0 transition-colors hover:text-gold-400">
+              English
             </Link>
           </div>
         </div>

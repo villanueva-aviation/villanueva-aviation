@@ -68,7 +68,7 @@ export function EtapasRuta() {
 }
 
 /** Etapas con foto: en escritorio la foto se queda fija y cambia al bajar; en celular cada etapa trae la suya. */
-export function EtapasConFoto({ titulo, descripcion, etapas }: { titulo: string; descripcion?: string; etapas: Etapa[] }) {
+export function EtapasConFoto({ titulo, descripcion, etapas, etiqueta = "ETAPA" }: { titulo: string; descripcion?: string; etapas: Etapa[]; etiqueta?: string }) {
   const TOTAL = n(etapas.length - 1);
   const [activa, setActiva] = useState(0);
   const bloques = useRef<(HTMLElement | null)[]>([]);
@@ -114,7 +114,7 @@ export function EtapasConFoto({ titulo, descripcion, etapas }: { titulo: string;
               <div className="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-navy-950/10 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-7">
                 <p className="font-display text-sm font-semibold tabular-nums tracking-[0.2em] text-gold-400">
-                  ETAPA {n(activa)} <span className="text-white/45">/ {TOTAL}</span>
+                  {etiqueta} {n(activa)} <span className="text-white/45">/ {TOTAL}</span>
                 </p>
                 <div className="mt-3 grid gap-2" style={{ gridTemplateColumns: `repeat(${etapas.length}, minmax(0, 1fr))` }} aria-hidden="true">
                   {etapas.map((e, i) => (
@@ -153,7 +153,7 @@ export function EtapasConFoto({ titulo, descripcion, etapas }: { titulo: string;
                     i === activa ? "text-gold-400" : "text-white/40"
                   } max-lg:text-gold-400`}
                 >
-                  ETAPA {n(i)}
+                  {etiqueta} {n(i)}
                 </p>
                 <h3 className="mt-3 font-display text-2xl font-bold text-white sm:text-3xl">{e.titulo}</h3>
                 <p className="mt-4 max-w-md text-base leading-relaxed text-white/65">{e.texto}</p>

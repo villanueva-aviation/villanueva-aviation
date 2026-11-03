@@ -1,11 +1,12 @@
 import { useState, type FormEvent } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { Mail, PlaneTakeoff } from "lucide-react";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "../features/auth/AuthContext";
 import { Reveal } from "../components/ui/Reveal";
 import { ROUTES } from "../lib/routes";
+import { RUTAS_EN, esIngles } from "../lib/idioma";
 
 function GoogleIcon() {
   return (
@@ -27,14 +28,44 @@ function GoogleIcon() {
   );
 }
 
+const TEXTOS = {
+  es: {
+    titulo: "Acceso de cadete",
+    intro: "Crea tu cuenta o inicia sesión con tu correo para acceder a la Academia y tu cabina de entrenamiento.",
+    enviado: ["Te enviamos un enlace de acceso a", "Ábrelo desde este mismo dispositivo para entrar — puedes cerrar esta pestaña."],
+    google: "Continuar con Google",
+    separador: "o con tu correo",
+    correo: "Correo electrónico",
+    placeholder: "tu@correo.com",
+    enviando: "Enviando...",
+    enviar: "Enviar enlace de acceso",
+    nota: "Sin contraseñas — te enviamos un enlace de un solo uso a tu correo para entrar de forma segura.",
+  },
+  en: {
+    titulo: "Sign in",
+    intro: "Create your account or sign in with your email to book your free assessment.",
+    enviado: ["We sent a sign-in link to", "Open it on this same device to sign in. You can close this tab. The email may arrive in Spanish."],
+    google: "Continue with Google",
+    separador: "or with your email",
+    correo: "Email",
+    placeholder: "you@email.com",
+    enviando: "Sending...",
+    enviar: "Send sign-in link",
+    nota: "No passwords: we email you a one-time link to sign in securely.",
+  },
+};
+
 export function Ingresar() {
   const { sendMagicLink, loginWithGoogle } = useAuth();
   const [params] = useSearchParams();
+  const { pathname } = useLocation();
+  const ingles = esIngles(pathname);
+  const t = TEXTOS[ingles ? "en" : "es"];
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
 
-  const redirectTo = `${window.location.origin}${params.get("from") || ROUTES.miFormacion}`;
+  const redirectTo = `${window.location.origin}${params.get("from") || (ingles ? RUTAS_EN.assessment : ROUTES.miFormacion)}`;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -63,15 +94,12 @@ export function Ingresar() {
           <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gold-500/40 bg-gold-500/10 text-gold-400">
             <PlaneTakeoff size={20} />
           </div>
-          <h1 className="mt-5 font-display text-2xl font-semibold text-white">Acceso de cadete</h1>
-          <p className="mt-2 text-sm text-white/55">
-            Crea tu cuenta o inicia sesión con tu correo para acceder a la Academia y tu cabina de entrenamiento.
-          </p>
+          <h1 className="mt-5 font-display text-2xl font-semibold text-white">{t.titulo}</h1>
+          <p className="mt-2 text-sm text-white/55">{t.intro}</p>
 
           {status === "sent" ? (
             <div className="mt-8 rounded-xl border border-gold-500/30 bg-gold-500/10 p-5 text-sm text-white/80">
-              Te enviamos un enlace de acceso a <span className="text-gold-400">{email}</span>. Ábrelo desde este
-              mismo dispositivo para entrar — puedes cerrar esta pestaña.
+              {t.enviado[0]} <span className="text-gold-400">{email}</span>. {t.enviado[1]}
             </div>
           ) : (
             <>
@@ -79,24 +107,24 @@ export function Ingresar() {
                 onClick={handleGoogle}
                 className="mt-8 flex w-full items-center justify-center gap-2.5 rounded-full border border-white/20 bg-white px-6 py-3 text-sm font-semibold text-navy-950 transition-all duration-200 hover:bg-white/90 active:scale-[0.97]"
               >
-                <GoogleIcon /> Continuar con Google
+                <GoogleIcon /> {t.google}
               </button>
 
               <div className="my-5 flex items-center gap-3 text-xs text-white/35">
                 <div className="h-px flex-1 bg-white/10" />
-                o con tu correo
+                {t.separador}
                 <div className="h-px flex-1 bg-white/10" />
               </div>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <label className="flex flex-col gap-1.5 text-sm text-white/70">
-                  Correo electrónico
+                  {t.correo}
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="tu@correo.com"
+                    placeholder={t.placeholder}
                     className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-white placeholder:text-white/30 outline-none transition-colors focus:border-gold-500/50"
                   />
                 </label>
@@ -104,15 +132,13 @@ export function Ingresar() {
                 {error && <p className="text-sm text-red-400">{error}</p>}
 
                 <Button type="submit" variant="primary" className="mt-2 w-full" disabled={status === "sending"}>
-                  <Mail size={16} /> {status === "sending" ? "Enviando..." : "Enviar enlace de acceso"}
+                  <Mail size={16} /> {status === "sending" ? t.enviando : t.enviar}
                 </Button>
               </form>
             </>
           )}
 
-          <p className="mt-6 text-center text-xs text-white/35">
-            Sin contraseñas — te enviamos un enlace de un solo uso a tu correo para entrar de forma segura.
-          </p>
+          <p className="mt-6 text-center text-xs text-white/35">{t.nota}</p>
         </Reveal>
       </Container>
     </div>

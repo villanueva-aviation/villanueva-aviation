@@ -73,7 +73,7 @@ function etiquetaRumbo(g: number) {
  * Pantalla de navegación estilo cabina para la portada: un avión recorre una ruta real del
  * Paquete 1 con el mapa girando "track up". Con movimiento reducido se queda en un cuadro fijo.
  */
-export function NavDisplay() {
+export function NavDisplay({ en = false }: { en?: boolean }) {
   const [nm, setNm] = useState(52);
   const raiz = useRef<HTMLDivElement>(null);
 
@@ -131,7 +131,7 @@ export function NavDisplay() {
     <figure ref={raiz} className="relative">
       <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#03080f] p-2 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.8)] sm:p-3">
         <div className="pointer-events-none absolute inset-0 rounded-[28px] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.06)]" />
-        <svg viewBox={`0 0 ${ANCHO} ${ALTO}`} className="block h-auto w-full" role="img" aria-label={`Pantalla de navegación: vuelo de ${AEROPUERTOS[tramo.origen].nombre} a ${AEROPUERTOS[tramo.destino].nombre}`}>
+        <svg viewBox={`0 0 ${ANCHO} ${ALTO}`} className="block h-auto w-full" role="img" aria-label={en ? `Navigation display: flight from ${AEROPUERTOS[tramo.origen].nombre} to ${AEROPUERTOS[tramo.destino].nombre}` : `Pantalla de navegación: vuelo de ${AEROPUERTOS[tramo.origen].nombre} a ${AEROPUERTOS[tramo.destino].nombre}`}>
           <defs>
             <clipPath id="nd-mapa">
               <circle cx={CENTRO.x} cy={CENTRO.y} r={RADIO - 2} />
@@ -214,7 +214,7 @@ export function NavDisplay() {
           <g className="tabular-nums">
             <text x="22" y="34" className="fill-white/45 text-[12px] font-semibold tracking-wider">GS</text>
             <text x="48" y="34" className="fill-white font-display text-[17px] font-bold">{GS_KT}</text>
-            <text x="22" y="58" className="fill-white/45 text-[12px]">KT · RANGO {RANGO_NM} NM</text>
+            <text x="22" y="58" className="fill-white/45 text-[12px]">KT · {en ? "RANGE" : "RANGO"} {RANGO_NM} NM</text>
             <text x={ANCHO - 22} y="34" textAnchor="end" className="fill-gold-400 font-display text-[17px] font-bold">{tramo.destino}</text>
             <text x={ANCHO - 22} y="58" textAnchor="end" className="fill-white text-[14px] font-semibold">
               {Math.round(restanteNm)} NM · {Math.round((restanteNm / GS_KT) * 60)} MIN
@@ -226,7 +226,7 @@ export function NavDisplay() {
         <span>
           <span className="text-white/80">{AEROPUERTOS[tramo.origen].nombre}</span> → <span className="text-white/80">{AEROPUERTOS[tramo.destino].nombre}</span>
         </span>
-        <span>Pantalla ilustrativa con aeropuertos reales de las Rutas de México</span>
+        <span>{en ? "Illustrative display with real airports from our Mexico routes" : "Pantalla ilustrativa con aeropuertos reales de las Rutas de México"}</span>
       </figcaption>
     </figure>
   );

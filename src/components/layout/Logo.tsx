@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
 import { ROUTES } from "../../lib/routes";
 
-export function Logo({ onClick, className = "" }: { onClick?: () => void; className?: string }) {
+export function Logo({ onClick, className = "", to = ROUTES.home }: { onClick?: () => void; className?: string; to?: string }) {
   return (
     <Link
-      to={ROUTES.home}
+      to={to}
       onClick={onClick}
       className={`group relative inline-flex items-center ${className}`}
     >
