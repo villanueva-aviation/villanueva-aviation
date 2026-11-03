@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Award, CalendarCheck, ClipboardCheck, ListChecks, Radio, TrendingUp } from "lucide-react";
+import { ArrowRight, Award, CalendarCheck, ClipboardCheck, ListChecks, Monitor, Radio, TrendingUp } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
@@ -15,9 +15,11 @@ import { ROUTES } from "../lib/routes";
 const numChecklists = CONTENIDO_EXCLUSIVO.filter((i) => i.tipo === "Checklist").length;
 const numExamenes = CONTENIDO_EXCLUSIVO.filter((i) => i.tipo === "Examen").length;
 const numAudios = CONTENIDO_EXCLUSIVO.filter((i) => i.tipo === "Audio").length;
+const numDashes = 5; // un solo item de CONTENIDO_EXCLUSIVO reúne los cinco (ver SimhubExclusivo)
 
 const STATS = [
-  { icon: ClipboardCheck, valor: numChecklists, label: "Checklists premium", detalle: "6 aviones" },
+  { icon: ClipboardCheck, valor: numChecklists, label: "Checklists premium", detalle: `${numChecklists} aviones` },
+  { icon: Monitor, valor: numDashes, label: "Dashes de SimHub", detalle: "Para pantalla extra" },
   { icon: Award, valor: numExamenes, label: "Simulacros de checkride", detalle: "Oral y en vuelo" },
   { icon: Radio, valor: numAudios, label: "Sets de audio ATC", detalle: "Situaciones reales" },
   { icon: ListChecks, valor: "12", label: "Maniobras de práctica", detalle: "De familiarización a TyD" },
@@ -34,7 +36,7 @@ export function ContenidoExclusivo() {
       <PageHero
         eyebrow="Contenido Exclusivo"
         title="La biblioteca privada de la Academia"
-        description="Checklists premium, simulacros de checkride y revisión personal del fundador, disponibles únicamente para cadetes de Villanueva Aviation."
+        description="Checklists premium, dashes de SimHub, simulacros de checkride y revisión personal del fundador, disponibles únicamente para cadetes de Villanueva Aviation."
       />
 
       {!puedeAbrir && (
@@ -48,7 +50,7 @@ export function ContenidoExclusivo() {
               Una biblioteca completa para llegar listo a tu checkride
             </p>
 
-            <div className="mt-7 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
+            <div className="mt-7 grid grid-cols-2 gap-4 sm:grid-cols-3">
               {STATS.map(({ icon: Icon, valor, label, detalle }) => (
                 <div key={label} className="flex flex-col items-center gap-2 rounded-xl bg-white/[0.03] p-4">
                   <Icon size={20} className="text-gold-400" />

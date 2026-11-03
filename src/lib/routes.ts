@@ -29,6 +29,7 @@ export const ROUTES = {
   simulacroOral: "/premium/simulacro-oral",
   simulacroVuelo: "/premium/simulacro-vuelo",
   practicaVuelo: "/premium/practica-de-vuelo",
+  simhubExclusivo: "/premium/simhub",
   agendarCita: "/agendar-cita",
   asesorias: "/asesorias",
   testNivel: "/nivel",

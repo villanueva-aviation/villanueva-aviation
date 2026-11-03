@@ -1,6 +1,6 @@
 export interface ContenidoExclusivo {
   id: string;
-  tipo: "Checklist" | "Examen" | "Agenda" | "Audio" | "Práctica";
+  tipo: "Checklist" | "Examen" | "Agenda" | "Audio" | "Práctica" | "SimHub";
   titulo: string;
   descripcion: string;
   duracion: string;
@@ -9,6 +9,15 @@ export interface ContenidoExclusivo {
 }
 
 export const CONTENIDO_EXCLUSIVO: ContenidoExclusivo[] = [
+  {
+    id: "simhub-dashes",
+    tipo: "SimHub",
+    titulo: "Dashes de SimHub — 5 aviones",
+    descripcion: "Panel de vuelo y de motor para una pantalla extra del V35B, A36TC, C208, Arrow III y Seneca V, con el valor exacto bajo cada instrumento. Requiere SimHub con licencia.",
+    duracion: "5 dashes",
+    imagen: "/images/exclusivo-simhub.jpg",
+    interactivoHref: "/premium/simhub",
+  },
   {
     id: "checklist-premium-c172",
     tipo: "Checklist",

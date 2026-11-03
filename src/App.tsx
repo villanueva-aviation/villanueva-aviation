@@ -40,6 +40,7 @@ const ChecklistPremiumC152 = lazy(() => import("./pages/ChecklistPremiumC152").t
 const SimulacroOral = lazy(() => import("./pages/SimulacroOral").then((m) => ({ default: m.SimulacroOral })));
 const SimulacroVuelo = lazy(() => import("./pages/SimulacroVuelo").then((m) => ({ default: m.SimulacroVuelo })));
 const PracticaVuelo = lazy(() => import("./pages/PracticaVuelo").then((m) => ({ default: m.PracticaVuelo })));
+const SimhubExclusivo = lazy(() => import("./pages/SimhubExclusivo").then((m) => ({ default: m.SimhubExclusivo })));
 const AgendarCita = lazy(() => import("./pages/AgendarCita").then((m) => ({ default: m.AgendarCita })));
 const GuiaVFR = lazy(() => import("./pages/GuiaVFR").then((m) => ({ default: m.GuiaVFR })));
 const Aventura = lazy(() => import("./pages/Aventura").then((m) => ({ default: m.Aventura })));
@@ -215,6 +216,14 @@ function RoutedContent() {
             element={
               <PremiumRoute>
                 <PracticaVuelo />
+              </PremiumRoute>
+            }
+          />
+          <Route
+            path={ROUTES.simhubExclusivo}
+            element={
+              <PremiumRoute>
+                <SimhubExclusivo />
               </PremiumRoute>
             }
           />
