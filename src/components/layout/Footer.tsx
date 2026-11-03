@@ -18,7 +18,8 @@ export function Footer() {
         <div className="flex flex-col gap-10 md:flex-row md:justify-between">
           <div className="max-w-sm">
             <Logo />
-            <p className="mt-4 text-sm leading-relaxed text-white/55">
+            <p className="mt-4 font-display text-base font-semibold text-gold-400">{SITE.tagline}</p>
+            <p className="mt-2 text-sm leading-relaxed text-white/55">
               {SITE.description}
             </p>
             <a

@@ -1,6 +1,6 @@
 export const SITE = {
   name: "Villanueva Aviation",
-  tagline: "Todo para volar mejor tu simulador, en español.",
+  tagline: "Vive la aviación desde casa.",
   description:
     "La casa de los pilotos de simulador en español: rutas de México, briefing con el clima real, dashes y checklists para tu cabina, una comunidad que vuela contigo y una academia para aprender aviación de verdad.",
 } as const;

@@ -43,7 +43,7 @@ Unlike recorded video courses (Eddie Aviation Services) and English/FAA-centred 
 ## Brand Commitments
 
 - Name: **Villanueva Aviation**. Founder: Erik Villanueva ("No es solo volar. Es vivir la aviación." / "El cielo no es el límite, es el comienzo.").
-- Tagline: "Aprende. Practica. Comunica. Vuela."; the logo carries "LEARN. NAVIGATE. FLY."
+- Slogan (since Nov 2026): "Vive la aviación desde casa." The logo carries it as "VIVE LA AVIACIÓN DESDE CASA" ("AVIACIÓN" in gold). It replaced "LEARN. NAVIGATE. FLY." and "Aprende. Practica. Comunica. Vuela." Descriptive line for titles and metas: "Todo para volar mejor tu simulador".
 - Palette: navy (`#060e1a`, `#0b1d34`) and gold (`#d4af37`). Typefaces: Sora (display) and Inter (body).
 - Logo: compass + "V" + climbing plane, transparent PNG on the dark background.
 - Imagery: the founder's own in-sim captures of the XB- fleet. Prefer them over stock photos; label them as simulator captures.
