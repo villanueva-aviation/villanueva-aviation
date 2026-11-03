@@ -2,10 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { Container } from "../../components/ui/Container";
-import { ROUTES } from "../../lib/routes";
-import { ACADEMIA_MODULOS } from "../../data/academia";
-import { EXAMENES_TIPO } from "../../data/examenesTipo";
-import { TOTAL_AVIONES, fotoFlota } from "../../data/flota";
 
 export interface Etapa {
   titulo: string;
@@ -15,57 +11,7 @@ export interface Etapa {
   cta?: { label: string; to: string };
 }
 
-const ETAPAS_INICIO: Etapa[] = [
-  {
-    titulo: "Descubre tu nivel",
-    texto: "Doce preguntas de seis áreas, en unos tres minutos y sin crear cuenta. Ves tu nivel, tus puntos fuertes y por dónde te conviene seguir.",
-    cta: { label: "Hacer el test", to: ROUTES.testNivel },
-    img: fotoFlota("c152"),
-    alt: "Cessna 152 XB-CDT en vuelo, captura de simulador",
-  },
-  {
-    titulo: "Aprende la teoría",
-    texto: `${ACADEMIA_MODULOS.length} módulos, de Fundamentos a IFR: lecciones, ejercicios interactivos y un proyecto final que el fundador revisa en persona. Gratis.`,
-    cta: { label: "Ver la Academia", to: ROUTES.academia },
-    img: fotoFlota("c172"),
-    alt: "Cessna 172 XB-VNA en vuelo, captura de simulador",
-  },
-  {
-    titulo: "Practica en tu simulador",
-    texto: `Checklists de ${TOTAL_AVIONES} aviones, exámenes de ${EXAMENES_TIPO.length} modelos, rutas de México con su plan de vuelo listo para cargar y un briefing con el METAR real.`,
-    cta: { label: "Ver la flota", to: ROUTES.flota },
-    img: fotoFlota("seneca"),
-    alt: "Piper Seneca XB-SNV en vuelo, captura de simulador",
-  },
-  {
-    titulo: "Vuela con acompañamiento",
-    texto: "Asesorías 1 a 1 por Discord, con un plan escrito para ti. Empiezas con un diagnóstico gratis de 30 minutos.",
-    cta: { label: "Ver asesorías", to: ROUTES.asesorias },
-    img: fotoFlota("c90"),
-    alt: "King Air C90 XB-KNG en vuelo, captura de simulador",
-  },
-  {
-    titulo: "Vuela en una aerolínea",
-    texto:
-      "Cuando ya te muevas en la red, súmate a Axolojet Virtual, nuestra aerolínea aliada en IVAO: base en Guadalajara, tours en grupo y eventos con ATC, del TBM al 747. Su vuelo de entrada es en Cessna 172 de Guadalajara a Puerto Vallarta y de regreso, justo lo que practicas aquí.",
-    cta: { label: "Conoce Axolojet", to: "https://axolojetva.com" },
-    img: { src: "/images/axolojet-737-max.webp" },
-    alt: "Boeing 737 MAX con los colores de Axolojet Virtual sobre las nubes, captura de simulador",
-  },
-];
-
 const n = (i: number) => String(i + 1).padStart(2, "0");
-
-/** La ruta del cadete en el inicio. */
-export function EtapasRuta() {
-  return (
-    <EtapasConFoto
-      titulo="Tu ruta, etapa por etapa"
-      descripcion="Del primer test a volar en una aerolínea virtual. Cada etapa se puede hacer por separado y a tu ritmo."
-      etapas={ETAPAS_INICIO}
-    />
-  );
-}
 
 /** Etapas con foto: en escritorio la foto se queda fija y cambia al bajar; en celular cada etapa trae la suya. */
 export function EtapasConFoto({ titulo, descripcion, etapas, etiqueta = "ETAPA" }: { titulo: string; descripcion?: string; etapas: Etapa[]; etiqueta?: string }) {

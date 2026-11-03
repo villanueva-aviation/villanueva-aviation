@@ -1,8 +1,8 @@
 export const SITE = {
   name: "Villanueva Aviation",
-  tagline: "Aprende. Practica. Comunica. Vuela.",
+  tagline: "Todo para volar mejor tu simulador, en español.",
   description:
-    "Academia aeronáutica digital enfocada en educación teórica y simulación de vuelo para futuros pilotos: fundamentos, meteorología, aerodinámica, navegación, VFR e IFR.",
+    "La casa de los pilotos de simulador en español: rutas de México, briefing con el clima real, dashes y checklists para tu cabina, una comunidad que vuela contigo y una academia para aprender aviación de verdad.",
 } as const;
 
 export const DISCORD_URL = "https://discord.gg/A952wXcqDW";

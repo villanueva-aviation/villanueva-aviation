@@ -1,7 +1,10 @@
-import { BookOpen, Info, ClipboardCheck, Compass, Download, GraduationCap, Home, Plane, PlaneTakeoff, Sparkles, UserCircle, Users, Waypoints } from "lucide-react";
+import { BookOpen, Info, ClipboardCheck, Compass, Download, GraduationCap, Home, Plane, PlaneTakeoff, Route, Sparkles, UserCircle, Users, Warehouse, Waypoints } from "lucide-react";
 
 export const ROUTES = {
   home: "/",
+  vuela: "/vuela",
+  hangar: "/hangar",
+  aprende: "/aprende",
   academia: "/academia",
   academiaModulo: (slug: string) => `/academia/${slug}`,
   examenTipo: (clave: string) => `/academia/avion/${clave}`,
@@ -61,17 +64,17 @@ export const ROUTES = {
 
 export const NAV_LINKS = [
   { label: "Inicio", to: ROUTES.home, icon: Home },
-  { label: "Academia", to: ROUTES.academia, icon: BookOpen },
-  { label: "Mi Formación", to: ROUTES.miFormacion, icon: Compass },
-  { label: "Tracker", to: ROUTES.tracker, icon: Waypoints },
-  { label: "Evaluaciones", to: ROUTES.evaluaciones, icon: ClipboardCheck },
-  { label: "Contenido Exclusivo", to: ROUTES.contenidoExclusivo, icon: Sparkles },
-  { label: "Descargas", to: ROUTES.descargas, icon: Download },
-  { label: "Aventura", to: ROUTES.aventura, icon: Plane },
-  // Fuera de la barra superior (ya no cabe en escritorio): aparece en el menú móvil y en el pie.
-  { label: "Flota", to: ROUTES.flota, icon: PlaneTakeoff, soloMenus: true },
-  { label: "Asesorías", to: ROUTES.asesorias, icon: GraduationCap, soloMenus: true },
+  { label: "Vuela", to: ROUTES.vuela, icon: PlaneTakeoff },
+  { label: "Hangar", to: ROUTES.hangar, icon: Warehouse },
+  { label: "Aprende", to: ROUTES.aprende, icon: GraduationCap },
   { label: "Comunidad", to: ROUTES.comunidad, icon: Users },
+  { label: "Contenido Exclusivo", to: ROUTES.contenidoExclusivo, icon: Sparkles },
+  // Fuera de la barra superior: aparecen en el menú móvil y en el pie. Lo de cadete (Mi Formación, Tracker...) vive en CADET_TABS.
+  { label: "Descargas", to: ROUTES.descargas, icon: Download, soloMenus: true },
+  { label: "Flota", to: ROUTES.flota, icon: Plane, soloMenus: true },
+  { label: "Aventura", to: ROUTES.aventura, icon: Route, soloMenus: true },
+  { label: "Academia", to: ROUTES.academia, icon: BookOpen, soloMenus: true },
+  { label: "Asesorías", to: ROUTES.asesorias, icon: Compass, soloMenus: true },
   { label: "Quiénes somos", to: ROUTES.quienesSomos, icon: Info, soloMenus: true },
 ];
 

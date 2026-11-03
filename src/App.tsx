@@ -72,6 +72,7 @@ const RutaRed = lazy(() => import("./pages/RutaRed").then((m) => ({ default: m.R
 const RutaRedLeccion = lazy(() => import("./pages/RutaRedLeccion").then((m) => ({ default: m.RutaRedLeccion })));
 const PruebaRed = lazy(() => import("./pages/PruebaRed").then((m) => ({ default: m.PruebaRed })));
 const Ingresar = lazy(() => import("./pages/Ingresar").then((m) => ({ default: m.Ingresar })));
+const SeccionPage = lazy(() => import("./pages/Seccion").then((m) => ({ default: m.SeccionPage })));
 const EnHome = lazy(() => import("./pages/en/EnHome").then((m) => ({ default: m.EnHome })));
 const EnCoaching = lazy(() => import("./pages/en/EnCoaching").then((m) => ({ default: m.EnCoaching })));
 const EnLegal = lazy(() => import("./pages/en/EnLegal").then((m) => ({ default: m.EnLegal })));
@@ -85,7 +86,7 @@ function ScrollToTop() {
   return null;
 }
 
-const TITULO_ES = "Villanueva Aviation — Aprende. Practica. Comunica. Vuela.";
+const TITULO_ES = "Villanueva Aviation — Todo para volar mejor tu simulador";
 const TITULOS_EN: Record<string, string> = {
   [RUTAS_EN.home]: "Villanueva Aviation — Learn to fly for real in your simulator",
   [RUTAS_EN.coaching]: "One-on-one flight sim coaching — Villanueva Aviation",
@@ -130,6 +131,9 @@ function RoutedContent() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path={ROUTES.home} element={<Home />} />
+          <Route path={ROUTES.vuela} element={<SeccionPage clave="vuela" />} />
+          <Route path={ROUTES.hangar} element={<SeccionPage clave="hangar" />} />
+          <Route path={ROUTES.aprende} element={<SeccionPage clave="aprende" />} />
           <Route
             path={ROUTES.academia}
             element={

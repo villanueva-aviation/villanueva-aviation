@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { CalendarClock, ClipboardCheck, GraduationCap, LogOut, MessageSquareText, User, Users } from "lucide-react";
+import { CalendarClock, ClipboardCheck, Compass, GraduationCap, LogOut, MessageSquareText, User, Users } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { DISCORD_URL } from "../../lib/constants";
 import { useAuth } from "../../features/auth/AuthContext";
@@ -114,6 +114,13 @@ export function MobileMenu({
                   <LogOut size={16} />
                 </button>
               </div>
+              <Link
+                to={ROUTES.miFormacion}
+                onClick={onClose}
+                className="flex w-full items-center justify-center gap-2 rounded-full border border-white/20 py-3 font-display text-sm font-semibold text-white"
+              >
+                <Compass size={15} /> Mi formación
+              </Link>
               {esFundador && (
                 <Link
                   to={ROUTES.adminVuelosPractica}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { CalendarClock, ClipboardCheck, Globe, GraduationCap, LogOut, MessageSquareText, User, Users } from "lucide-react";
+import { CalendarClock, ClipboardCheck, Compass, Globe, GraduationCap, LogOut, MessageSquareText, User, Users } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { rutaEnOtroIdioma } from "../../lib/idioma";
 import { useAuth } from "../../features/auth/AuthContext";
@@ -68,6 +68,13 @@ function ProfileControl({
           className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
         >
           <User size={14} /> Mi perfil
+        </Link>
+        <Link
+          to={ROUTES.miFormacion}
+          onClick={() => setOpen(false)}
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+        >
+          <Compass size={14} /> Mi formación
         </Link>
         {esFundador && (
           <Link
