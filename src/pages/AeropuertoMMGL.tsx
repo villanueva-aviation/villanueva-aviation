@@ -9,7 +9,9 @@ import { ROUTES } from "../lib/routes";
 
 // Datos: salidas, los mismos de la ruta "Listo para volar en red" (cartas Jeppesen vía Navigraph, confirmadas por
 // el fundador el 2026-10-19; ver CARTAS_RED en src/data/rutaRed.ts). Frecuencias, llegadas (10-2B a 10-2E) y
-// aproximaciones ILS Z (11-1 y 11-3): leídas en Navigraph el 2026-11-03. Si una carta cambia, cambia aquí.
+// aproximaciones ILS Z (11-1 y 11-3): leídas en Navigraph el 2026-11-03. Puntos VFR: carta de aproximación visual
+// MMGL-VAC-2/VAC-3 del AIP de México (SENEAM, AIRAC 10/15); el fundador confirmó con IVAO y VATSIM el 2026-11-04 que
+// siguen en uso. Rumbo y distancia de cada punto: medidos sobre la carta, aproximados. Si una carta cambia, cambia aquí.
 // ponytail: página de un solo aeropuerto; sacar los datos a un archivo cuando haya un segundo aeropuerto.
 
 const NB = " "; // espacio que no se parte, para que «11 000 ft» no quede en dos renglones
@@ -157,6 +159,39 @@ const ILS = [
   },
 ];
 
+// Del más lejano al más cercano. "nm" es aproximado, medido sobre la carta visual.
+const PUNTOS_VFR = [
+  { nombre: "Ocotlán", donde: "Este-sureste", nm: 31 },
+  { nombre: "Ixtlahuacán del Río", donde: "Norte", nm: 20 },
+  { nombre: "Presa de Valencia", donde: "Oeste", nm: 18 },
+  { nombre: "Chapala", donde: "Sur-sureste", nm: 15 },
+  { nombre: "Zapotlanejo", donde: "Este-noreste", nm: 14 },
+  { nombre: "Sta. Cruz de las Flores", donde: "Oeste", nm: 10 },
+  { nombre: "Cd. Granja", donde: "Noroeste", nm: 10 },
+  { nombre: "Estadio", donde: "Norte", nm: 9 },
+  { nombre: "Tlajomulco", donde: "Oeste-suroeste", nm: 7 },
+  { nombre: "Tonalá", donde: "Norte-noreste", nm: 7 },
+  { nombre: "Cerro del Cuatro", donde: "Noroeste", nm: 5 },
+  { nombre: "Cajititlán", donde: "Sur", nm: 5 },
+  { nombre: "Hotel Tapatío", donde: "Norte", nm: 5 },
+  { nombre: "Pirámide", donde: "Sur", nm: 4 },
+  { nombre: "Club de Golf Atlas", donde: "Norte", nm: 3 },
+];
+
+const RUTAS_VFR = [
+  { desde: "Por el norte", ruta: ["Estadio", "Hotel Tapatío", "Club de Golf Atlas"] },
+  { desde: "Por el noroeste", ruta: ["Cd. Granja", "Hotel Tapatío", "Club de Golf Atlas"] },
+  { desde: "Por el este", ruta: ["Ocotlán", "Zapotlanejo", "Club de Golf Atlas"] },
+  { desde: "Por el sur", ruta: ["Chapala", "Cajititlán", "Pirámide"] },
+  { desde: "Por el oeste", ruta: ["Sta. Cruz de las Flores", "Tlajomulco", "Pirámide"] },
+];
+
+const VFR_DIALOGO: Linea[] = [
+  { de: "tu", texto: "Guadalajara Aproximación, XB-VNA, VFR sobre Chapala, 9000 pies, con información Bravo, para aterrizar." },
+  { de: "atc", texto: "XB-VNA, identificado, proceda a Cajititlán y Pirámide, notifique Pirámide." },
+  { de: "tu", texto: "Procedo a Cajititlán y Pirámide, notifico Pirámide, XB-VNA." },
+];
+
 const ERRORES = [
   {
     error: "Llamar sin haber escuchado el ATIS.",
@@ -216,7 +251,7 @@ export function AeropuertoMMGL() {
       <PageHero
         eyebrow="Guía de aeropuerto · Gratis · Sin cuenta"
         title="Guadalajara MMGL: sal y llega sin trabarte en la radio"
-        description="Cada llamada de la salida IFR en orden: a quién le hablas, qué te van a decir y qué contestas. Con las salidas, las llegadas, las aproximaciones ILS y los errores que más vemos en la red."
+        description="Cada llamada de la salida IFR en orden: a quién le hablas, qué te van a decir y qué contestas. Con las salidas, las llegadas, las aproximaciones ILS, los puntos VFR y los errores que más vemos en la red."
       />
       <Container className="py-12 md:py-16">
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -379,6 +414,65 @@ export function AeropuertoMMGL() {
           ))}
         </div>
 
+        <h2 className="mt-16 font-display text-2xl font-bold text-white sm:text-3xl">Si vuelas VFR: los puntos visuales</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
+          Guadalajara tiene 15 puntos de notificación VFR. Los controladores de IVAO y VATSIM los siguen usando. Al primer contacto di sobre
+          cuál estás; el control te va pasando de uno a otro hasta el aeropuerto.
+        </p>
+        <ul className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+          {PUNTOS_VFR.map((p) => (
+            <li key={p.nombre} className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+              <p className="font-semibold text-white">{p.nombre}</p>
+              <p className="text-xs text-white/55">
+                {p.donde}, ~{p.nm}{NB}NM
+              </p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 text-xs text-white/45">Rumbo y distancia desde el aeropuerto, aproximados: mídelos en tu carta.</p>
+
+        <p className="mt-8 font-semibold text-white">Cómo entrar</p>
+        <ul className="mt-3 grid gap-2 md:grid-cols-2">
+          {RUTAS_VFR.map((r) => (
+            <li key={r.desde} className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm">
+              <span className="text-white/55">{r.desde}: </span>
+              <span className="text-white">{r.ruta.join(" → ")}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="font-semibold text-white">Dos áreas restringidas</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-white/60">
+              Al oeste (radiales 265° a 305° del VOR) y al este (085° a 125°) del aeropuerto. No las cruces: por eso las rutas entran por el
+              norte, hasta Club de Golf Atlas, o por el sur, hasta Pirámide.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="font-semibold text-white">Respeta la altitud de cada sector</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-white/60">
+              La carta marca en rojo una altitud por sector: 7000 a 7500 ft cerca del aeropuerto y hasta 10{NB}500 ft al suroeste, por los
+              cerros. Al norte está la base aérea de Zapopan, con su propia torre en 118.45.
+            </p>
+          </div>
+        </div>
+        <div className="mt-6 grid gap-2">
+          {VFR_DIALOGO.map((l, j) => (
+            <p
+              key={j}
+              className={`max-w-2xl rounded-xl px-4 py-2.5 text-sm leading-relaxed ${
+                l.de === "tu" ? "border border-gold-500/25 bg-gold-500/[0.06] text-white" : "ml-auto border border-white/10 bg-navy-900 text-white/80"
+              }`}
+            >
+              <span className="mr-2 text-xs font-semibold uppercase tracking-wider text-white/40">{l.de === "tu" ? "Tú" : "Control"}</span>
+              {l.texto}
+            </p>
+          ))}
+        </div>
+        <p className="mt-3 text-xs text-white/45">
+          Ejemplo de entrada por el sur. Carta de aproximación visual MMGL-VAC-2 y VAC-3, AIP de México (SENEAM), AIRAC 10/15.
+        </p>
+
         <h2 className="mt-16 font-display text-2xl font-bold text-white sm:text-3xl">Los errores que más vemos</h2>
         <ul className="mt-6 grid gap-3 md:grid-cols-2">
           {ERRORES.map((e) => (
@@ -420,7 +514,7 @@ export function AeropuertoMMGL() {
 
         <p className="mt-12 max-w-3xl text-xs leading-relaxed text-white/45">
           Procedimientos y frecuencias de las cartas Jeppesen vía Navigraph, con la fecha de cada una; llegadas y aproximaciones
-          consultadas el 3 de noviembre de 2026. Las cartas cambian por ciclo: antes de
+          consultadas el 3 de noviembre de 2026. Puntos VFR de la carta de aproximación visual del AIP de México (SENEAM). Las cartas cambian por ciclo: antes de
           volar, revisa la tuya. Solo para simulación, no para navegación real. Material de práctica para simulador, no instrucción
           certificada.
         </p>
