@@ -43,6 +43,7 @@
   #marca { top: 32px; left: 40px; display: flex; align-items: center; gap: 14px; padding: 10px 20px 10px 12px; }
   #marca img { width: 40px; height: 40px; object-fit: contain; }
   #marca b { font: 700 17px var(--display); letter-spacing: .04em; }
+  #marca .credito { position: absolute; left: 14px; top: calc(100% + 4px); font: 500 11px var(--body); color: var(--muted); white-space: nowrap; }
   .vivo { display: flex; align-items: center; gap: 8px; margin-left: 10px; padding: 5px 12px; border-radius: 999px; background: var(--gold); color: var(--navy-950); font: 800 13px var(--display); letter-spacing: .12em; }
   .vivo i { width: 8px; height: 8px; border-radius: 50%; background: var(--navy-950); animation: pulso 1.6s ease-in-out infinite; }
   @keyframes pulso { 50% { opacity: .25; } }
@@ -147,16 +148,17 @@
 </head>
 <body>
   <div id="marca" class="panel">
-    <img src="/images/logo-mark.png" alt="" />
-    <b>VILLANUEVA AVIATION</b>
+    <img id="m-logo" src="/images/logo-mark.png" alt="" />
+    <b id="m-nombre">VILLANUEVA AVIATION</b>
     <span class="vivo"><i></i>EN VIVO</span>
+    <small class="credito" id="m-credito" hidden>Overlay gratis de Villanueva Aviation</small>
   </div>
 
   <div id="titulo" class="panel"><div class="t" id="t-titulo">Vuelo en vivo</div><div class="s" id="t-sub"></div></div>
 
   <div id="reloj" class="panel">
     <div><span class="label">UTC</span><b id="utc">--:--Z</b></div>
-    <div><span class="label">CDMX</span><b id="local">--:--</b></div>
+    <div><span class="label" id="local-label">CDMX</span><b id="local">--:--</b></div>
   </div>
 
   <div id="columna">
@@ -195,7 +197,7 @@
   </div>
 
   <div id="camara" class="panel anim">
-    <div class="nombre"><b>Erik Villanueva</b><span>Fundador · 6,884 h en IVAO</span></div>
+    <div class="nombre" id="c-nombre"><b id="c-piloto">Erik Villanueva</b><span id="c-linea">Fundador · 6,884 h en IVAO</span></div>
   </div>
 
   <div id="pregunta" class="panel anim oculto">
@@ -255,8 +257,26 @@
   function leerEstado() {
     try { return { ...BASE, ...JSON.parse(localStorage.getItem(CLAVE) || "{}") }; } catch { return BASE; }
   }
+  // Otros streamers configuran su canal en el panel; sin canal se ve la versión de Villanueva Aviation.
+  let ctas = null;
+  function aplicarCanal(c) {
+    const propio = !!c?.nombre;
+    $("m-nombre").textContent = propio ? c.nombre : "VILLANUEVA AVIATION";
+    const logo = propio ? c.logo || "" : "/images/logo-mark.png";
+    if ($("m-logo").getAttribute("src") !== logo) $("m-logo").src = logo;
+    $("m-logo").hidden = !logo;
+    $("m-credito").hidden = !propio;
+    $("c-piloto").textContent = propio ? c.piloto || "" : "Erik Villanueva";
+    $("c-linea").textContent = propio ? c.linea || "" : "Fundador · 6,884 h en IVAO";
+    $("c-nombre").hidden = propio && !c.piloto;
+    const nuevas = propio
+      ? [...(c.invitacion && c.enlace ? [[c.invitacion, c.enlace]] : []), ["Overlay gratis para tu transmisión:", "villanueva-aviation.pages.dev/overlay-gratis"]]
+      : CTAS;
+    if (JSON.stringify(nuevas) !== JSON.stringify(ctas)) { ctas = nuevas; ctaI = 0; cta(); }
+  }
   function aplicar(e) {
     configurarVuelo(e);
+    aplicarCanal(e.canal);
     $("t-titulo").textContent = e.titulo || "Vuelo en vivo";
     $("t-sub").textContent = e.subtitulo || "";
     const m = { ...BASE.mostrar, ...(e.mostrar || {}) };
@@ -279,6 +299,19 @@
     momentos(e, m);
     $("pregunta").classList.toggle("oculto", !(q.visible && q.texto));
     $("columna").classList.toggle("con-pregunta", !!(q.visible && q.texto));
+  }
+  // ---------- Llamado al test / ruta, rotando (o la invitación del canal + el crédito) ----------
+  const CTAS = [
+    ["Test de nivel gratis, 3 minutos:", "villanueva-aviation.pages.dev/nivel"],
+    ["Aprende a volar en red, gratis:", "villanueva-aviation.pages.dev/ruta/listo-para-red"],
+    ["Diagnóstico 1 a 1 gratis:", "villanueva-aviation.pages.dev/asesorias"],
+  ];
+  let ctaI = 0;
+  function cta() {
+    if (!ctas) return;
+    const [a, b] = ctas[ctaI++ % ctas.length];
+    $("cta-texto").innerHTML = "";
+    $("cta-texto").append(a + " ", Object.assign(document.createElement("b"), { textContent: b }));
   }
   // ---------- Saludos, "nos ven desde", aterrizaje y modo cine ----------
   let ultimoSaludo = 0, saludoTimer = 0;
@@ -331,23 +364,13 @@
   function relojes() {
     const d = new Date();
     $("utc").textContent = `${dos(d.getUTCHours())}:${dos(d.getUTCMinutes())}Z`;
-    $("local").textContent = d.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Mexico_City" });
+    $("local").textContent = d.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit", hour12: false });
   }
+  // Hora de la PC del streamer; dice CDMX solo si esa es su zona.
+  if (Intl.DateTimeFormat().resolvedOptions().timeZone !== "America/Mexico_City") $("local-label").textContent = "LOCAL";
   relojes(); setInterval(relojes, 10000);
 
-  // ---------- Llamado al test / ruta, rotando ----------
-  const CTAS = [
-    ["Test de nivel gratis, 3 minutos:", "villanueva-aviation.pages.dev/nivel"],
-    ["Aprende a volar en red, gratis:", "villanueva-aviation.pages.dev/ruta/listo-para-red"],
-    ["Diagnóstico 1 a 1 gratis:", "villanueva-aviation.pages.dev/asesorias"],
-  ];
-  let ctaI = 0;
-  function cta() {
-    const [a, b] = CTAS[ctaI++ % CTAS.length];
-    $("cta-texto").innerHTML = "";
-    $("cta-texto").append(a + " ", Object.assign(document.createElement("b"), { textContent: b }));
-  }
-  cta(); setInterval(cta, 30000);
+  setInterval(cta, 30000);
 
   // ---------- Mapa ----------
   const mapa = L.map("mapa", { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, attributionControl: true })

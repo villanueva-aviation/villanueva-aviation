@@ -29,10 +29,33 @@
   button.cine.activo { background: var(--gold); color: #060e1a; }
   .nota { margin: 0; color: var(--muted); font-size: 12px; }
   #estado { color: var(--muted); font-size: 12px; min-height: 1em; }
+  details > summary { cursor: pointer; list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary h2::after { content: " ▸"; }
+  details[open] > summary h2::after { content: " ▾"; }
+  details[open] { display: flex; flex-direction: column; gap: 8px; }
 </style>
 </head>
 <body>
   <button class="cine" id="cine">🎬 Modo cine: ocultar todo</button>
+
+  <section>
+    <details id="canal-box">
+      <summary><h2>Tu canal</h2></summary>
+      <p class="nota">Pon tu marca en el overlay. Instrucciones: villanueva-aviation.pages.dev/overlay-gratis</p>
+      <label>Nombre del canal <input id="c-nombre" placeholder="Vuela con Ana" autocomplete="off" maxlength="40" /></label>
+      <label>Logo (enlace a una imagen PNG, opcional) <input id="c-logo" placeholder="https://…/logo.png" autocomplete="off" /></label>
+      <div class="dos">
+        <label>Tu nombre <input id="c-piloto" placeholder="Ana López" autocomplete="off" maxlength="40" /></label>
+        <label>Debajo de tu nombre <input id="c-linea" placeholder="1,200 h en VATSIM" autocomplete="off" maxlength="50" /></label>
+      </div>
+      <div class="dos">
+        <label>Invitación (opcional) <input id="c-invitacion" placeholder="Únete a mi Discord:" autocomplete="off" maxlength="50" /></label>
+        <label>Enlace <input id="c-enlace" placeholder="discord.gg/tu-codigo" autocomplete="off" maxlength="60" /></label>
+      </div>
+      <button class="primario" id="guardar-canal">Guardar canal</button>
+    </details>
+  </section>
 
   <section>
     <h2>Saludos</h2>
@@ -109,7 +132,7 @@
       <label><input type="checkbox" data-panel="atc" checked /> Control en línea</label>
       <label><input type="checkbox" data-panel="camara" checked /> Marco de cámara</label>
       <label><input type="checkbox" data-panel="metar" checked /> METAR</label>
-      <label><input type="checkbox" data-panel="cta" checked /> Invitación al test</label>
+      <label><input type="checkbox" data-panel="cta" checked /> Invitación</label>
       <label><input type="checkbox" data-panel="desde" checked /> Nos ven desde</label>
     </div>
   </section>
@@ -207,6 +230,17 @@
   revisarPuente();
   setInterval(revisarPuente, 5000);
 
+  // Tu canal (otros streamers). Sin nombre de canal el overlay muestra Villanueva Aviation.
+  const CAMPOS_CANAL = ["nombre", "logo", "piloto", "linea", "invitacion", "enlace"];
+  $("guardar-canal").onclick = () => {
+    const canal = Object.fromEntries(CAMPOS_CANAL.map((k) => [k, $(`c-${k}`).value.trim()]));
+    if (canal.logo && !/^https:\/\//.test(canal.logo)) { $("estado").textContent = "El logo debe ser un enlace que empiece con https://"; return; }
+    // Quien pone su canal no debe heredar los datos de vuelo de Villanueva Aviation.
+    if (canal.nombre && $("callsign").value === "XBCVN") $("callsign").value = "";
+    if (canal.nombre && $("simbrief").value === "Piloto4961") $("simbrief").value = "";
+    enviar({ canal }, canal.nombre ? `Canal "${canal.nombre}" guardado.` : "Canal borrado: se ve Villanueva Aviation.");
+  };
+
   // Modo cine
   function pintarCine(activo) {
     $("cine").classList.toggle("activo", activo);
@@ -257,13 +291,16 @@
   // Al abrir, recupera lo último que se mandó.
   const e = leer();
   const v = e.vuelo || {};
+  const propio = !!e.canal?.nombre;
+  CAMPOS_CANAL.forEach((k) => ($(`c-${k}`).value = e.canal?.[k] || ""));
+  if (!e.canal) $("canal-box").open = !("vuelo" in e); // primera vez en otra PC: se abre solo
   $("red").value = v.red || "ivao";
-  $("callsign").value = v.callsign || "XBCVN";
+  $("callsign").value = v.callsign || (propio ? "" : "XBCVN");
   $("dep").value = v.dep || "";
   $("arr").value = v.arr || "";
   $("avion").value = v.avion || "";
   $("demo").checked = !!v.demo;
-  $("simbrief").value = v.simbrief || "Piloto4961";
+  $("simbrief").value = v.simbrief || (propio ? "" : "Piloto4961");
   $("subtitulo").value = e.subtitulo || "";
   if (e.pregunta) { $("categoria").value = e.pregunta.categoria || ""; $("texto").value = e.pregunta.texto || ""; $("respuesta").value = e.pregunta.respuesta || ""; $("acertaron").value = e.pregunta.acertaron || ""; }
   pintarCine(!!e.cine);

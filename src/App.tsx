@@ -50,6 +50,7 @@ const QuienesSomos = lazy(() => import("./pages/QuienesSomos").then((m) => ({ de
 const Flota = lazy(() => import("./pages/Flota").then((m) => ({ default: m.Flota })));
 const AdminAventura = lazy(() => import("./pages/AdminAventura").then((m) => ({ default: m.AdminAventura })));
 const EntrenadorEsperas = lazy(() => import("./pages/EntrenadorEsperas").then((m) => ({ default: m.EntrenadorEsperasPage })));
+const OverlayGratis = lazy(() => import("./pages/OverlayGratis").then((m) => ({ default: m.OverlayGratis })));
 const AeropuertoMMGL = lazy(() => import("./pages/AeropuertoMMGL").then((m) => ({ default: m.AeropuertoMMGL })));
 const GimnasioAutorizaciones = lazy(() =>
   import("./pages/GimnasioAutorizacionesPage").then((m) => ({ default: m.GimnasioAutorizacionesPage })),
@@ -90,6 +91,7 @@ function ScrollToTop() {
 const TITULO_ES = "Villanueva Aviation — Todo para volar mejor tu simulador";
 const TITULOS: Record<string, string> = {
   [ROUTES.aeropuertoMMGL]: "Guadalajara MMGL: guía de radio y salida para tu simulador — Villanueva Aviation",
+  [ROUTES.overlayGratis]: "Overlay gratis para streamers de simulador (OBS) — Villanueva Aviation",
   [RUTAS_EN.home]: "Villanueva Aviation — Learn to fly for real in your simulator",
   [RUTAS_EN.coaching]: "One-on-one flight sim coaching — Villanueva Aviation",
   [RUTAS_EN.assessment]: "Book your free assessment — Villanueva Aviation",
@@ -292,6 +294,7 @@ function RoutedContent() {
           <Route path={ROUTES.entrenadorEsperas} element={<EntrenadorEsperas />} />
           <Route path={ROUTES.gimnasioAutorizaciones} element={<GimnasioAutorizaciones />} />
           <Route path={ROUTES.aeropuertoMMGL} element={<AeropuertoMMGL />} />
+          <Route path={ROUTES.overlayGratis} element={<OverlayGratis />} />
           <Route path={ROUTES.resumenHsi} element={<ResumenHsi />} />
           <Route
             path={ROUTES.adminAventura}
