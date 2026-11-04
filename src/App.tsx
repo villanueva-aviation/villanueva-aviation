@@ -50,6 +50,7 @@ const QuienesSomos = lazy(() => import("./pages/QuienesSomos").then((m) => ({ de
 const Flota = lazy(() => import("./pages/Flota").then((m) => ({ default: m.Flota })));
 const AdminAventura = lazy(() => import("./pages/AdminAventura").then((m) => ({ default: m.AdminAventura })));
 const EntrenadorEsperas = lazy(() => import("./pages/EntrenadorEsperas").then((m) => ({ default: m.EntrenadorEsperasPage })));
+const AeropuertoMMGL = lazy(() => import("./pages/AeropuertoMMGL").then((m) => ({ default: m.AeropuertoMMGL })));
 const GimnasioAutorizaciones = lazy(() =>
   import("./pages/GimnasioAutorizacionesPage").then((m) => ({ default: m.GimnasioAutorizacionesPage })),
 );
@@ -87,7 +88,8 @@ function ScrollToTop() {
 }
 
 const TITULO_ES = "Villanueva Aviation — Todo para volar mejor tu simulador";
-const TITULOS_EN: Record<string, string> = {
+const TITULOS: Record<string, string> = {
+  [ROUTES.aeropuertoMMGL]: "Guadalajara MMGL: guía de radio y salida para tu simulador — Villanueva Aviation",
   [RUTAS_EN.home]: "Villanueva Aviation — Learn to fly for real in your simulator",
   [RUTAS_EN.coaching]: "One-on-one flight sim coaching — Villanueva Aviation",
   [RUTAS_EN.assessment]: "Book your free assessment — Villanueva Aviation",
@@ -103,8 +105,8 @@ function EtiquetasIdioma() {
   useEffect(() => {
     const ingles = esIngles(pathname);
     document.documentElement.lang = ingles ? "en" : "es";
-    if (TITULOS_EN[pathname]) document.title = TITULOS_EN[pathname];
-    else if (esIngles(anterior.current)) document.title = TITULO_ES;
+    if (TITULOS[pathname]) document.title = TITULOS[pathname];
+    else if (TITULOS[anterior.current] || esIngles(anterior.current)) document.title = TITULO_ES;
     anterior.current = pathname;
 
     document.head.querySelectorAll('link[rel="canonical"], link[rel="alternate"][hreflang]').forEach((l) => l.remove());
@@ -289,6 +291,7 @@ function RoutedContent() {
           <Route path={ROUTES.quienesSomos} element={<QuienesSomos />} />
           <Route path={ROUTES.entrenadorEsperas} element={<EntrenadorEsperas />} />
           <Route path={ROUTES.gimnasioAutorizaciones} element={<GimnasioAutorizaciones />} />
+          <Route path={ROUTES.aeropuertoMMGL} element={<AeropuertoMMGL />} />
           <Route path={ROUTES.resumenHsi} element={<ResumenHsi />} />
           <Route
             path={ROUTES.adminAventura}

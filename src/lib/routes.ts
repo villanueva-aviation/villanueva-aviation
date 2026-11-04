@@ -58,6 +58,7 @@ export const ROUTES = {
   quienesSomos: "/quienes-somos",
   entrenadorEsperas: "/entrenador-esperas",
   gimnasioAutorizaciones: "/gimnasio-autorizaciones",
+  aeropuertoMMGL: "/aeropuertos/mmgl",
   resumenHsi: "/resumen-hsi",
   adminAventura: "/admin/aventura",
 } as const;

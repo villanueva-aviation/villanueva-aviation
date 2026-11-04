@@ -148,6 +148,13 @@ export const SECCIONES: Seccion[] = [
         alt: "Avión de línea en ascenso, captura de simulador",
       },
       {
+        titulo: "Guía de Guadalajara (MMGL)",
+        texto: "Cada llamada de la salida IFR en orden: qué te dice el control, qué contestas y los errores más comunes.",
+        to: ROUTES.aeropuertoMMGL,
+        img: { src: "/images/msfs-sunset-wing.jpg" },
+        alt: "Ala de avión al atardecer, captura de simulador",
+      },
+      {
         titulo: "Gimnasio de autorizaciones",
         texto: "Escucha autorizaciones IFR en inglés a la velocidad que elijas, hasta que las copies a la primera.",
         to: ROUTES.gimnasioAutorizaciones,
