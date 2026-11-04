@@ -21,7 +21,7 @@ const VUELO_DEL_MES = {
 } as VueloDelMes | null;
 
 // Guías nuestras por aeropuerto, para enlazarlas desde cada evento que pase por ahí.
-const GUIAS: Record<string, string> = { MMGL: ROUTES.aeropuertoMMGL };
+const GUIAS: Record<string, string> = { MMGL: ROUTES.aeropuertoMMGL, MMMX: ROUTES.aeropuertoMMMX };
 
 const CONSEJOS = [
   { titulo: "Conéctate temprano", texto: "Entra 30 a 45 minutos antes. En un evento hay fila para la autorización y para el rodaje." },

@@ -59,6 +59,7 @@ export const ROUTES = {
   entrenadorEsperas: "/entrenador-esperas",
   gimnasioAutorizaciones: "/gimnasio-autorizaciones",
   aeropuertoMMGL: "/aeropuertos/mmgl",
+  aeropuertoMMMX: "/aeropuertos/mmmx",
   overlayGratis: "/overlay-gratis",
   eventos: "/eventos",
   resumenHsi: "/resumen-hsi",

@@ -155,6 +155,13 @@ export const SECCIONES: Seccion[] = [
         alt: "Guía de comunicaciones IFR",
       },
       {
+        titulo: "Guía de Ciudad de México (MMMX)",
+        texto: "Las salidas y llegadas con su letra de pista, los ILS y cada llamada de radio en orden.",
+        to: ROUTES.aeropuertoMMMX,
+        img: { src: "/images/msfs-aeromexico-clouds.jpg" },
+        alt: "Avión de línea sobre las nubes, captura de simulador",
+      },
+      {
         titulo: "Gimnasio de autorizaciones",
         texto: "Escucha autorizaciones IFR en inglés a la velocidad que elijas, hasta que las copies a la primera.",
         to: ROUTES.gimnasioAutorizaciones,
