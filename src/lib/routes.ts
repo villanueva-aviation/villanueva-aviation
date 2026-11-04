@@ -60,6 +60,7 @@ export const ROUTES = {
   gimnasioAutorizaciones: "/gimnasio-autorizaciones",
   aeropuertoMMGL: "/aeropuertos/mmgl",
   aeropuertoMMMX: "/aeropuertos/mmmx",
+  aeropuertoMMMY: "/aeropuertos/mmmy",
   overlayGratis: "/overlay-gratis",
   eventos: "/eventos",
   resumenHsi: "/resumen-hsi",

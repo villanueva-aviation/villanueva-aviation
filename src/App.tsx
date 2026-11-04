@@ -54,6 +54,7 @@ const Eventos = lazy(() => import("./pages/Eventos").then((m) => ({ default: m.E
 const OverlayGratis = lazy(() => import("./pages/OverlayGratis").then((m) => ({ default: m.OverlayGratis })));
 const AeropuertoMMGL = lazy(() => import("./pages/Aeropuertos").then((m) => ({ default: m.AeropuertoMMGL })));
 const AeropuertoMMMX = lazy(() => import("./pages/Aeropuertos").then((m) => ({ default: m.AeropuertoMMMX })));
+const AeropuertoMMMY = lazy(() => import("./pages/Aeropuertos").then((m) => ({ default: m.AeropuertoMMMY })));
 const GimnasioAutorizaciones = lazy(() =>
   import("./pages/GimnasioAutorizacionesPage").then((m) => ({ default: m.GimnasioAutorizacionesPage })),
 );
@@ -94,6 +95,7 @@ const TITULO_ES = "Villanueva Aviation — Todo para volar mejor tu simulador";
 const TITULOS: Record<string, string> = {
   [ROUTES.aeropuertoMMGL]: "Guadalajara MMGL: guía de radio, salida y llegada para tu simulador — Villanueva Aviation",
   [ROUTES.aeropuertoMMMX]: "Ciudad de México MMMX: guía de radio, salida y llegada para tu simulador — Villanueva Aviation",
+  [ROUTES.aeropuertoMMMY]: "Monterrey MMMY: guía de radio, salida y llegada para tu simulador — Villanueva Aviation",
   [ROUTES.eventos]: "Eventos de IVAO y VATSIM en español, en grupo — Villanueva Aviation",
   [ROUTES.overlayGratis]: "Overlay gratis para streamers de simulador (OBS) — Villanueva Aviation",
   [RUTAS_EN.home]: "Villanueva Aviation — Learn to fly for real in your simulator",
@@ -299,6 +301,7 @@ function RoutedContent() {
           <Route path={ROUTES.gimnasioAutorizaciones} element={<GimnasioAutorizaciones />} />
           <Route path={ROUTES.aeropuertoMMGL} element={<AeropuertoMMGL />} />
           <Route path={ROUTES.aeropuertoMMMX} element={<AeropuertoMMMX />} />
+          <Route path={ROUTES.aeropuertoMMMY} element={<AeropuertoMMMY />} />
           <Route path={ROUTES.overlayGratis} element={<OverlayGratis />} />
           <Route path={ROUTES.eventos} element={<Eventos />} />
           <Route path={ROUTES.resumenHsi} element={<ResumenHsi />} />

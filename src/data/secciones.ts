@@ -162,6 +162,13 @@ export const SECCIONES: Seccion[] = [
         alt: "Avión de línea sobre las nubes, captura de simulador",
       },
       {
+        titulo: "Guía de Monterrey (MMMY)",
+        texto: "Qué letra cargar en cada pista, el gradiente de cada salida, el ILS de la 30 y cada llamada de radio en orden.",
+        to: ROUTES.aeropuertoMMMY,
+        img: { src: "/images/msfs-sunset-wing.jpg" },
+        alt: "Ala de un avión al atardecer, captura de simulador",
+      },
+      {
         titulo: "Gimnasio de autorizaciones",
         texto: "Escucha autorizaciones IFR en inglés a la velocidad que elijas, hasta que las copies a la primera.",
         to: ROUTES.gimnasioAutorizaciones,
