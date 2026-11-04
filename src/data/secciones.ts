@@ -194,6 +194,13 @@ export const SECCIONES: Seccion[] = [
         alt: "Ala de un avión al atardecer, captura de simulador",
       },
       {
+        titulo: "Eventos de IVAO y VATSIM",
+        texto: "Los próximos eventos con control en el mundo hispano, y el vuelo del mes que hacemos en grupo.",
+        to: ROUTES.eventos,
+        img: { src: "/images/msfs-volaris-climb.jpg" },
+        alt: "Avión de línea en ascenso, captura de simulador",
+      },
+      {
         titulo: "La Aventura",
         texto: "Un viaje en Cessna 152 que sale de Guadalajara y no se salta ningún aeropuerto. Cada aterrizaje queda registrado con su video.",
         to: ROUTES.aventura,
