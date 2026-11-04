@@ -7,14 +7,17 @@ import { registrarVisitaRuta } from "../features/rutaRed/fuente";
 import { DISCORD_URL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 
-// Datos: los mismos de la ruta "Listo para volar en red" (cartas Jeppesen vía Navigraph, confirmadas por
-// el fundador el 2026-10-19; ver CARTAS_RED en src/data/rutaRed.ts). Si una carta cambia, cambia en los dos.
+// Datos: salidas, los mismos de la ruta "Listo para volar en red" (cartas Jeppesen vía Navigraph, confirmadas por
+// el fundador el 2026-10-19; ver CARTAS_RED en src/data/rutaRed.ts). Frecuencias, llegadas (10-2B a 10-2E) y
+// aproximaciones ILS Z (11-1 y 11-3): leídas en Navigraph el 2026-11-03. Si una carta cambia, cambia aquí.
 // ponytail: página de un solo aeropuerto; sacar los datos a un archivo cuando haya un segundo aeropuerto.
+
+const NB = " "; // espacio que no se parte, para que «11 000 ft» no quede en dos renglones
 
 const FICHA = [
   { dato: "Elevación", valor: "5013 ft" },
   { dato: "Pistas", valor: "11L/29R · 11R/29L" },
-  { dato: "Altitud de transición", valor: "  " },
+  { dato: "Altitud de transición", valor: "18 500 ft" },
   { dato: "VOR", valor: "GDL 117.3" },
 ];
 
@@ -24,7 +27,7 @@ const FRECUENCIAS = [
   { quien: "Rampa", mhz: "134.1", para: "Para moverte dentro de la plataforma o salir de ella." },
   { quien: "Rodaje", mhz: "121.9", para: "Te lleva de la plataforma al punto de espera de la pista." },
   { quien: "Torre", mhz: "118.1", para: "Te autoriza a entrar a la pista y a despegar." },
-  { quien: "Salida", mhz: "La que te den", para: "Viene en tu autorización (la F de CRAFT). Anótala." },
+  { quien: "Aproximación", mhz: "119.3 · 120.8 · 128.9", para: "Guadalajara Aproximación te recibe al despegar y te trae al llegar. Cuál de las tres usas viene en tu autorización (la F de CRAFT)." },
 ];
 
 type Linea = { de: "tu" | "atc"; texto: string };
@@ -41,8 +44,8 @@ const PASOS: { titulo: string; frecuencia: string; nota: string; dialogo: Linea[
     nota: "Ten la libreta lista con C-R-A-F-T y escribe mientras te dictan. Al final lees todo de vuelta, en el mismo orden.",
     dialogo: [
       { de: "tu", texto: "Guadalajara Autorizaciones, XB-VNA, Cessna 172 en plataforma de aviación general, con información Alfa, solicito autorización IFR a Ciudad de México." },
-      { de: "atc", texto: "XB-VNA, autorizado a Ciudad de México, salida LONKU 1D, luego ruta del plan de vuelo, ascienda y mantenga   , frecuencia de salida 124.5, transpondedor 4521." },
-      { de: "tu", texto: "Autorizado a Ciudad de México, salida LONKU 1D, luego ruta del plan de vuelo, ascienda y mantenga   , frecuencia de salida 124.5, transpondedor 4521, XB-VNA." },
+      { de: "atc", texto: "XB-VNA, autorizado a Ciudad de México, salida LONKU 1D, luego ruta del plan de vuelo, ascienda y mantenga 12 000 pies, frecuencia de salida 120.8, transpondedor 4521." },
+      { de: "tu", texto: "Autorizado a Ciudad de México, salida LONKU 1D, luego ruta del plan de vuelo, ascienda y mantenga 12 000 pies, frecuencia de salida 120.8, transpondedor 4521, XB-VNA." },
       { de: "atc", texto: "XB-VNA, colación correcta." },
     ],
   },
@@ -77,13 +80,13 @@ const PASOS: { titulo: string; frecuencia: string; nota: string; dialogo: Linea[
     ],
   },
   {
-    titulo: "Pasa con Salida",
+    titulo: "Pasa con Aproximación",
     frecuencia: "La de tu autorización",
-    nota: "Torre te pasa con la frecuencia de salida que anotaste. Al primer contacto di tu altitud, a qué altitud subes y en qué salida vas.",
+    nota: "Torre te pasa con la frecuencia de salida que anotaste: es Guadalajara Aproximación. Al primer contacto di tu altitud, a qué altitud subes y en qué salida vas.",
     dialogo: [
-      { de: "atc", texto: "XB-VNA, contacte Salida en 124.5." },
-      { de: "tu", texto: "124.5, XB-VNA." },
-      { de: "tu", texto: "Guadalajara, XB-VNA, pasando 6500 pies para  , en la salida LONKU 1D." },
+      { de: "atc", texto: "XB-VNA, contacte Aproximación en 120.8." },
+      { de: "tu", texto: "120.8, XB-VNA." },
+      { de: "tu", texto: "Guadalajara Aproximación, XB-VNA, pasando 6500 pies para 12 000, en la salida LONKU 1D." },
     ],
   },
 ];
@@ -102,11 +105,11 @@ const SALIDAS = [
     pistas: "29L y 29R",
     tipo: "RNAV 1 · GNSS · radar",
     vigencia: "11 jul 2024",
-    recorrido: "Pasa por GL710, GL720 y GL726 y termina en LONKU. Es la más exigente de las tres.",
+    recorrido: "Pasa por GL710, GL720 y GL726 y termina en LONKU. Es la más exigente de estas tres.",
     restricciones: [
       "GL710: 7800 ft o más, máximo 220 kt",
-      "GL720:    o más · GL726:    o más",
-      "Gradiente 4.0 % hasta 7400 ft y 5.1 % hasta   ",
+      "GL720: 12 000 ft o más · GL726: 15 000 ft o más",
+      "Gradiente 4.0 % hasta 7400 ft y 5.1 % hasta 12 000 ft",
     ],
   },
   {
@@ -115,7 +118,42 @@ const SALIDAS = [
     tipo: "Convencional · VOR GDL 117.3",
     vigencia: "4 sep 2025",
     recorrido: "Radial 108 de GDL hasta 16.0 DME, viraje a la izquierda a rumbo 084° hasta interceptar el radial 101, y por él hasta OVALI.",
-    restricciones: ["Gradiente 280 ft por milla (4.6 %) hasta   ", "Sin puntos de GPS: tú corriges el viento"],
+    restricciones: ["Gradiente 280 ft por milla (4.6 %) hasta 11 000 ft", "Sin puntos de GPS: tú corriges el viento"],
+  },
+];
+
+const LLEGADAS = [
+  { punto: "AMULA", desde: "Norte" },
+  { punto: "MEZCA", desde: "Noreste" },
+  { punto: "MUTEM", desde: "Este" },
+  { punto: "IGSON", desde: "Sureste" },
+  { punto: "USBIM", desde: "Suroeste" },
+  { punto: "VOLAT", desde: "Oeste" },
+  { punto: "KASUP", desde: "Oeste" },
+];
+
+const LLEGADA_DIALOGO: Linea[] = [
+  { de: "tu", texto: "Guadalajara Aproximación, XB-VNA, nivel de vuelo 210 en la llegada MUTEM 1A, con información Bravo." },
+  { de: "atc", texto: "XB-VNA, identificado, descienda y mantenga 11 000 pies, QNH [el del ATIS], espere aproximación ILS Z pista 11R." },
+  { de: "tu", texto: "Desciendo y mantengo 11 000 pies, QNH [valor], espero ILS Z pista 11R, XB-VNA." },
+];
+
+const ILS = [
+  {
+    nombre: "ILS Z pista 11R",
+    carta: "11-1",
+    localizador: "IAIG 110.1",
+    curso: "108°",
+    minimo: "DA 5210 ft (200 ft sobre la pista)",
+    frustrada: "Asciende por el radial 108 de GDL hasta 8 DME, vira a la izquierda sin pasar de 10 NM e intercepta el radial 084 de regreso al VOR GDL, a la altitud mínima de espera.",
+  },
+  {
+    nombre: "ILS Z pista 29L",
+    carta: "11-3",
+    localizador: "IGDL 111.3",
+    curso: "288°",
+    minimo: "DA 5310 ft (300 ft sobre la pista)",
+    frustrada: "Asciende por el radial 288 de GDL hasta 8 DME, vira a la derecha sin pasar de 10 NM y regresa al VOR GDL, a la altitud mínima de espera.",
   },
 ];
 
@@ -141,12 +179,20 @@ const ERRORES = [
     mejor: "MMGL está a 5013 ft y en tarde caliente subes menos. Si no cumples el gradiente o una restricción, contesta «imposible» antes de despegar.",
   },
   {
-    error: "Saltarse GL405 porque te autorizaron a   .",
+    error: "Saltarse GL405 porque te autorizaron a 12 000 ft.",
     mejor: "Las restricciones de la salida siguen valiendo: cruzas GL405 a 9000 ft o más y a no más de 220 kt.",
   },
   {
-    error: "Cambiar a 29.92 al pasar   .",
-    mejor: "En MMGL la altitud de transición es   . Abajo de ella vuelas con el QNH del ATIS.",
+    error: "Cambiar a 29.92 al pasar 18 000 ft.",
+    mejor: "En MMGL la altitud de transición es 18 500 ft. Abajo de ella vuelas con el QNH del ATIS.",
+  },
+  {
+    error: "Cargar la llegada de la otra pista.",
+    mejor: "Las que terminan en 1A (USBIM 1C) son para las pistas 11; las que terminan en 1B (USBIM 1D), para las 29. Revisa la pista en el ATIS antes de cargarla.",
+  },
+  {
+    error: "Bajar con 29.92 hasta la aproximación.",
+    mejor: "Al descender, pon el QNH al cruzar el nivel de transición, FL195. Pídelo si no lo tienes.",
   },
   {
     error: "En IVAO o VATSIM, llamar a una frecuencia que nadie atiende.",
@@ -169,8 +215,8 @@ export function AeropuertoMMGL() {
     <div>
       <PageHero
         eyebrow="Guía de aeropuerto · Gratis · Sin cuenta"
-        title="Guadalajara MMGL: sal sin trabarte en la radio"
-        description="Cada llamada de la salida IFR en orden: a quién le hablas, qué te van a decir y qué contestas. Con las tres salidas publicadas y los errores que más vemos en la red."
+        title="Guadalajara MMGL: sal y llega sin trabarte en la radio"
+        description="Cada llamada de la salida IFR en orden: a quién le hablas, qué te van a decir y qué contestas. Con las salidas, las llegadas, las aproximaciones ILS y los errores que más vemos en la red."
       />
       <Container className="py-12 md:py-16">
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -232,9 +278,11 @@ export function AeropuertoMMGL() {
           ))}
         </ol>
 
-        <h2 className="mt-16 font-display text-2xl font-bold text-white sm:text-3xl">Las tres salidas publicadas</h2>
+        <h2 className="mt-16 font-display text-2xl font-bold text-white sm:text-3xl">Tres salidas, a fondo</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
-          Lo esencial de cada carta para saber si tu avión la puede volar. Vuela siempre con la carta del ciclo vigente.
+          MMGL tiene más salidas: RNAV a EMIRI, FEISE, KELVA, OTOKI, NOTUP y SEDEM, y una omnidireccional. Aquí van las dos LONKU, que son
+          las de la ruta a Ciudad de México, y OVALI 1, la convencional, con lo esencial para saber si tu avión las puede volar. Vuela siempre
+          con la carta del ciclo vigente.
         </p>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {SALIDAS.map((s) => (
@@ -251,6 +299,82 @@ export function AeropuertoMMGL() {
                 ))}
               </ul>
               <p className="mt-auto pt-4 text-xs text-white/40">Carta vigente desde el {s.vigencia}</p>
+            </article>
+          ))}
+        </div>
+
+        <h2 className="mt-16 font-display text-2xl font-bold text-white sm:text-3xl">La llegada</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
+          Hay siete llegadas RNAV (STAR), una por cada punto de entrada. Todas piden RNAV 1 con GNSS y radar. Cuál te toca depende de por dónde
+          llegas; SimBrief la propone y el controlador la confirma.
+        </p>
+        <ul className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
+          {LLEGADAS.map((l) => (
+            <li key={l.punto} className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+              <p className="font-mono text-base font-bold text-gold-400">{l.punto}</p>
+              <p className="text-xs text-white/55">Llegas del {l.desde.toLowerCase()}</p>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="font-semibold text-white">Pistas 11: la que termina en 1A</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-white/60">
+              AMULA 1A, MEZCA 1A, MUTEM 1A, IGSON 1A, KASUP 1A, VOLAT 1A y USBIM 1C. Todas terminan en OLAVA, donde empieza la aproximación:
+              cruzas a 11{NB}000 ft y a no más de 190 kt. Cartas 10-2B y 10-2D.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="font-semibold text-white">Pistas 29: la que termina en 1B</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-white/60">
+              AMULA 1B, MEZCA 1B, MUTEM 1B, IGSON 1B, KASUP 1B, VOLAT 1B y USBIM 1D. Te llevan al este del aeropuerto para la final de la 29.
+              Cartas 10-2C y 10-2E.
+            </p>
+          </div>
+        </div>
+        <div className="mt-6 grid gap-2">
+          {LLEGADA_DIALOGO.map((l, j) => (
+            <p
+              key={j}
+              className={`max-w-2xl rounded-xl px-4 py-2.5 text-sm leading-relaxed ${
+                l.de === "tu" ? "border border-gold-500/25 bg-gold-500/[0.06] text-white" : "ml-auto border border-white/10 bg-navy-900 text-white/80"
+              }`}
+            >
+              <span className="mr-2 text-xs font-semibold uppercase tracking-wider text-white/40">{l.de === "tu" ? "Tú" : "Control"}</span>
+              {l.texto}
+            </p>
+          ))}
+        </div>
+        <p className="mt-3 text-xs text-white/45">Ejemplo de primer contacto. El nivel, la letra y la llegada dependen de tu vuelo.</p>
+
+        <h2 className="mt-16 font-display text-2xl font-bold text-white sm:text-3xl">Las aproximaciones ILS</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
+          Solo la pista principal, 11R/29L (13{NB}123 ft de largo), tiene ILS. Las cuatro pistas tienen aproximación RNP y VOR, y la 11R/29L
+          tiene además ILS Y y X y aproximación radar.
+        </p>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {ILS.map((a) => (
+            <article key={a.nombre} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <h3 className="font-display text-xl font-bold text-white">{a.nombre}</h3>
+              <dl className="mt-4 grid grid-cols-3 gap-3 text-sm">
+                <div>
+                  <dt className="text-xs uppercase tracking-wider text-white/45">Localizador</dt>
+                  <dd className="mt-0.5 font-mono text-gold-400">{a.localizador}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wider text-white/45">Curso final</dt>
+                  <dd className="mt-0.5 font-mono text-gold-400">{a.curso}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs uppercase tracking-wider text-white/45">Mínimo</dt>
+                  <dd className="mt-0.5 text-white/80">{a.minimo}</dd>
+                </div>
+              </dl>
+              <p className="mt-4 text-sm leading-relaxed text-white/70">
+                <span className="font-semibold text-white">Frustrada: </span>
+                {a.frustrada}
+              </p>
+              <p className="mt-4 text-xs text-white/40">Carta {a.carta}, vigente desde el 11 jul 2024</p>
             </article>
           ))}
         </div>
@@ -295,7 +419,8 @@ export function AeropuertoMMGL() {
         </div>
 
         <p className="mt-12 max-w-3xl text-xs leading-relaxed text-white/45">
-          Procedimientos y frecuencias de las cartas Jeppesen vía Navigraph, con la fecha de cada una. Las cartas cambian por ciclo: antes de
+          Procedimientos y frecuencias de las cartas Jeppesen vía Navigraph, con la fecha de cada una; llegadas y aproximaciones
+          consultadas el 3 de noviembre de 2026. Las cartas cambian por ciclo: antes de
           volar, revisa la tuya. Solo para simulación, no para navegación real. Material de práctica para simulador, no instrucción
           certificada.
         </p>

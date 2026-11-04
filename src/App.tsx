@@ -91,7 +91,7 @@ function ScrollToTop() {
 
 const TITULO_ES = "Villanueva Aviation — Todo para volar mejor tu simulador";
 const TITULOS: Record<string, string> = {
-  [ROUTES.aeropuertoMMGL]: "Guadalajara MMGL: guía de radio y salida para tu simulador — Villanueva Aviation",
+  [ROUTES.aeropuertoMMGL]: "Guadalajara MMGL: guía de radio, salida y llegada para tu simulador — Villanueva Aviation",
   [ROUTES.eventos]: "Eventos de IVAO y VATSIM en español, en grupo — Villanueva Aviation",
   [ROUTES.overlayGratis]: "Overlay gratis para streamers de simulador (OBS) — Villanueva Aviation",
   [RUTAS_EN.home]: "Villanueva Aviation — Learn to fly for real in your simulator",
