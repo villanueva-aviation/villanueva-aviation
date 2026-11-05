@@ -43,7 +43,7 @@ export interface Tramo {
 
 export interface ResultadoLado {
   lado: Lado;
-  entrada: { altitud: number; rumbo: number; velocidad: number; va: number };
+  entrada: { t: number; altitud: number; rumbo: number; velocidad: number; va: number };
   peor: Record<Campo, number>; // desviación máxima con signo
   rumboSalida: number; // error con signo, −180…180
   fuera: Record<Campo, Tramo[]>;
@@ -177,7 +177,7 @@ function evaluarLado({ ref, muestras, girado }: Giro): ResultadoLado {
   ns.rumbo = Math.abs(rumboSalida) > TOLERANCIAS.rumboSalidaGrados;
   return {
     lado: girado < 0 ? "izquierda" : "derecha",
-    entrada: { altitud: ref.altitud, rumbo: ref.rumbo, velocidad: ref.velocidad, va: vaPorPeso(ref.peso) },
+    entrada: { t: ref.t, altitud: ref.altitud, rumbo: ref.rumbo, velocidad: ref.velocidad, va: vaPorPeso(ref.peso) },
     peor,
     rumboSalida,
     fuera,
