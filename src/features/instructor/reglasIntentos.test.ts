@@ -60,3 +60,8 @@ test("lo guardado cambia las muestras por series cortas por lado", () => {
   }
   assert.equal(g.calificacion, 100);
 });
+
+test("las series de inclinacion y bola usan la misma ventana que la calificacion", () => {
+  const g = paraGuardar(calificar(simularManiobra()));
+  for (const lado of g.series) assert.ok(lado.inclinacion.every((p) => Math.abs(p.v) <= 5), JSON.stringify(lado.inclinacion.slice(0, 3)));
+});

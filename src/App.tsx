@@ -61,6 +61,9 @@ const GimnasioAutorizaciones = lazy(() =>
   import("./pages/GimnasioAutorizacionesPage").then((m) => ({ default: m.GimnasioAutorizacionesPage })),
 );
 const ResumenHsi = lazy(() => import("./pages/ResumenHsi").then((m) => ({ default: m.ResumenHsi })));
+const InstructorVirajeEscarpado = lazy(() =>
+  import("./pages/InstructorVirajeEscarpado").then((m) => ({ default: m.InstructorVirajeEscarpado })),
+);
 const Comunidad = lazy(() => import("./pages/Comunidad").then((m) => ({ default: m.Comunidad })));
 const Perfil = lazy(() => import("./pages/Perfil").then((m) => ({ default: m.Perfil })));
 const AdminVuelosPractica = lazy(() => import("./pages/AdminVuelosPractica").then((m) => ({ default: m.AdminVuelosPractica })));
@@ -101,6 +104,7 @@ const TITULOS: Record<string, string> = {
   [ROUTES.aeropuertoMMUN]: "Cancún MMUN: guía de radio, salida y llegada para tu simulador — Villanueva Aviation",
   [ROUTES.aeropuertoMMPR]: "Puerto Vallarta MMPR: guía de radio, salida y llegada para tu simulador — Villanueva Aviation",
   [ROUTES.eventos]: "Eventos de IVAO y VATSIM en español, en grupo — Villanueva Aviation",
+  [ROUTES.instructorVirajeEscarpado]: "Instructor virtual: viraje escarpado del C172 — Villanueva Aviation",
   [ROUTES.overlayGratis]: "Overlay gratis para streamers de simulador (OBS) — Villanueva Aviation",
   [RUTAS_EN.home]: "Villanueva Aviation — Learn to fly for real in your simulator",
   [RUTAS_EN.coaching]: "One-on-one flight sim coaching — Villanueva Aviation",
@@ -311,6 +315,14 @@ function RoutedContent() {
           <Route path={ROUTES.overlayGratis} element={<OverlayGratis />} />
           <Route path={ROUTES.eventos} element={<Eventos />} />
           <Route path={ROUTES.resumenHsi} element={<ResumenHsi />} />
+          <Route
+            path={ROUTES.instructorVirajeEscarpado}
+            element={
+              <ProtectedRoute>
+                <InstructorVirajeEscarpado />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path={ROUTES.adminAventura}
             element={

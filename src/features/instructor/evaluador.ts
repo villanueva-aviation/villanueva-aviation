@@ -152,12 +152,16 @@ function analizar(puntos: { t: number; v: number }[], tol: number) {
   return { peor, tramos, ns };
 }
 
-function evaluarLado({ ref, muestras, girado }: Giro): ResultadoLado {
+/** Inclinación y bola se califican desde que el viraje se establece (40°) hasta los 330°. `muestras` empieza en la entrada nivelada. */
+export function virajeEstablecido(muestras: Muestra[]): Muestra[] {
   let g = 0;
   const vuelta = muestras.map((m, k) => (k === 0 ? 0 : Math.abs((g += difRumbo(m.rumbo, muestras[k - 1].rumbo)))));
-  // Inclinación y bola: desde que el viraje se establece hasta los 330°.
   const inicio = muestras.findIndex((m) => Math.abs(m.inclinacion) >= INCLINACION_ESTABLECIDA);
-  const establecido = muestras.filter((_, k) => inicio >= 0 && k >= inicio && vuelta[k] < 330);
+  return muestras.filter((_, k) => inicio >= 0 && k >= inicio && vuelta[k] < 330);
+}
+
+function evaluarLado({ ref, muestras, girado }: Giro): ResultadoLado {
+  const establecido = virajeEstablecido(muestras);
   const puntos: Record<Campo, { t: number; v: number }[]> = {
     altitud: muestras.map((m) => ({ t: m.t, v: m.altitud - ref.altitud })),
     velocidad: muestras.map((m) => ({ t: m.t, v: m.velocidad - ref.velocidad })),

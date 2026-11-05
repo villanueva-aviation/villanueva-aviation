@@ -66,6 +66,7 @@ export const ROUTES = {
   overlayGratis: "/overlay-gratis",
   eventos: "/eventos",
   resumenHsi: "/resumen-hsi",
+  instructorVirajeEscarpado: "/instructor/viraje-escarpado",
   adminAventura: "/admin/aventura",
 } as const;
 

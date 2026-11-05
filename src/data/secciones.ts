@@ -141,6 +141,13 @@ export const SECCIONES: Seccion[] = [
         alt: "Cessna 172 XB-VNA en vuelo, captura de simulador",
       },
       {
+        titulo: "Instructor virtual",
+        texto: "Vuela el viraje escarpado en el C172 y el instructor te califica con las tolerancias de un checkride. Gratis con tu cuenta.",
+        to: ROUTES.instructorVirajeEscarpado,
+        img: { src: "/images/descargas-simhub-c172.jpg" },
+        alt: "Instrumentos del Cessna 172 en un monitor aparte",
+      },
+      {
         titulo: "Listo para volar en red",
         texto: "Ocho lecciones para volar IFR de MMGL a MMMX en IVAO o VATSIM sin trabarte con la radio.",
         to: ROUTES.rutaRed,

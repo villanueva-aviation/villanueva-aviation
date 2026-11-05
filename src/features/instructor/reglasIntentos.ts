@@ -1,4 +1,4 @@
-import type { Campo, Resultado } from "./evaluador.ts";
+import { virajeEstablecido, type Campo, type Resultado } from "./evaluador.ts";
 import { serie } from "./explicacion.ts";
 import type { CodigoAcs } from "./virajeEscarpado.ts";
 
@@ -72,8 +72,8 @@ export function paraGuardar(r: Resultado): ResultadoGuardado {
     return {
       altitud: serie(tramo, "altitud", l.entrada.altitud),
       velocidad: serie(tramo, "velocidad", l.entrada.velocidad),
-      inclinacion: serie(tramo, "inclinacion", 0),
-      bola: serie(tramo, "bola", 0),
+      inclinacion: serie(virajeEstablecido(tramo), "inclinacion", 0),
+      bola: serie(virajeEstablecido(tramo), "bola", 0),
     };
   });
   return { ...resto, series };
