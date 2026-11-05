@@ -1,4 +1,5 @@
 import type { ExplorerTema } from "../components/ui/TopicExplorer";
+import { INCLINACION_OBJETIVO, TOLERANCIAS } from "../features/instructor/virajeEscarpado";
 
 /**
  * Estándares de tolerancia estilo ACS para las maniobras más evaluadas en un
@@ -9,8 +10,7 @@ export const CHECKRIDE_VUELO: ExplorerTema[] = [
   {
     id: "virajes-pronunciados",
     titulo: "Virajes pronunciados (steep turns)",
-    texto:
-      "360° de viraje a 45° de inclinación, alternando izquierda y derecha. Tolerancias típicas: altitud ±100 pies, velocidad ±10 nudos, inclinación ±5°, rumbo de reingreso ±10°. El error más común es perder altitud al iniciar el viraje por no compensar con elevador la pérdida de sustentación vertical.",
+    texto: `360° de viraje a ${INCLINACION_OBJETIVO}° de inclinación, alternando izquierda y derecha. Tolerancias típicas: altitud ±${TOLERANCIAS.altitudFt} pies, velocidad ±${TOLERANCIAS.velocidadKt} nudos, inclinación ±${TOLERANCIAS.inclinacionGrados}°, rumbo de reingreso ±${TOLERANCIAS.rumboSalidaGrados}°. El error más común es perder altitud al iniciar el viraje por no compensar con elevador la pérdida de sustentación vertical.`,
   },
   {
     id: "vuelo-lento",
