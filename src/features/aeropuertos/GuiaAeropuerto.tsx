@@ -29,6 +29,9 @@ export interface Guia {
   };
   llegadas: { intro: string; puntos: { punto: string; desde: string }[]; notas: Nota[]; dialogo: Linea[]; pie: string };
   ils: {
+    /** Para aeropuertos sin ILS. Por omisión: "Las aproximaciones ILS" y "Localizador". */
+    titulo?: string;
+    etiquetaGuia?: string;
     intro: string;
     aproximaciones: {
       nombre: string;
@@ -181,7 +184,7 @@ export function GuiaAeropuerto({ guia, otras }: { guia: Guia; otras: { nombre: s
         </div>
         <p className="mt-3 text-xs text-white/45">{llegadas.pie}</p>
 
-        <h2 className={H2}>Las aproximaciones ILS</h2>
+        <h2 className={H2}>{ils.titulo ?? "Las aproximaciones ILS"}</h2>
         <p className={INTRO}>{nb(ils.intro)}</p>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {ils.aproximaciones.map((a) => (
@@ -189,7 +192,7 @@ export function GuiaAeropuerto({ guia, otras }: { guia: Guia; otras: { nombre: s
               <h3 className="font-display text-xl font-bold text-white">{a.nombre}</h3>
               <dl className="mt-4 grid grid-cols-3 gap-3 text-sm">
                 <div>
-                  <dt className="text-xs uppercase tracking-wider text-white/45">Localizador</dt>
+                  <dt className="text-xs uppercase tracking-wider text-white/45">{ils.etiquetaGuia ?? "Localizador"}</dt>
                   <dd className="mt-0.5 font-mono text-gold-400">{a.localizador}</dd>
                 </div>
                 <div>

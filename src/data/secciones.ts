@@ -176,6 +176,13 @@ export const SECCIONES: Seccion[] = [
         alt: "Avión de línea en ascenso, captura de simulador",
       },
       {
+        titulo: "Guía de Puerto Vallarta (MMPR)",
+        texto: "Sin Rodaje y sin ILS: quién te lleva a la pista, el gradiente de cada salida, las RNP y cada llamada en orden.",
+        to: ROUTES.aeropuertoMMPR,
+        img: { src: "/images/msfs-sunset-wing.jpg" },
+        alt: "Ala de un avión al atardecer, captura de simulador",
+      },
+      {
         titulo: "Gimnasio de autorizaciones",
         texto: "Escucha autorizaciones IFR en inglés a la velocidad que elijas, hasta que las copies a la primera.",
         to: ROUTES.gimnasioAutorizaciones,

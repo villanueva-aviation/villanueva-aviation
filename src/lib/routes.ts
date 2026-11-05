@@ -62,6 +62,7 @@ export const ROUTES = {
   aeropuertoMMMX: "/aeropuertos/mmmx",
   aeropuertoMMMY: "/aeropuertos/mmmy",
   aeropuertoMMUN: "/aeropuertos/mmun",
+  aeropuertoMMPR: "/aeropuertos/mmpr",
   overlayGratis: "/overlay-gratis",
   eventos: "/eventos",
   resumenHsi: "/resumen-hsi",
