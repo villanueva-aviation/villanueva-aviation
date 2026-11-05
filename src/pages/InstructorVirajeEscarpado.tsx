@@ -14,7 +14,7 @@ import { Progreso } from "../features/instructor/Progreso";
 import { paraGuardar, puedeMandar, type IntentoManiobra } from "../features/instructor/reglasIntentos";
 import { ReporteExamen } from "../features/instructor/ReporteExamen";
 import { useLector } from "../features/instructor/useLector";
-import { INCLINACION_ESTABLECIDA, INCLINACION_OBJETIVO } from "../features/instructor/virajeEscarpado";
+import { ALTURA_SEGURA_AGL, INCLINACION_ESTABLECIDA, INCLINACION_OBJETIVO } from "../features/instructor/virajeEscarpado";
 import { ROUTES } from "../lib/routes";
 
 const MANIOBRA = "viraje-escarpado";
@@ -209,6 +209,8 @@ export function InstructorVirajeEscarpado() {
   const intento = guardado.id ? (intentos.find((i) => i.id === guardado.id) ?? null) : null;
   const numero = intento ? intentos.findIndex((i) => i.id === intento.id) + 1 : undefined;
   const enCurso = ev && ev.fase !== "terminado" && ev.fase !== "invalido";
+  // Recién armado en el ascenso: primero que suba, luego los virajes.
+  const bajo = ev?.fase === "armado" && !!muestra && muestra.agl < ALTURA_SEGURA_AGL;
   // El último checkride que Erik aprobó, para verlo e imprimirlo con su firma en otra visita.
   const aprobadoPorErik = [...intentos].reverse().find((i) => i.revision === "aprobado") ?? null;
 
@@ -230,7 +232,10 @@ export function InstructorVirajeEscarpado() {
         <section className="grid gap-4 md:grid-cols-3">
           {[
             ["1. Abre el lector", "Un programa chico que lee tu avión en MSFS 2020. Solo funciona dentro de tu PC."],
-            ["2. Sube a 3500 ft", "En el C172, recto y nivelado, a no más de Va. Escoge Práctica o Checkride: el instructor empieza solo."],
+            [
+              "2. Sube a 1,500 ft sobre el terreno",
+              "No sobre el mar: en MMGL son unos 6,500 ft en el altímetro. Recto y nivelado, a no más de Va. Escoge Práctica o Checkride: el instructor empieza solo.",
+            ],
             ["3. Vuela", "Virajes de limpieza, 360° a un lado y 360° al otro. Puedes tener MSFS en pantalla completa: deja abierta la ventana del lector."],
           ].map(([t, d]) => (
             <div key={t} className="rounded-xl border border-white/10 bg-navy-900/60 p-4">
@@ -298,13 +303,18 @@ export function InstructorVirajeEscarpado() {
                 <p className="font-display text-xl font-bold text-white">Checkride en curso</p>
               ) : (
                 <>
-                  <p className="font-display text-xl font-bold text-white">{INSTRUCCION[ev.fase]}</p>
+                  {!bajo && <p className="font-display text-xl font-bold text-white">{INSTRUCCION[ev.fase]}</p>}
                   {aviso && (
                     <p className="mt-3 flex items-center gap-2 font-display text-2xl font-bold text-red-300">
                       <AlertTriangle className="h-6 w-6 shrink-0" /> {aviso}
                     </p>
                   )}
                 </>
+              )}
+              {bajo && muestra && (
+                <p className={modoIntento === "checkride" ? "mt-2 text-white/70" : "font-display text-xl font-bold text-white"}>
+                  Vas a {Math.round(muestra.agl).toLocaleString("es-MX")} ft sobre el terreno: sube a {ALTURA_SEGURA_AGL.toLocaleString("es-MX")} o más antes de los virajes.
+                </p>
               )}
             </div>
           )}

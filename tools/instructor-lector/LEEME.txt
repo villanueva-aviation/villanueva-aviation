@@ -25,7 +25,8 @@ CÓMO SE USA
    Instructor > Viraje escarpado. Si el navegador pregunta si la página
    puede acceder a dispositivos de tu red local, da clic en "Permitir":
    así la página lee el lector de tu propia PC.
-5. Vuela en el C172 a 3500 ft o más alto y sigue las instrucciones de la página.
+5. Vuela en el C172 a 1500 ft o más sobre el terreno (no sobre el mar: en
+   MMGL son unos 6500 ft en el altímetro) y sigue las instrucciones de la página.
 
 ABRIRLO SOLO AL PRENDER LA PC
 Da doble clic en "Iniciar con Windows.bat". Vuelve a darle doble clic
