@@ -169,6 +169,13 @@ export const SECCIONES: Seccion[] = [
         alt: "Ala de un avión al atardecer, captura de simulador",
       },
       {
+        titulo: "Guía de Cancún (MMUN)",
+        texto: "Las dos pistas paralelas sin confundirte: qué salida, qué frecuencia y qué ILS van con cada una, y cada llamada en orden.",
+        to: ROUTES.aeropuertoMMUN,
+        img: { src: "/images/msfs-volaris-climb.jpg" },
+        alt: "Avión de línea en ascenso, captura de simulador",
+      },
+      {
         titulo: "Gimnasio de autorizaciones",
         texto: "Escucha autorizaciones IFR en inglés a la velocidad que elijas, hasta que las copies a la primera.",
         to: ROUTES.gimnasioAutorizaciones,
