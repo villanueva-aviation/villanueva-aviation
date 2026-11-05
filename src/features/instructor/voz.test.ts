@@ -1,0 +1,120 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { armar, avanzar, crearEvaluacion, type Evaluacion, type Muestra } from "./evaluador.ts";
+import { simularManiobra } from "./simular.ts";
+import { avisoVoz, filtrarAviso, lecturaFinal, MEMORIA_VACIA, ordenVoz, paraVoz, pasoVoz, semaforo, type Aviso, type PasoVoz } from "./voz.ts";
+
+const correr = (muestras: Muestra[]): Evaluacion => muestras.reduce(avanzar, armar(crearEvaluacion(), muestras[0]));
+
+/** La evaluación en la primera muestra ya dentro del viraje izquierdo. */
+function enViraje(): { ev: Evaluacion; m: Muestra } {
+  const muestras = simularManiobra();
+  const i = muestras.findIndex((x) => Math.abs(x.inclinacion) > 41);
+  return { ev: correr(muestras.slice(0, i + 1)), m: muestras[i] };
+}
+
+const ambar: Aviso = { clave: "altitud-ambar--", nivel: "ambar", texto: "Ojo con tu altitud" };
+const rojo: Aviso = { clave: "altitud-rojo--", nivel: "rojo", texto: "Fuera de tolerancia: altitud" };
+
+test("semáforo: verde, ámbar al 60 % y rojo al pasar la tolerancia", () => {
+  const { ev, m } = enViraje();
+  const ref = ev.interno.giro!.ref;
+  assert.equal(semaforo(ev, { ...m, altitud: ref.altitud - 50 }).altitud, "verde");
+  assert.equal(semaforo(ev, { ...m, altitud: ref.altitud - 65 }).altitud, "ambar");
+  assert.equal(semaforo(ev, { ...m, altitud: ref.altitud - 110 }).altitud, "rojo");
+  assert.deepEqual(Object.values(semaforo(armar(crearEvaluacion(), m), m)), ["gris", "gris", "gris", "gris"]);
+});
+
+test("aviso: corto en checkride, con corrección en práctica", () => {
+  const { ev, m } = enViraje();
+  const bajo = { ...m, altitud: ev.interno.giro!.ref.altitud - 65 };
+  assert.equal(avisoVoz(ev, bajo, "checkride")!.texto, "Ojo con tu altitud");
+  assert.equal(avisoVoz(ev, bajo, "practica")!.texto, "Estás perdiendo altitud: más presión atrás");
+  const fuera = { ...m, altitud: ev.interno.giro!.ref.altitud - 110 };
+  assert.equal(avisoVoz(ev, fuera, "checkride")!.texto, "Fuera de tolerancia: altitud");
+  assert.equal(avisoVoz(ev, fuera, "practica")!.texto, "Fuera de tolerancia. Estás perdiendo altitud: más presión atrás");
+  assert.equal(avisoVoz(ev, m, "checkride"), null);
+});
+
+test("no avisa de inclinación mientras entra a 45°, sí 2 s después", () => {
+  const { ev, m } = enViraje();
+  assert.equal(semaforo(ev, { ...m, inclinacion: -41 }).inclinacion, "gris");
+  assert.equal(semaforo(ev, { ...m, t: m.t + 2.1, inclinacion: -41 }).inclinacion, "ambar");
+});
+
+test("filtro: no repite antes de 8 s, sí al escalar a rojo", () => {
+  let s = filtrarAviso(MEMORIA_VACIA, ambar, 0);
+  assert.equal(s.decir, "Ojo con tu altitud");
+  s = filtrarAviso(s.mem, ambar, 3);
+  assert.equal(s.decir, null);
+  s = filtrarAviso(s.mem, ambar, 8.1);
+  assert.equal(s.decir, "Ojo con tu altitud");
+  s = filtrarAviso(s.mem, rojo, 9);
+  assert.equal(s.decir, "Fuera de tolerancia: altitud");
+});
+
+test("filtro: alternar dentro/fuera no repite antes de 8 s", () => {
+  let mem = MEMORIA_VACIA;
+  const dichos: number[] = [];
+  for (let t = 0; t < 7.9; t += 0.5) {
+    const s = filtrarAviso(mem, Math.round(t * 2) % 2 ? null : ambar, t);
+    mem = s.mem;
+    if (s.decir) dichos.push(t);
+  }
+  assert.deepEqual(dichos, [0]);
+});
+
+test("filtro: tras 2 s dentro de la banda vuelve a avisar", () => {
+  let s = filtrarAviso(MEMORIA_VACIA, ambar, 0);
+  s = filtrarAviso(s.mem, null, 1);
+  s = filtrarAviso(s.mem, null, 3.1);
+  assert.equal(filtrarAviso(s.mem, ambar, 3.2).decir, "Ojo con tu altitud");
+});
+
+test("órdenes de una maniobra completa, en orden", () => {
+  const muestras = simularManiobra();
+  let ev = armar(crearEvaluacion(), muestras[0]);
+  let paso: PasoVoz | null = null;
+  const dichas: string[] = [];
+  for (const m of muestras) {
+    ev = avanzar(ev, m);
+    const p = pasoVoz(ev, m);
+    const o = ordenVoz(paso, p, ev);
+    if (o) dichas.push(o);
+    paso = p;
+  }
+  assert.deepEqual(dichas, [
+    "Despeje el área con sus virajes de limpieza.",
+    "Área despejada. Inicie el viraje de 360 grados.",
+    "Nivele en su rumbo de entrada.",
+    "Ahora al lado contrario.",
+    "Nivele en su rumbo de entrada.",
+  ]);
+});
+
+test("bajo de 1,500 AGL pide subir primero", () => {
+  const [m] = simularManiobra();
+  const bajo = { ...m, agl: 600 };
+  const ev = armar(crearEvaluacion(), bajo);
+  assert.equal(pasoVoz(ev, bajo), "bajo");
+  assert.equal(ordenVoz(null, "bajo", ev), "Suba a 1,500 pies sobre el terreno.");
+});
+
+test("anulado dice el motivo", () => {
+  const [m] = simularManiobra();
+  const ev: Evaluacion = { fase: "invalido", motivo: "Pausaste el simulador: el intento no se califica.", interno: crearEvaluacion().interno };
+  assert.equal(ordenVoz("limpieza", pasoVoz(ev, m), ev), "Intento anulado. Pausaste el simulador: el intento no se califica.");
+});
+
+test("lectura final completa y en voz", () => {
+  const r = correr(simularManiobra({ caidaAltitud: { lado: 0, ft: 130, segundos: 6, enGrados: 90 } })).resultado!;
+  const l = lecturaFinal(r);
+  assert.equal(l[0], "No aprobado. Calificación: 90 de 100.");
+  assert.ok(l.some((x) => x.includes("130 pies")), l.join(" | "));
+  assert.equal(l.at(-1), "Repite: viraje izquierdo");
+  assert.ok(l.every((x) => !/[✓✗°]|\bft\b/.test(x)), l.join(" | "));
+});
+
+test("paraVoz", () => {
+  assert.equal(paraVoz("✗ Perdiste 130 ft, vas a 95 kt y 45°"), "Perdiste 130 pies, vas a 95 nudos y 45 grados");
+});

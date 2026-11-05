@@ -21,6 +21,10 @@ export const NS_FACTOR = 1.5;
 export const LIMPIEZA = { ventanaSeg: 120, grados: 90 } as const;
 /** Práctica recomendada, no elemento del ACS: solo genera aviso. */
 export const ALTURA_SEGURA_AGL = 1500;
+/** La voz avisa al pasar de esta fracción de una tolerancia, antes de salirse. Ajustable. */
+export const AVISO_FRACCION = 0.6;
+/** Segundos antes de repetir el mismo aviso si sigue igual. */
+export const REPETIR_AVISO_SEG = 8;
 /** Fracción de la deflexión total de TURN COORDINATOR BALL (−1…1). Ajustable. */
 export const BOLA_TOLERANCIA = 0.25;
 /** Más segundos sin muestras invalida el intento. */
