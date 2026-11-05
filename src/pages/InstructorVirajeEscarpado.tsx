@@ -199,6 +199,8 @@ export function InstructorVirajeEscarpado() {
   const intento = guardado.id ? (intentos.find((i) => i.id === guardado.id) ?? null) : null;
   const numero = intento ? intentos.findIndex((i) => i.id === intento.id) + 1 : undefined;
   const enCurso = ev && ev.fase !== "terminado" && ev.fase !== "invalido";
+  // El último checkride que Erik aprobó, para verlo e imprimirlo con su firma en otra visita.
+  const aprobadoPorErik = [...intentos].reverse().find((i) => i.revision === "aprobado") ?? null;
 
   const mandar = async () => {
     if (!intento) return;
@@ -321,6 +323,18 @@ export function InstructorVirajeEscarpado() {
         )}
 
         <Progreso intentos={intentos} />
+
+        {!resultado && aprobadoPorErik && (
+          <section className="space-y-3">
+            <h2 className="font-display text-lg font-bold text-white">Tu checkride aprobado</h2>
+            <ReporteExamen
+              resultado={aprobadoPorErik}
+              intento={aprobadoPorErik}
+              nombre={user?.nombre ?? "Cadete"}
+              numero={intentos.indexOf(aprobadoPorErik) + 1}
+            />
+          </section>
+        )}
 
         <p className="text-center text-sm text-white/50">
           <Download className="mr-1 inline h-4 w-4" />
