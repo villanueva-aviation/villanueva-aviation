@@ -14,6 +14,8 @@ import { useHorasVueloConfirmadas } from "../features/practica/vuelosPractica";
 import { useRango } from "../features/progress/rango";
 import { fetchMisIntentos, fetchMisPruebas } from "../features/rutaRed/pruebasRed";
 import { insigniaGanada } from "../features/rutaRed/reglas";
+import { fetchMisIntentosManiobra } from "../features/instructor/intentos";
+import { insigniaManiobraGanada } from "../features/instructor/reglasIntentos";
 import { LECCIONES_RED, SLUG_RUTA_RED } from "../data/rutaRed";
 import { ROUTES } from "../lib/routes";
 import type { Logro } from "../data/cadete";
@@ -38,6 +40,18 @@ export function Perfil() {
     };
   }, []);
 
+  // Insignia del instructor virtual: con error (o sin la tabla todavía) se trata como no ganada.
+  const [virajeAprobado, setVirajeAprobado] = useState(false);
+  useEffect(() => {
+    let vivo = true;
+    fetchMisIntentosManiobra("viraje-escarpado")
+      .then((intentos) => vivo && setVirajeAprobado(insigniaManiobraGanada(intentos, "viraje-escarpado")))
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
   if (loading) return null;
 
   const pendientesRed = LECCIONES_RED.filter((l) => !isActividadCompletada(SLUG_RUTA_RED, l.id));
@@ -49,7 +63,14 @@ export function Perfil() {
     icon: Radio,
     desbloqueado: red.insignia,
   };
-  const todosLogros = [...logros, logroRed];
+  const logroViraje: Logro = {
+    id: "maniobra-viraje-escarpado-c172",
+    titulo: "Viraje escarpado · C172",
+    descripcion: "Se gana cuando Erik revisa y aprueba tu checkride del instructor virtual. Práctica en simulador, no es una evaluación oficial.",
+    icon: Plane,
+    desbloqueado: virajeAprobado,
+  };
+  const todosLogros = [...logros, logroRed, logroViraje];
 
   return (
     <div>

@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { CalendarClock, ClipboardCheck, Compass, GraduationCap, LogOut, MessageSquareText, User, Users } from "lucide-react";
+import { CalendarClock, ClipboardCheck, Compass, GraduationCap, LogOut, MessageSquareText, Plane, User, Users } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { DISCORD_URL } from "../../lib/constants";
 import { useAuth } from "../../features/auth/AuthContext";
@@ -14,6 +14,7 @@ export function MobileMenu({
   vuelosPendientes,
   reservasPendientes,
   graduadosPendientes,
+  maniobrasPendientes,
 }: {
   open: boolean;
   onClose: () => void;
@@ -158,6 +159,16 @@ export function MobileMenu({
                 >
                   <GraduationCap size={15} /> Graduados de teoría
                   <CountBadge count={graduadosPendientes} />
+                </Link>
+              )}
+              {esFundador && (
+                <Link
+                  to={ROUTES.adminManiobras}
+                  onClick={onClose}
+                  className="flex items-center gap-2 rounded-full border border-gold-500/25 bg-gold-500/[0.06] py-3 px-4 font-display text-sm font-semibold text-white/85"
+                >
+                  <Plane size={15} /> Checkrides del instructor
+                  <CountBadge count={maniobrasPendientes} />
                 </Link>
               )}
               {esFundador && (

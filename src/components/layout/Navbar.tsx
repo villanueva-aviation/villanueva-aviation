@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { CalendarClock, ClipboardCheck, Compass, Globe, GraduationCap, LogOut, MessageSquareText, User, Users } from "lucide-react";
+import { CalendarClock, ClipboardCheck, Compass, Globe, GraduationCap, LogOut, MessageSquareText, Plane, User, Users } from "lucide-react";
 import { NAV_LINKS, ROUTES } from "../../lib/routes";
 import { rutaEnOtroIdioma } from "../../lib/idioma";
 import { useAuth } from "../../features/auth/AuthContext";
@@ -15,6 +15,7 @@ function ProfileControl({
   vuelosPendientes,
   reservasPendientes,
   graduadosPendientes,
+  maniobrasPendientes,
   totalPendientes,
 }: ReturnType<typeof usePendientesFundador>) {
   const { isAuthenticated, user, logout } = useAuth();
@@ -113,6 +114,16 @@ function ProfileControl({
           >
             <GraduationCap size={14} /> Graduados de teoría
             <CountBadge count={graduadosPendientes} />
+          </Link>
+        )}
+        {esFundador && (
+          <Link
+            to={ROUTES.adminManiobras}
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+          >
+            <Plane size={14} /> Checkrides del instructor
+            <CountBadge count={maniobrasPendientes} />
           </Link>
         )}
         {esFundador && (

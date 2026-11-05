@@ -60,14 +60,14 @@ export async function mandarARevision(id: string): Promise<Escritura> {
 
 // Fundador
 
-export async function fetchPorRevisar(): Promise<IntentoManiobra[]> {
+export async function fetchPorRevisar(): Promise<(IntentoManiobra & { email: string | null })[]> {
   const { data, error } = await supabase
     .from("intentos_maniobra")
-    .select(COLUMNAS)
+    .select(`${COLUMNAS}, email`)
     .eq("revision", "mandado")
     .order("created_at", { ascending: true });
   if (error) throw error;
-  return (data as IntentoManiobra[]) ?? [];
+  return (data as (IntentoManiobra & { email: string | null })[]) ?? [];
 }
 
 export async function contarPorRevisar(): Promise<number> {

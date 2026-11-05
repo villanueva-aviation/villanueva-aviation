@@ -36,6 +36,16 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     archivoHref: "/downloads/villanueva-six-pack-c152.zip",
   },
   {
+    id: "instructor-lector",
+    categoria: "Herramientas",
+    nombre: "Lector del instructor virtual",
+    descripcion: "Conecta tu MSFS 2020 con el instructor virtual del sitio. Gratis, no necesita SimHub.",
+    version: "v1.0",
+    fecha: "2026-11-05",
+    imagen: "/images/descargas-simhub-c172.jpg",
+    archivoHref: "/downloads/villanueva-instructor-lector.zip",
+  },
+  {
     id: "simhub-c172",
     categoria: "SimHub Dashboards",
     nombre: "Dashboard SimHub — Cessna 172",

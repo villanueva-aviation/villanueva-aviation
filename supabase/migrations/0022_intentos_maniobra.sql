@@ -10,6 +10,8 @@
 create table if not exists public.intentos_maniobra (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
+  -- Para que el fundador sepa de quién es; lo pone la base con el correo de la sesión.
+  email text default (auth.jwt() ->> 'email'),
   maniobra text not null check (char_length(maniobra) between 1 and 60),
   avion text not null check (char_length(avion) between 1 and 20),
   modo text not null check (modo in ('practica', 'checkride')),
@@ -43,7 +45,10 @@ create policy "intentos_maniobra: fundador lee todo" on public.intentos_maniobra
 drop policy if exists "intentos_maniobra: guardar propio" on public.intentos_maniobra;
 create policy "intentos_maniobra: guardar propio" on public.intentos_maniobra
   for insert
-  with check (auth.uid() = user_id and revision = 'sin_mandar' and revisado_at is null);
+  with check (
+    auth.uid() = user_id and revision = 'sin_mandar' and revisado_at is null
+    and email is not distinct from (auth.jwt() ->> 'email')
+  );
 
 -- El cadete solo pasa un checkride aprobado de sin_mandar a mandado; el trigger
 -- de abajo revisa que no toque ninguna otra columna.

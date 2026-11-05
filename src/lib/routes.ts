@@ -41,6 +41,7 @@ export const ROUTES = {
   comunidad: "/comunidad",
   perfil: "/perfil",
   adminVuelosPractica: "/admin/vuelos-practica",
+  adminManiobras: "/admin/maniobras",
   adminReservas: "/admin/agenda-y-proyectos",
   rutaRed: "/ruta/listo-para-red",
   rutaRedLeccion: (id: string) => `/ruta/listo-para-red/${id}`,
