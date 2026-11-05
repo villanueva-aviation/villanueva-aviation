@@ -14,6 +14,8 @@ interface AuthContextValue {
   /** Verdadero mientras se confirma la sesión inicial (evita redirigir a /ingresar antes de tiempo). */
   loading: boolean;
   sendMagicLink: (email: string, redirectTo: string) => Promise<{ error: string | null }>;
+  /** El código del mismo correo del enlace: para la ventana del instructor, donde el enlace abriría otro navegador. */
+  verifyEmailCode: (email: string, code: string) => Promise<{ error: string | null }>;
   loginWithGoogle: (redirectTo: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
 }
@@ -56,6 +58,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email,
           options: { emailRedirectTo: redirectTo },
         });
+        return { error: error?.message ?? null };
+      },
+      verifyEmailCode: async (email: string, code: string) => {
+        const { error } = await supabase.auth.verifyOtp({ email, token: code, type: "email" });
         return { error: error?.message ?? null };
       },
       loginWithGoogle: async (redirectTo: string) => {

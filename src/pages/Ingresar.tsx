@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Mail, PlaneTakeoff } from "lucide-react";
 import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
@@ -56,8 +56,13 @@ const TEXTOS = {
 };
 
 export function Ingresar() {
-  const { sendMagicLink, loginWithGoogle } = useAuth();
+  const { sendMagicLink, verifyEmailCode, loginWithGoogle } = useAuth();
+  const navigate = useNavigate();
   const [params] = useSearchParams();
+  // La ventana del instructor: el enlace del correo abriría el navegador normal, así que ahí se escribe el código.
+  const desdePrograma = params.get("from") === ROUTES.instructorPrograma;
+  const [codigo, setCodigo] = useState("");
+  const [errorCodigo, setErrorCodigo] = useState<string | null>(null);
   const { pathname } = useLocation();
   const ingles = esIngles(pathname);
   const t = TEXTOS[ingles ? "en" : "es"];
@@ -80,6 +85,14 @@ export function Ingresar() {
     }
   }
 
+  async function handleCodigo(e: FormEvent) {
+    e.preventDefault();
+    setErrorCodigo(null);
+    const { error: codeError } = await verifyEmailCode(email, codigo.trim());
+    if (codeError) setErrorCodigo(codeError);
+    else navigate(ROUTES.instructorPrograma, { replace: true });
+  }
+
   async function handleGoogle() {
     setError(null);
     const { error: googleError } = await loginWithGoogle(redirectTo);
@@ -98,9 +111,43 @@ export function Ingresar() {
           <p className="mt-2 text-sm text-white/55">{t.intro}</p>
 
           {status === "sent" ? (
-            <div className="mt-8 rounded-xl border border-gold-500/30 bg-gold-500/10 p-5 text-sm text-white/80">
-              {t.enviado[0]} <span className="text-gold-400">{email}</span>. {t.enviado[1]}
-            </div>
+            desdePrograma ? (
+              <form onSubmit={handleCodigo} className="mt-8 flex flex-col gap-4">
+                <p className="rounded-xl border border-gold-500/30 bg-gold-500/10 p-5 text-sm text-white/80">
+                  Te enviamos un correo a <span className="text-gold-400">{email}</span>. Escribe aquí el código que trae.
+                </p>
+                <label className="flex flex-col gap-1.5 text-sm text-white/70">
+                  Código del correo
+                  <input
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    pattern="[0-9]{6,10}"
+                    required
+                    value={codigo}
+                    onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ""))}
+                    className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5 text-center text-lg tracking-[0.3em] text-white outline-none focus:border-gold-500/50"
+                  />
+                </label>
+                <Button type="submit" variant="primary" className="w-full">Entrar</Button>
+                {errorCodigo && (
+                  <div className="space-y-2 text-sm">
+                    <p className="text-red-400">{errorCodigo}</p>
+                    <p className="text-white/60">¿No te llegó un código? Entra con Google.</p>
+                    <button
+                      type="button"
+                      onClick={handleGoogle}
+                      className="flex w-full items-center justify-center gap-2.5 rounded-full border border-white/20 bg-white px-6 py-3 text-sm font-semibold text-navy-950"
+                    >
+                      <GoogleIcon /> {t.google}
+                    </button>
+                  </div>
+                )}
+              </form>
+            ) : (
+              <div className="mt-8 rounded-xl border border-gold-500/30 bg-gold-500/10 p-5 text-sm text-white/80">
+                {t.enviado[0]} <span className="text-gold-400">{email}</span>. {t.enviado[1]}
+              </div>
+            )
           ) : (
             <>
               <button
