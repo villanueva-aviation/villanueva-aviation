@@ -50,6 +50,25 @@ class Muestra
     }
 }
 
+class Opciones
+{
+    public string Modo = "";
+    public string Url = LectorInstructor.UrlPrograma;
+    public bool SinVentana;
+
+    public static Opciones Leer(string[] args)
+    {
+        var o = new Opciones();
+        for (var i = 0; i < args.Length; i++)
+        {
+            if (args[i] == "--simulado" || args[i] == "--simulado-limpio") o.Modo = args[i];
+            else if (args[i] == "--sin-ventana") o.SinVentana = true;
+            else if (args[i] == "--url" && i + 1 < args.Length) o.Url = args[++i];
+        }
+        return o;
+    }
+}
+
 static class LectorInstructor
 {
     const int Puerto = 8766;
@@ -96,22 +115,87 @@ static class LectorInstructor
               && Pausado(100.10, 10.70, ref ant, ref ult)    // 0.6 s quieto: pausa
               && !Pausado(100.20, 10.80, ref ant, ref ult);  // vuelve a avanzar
         Console.WriteLine(ok ? "Pausado: OK" : "Pausado: FALLA");
-        return ok ? 0 : 1;
+
+        var edge = ArgumentosEdge("https://x/instructor/programa", @"C:\p") ==
+            "--app=https://x/instructor/programa --user-data-dir=\"C:\\p\" --window-size=480,860 --no-first-run " +
+            "--autoplay-policy=no-user-gesture-required --disable-background-timer-throttling " +
+            "--disable-backgrounding-occluded-windows --disable-renderer-backgrounding";
+        Console.WriteLine(edge ? "ArgumentosEdge: OK" : "ArgumentosEdge: FALLA");
+
+        var o = Opciones.Leer(new[] { "--simulado", "--url", "http://localhost:5180/instructor/programa", "--sin-ventana" });
+        var d = Opciones.Leer(new string[0]);
+        var banderas = o.Modo == "--simulado" && o.Url == "http://localhost:5180/instructor/programa" && o.SinVentana
+            && d.Modo == "" && d.Url == UrlPrograma && !d.SinVentana;
+        Console.WriteLine(banderas ? "Banderas: OK" : "Banderas: FALLA");
+        return ok && edge && banderas ? 0 : 1;
+    }
+
+    public const string UrlPrograma = "https://villanueva-aviation.pages.dev/instructor/programa";
+
+    public static string ArgumentosEdge(string url, string perfil)
+    {
+        return "--app=" + url + " --user-data-dir=\"" + perfil + "\" --window-size=480,860 --no-first-run" +
+            " --autoplay-policy=no-user-gesture-required --disable-background-timer-throttling" +
+            " --disable-backgrounding-occluded-windows --disable-renderer-backgrounding";
+    }
+
+    public static string BuscarEdge()
+    {
+        const string clave = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe";
+        foreach (var raiz in new[] { Microsoft.Win32.Registry.LocalMachine, Microsoft.Win32.Registry.CurrentUser })
+        {
+            using (var k = raiz.OpenSubKey(clave))
+            {
+                var ruta = k == null ? null : k.GetValue("") as string;
+                if (!string.IsNullOrEmpty(ruta) && File.Exists(ruta)) return ruta;
+            }
+        }
+        foreach (var carpeta in new[] { "ProgramFiles(x86)", "ProgramFiles" })
+        {
+            var ruta = Path.Combine(Environment.GetEnvironmentVariable(carpeta) ?? "", @"Microsoft\Edge\Application\msedge.exe");
+            if (File.Exists(ruta)) return ruta;
+        }
+        return null;
+    }
+
+    // Ventana propia de Edge (sin barra de direcciones) con su perfil: la sesion del cadete se guarda ahi.
+    public static void AbrirVentana(string url)
+    {
+        var edge = BuscarEdge();
+        if (edge == null)
+        {
+            Console.WriteLine("No encontre Microsoft Edge. Abre la pagina del instructor en tu navegador.");
+            return;
+        }
+        var perfil = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"VillanuevaInstructor\Edge");
+        try { Process.Start(new ProcessStartInfo(edge, ArgumentosEdge(url, perfil)) { UseShellExecute = false }); }
+        catch (Exception e) { Console.WriteLine("No pude abrir Edge: " + e.Message); }
     }
 
     static void Main(string[] args)
     {
         if (args.Length > 0 && args[0] == "--probar") Environment.Exit(Probar());
         Console.Title = "Villanueva Aviation - Lector del instructor";
-        var servidor = new Thread(Servir);
+        var op = Opciones.Leer(args);
+
+        var escucha = new TcpListener(IPAddress.Loopback, Puerto);
+        try { escucha.Start(); }
+        catch (SocketException)
+        {
+            AbrirVentana(op.Url);
+            Console.WriteLine("El lector ya estaba abierto: abri la ventana del instructor.");
+            Thread.Sleep(3000);
+            return;
+        }
+        var servidor = new Thread(() => Servir(escucha));
         servidor.IsBackground = true;
         servidor.Start();
+        if (!op.SinVentana) AbrirVentana(op.Url);
 
-        var modo = args.Length > 0 ? args[0] : "";
-        if (modo == "--simulado" || modo == "--simulado-limpio")
+        if (op.Modo == "--simulado" || op.Modo == "--simulado-limpio")
         {
             Console.WriteLine("Modo simulado: no se conecta a MSFS.");
-            Simulado.Correr(modo == "--simulado");
+            Simulado.Correr(op.Modo == "--simulado");
             return;
         }
         if (!Dlls.Preparar())
@@ -134,15 +218,8 @@ static class LectorInstructor
 
     // ---- HTTP minimo: HttpListener pediria permisos de administrador para el puerto. ----
 
-    static void Servir()
+    static void Servir(TcpListener escucha)
     {
-        var escucha = new TcpListener(IPAddress.Loopback, Puerto);
-        try { escucha.Start(); }
-        catch (SocketException)
-        {
-            Console.WriteLine("El puerto " + Puerto + " ya esta ocupado: quiza el lector ya esta abierto.");
-            return;
-        }
         while (true)
         {
             var cliente = escucha.AcceptTcpClient();

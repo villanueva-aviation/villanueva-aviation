@@ -21,20 +21,30 @@ CÓMO SE USA
    da clic en "Más información" > "Ejecutar de todas formas".
 3. Deja abierta la ventana negra. Dice "Esperando a MSFS..." hasta que
    abras el simulador y "Conectado a MSFS." cuando ya lee tu avión.
-4. Entra a villanueva-aviation.pages.dev, inicia sesión y abre
-   Instructor > Viraje escarpado. Si el navegador pregunta si la página
-   puede acceder a dispositivos de tu red local, da clic en "Permitir":
-   así la página lee el lector de tu propia PC.
+4. Al abrir el lector se abre sola la ventana del instructor (Microsoft
+   Edge, sin barra de direcciones). La primera vez inicia sesión ahí con
+   Google o con el código que te llega por correo; después ya no te lo pide.
+   Da clic en "Probar voz" para escuchar al instructor y ajustar el volumen.
+   Si Edge pregunta si la página puede acceder a dispositivos de tu red
+   local, da clic en "Permitir": así lee el lector de tu propia PC.
 5. Vuela en el C172 a 1500 ft o más sobre el terreno (no sobre el mar: en
-   MMGL son unos 6500 ft en el altímetro) y sigue las instrucciones de la página.
+   MMGL son unos 6500 ft en el altímetro) y sigue lo que te dice el instructor.
+
+¿PREFIERES LA PÁGINA?
+La página del sitio (Instructor > Viraje escarpado) sigue funcionando igual.
+Si solo quieres el lector para la página, ábrelo con --sin-ventana
+(por ejemplo, en un acceso directo).
 
 ABRIRLO SOLO AL PRENDER LA PC
 Da doble clic en "Iniciar con Windows.bat". Vuelve a darle doble clic
-para quitarlo.
+para quitarlo. Así se abre solo el lector, sin ventana; cuando vayas a
+volar, abre el lector otra vez y te abre la ventana del instructor.
 
 PROBLEMAS
 - "No encontré las librerías de SimConnect": instala el SDK (arriba).
-- "El puerto 8766 ya está ocupado": el lector ya está abierto en otra ventana.
+- "El lector ya estaba abierto": no pasa nada, solo te abre otra ventana
+  del instructor.
+- "No encontré Microsoft Edge": abre la página del instructor en tu navegador.
 - La página dice que no encuentra el lector: revisa que la ventana negra
   siga abierta y que diste "Permitir" en el navegador.
 
