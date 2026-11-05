@@ -122,6 +122,12 @@ export function armar(_ev: Evaluacion, m: Muestra): Evaluacion {
   return { fase: "armado", interno: { ...vacio(), historial: [m], previo: m, ultimaNivelada: nivelada ? m : null } };
 }
 
+/** La página se arma sola sin intento o tras uno anulado, cuando el avión vuela nivelado y en condiciones de calificar. Nunca encima de un resultado. */
+export function armarSolo(ev: Evaluacion | null, m: Muestra): boolean {
+  if (ev && ev.fase !== "invalido") return false;
+  return !m.enTierra && Math.abs(m.inclinacion) < INCLINACION_NIVELADO && invalidez(m, null) === null;
+}
+
 function invalidez(m: Muestra, previo: Muestra | null): string | null {
   if (previo && m.t - previo.t > HUECO_MAX_SEG) return "Se perdió la conexión con el simulador por más de 2 segundos.";
   if (m.pausa) return "Pausaste el simulador: el intento no se califica.";
@@ -240,7 +246,10 @@ export function avanzar(ev: Evaluacion, m: Muestra): Evaluacion {
 
   const d = i.previo ? difRumbo(m.rumbo, i.previo.rumbo) : 0;
   const banco = Math.abs(m.inclinacion);
-  const sig: Interno = { ...i, historial: [...i.historial, m], previo: m };
+  // Antes del primer viraje solo importa la ventana de limpieza: armado en el ascenso no acumula todo el vuelo.
+  const esperando = ev.fase === "armado" && !i.giro;
+  const historial = esperando ? i.historial.filter((x) => x.t >= m.t - LIMPIEZA.ventanaSeg - 10) : i.historial;
+  const sig: Interno = { ...i, historial: [...historial, m], previo: m };
   const nivelado = { ultimaNivelada: m, tramo: [], acumulado: 0 };
 
   if (!i.giro) {

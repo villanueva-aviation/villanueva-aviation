@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { armar, avanzar, avanzarLote, crearEvaluacion, type Evaluacion, type Muestra } from "./evaluador.ts";
+import { armar, armarSolo, avanzar, avanzarLote, crearEvaluacion, type Evaluacion, type Muestra } from "./evaluador.ts";
 import { simularManiobra } from "./simular.ts";
 
 const correr = (muestras: Muestra[]): Evaluacion => muestras.reduce(avanzar, armar(crearEvaluacion(), muestras[0]));
@@ -117,6 +117,36 @@ test("un lote con muestras repetidas o viejas da lo mismo que una por una", () =
   assert.equal(ev.fase, "terminado");
   assert.equal(ev.resultado!.calificacion, unaPorUna.resultado!.calificacion);
   assert.equal(ev.resultado!.muestras.length, unaPorUna.resultado!.muestras.length);
+});
+
+test("se arma solo en el aire y nivelado, y no borra un resultado", () => {
+  const [m] = simularManiobra();
+  assert.equal(armarSolo(null, m), true);
+  assert.equal(armarSolo(null, { ...m, enTierra: true }), false);
+  assert.equal(armarSolo(null, { ...m, inclinacion: 20 }), false);
+  assert.equal(armarSolo(null, { ...m, pausa: true }), false);
+  assert.equal(armarSolo(null, { ...m, slew: true }), false);
+  assert.equal(armarSolo(null, { ...m, tasa: 4 }), false);
+  assert.equal(armarSolo(null, { ...m, titulo: "Cessna 152" }), false);
+  // Después de una pausa se vuelve a armar solo; después de un resultado, no.
+  assert.equal(armarSolo({ fase: "invalido", motivo: "Pausaste", interno: crearEvaluacion().interno }, m), true);
+  assert.equal(armarSolo(correr(simularManiobra()), m), false);
+  assert.equal(armarSolo(armar(crearEvaluacion(), m), m), false);
+});
+
+test("armado mucho rato no acumula muestras de más ni cambia la calificación", () => {
+  const maniobra = simularManiobra();
+  const [m] = maniobra;
+  // 20 minutos subiendo y nivelado antes de la maniobra.
+  const espera: Muestra[] = [];
+  for (let i = 0; i < 12000; i++) espera.push({ ...m, t: i / 10, altitud: 1500 + i / 6 });
+  const desfase = 1200;
+  const todo = [...espera, ...maniobra.map((x) => ({ ...x, t: x.t + desfase }))];
+  const armadoLargo = espera.reduce(avanzar, armar(crearEvaluacion(), espera[0]));
+  assert.ok(armadoLargo.interno.historial.length < 1400, `historial ${armadoLargo.interno.historial.length}`);
+  const ev = correr(todo);
+  assert.equal(ev.fase, "terminado");
+  assert.equal(ev.resultado!.calificacion, correr(maniobra).resultado!.calificacion);
 });
 
 test("aviso bajo 1500 AGL", () => {

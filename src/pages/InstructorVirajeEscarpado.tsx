@@ -5,7 +5,7 @@ import { PageHero } from "../components/layout/PageHero";
 import { Button } from "../components/ui/Button";
 import { Container } from "../components/ui/Container";
 import { useAuth } from "../features/auth/AuthContext";
-import { armar, avanzarLote, crearEvaluacion, TOLERANCIA, type Campo, type Evaluacion, type Muestra, type Resultado } from "../features/instructor/evaluador";
+import { armar, armarSolo, avanzarLote, crearEvaluacion, TOLERANCIA, type Campo, type Evaluacion, type Muestra, type Resultado } from "../features/instructor/evaluador";
 import { explicar, repetir } from "../features/instructor/explicacion";
 import { Grafica } from "../features/instructor/Grafica";
 import { HojaCheckride } from "../features/instructor/HojaCheckride";
@@ -136,6 +136,7 @@ export function InstructorVirajeEscarpado() {
   const [intentos, setIntentos] = useState<IntentoManiobra[]>([]);
   const [guardado, setGuardado] = useState<{ id: string | null; error: string | null; guardando: boolean }>({ id: null, error: null, guardando: false });
   const [envio, setEnvio] = useState<string | null>(null);
+  const [anulado, setAnulado] = useState<string | null>(null);
   const guardadoPara = useRef<Resultado | null>(null);
   const ultimoPitido = useRef(0);
 
@@ -188,7 +189,21 @@ export function InstructorVirajeEscarpado() {
     setModoIntento(modo);
     setGuardado({ id: null, error: null, guardando: false });
     setEnvio(null);
+    setAnulado(null);
     setEv(armar(crearEvaluacion(), muestra));
+  };
+
+  // Se arma sola en el aire y nivelada, también tras un intento anulado (pausa, slew...), nunca encima de un resultado.
+  useEffect(() => {
+    if (!muestra || !armarSolo(ev, muestra)) return;
+    setModoIntento(modo);
+    setAnulado(ev?.fase === "invalido" ? (ev.motivo ?? null) : null);
+    setEv(armar(crearEvaluacion(), muestra));
+  }, [ev, muestra, modo]);
+
+  const cambiarModo = (m: Modo) => {
+    setModo(m);
+    if (ev?.fase === "armado") setModoIntento(m);
   };
 
   const intento = guardado.id ? (intentos.find((i) => i.id === guardado.id) ?? null) : null;
@@ -215,7 +230,7 @@ export function InstructorVirajeEscarpado() {
         <section className="grid gap-4 md:grid-cols-3">
           {[
             ["1. Abre el lector", "Un programa chico que lee tu avión en MSFS 2020. Solo funciona dentro de tu PC."],
-            ["2. Sube a 3500 ft", "En el C172, recto y nivelado, a no más de Va. Escoge Práctica o Checkride y arma la maniobra."],
+            ["2. Sube a 3500 ft", "En el C172, recto y nivelado, a no más de Va. Escoge Práctica o Checkride: el instructor empieza solo."],
             ["3. Vuela", "Virajes de limpieza, 360° a un lado y 360° al otro. Puedes tener MSFS en pantalla completa: deja abierta la ventana del lector."],
           ].map(([t, d]) => (
             <div key={t} className="rounded-xl border border-white/10 bg-navy-900/60 p-4">
@@ -236,17 +251,19 @@ export function InstructorVirajeEscarpado() {
                   type="button"
                   role="radio"
                   aria-checked={modo === m}
-                  disabled={!!enCurso}
-                  onClick={() => setModo(m)}
+                  disabled={!!enCurso && ev?.fase !== "armado"}
+                  onClick={() => cambiarModo(m)}
                   className={`rounded-full px-4 py-1.5 text-sm font-semibold ${modo === m ? "bg-gold-500 text-navy-950" : "text-white/70"}`}
                 >
                   {m === "practica" ? "Práctica" : "Checkride"}
                 </button>
               ))}
             </div>
-            <Button onClick={iniciar} disabled={estado !== "conectado"}>
-              {enCurso ? "Volver a armar" : "Armar maniobra"}
-            </Button>
+            {ev && ev.fase !== "invalido" && (
+              <Button onClick={iniciar} disabled={estado !== "conectado"}>
+                {resultado ? "Otro intento" : "Volver a armar"}
+              </Button>
+            )}
             {modo === "practica" && (
               <button type="button" onClick={cambiarSonido} className="inline-flex items-center gap-1.5 text-sm text-white/70" aria-pressed={sonido}>
                 {sonido ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />} Sonido
@@ -259,6 +276,22 @@ export function InstructorVirajeEscarpado() {
               : "Checkride: no te avisa nada hasta el final, como en el examen. Si apruebas, lo puedes mandar a revisión para tu insignia."}
           </p>
 
+          {!ev && estado === "conectado" && (
+            <p className="mt-5 rounded-lg bg-navy-950/60 p-4 font-display text-lg font-bold text-white" aria-live="polite">
+              {muestra && !/172/.test(muestra.titulo)
+                ? `Esta maniobra es para el C172 y tu avión es «${muestra.titulo}».`
+                : muestra?.enTierra
+                  ? "Despega: el instructor empieza solo cuando vueles nivelado."
+                  : muestra?.pausa || muestra?.slew || (muestra && muestra.tasa !== 1)
+                    ? "Quita la pausa, el slew o la velocidad acelerada y el instructor empieza solo."
+                    : "Nivela las alas y el instructor empieza solo."}
+            </p>
+          )}
+          {anulado && ev?.fase === "armado" && (
+            <p className="mt-5 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
+              El intento anterior no se calificó: {anulado} Ya empezó otro.
+            </p>
+          )}
           {enCurso && ev && (
             <div className="mt-5 rounded-lg bg-navy-950/60 p-4" aria-live="polite">
               {modoIntento === "checkride" ? (
@@ -277,7 +310,7 @@ export function InstructorVirajeEscarpado() {
           )}
           {ev?.fase === "invalido" && (
             <p className="mt-5 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
-              Intento sin calificar: {ev.motivo} Vuelve a armar la maniobra.
+              Intento sin calificar: {ev.motivo} Empieza otro solo en cuanto vueles nivelado.
             </p>
           )}
         </section>
