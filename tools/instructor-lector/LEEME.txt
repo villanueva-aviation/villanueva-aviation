@@ -1,0 +1,43 @@
+VILLANUEVA AVIATION - LECTOR DEL INSTRUCTOR VIRTUAL
+====================================================
+
+Este programa lee tu avión en Microsoft Flight Simulator 2020 y se lo pasa
+a la página del instructor virtual para que califique tu maniobra.
+Solo funciona dentro de tu PC: no manda nada a internet.
+
+REQUISITOS
+- Windows 10 u 11 de 64 bits.
+- Microsoft Flight Simulator 2020.
+- Las librerías de SimConnect en tu PC. Si ya usas SimHub o MobiFlight,
+  ya las tienes. Si no, instala el SDK de MSFS (gratis, oficial):
+    1. En MSFS: Opciones > General > Desarrolladores > Modo desarrollador: Activado.
+    2. Arriba aparece una barra. Abre Help > SDK Installer (Core) y descárgalo.
+    3. Instálalo con las opciones de siempre (queda en C:\MSFS SDK).
+    4. Si quieres, apaga otra vez el Modo desarrollador.
+
+CÓMO SE USA
+1. Descomprime esta carpeta donde quieras (por ejemplo en Documentos).
+2. Abre VillanuevaInstructorLector.exe. Si Windows dice que protegió tu PC,
+   da clic en "Más información" > "Ejecutar de todas formas".
+3. Deja abierta la ventana negra. Dice "Esperando a MSFS..." hasta que
+   abras el simulador y "Conectado a MSFS." cuando ya lee tu avión.
+4. Entra a villanueva-aviation.pages.dev, inicia sesión y abre
+   Instructor > Viraje escarpado. Si el navegador pregunta si la página
+   puede acceder a dispositivos de tu red local, da clic en "Permitir":
+   así la página lee el lector de tu propia PC.
+5. Vuela en el C172 a 3500 ft o más alto y sigue las instrucciones de la página.
+
+ABRIRLO SOLO AL PRENDER LA PC
+Da doble clic en "Iniciar con Windows.bat". Vuelve a darle doble clic
+para quitarlo.
+
+PROBLEMAS
+- "No encontré las librerías de SimConnect": instala el SDK (arriba).
+- "El puerto 8766 ya está ocupado": el lector ya está abierto en otra ventana.
+- La página dice que no encuentra el lector: revisa que la ventana negra
+  siga abierta y que diste "Permitir" en el navegador.
+
+Dudas: en el Discord de Villanueva Aviation.
+
+Práctica en simulador. No es un documento oficial ni sustituye un examen
+ante una autoridad aeronáutica.
