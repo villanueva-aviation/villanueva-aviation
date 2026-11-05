@@ -58,12 +58,12 @@ export function useVoz() {
   };
 
   const decir = useCallback(
-    (textos: string | string[], opciones?: { final?: boolean }) => {
+    (textos: string | string[], opciones?: { final?: boolean; encolar?: boolean }) => {
       if (!sintesis || !activa) return;
       const lista = (Array.isArray(textos) ? textos : [textos]).filter(Boolean);
       if (!lista.length) return;
       if (!opciones?.final && leyendoFinal.current) return;
-      sintesis.cancel();
+      if (!opciones?.encolar) sintesis.cancel();
       leyendoFinal.current = !!opciones?.final;
       lista.forEach((texto, k) => {
         const u = new SpeechSynthesisUtterance(texto);

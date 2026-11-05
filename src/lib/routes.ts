@@ -68,6 +68,7 @@ export const ROUTES = {
   eventos: "/eventos",
   resumenHsi: "/resumen-hsi",
   instructorVirajeEscarpado: "/instructor/viraje-escarpado",
+  instructorPrograma: "/instructor/programa",
   adminAventura: "/admin/aventura",
 } as const;
 
