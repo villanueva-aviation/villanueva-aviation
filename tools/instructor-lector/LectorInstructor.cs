@@ -77,8 +77,31 @@ static class LectorInstructor
         }
     }
 
+    // El evento "Pause" de MSFS 2020 se queda pegado en 1 (pasa al cargar o tras una pausa): no sirve.
+    // En pausa el reloj del simulador deja de avanzar aunque sigan llegando cuadros.
+    public static bool Pausado(double tiempoSim, double ahora, ref double simAnterior, ref double ultimoAvance)
+    {
+        if (tiempoSim != simAnterior) { simAnterior = tiempoSim; ultimoAvance = ahora; }
+        return ahora - ultimoAvance > 0.5;
+    }
+
+    // --probar: revisa Pausado sin MSFS. Sale con 1 si algo falla.
+    static int Probar()
+    {
+        double ant = -1, ult = 0;
+        var ok = !Pausado(100.00, 10.00, ref ant, ref ult)   // avanza
+              && !Pausado(100.00, 10.06, ref ant, ref ult)   // un cuadro repetido no es pausa
+              && !Pausado(100.10, 10.10, ref ant, ref ult)
+              && !Pausado(100.10, 10.50, ref ant, ref ult)   // 0.4 s quieto: todavía no
+              && Pausado(100.10, 10.70, ref ant, ref ult)    // 0.6 s quieto: pausa
+              && !Pausado(100.20, 10.80, ref ant, ref ult);  // vuelve a avanzar
+        Console.WriteLine(ok ? "Pausado: OK" : "Pausado: FALLA");
+        return ok ? 0 : 1;
+    }
+
     static void Main(string[] args)
     {
+        if (args.Length > 0 && args[0] == "--probar") Environment.Exit(Probar());
         Console.Title = "Villanueva Aviation - Lector del instructor";
         var servidor = new Thread(Servir);
         servidor.IsBackground = true;
@@ -344,7 +367,6 @@ static class Sim
 {
     enum Def { Vuelo, Titulo }
     enum Req { Vuelo, Titulo }
-    enum Evento { Pausa }
 
     static readonly string[][] Vars =
     {
@@ -358,10 +380,11 @@ static class Sim
         new[] { "SIM ON GROUND", "bool" },
         new[] { "IS SLEW ACTIVE", "bool" },
         new[] { "SIMULATION RATE", "number" },
+        new[] { "SIMULATION TIME", "seconds" },
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    struct Vuelo { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)] public double[] Valores; }
+    struct Vuelo { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 11)] public double[] Valores; }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     struct Titulo { [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)] public string Valor; }
@@ -373,19 +396,20 @@ static class Sim
         using (var sim = new Microsoft.FlightSimulator.SimConnect.SimConnect("Villanueva Instructor", IntPtr.Zero, 0, senal, 0))
         {
             var abierto = true;
-            var pausa = false;
+            double simAnterior = -1, ultimoAvance = 0;
             var titulo = "";
             Console.WriteLine("Conectado a MSFS.");
             sim.OnRecvQuit += (s, d) => abierto = false;
-            sim.OnRecvEvent += (s, d) => { if (d.uEventID == (uint)Evento.Pausa) pausa = d.dwData != 0; };
             sim.OnRecvSimobjectData += (s, d) =>
             {
                 if (d.dwRequestID == (uint)Req.Titulo) { titulo = ((Titulo)d.dwData[0]).Valor ?? ""; return; }
                 var x = ((Vuelo)d.dwData[0]).Valores;
+                var ahora = LectorInstructor.Ahora();
                 LectorInstructor.Publicar(new Muestra
                 {
-                    T = LectorInstructor.Ahora(), Inclinacion = x[0], Altitud = x[1], Velocidad = x[2], Rumbo = x[3], Bola = x[4],
-                    Agl = x[5], Peso = x[6], EnTierra = x[7] != 0, Slew = x[8] != 0, Tasa = x[9], Pausa = pausa, Titulo = titulo,
+                    T = ahora, Inclinacion = x[0], Altitud = x[1], Velocidad = x[2], Rumbo = x[3], Bola = x[4],
+                    Agl = x[5], Peso = x[6], EnTierra = x[7] != 0, Slew = x[8] != 0, Tasa = x[9],
+                    Pausa = LectorInstructor.Pausado(x[10], ahora, ref simAnterior, ref ultimoAvance), Titulo = titulo,
                 });
             };
             foreach (var v in Vars)
@@ -393,7 +417,6 @@ static class Sim
             sim.RegisterDataDefineStruct<Vuelo>(Def.Vuelo);
             sim.AddToDataDefinition(Def.Titulo, "TITLE", null, Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATATYPE.STRING256, 0, Microsoft.FlightSimulator.SimConnect.SimConnect.SIMCONNECT_UNUSED);
             sim.RegisterDataDefineStruct<Titulo>(Def.Titulo);
-            sim.SubscribeToSystemEvent(Evento.Pausa, "Pause");
             // VISUAL_FRAME con intervalo 4, como el six pack: unas 15-20 muestras por segundo.
             sim.RequestDataOnSimObject(Req.Vuelo, Def.Vuelo, Microsoft.FlightSimulator.SimConnect.SimConnect.SIMCONNECT_OBJECT_ID_USER,
                 Microsoft.FlightSimulator.SimConnect.SIMCONNECT_PERIOD.VISUAL_FRAME, Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_REQUEST_FLAG.DEFAULT, 0, 4, 0);
