@@ -5,7 +5,7 @@ import { PageHero } from "../components/layout/PageHero";
 import { Button } from "../components/ui/Button";
 import { Container } from "../components/ui/Container";
 import { useAuth } from "../features/auth/AuthContext";
-import { armar, avanzar, crearEvaluacion, TOLERANCIA, type Campo, type Evaluacion, type Muestra, type Resultado } from "../features/instructor/evaluador";
+import { armar, avanzarLote, crearEvaluacion, TOLERANCIA, type Campo, type Evaluacion, type Muestra, type Resultado } from "../features/instructor/evaluador";
 import { explicar, repetir } from "../features/instructor/explicacion";
 import { Grafica } from "../features/instructor/Grafica";
 import { HojaCheckride } from "../features/instructor/HojaCheckride";
@@ -127,7 +127,8 @@ function Explicacion({ resultado }: { resultado: Resultado }) {
 
 export function InstructorVirajeEscarpado() {
   const { user } = useAuth();
-  const { estado, muestra } = useLector();
+  // Cada lote del lector entra a la evaluación; avanzar ignora las muestras repetidas.
+  const { estado, muestra } = useLector((lote) => setEv((e) => (e ? avanzarLote(e, lote) : e)));
   const [modo, setModo] = useState<Modo>("practica");
   const [ev, setEv] = useState<Evaluacion | null>(null);
   const [modoIntento, setModoIntento] = useState<Modo>("practica");
@@ -142,12 +143,6 @@ export function InstructorVirajeEscarpado() {
     fetchMisIntentosManiobra(MANIOBRA).then(setIntentos, () => {});
   }, []);
   useEffect(cargarIntentos, [cargarIntentos]);
-
-  // Cada muestra nueva entra una vez a la evaluación.
-  useEffect(() => {
-    if (!muestra) return;
-    setEv((e) => (e && muestra.t > (e.interno.previo?.t ?? -Infinity) ? avanzar(e, muestra) : e));
-  }, [muestra]);
 
   const resultado = ev?.fase === "terminado" ? ev.resultado! : null;
   const series = useMemo(() => (resultado ? paraGuardar(resultado).series : []), [resultado]);
@@ -221,7 +216,7 @@ export function InstructorVirajeEscarpado() {
           {[
             ["1. Abre el lector", "Un programa chico que lee tu avión en MSFS 2020. Solo funciona dentro de tu PC."],
             ["2. Sube a 3500 ft", "En el C172, recto y nivelado, a no más de Va. Escoge Práctica o Checkride y arma la maniobra."],
-            ["3. Vuela", "Virajes de limpieza, 360° a un lado y 360° al otro. No cambies de pestaña mientras vuelas."],
+            ["3. Vuela", "Virajes de limpieza, 360° a un lado y 360° al otro. Puedes tener MSFS en pantalla completa: deja abierta la ventana del lector."],
           ].map(([t, d]) => (
             <div key={t} className="rounded-xl border border-white/10 bg-navy-900/60 p-4">
               <h2 className="font-display font-bold text-white">{t}</h2>

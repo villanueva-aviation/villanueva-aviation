@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { armar, avanzar, crearEvaluacion, type Evaluacion, type Muestra } from "./evaluador.ts";
+import { armar, avanzar, avanzarLote, crearEvaluacion, type Evaluacion, type Muestra } from "./evaluador.ts";
 import { simularManiobra } from "./simular.ts";
 
 const correr = (muestras: Muestra[]): Evaluacion => muestras.reduce(avanzar, armar(crearEvaluacion(), muestras[0]));
@@ -106,6 +106,17 @@ test("no se arma en tierra", () => {
 test("otro avion invalida", () => {
   const ev = correr(simularManiobra().map((m) => ({ ...m, titulo: "Cessna 152" })));
   assert.equal(ev.fase, "invalido");
+});
+
+test("un lote con muestras repetidas o viejas da lo mismo que una por una", () => {
+  const muestras = simularManiobra();
+  const unaPorUna = correr(muestras);
+  let ev = armar(crearEvaluacion(), muestras[0]);
+  // Lotes de 10 (un poll por segundo con la pestaña oculta), cada uno repitiendo las 3 últimas del anterior.
+  for (let i = 0; i < muestras.length; i += 10) ev = avanzarLote(ev, muestras.slice(Math.max(0, i - 3), i + 10));
+  assert.equal(ev.fase, "terminado");
+  assert.equal(ev.resultado!.calificacion, unaPorUna.resultado!.calificacion);
+  assert.equal(ev.resultado!.muestras.length, unaPorUna.resultado!.muestras.length);
 });
 
 test("aviso bajo 1500 AGL", () => {

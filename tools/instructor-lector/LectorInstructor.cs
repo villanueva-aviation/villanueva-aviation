@@ -58,12 +58,23 @@ static class LectorInstructor
     static readonly object Candado = new object();
     static Muestra ultima;
     static double recibida = -10; // segundos de reloj en que llego la ultima muestra
+    // Ultimos 120 s: si Chrome frena la pagina (pestana oculta o ventana tapada por MSFS), la pagina pide lo que le falto.
+    static readonly List<Muestra> Historial = new List<Muestra>();
+    const double GuardarSeg = 120;
 
     public static double Ahora() { return Reloj.Elapsed.TotalSeconds; }
 
     public static void Publicar(Muestra m)
     {
-        lock (Candado) { ultima = m; recibida = Ahora(); }
+        lock (Candado)
+        {
+            ultima = m;
+            recibida = Ahora();
+            Historial.Add(m);
+            var viejas = 0;
+            while (viejas < Historial.Count && Historial[viejas].T < m.T - GuardarSeg) viejas++;
+            if (viejas > 0) Historial.RemoveRange(0, viejas);
+        }
     }
 
     static void Main(string[] args)
@@ -144,7 +155,7 @@ static class LectorInstructor
                     Responder(flujo, "204 No Content", extra.ToString(), null);
                 }
                 else if (partes[0] == "GET" && partes[1].Split('?')[0] == "/muestra")
-                    Responder(flujo, "200 OK", extra.ToString(), Estado());
+                    Responder(flujo, "200 OK", extra.ToString(), Estado(Desde(partes[1])));
                 else
                     Responder(flujo, "404 Not Found", extra.ToString(), null);
             }
@@ -169,13 +180,35 @@ static class LectorInstructor
         return null;
     }
 
-    static string Estado()
+    // "?desde=12.3" -> 12.3; sin el parametro, NaN (no manda historial).
+    static double Desde(string ruta)
+    {
+        var q = ruta.IndexOf("?desde=", StringComparison.Ordinal);
+        double d;
+        if (q < 0 || !double.TryParse(ruta.Substring(q + 7).Split('&')[0], NumberStyles.Float, CultureInfo.InvariantCulture, out d)) return double.NaN;
+        return d;
+    }
+
+    static string Estado(double desde)
     {
         lock (Candado)
         {
             // Sin muestra nueva en 2 s: el simulador se cerro, se pauso el envio o se perdio la conexion.
             var conectado = ultima != null && Ahora() - recibida < 2;
-            return "{\"conectado\":" + (conectado ? "true" : "false") + ",\"muestra\":" + (conectado ? ultima.Json() : "null") + "}";
+            var sb = new StringBuilder("{\"conectado\":").Append(conectado ? "true" : "false")
+                .Append(",\"muestra\":").Append(conectado ? ultima.Json() : "null").Append(",\"muestras\":[");
+            if (conectado && !double.IsNaN(desde))
+            {
+                var primera = true;
+                foreach (var m in Historial)
+                {
+                    if (m.T <= desde) continue;
+                    if (!primera) sb.Append(',');
+                    sb.Append(m.Json());
+                    primera = false;
+                }
+            }
+            return sb.Append("]}").ToString();
         }
     }
 

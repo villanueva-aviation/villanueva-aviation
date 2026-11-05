@@ -224,10 +224,17 @@ function resultado(lados: ResultadoLado[], refs: Muestra[], historial: Muestra[]
   };
 }
 
+/** Las muestras que juntó el lector desde la última lectura, en orden. */
+export function avanzarLote(ev: Evaluacion, muestras: Muestra[]): Evaluacion {
+  return muestras.reduce(avanzar, ev);
+}
+
 /** Pura: devuelve una evaluación nueva sin tocar la anterior (useReducer la puede llamar dos veces). */
 export function avanzar(ev: Evaluacion, m: Muestra): Evaluacion {
   if (ev.fase === "terminado" || ev.fase === "invalido") return ev;
   const i = ev.interno;
+  // Repetida o vieja (los lotes del lector se enciman): ya se contó.
+  if (i.previo && m.t <= i.previo.t) return ev;
   const motivo = invalidez(m, i.previo);
   if (motivo) return { fase: "invalido", motivo, interno: i };
 
