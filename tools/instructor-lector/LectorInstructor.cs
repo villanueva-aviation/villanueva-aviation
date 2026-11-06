@@ -32,12 +32,12 @@ class Muestra
 
     public Muestra Copia() { return (Muestra)MemberwiseClone(); }
 
-    static string N(double x) { return x.ToString("0.###", CultureInfo.InvariantCulture); }
-    static string N6(double x) { return x.ToString("0.######", CultureInfo.InvariantCulture); }
+    public static string N(double x) { return x.ToString("0.###", CultureInfo.InvariantCulture); }
+    public static string N6(double x) { return x.ToString("0.######", CultureInfo.InvariantCulture); }
     static string N2(double x) { return x.ToString("0.##", CultureInfo.InvariantCulture); }
     static string B(bool x) { return x ? "true" : "false"; }
 
-    static string Texto(string s)
+    public static string Texto(string s)
     {
         var sb = new StringBuilder("\"");
         foreach (var c in s)
@@ -99,6 +99,10 @@ static class LectorInstructor
     // Ultimos 120 s: si Chrome frena la pagina (pestana oculta o ventana tapada por MSFS), la pagina pide lo que le falto.
     static readonly List<Muestra> Historial = new List<Muestra>();
     const double GuardarSeg = 120;
+    static string aeropuerto; // JSON del aeropuerto mas cercano; null mientras no llega
+
+    public static void PonerAeropuerto(string json) { lock (Candado) aeropuerto = json; }
+    public static Muestra Ultima() { lock (Candado) return ultima; }
 
     public static double Ahora() { return Reloj.Elapsed.TotalSeconds; }
 
@@ -161,7 +165,14 @@ static class LectorInstructor
         var v = new Muestra { Lat = 20.52, Xpdr = "1200", Com1 = 118.1, Motor = true }.Json();
         var json14 = v.Contains("\"lat\":20.52") && v.Contains("\"xpdr\":\"1200\"") && v.Contains("\"com1\":118.1") && v.Contains("\"motor\":true");
         Console.WriteLine(json14 ? "Json v1.4: OK" : "Json v1.4: FALLA");
-        return ok && edge && banderas && puerto && json && json14 ? 0 : 1;
+
+        // v1.4: el aeropuerto va en la raiz de /muestra; null mientras no llega.
+        var sinAeropuerto = Estado(double.NaN).Contains("\"aeropuerto\":null");
+        PonerAeropuerto("{\"icao\":\"MMGL\"}");
+        var aeropuerto = sinAeropuerto && Estado(double.NaN).Contains("\"aeropuerto\":{\"icao\":\"MMGL\"}");
+        PonerAeropuerto(null);
+        Console.WriteLine(aeropuerto ? "Aeropuerto: OK" : "Aeropuerto: FALLA");
+        return ok && edge && banderas && puerto && json && json14 && aeropuerto ? 0 : 1;
     }
 
     // Lo que pasaba: Edge heredaba el puerto del lector y, si el lector se cerraba, nadie podia volver a usarlo.
@@ -389,7 +400,7 @@ static class LectorInstructor
                     primera = false;
                 }
             }
-            return sb.Append("]}").ToString();
+            return sb.Append("],\"aeropuerto\":").Append(aeropuerto ?? "null").Append('}').ToString();
         }
     }
 
@@ -564,8 +575,47 @@ static class Simulado
 
 static class Sim
 {
-    enum Def { Vuelo, Titulo }
-    enum Req { Vuelo, Titulo }
+    enum Def { Vuelo, Titulo, Aeropuerto }
+    enum Req { Vuelo, Titulo, Aeropuertos, DatosAeropuerto }
+
+    // Aeropuerto mas cercano, en el orden de CamposAeropuerto. Unidades del SDK: metros y Hz.
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+    struct DatoAeropuerto { public double Lat, Lon, Alt; [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string Nombre; }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct DatoPista { public double Lat, Lon, Alt; public float Rumbo, Largo, Ancho; public int N1, D1, N2, D2; }
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
+    struct DatoFrecuencia { public int Tipo, Hz; [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)] public string Nombre; }
+
+    static readonly string[] CamposAeropuerto =
+    {
+        "OPEN AIRPORT", "LATITUDE", "LONGITUDE", "ALTITUDE", "NAME",
+        "OPEN RUNWAY", "LATITUDE", "LONGITUDE", "ALTITUDE", "HEADING", "LENGTH", "WIDTH",
+        "PRIMARY_NUMBER", "PRIMARY_DESIGNATOR", "SECONDARY_NUMBER", "SECONDARY_DESIGNATOR", "CLOSE RUNWAY",
+        "OPEN FREQUENCY", "TYPE", "FREQUENCY", "NAME", "CLOSE FREQUENCY", "CLOSE AIRPORT",
+    };
+
+    static string JsonAeropuerto(string icao, DatoAeropuerto a, List<DatoPista> pistas, List<DatoFrecuencia> frecuencias)
+    {
+        var sb = new StringBuilder("{\"icao\":").Append(Muestra.Texto(icao)).Append(",\"nombre\":").Append(Muestra.Texto(a.Nombre ?? ""))
+            .Append(",\"lat\":").Append(Muestra.N6(a.Lat)).Append(",\"lon\":").Append(Muestra.N6(a.Lon)).Append(",\"altM\":").Append(Muestra.N(a.Alt))
+            .Append(",\"pistas\":[");
+        for (var i = 0; i < pistas.Count; i++)
+        {
+            var p = pistas[i];
+            if (i > 0) sb.Append(',');
+            sb.Append("{\"lat\":").Append(Muestra.N6(p.Lat)).Append(",\"lon\":").Append(Muestra.N6(p.Lon)).Append(",\"rumboV\":").Append(Muestra.N(p.Rumbo))
+                .Append(",\"largoM\":").Append(Muestra.N(p.Largo)).Append(",\"anchoM\":").Append(Muestra.N(p.Ancho))
+                .Append(",\"n1\":").Append(p.N1).Append(",\"d1\":").Append(p.D1).Append(",\"n2\":").Append(p.N2).Append(",\"d2\":").Append(p.D2).Append('}');
+        }
+        sb.Append("],\"frecuencias\":[");
+        for (var i = 0; i < frecuencias.Count; i++)
+        {
+            var f = frecuencias[i];
+            if (i > 0) sb.Append(',');
+            sb.Append("{\"tipo\":").Append(f.Tipo).Append(",\"hz\":").Append(f.Hz).Append(",\"nombre\":").Append(Muestra.Texto(f.Nombre ?? "")).Append('}');
+        }
+        return sb.Append("]}").ToString();
+    }
 
     static readonly string[][] Vars =
     {
@@ -662,8 +712,66 @@ static class Sim
                 Microsoft.FlightSimulator.SimConnect.SIMCONNECT_PERIOD.VISUAL_FRAME, Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_REQUEST_FLAG.DEFAULT, 0, 4, 0);
             sim.RequestDataOnSimObject(Req.Titulo, Def.Titulo, Microsoft.FlightSimulator.SimConnect.SimConnect.SIMCONNECT_OBJECT_ID_USER,
                 Microsoft.FlightSimulator.SimConnect.SIMCONNECT_PERIOD.VISUAL_FRAME, Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_REQUEST_FLAG.DEFAULT, 0, 4, 0);
+            // Aeropuerto mas cercano: la lista del simulador cada 30 s; los datos solo cuando cambia.
+            var cercanos = new List<Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_FACILITY_AIRPORT>();
+            string icaoActual = null, icaoPedido = null;
+            var datoAeropuerto = new DatoAeropuerto();
+            var pistas = new List<DatoPista>();
+            var frecuencias = new List<DatoFrecuencia>();
+            var conAeropuertos = true;
+            try
+            {
+                foreach (var campo in CamposAeropuerto) sim.AddToFacilityDefinition(Def.Aeropuerto, campo);
+                sim.RegisterFacilityDataDefineStruct<DatoAeropuerto>(Microsoft.FlightSimulator.SimConnect.SIMCONNECT_FACILITY_DATA_TYPE.AIRPORT);
+                sim.RegisterFacilityDataDefineStruct<DatoPista>(Microsoft.FlightSimulator.SimConnect.SIMCONNECT_FACILITY_DATA_TYPE.RUNWAY);
+                sim.RegisterFacilityDataDefineStruct<DatoFrecuencia>(Microsoft.FlightSimulator.SimConnect.SIMCONNECT_FACILITY_DATA_TYPE.FREQUENCY);
+            }
+            catch (Exception e) { conAeropuertos = false; Console.WriteLine("Sin datos de aeropuerto: " + e.Message); }
+            sim.OnRecvAirportList += (s, d) =>
+            {
+                if (d.dwEntryNumber == 0) cercanos.Clear();
+                foreach (var o in d.rgData) cercanos.Add((Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_FACILITY_AIRPORT)o);
+                if (d.dwEntryNumber + 1 < d.dwOutOf) return;
+                var m = LectorInstructor.Ultima();
+                if (m == null || cercanos.Count == 0 || icaoPedido != null) return;
+                var cos = Math.Cos(m.Lat * Math.PI / 180);
+                Func<Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_FACILITY_AIRPORT, double> dist = a =>
+                    Math.Pow(a.Latitude - m.Lat, 2) + Math.Pow((a.Longitude - m.Lon) * cos, 2);
+                var mejor = cercanos[0];
+                foreach (var a in cercanos) if (dist(a) < dist(mejor)) mejor = a;
+                if (mejor.Ident == icaoActual) return;
+                icaoPedido = mejor.Ident;
+                pistas.Clear();
+                frecuencias.Clear();
+                try { sim.RequestFacilityData(Def.Aeropuerto, Req.DatosAeropuerto, mejor.Ident, mejor.Region ?? ""); }
+                catch (Exception e) { Console.WriteLine("No se pudo pedir " + mejor.Ident + ": " + e.Message); icaoPedido = null; }
+            };
+            sim.OnRecvFacilityData += (s, d) =>
+            {
+                var dato = d.Data[0];
+                if (d.Type == (uint)Microsoft.FlightSimulator.SimConnect.SIMCONNECT_FACILITY_DATA_TYPE.AIRPORT) datoAeropuerto = (DatoAeropuerto)dato;
+                else if (d.Type == (uint)Microsoft.FlightSimulator.SimConnect.SIMCONNECT_FACILITY_DATA_TYPE.RUNWAY) pistas.Add((DatoPista)dato);
+                else if (d.Type == (uint)Microsoft.FlightSimulator.SimConnect.SIMCONNECT_FACILITY_DATA_TYPE.FREQUENCY) frecuencias.Add((DatoFrecuencia)dato);
+            };
+            sim.OnRecvFacilityDataEnd += (s, d) =>
+            {
+                if (icaoPedido == null) return;
+                icaoActual = icaoPedido;
+                icaoPedido = null;
+                LectorInstructor.PonerAeropuerto(JsonAeropuerto(icaoActual, datoAeropuerto, pistas, frecuencias));
+                Console.WriteLine("Aeropuerto: " + icaoActual + " (" + pistas.Count + " pistas, " + frecuencias.Count + " frecuencias)");
+            };
+            double ultimaLista = -100;
             while (abierto)
+            {
                 if (senal.WaitOne(10000)) sim.ReceiveMessage();
+                if (conAeropuertos && LectorInstructor.Ultima() != null && LectorInstructor.Ahora() - ultimaLista > 30)
+                {
+                    ultimaLista = LectorInstructor.Ahora();
+                    try { sim.RequestFacilitiesList(Microsoft.FlightSimulator.SimConnect.SIMCONNECT_FACILITY_LIST_TYPE.AIRPORT, Req.Aeropuertos); }
+                    catch (Exception e) { Console.WriteLine("Lista de aeropuertos: " + e.Message); }
+                }
+            }
         }
     }
 }
