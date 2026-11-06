@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Muestra } from "./evaluador.ts";
+import { LECTOR_INICIAL, recibir } from "./lector.ts";
 
 const URL_LECTOR = "http://127.0.0.1:8766/muestra";
 const CADA_MS = 100;
@@ -20,21 +21,21 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): { estado: 
   useEffect(() => {
     let vivo = true;
     let timer: number | undefined;
-    let desde: number | null = null;
+    let lectura = LECTOR_INICIAL;
 
     const leer = async () => {
       try {
-        const url = desde === null ? URL_LECTOR : `${URL_LECTOR}?desde=${desde}`;
+        const url = lectura.desde === null ? URL_LECTOR : `${URL_LECTOR}?desde=${lectura.desde}`;
         const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(2000) });
         const json = (await res.json()) as { conectado: boolean; muestra: Muestra | null; muestras?: Muestra[] };
         if (!vivo) return;
         setEstado(json.conectado && json.muestra ? "conectado" : "sin-simulador");
         if (json.muestra) {
-          const lote = (json.muestras?.length ? json.muestras : [json.muestra]).filter((m) => desde === null || m.t > desde);
-          if (lote.length) {
-            desde = lote[lote.length - 1].t;
-            callback.current?.(lote);
-            setMuestra(lote[lote.length - 1]);
+          const r = recibir(lectura, json.muestra, json.muestras ?? [], Date.now());
+          lectura = r.estado;
+          if (r.lote.length) {
+            callback.current?.(r.lote);
+            setMuestra(r.lote[r.lote.length - 1]);
           }
         }
       } catch {
