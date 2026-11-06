@@ -35,10 +35,38 @@ export interface Muestra {
   perdida?: boolean; // aviso de pérdida sonando
   flaps?: number; // índice de la palanca, 0 = arriba
   rpm?: number;
+  // Desde el lector v1.4, para el vuelo completo. rumboV y vientoDir: verdaderos. mezcla y acelerador: 0–100. altimetro y qnh: inHg.
+  lat?: number;
+  lon?: number;
+  gs?: number; // kt sobre el suelo
+  rumboV?: number;
+  motor?: boolean;
+  mezcla?: number;
+  acelerador?: number;
+  magIzq?: boolean;
+  magDer?: boolean;
+  master?: boolean;
+  luzBeacon?: boolean;
+  luzNav?: boolean;
+  luzAterrizaje?: boolean;
+  luzStrobe?: boolean;
+  luzTaxi?: boolean;
+  freno?: boolean; // freno de estacionamiento
+  xpdr?: string; // "1200"
+  xpdrModo?: number;
+  altimetro?: number;
+  qnh?: number;
+  com1?: number; // MHz
+  tren?: boolean;
+  vientoDir?: number;
+  vientoKt?: number;
 }
 
 /** Un lector anterior a v1.3 no manda el aviso de pérdida: el vuelo lento no se puede calificar. */
 export const lectorViejo = (m: Muestra) => m.perdida === undefined;
+
+/** Un lector anterior a v1.4 no manda la posición: no se puede seguir un vuelo completo. */
+export const lectorViejoVuelo = (m: Muestra) => m.lat === undefined;
 
 export type Fase = "armado" | "viraje1" | "entre" | "viraje2" | "terminado" | "invalido";
 export type Lado = "izquierda" | "derecha";
