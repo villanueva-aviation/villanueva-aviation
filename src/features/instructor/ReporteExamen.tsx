@@ -1,7 +1,6 @@
-import type { Resultado } from "./evaluador.ts";
 import { textosReporte, type Idioma } from "./idiomaInstructor.ts";
+import { MANIOBRAS, type DefManiobra, type ResultadoComun } from "./maniobras.ts";
 import { folio, type IntentoManiobra } from "./reglasIntentos.ts";
-import { ELEMENTOS_ACS } from "./virajeEscarpado.ts";
 
 export { AVISO_REPORTE } from "./idiomaInstructor.ts";
 
@@ -18,15 +17,20 @@ export function ReporteExamen({
   nombre,
   numero,
   idioma = "es",
+  def = MANIOBRAS["viraje-escarpado"],
+  calificado = "checkride",
 }: {
-  resultado: Pick<Resultado, "aprobado" | "calificacion" | "elementos">;
+  resultado: Pick<ResultadoComun, "aprobado" | "calificacion" | "elementos">;
   intento: IntentoManiobra | null;
   nombre: string;
   numero?: number;
   idioma?: Idioma;
+  def?: DefManiobra;
+  /** "intento": maniobras fuera del ACS, sin la palabra checkride. */
+  calificado?: "checkride" | "intento";
 }) {
-  const t = textosReporte(idioma);
-  const ns = ELEMENTOS_ACS.filter((e) => resultado.elementos[e.codigo] === "NS").map((e) => e.codigo);
+  const t = textosReporte(idioma, calificado);
+  const ns = def.elementosReporte.filter((e) => resultado.elementos[e.codigo] === "NS").map((e) => e.codigo);
   const gris = "text-[#6b6457]";
   return (
     <article className="reporte-examen mx-auto max-w-xl rounded-lg bg-[#f6f3ea] p-5 font-serif text-[13px] leading-snug text-[#1d1f22] sm:p-6">
@@ -56,10 +60,10 @@ export function ReporteExamen({
           </>
         )}
       </dl>
-      <p className="mb-1 font-bold">{t.tarea}</p>
+      <p className="mb-1 font-bold">{def.tarea[idioma]}</p>
       <table className="w-full border-collapse text-xs">
         <tbody>
-          {ELEMENTOS_ACS.map((e) => (
+          {def.elementosReporte.map((e) => (
             <tr key={e.codigo} className="border-b border-[#c9c1ae] last:border-0">
               <td className="py-1 pr-2 whitespace-nowrap">{e.codigo}</td>
               <td className="py-1 pr-2">{idioma === "en" ? e.textoEn : e.texto}</td>

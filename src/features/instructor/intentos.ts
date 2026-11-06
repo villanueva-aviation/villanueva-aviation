@@ -1,6 +1,6 @@
 import { supabase } from "../../lib/supabaseClient";
-import type { Resultado } from "./evaluador.ts";
-import { paraGuardar, type IntentoManiobra } from "./reglasIntentos.ts";
+import type { ResultadoComun } from "./maniobras.ts";
+import type { IntentoManiobra } from "./reglasIntentos.ts";
 
 const COLUMNAS =
   "id, user_id, maniobra, avion, modo, calificacion, aprobado, elementos, detalle, revision, revisado_at, created_at, sesion_id";
@@ -16,7 +16,9 @@ export async function guardarIntento(input: {
   maniobra: string;
   avion: string;
   modo: "practica" | "checkride";
-  resultado: Resultado;
+  resultado: ResultadoComun;
+  /** Lo que se guarda en `detalle`: `def.paraGuardar(resultado)`. */
+  detalle: object;
   /** Solo desde la sesión del programa. */
   sesionId?: string;
 }): Promise<{ id: string | null; error: string | null }> {
@@ -33,7 +35,7 @@ export async function guardarIntento(input: {
       calificacion: r.calificacion,
       aprobado: r.aprobado,
       elementos: r.elementos,
-      detalle: paraGuardar(r),
+      detalle: input.detalle,
       ...(input.sesionId ? { sesion_id: input.sesionId } : {}),
     })
     .select("id")

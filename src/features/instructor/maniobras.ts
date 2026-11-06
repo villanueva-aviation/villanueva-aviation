@@ -59,7 +59,7 @@ const defViraje: DefManiobra<Evaluacion, Resultado> = {
   id: "viraje-escarpado",
   insignia: "maniobra-viraje-escarpado-c172",
   avion: "C172",
-  titulo: { es: "Viraje escarpado C172", en: "Steep turn C172" },
+  titulo: { es: "Viraje escarpado C172", en: "C172 steep turn" },
   tarea: { es: textosReporte("es").tarea, en: textosReporte("en").tarea },
   elementosReporte: ELEMENTOS_ACS,
   celdas: [celda("altitud", "Altitud", "Altitude"), celda("velocidad", "Velocidad", "Airspeed"), celda("inclinacion", "Inclinación", "Bank"), celda("bola", "Bola", "Ball")],
@@ -88,7 +88,7 @@ const defRecto: DefManiobra<EvaluacionRecto, ResultadoRecto> = {
   id: "recto-nivelado",
   insignia: "maniobra-recto-nivelado-c172",
   avion: "C172",
-  titulo: { es: "Recto y nivelado C172", en: "Straight and level C172" },
+  titulo: { es: "Recto y nivelado C172", en: "C172 straight and level" },
   tarea: { es: "Práctica · Recto y nivelado", en: "Practice · Straight and level" },
   elementosReporte: [
     { codigo: "1", texto: `Mantiene la altitud ±${TOL.altitudFt} ft`, textoEn: `Maintains altitude ±${TOL.altitudFt} ft` },

@@ -2,20 +2,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Check, Volume2, VolumeX } from "lucide-react";
 import { Button } from "../components/ui/Button";
-import { MATERIAL_VIRAJE } from "../data/materialInstructor";
+import { MATERIAL_RECTO, MATERIAL_VIRAJE } from "../data/materialInstructor";
 import { useAuth } from "../features/auth/AuthContext";
 import { ACTIVIDADES, estadoActividad } from "../features/instructor/actividades";
 import { BANCO } from "../features/instructor/bancoPreguntas";
-import { calificarRespuesta, lineasPreguntas, siguientePregunta, type Pregunta, type Tema } from "../features/instructor/preguntas";
+import { calificarRespuesta, lineasPreguntas, siguientePregunta, type Pregunta } from "../features/instructor/preguntas";
 import { useEscucha } from "../features/instructor/useEscucha";
 import { usePremiumAccess } from "../features/payments/usePremiumAccess";
 import { ROUTES } from "../lib/routes";
-import { briefing, debriefing, listaPasos, queHacer, vozDebriefing } from "../features/instructor/briefing";
+import { debriefing, vozDebriefing } from "../features/instructor/briefing";
 import { Explicacion } from "../features/instructor/ExplicacionInstructor";
-import { HojaCheckride } from "../features/instructor/HojaCheckride";
 import { PruebaMicrofono } from "../features/instructor/PruebaMicrofono";
 import type { Idioma } from "../features/instructor/idiomaInstructor";
-import { defDe, lecturaFinalDe } from "../features/instructor/maniobras";
+import { defDe, lecturaFinalDe, type ManiobraId } from "../features/instructor/maniobras";
+import { HOJA } from "../features/instructor/vistasManiobra";
 import { puedeMandar } from "../features/instructor/reglasIntentos";
 import { ReporteExamen } from "../features/instructor/ReporteExamen";
 import {
@@ -30,29 +30,15 @@ import {
   type IntentoSesion,
   type Sesion,
 } from "../features/instructor/sesion";
-import { useIntentoViraje } from "../features/instructor/useIntentoViraje";
+import { useIntento } from "../features/instructor/useIntento";
 import { useVoz } from "../features/instructor/useVoz";
-import {
-  avisoVoz,
-  filtrarAviso,
-  MEMORIA_VACIA,
-  ordenVoz,
-  paraVoz,
-  pasoVoz,
-  semaforo,
-  textoEspera,
-  textoPaso,
-  type CampoAviso,
-  type Luz,
-  type MemoriaAviso,
-  type PasoVoz,
-} from "../features/instructor/voz";
+import { filtrarAviso, MEMORIA_VACIA, paraVoz, textoEspera, type Luz, type MemoriaAviso } from "../features/instructor/voz";
 
 const CLAVE_IDIOMA = "instructor-idioma";
 
 const T = {
   es: {
-    titulo: "Instructor virtual · Viraje escarpado C172",
+    titulo: (m: string) => `Instructor virtual · ${m}`,
     elegir: "¿En qué idioma quieres tu sesión?",
     menu: "¿Qué quieres practicar hoy?",
     acceso: { gratis: "Gratis", exclusivo: "Exclusivo", proximamente: "Próximamente" },
@@ -61,9 +47,8 @@ const T = {
     bloques: { briefing: "Briefing", preparacion: "Preparación", practica: "Práctica", checkride: "Checkride", debriefing: "Debriefing", cierre: "Cierre" },
     min: "min",
     estado: { conectado: "Conectado a MSFS", "sin-simulador": "Abre MSFS 2020 con el C172", "sin-lector": "No encuentro el lector: ábrelo otra vez" },
-    celdas: { altitud: "Altitud", velocidad: "Velocidad", inclinacion: "Inclinación", bola: "Bola" },
     listo: "Listo, empiezo",
-    pasar: "Pasar al checkride",
+    pasar: (c: string) => `Pasar al ${c}`,
     otro: "Otro intento",
     unoMas: "Un intento más",
     siguiente: "Siguiente",
@@ -77,7 +62,7 @@ const T = {
     reintentar: "Reintentar guardar",
     mandar: "Mandar a revisión",
     mandado: "Mandado. Erik lo revisa para tu insignia.",
-    sinCheckride: "Esta sesión no tuvo checkride.",
+    sinCheckride: (c: string) => `Esta sesión no tuvo ${c}.`,
     voz: "Voz",
     vozNombre: "Voz del instructor",
     velocidad: "Velocidad",
@@ -93,7 +78,7 @@ const T = {
     micApagado: "No se pudo usar el micrófono: las preguntas se apagaron.",
   },
   en: {
-    titulo: "Virtual instructor · C172 steep turn",
+    titulo: (m: string) => `Virtual instructor · ${m}`,
     elegir: "Which language do you want for your session?",
     menu: "What do you want to practice today?",
     acceso: { gratis: "Free", exclusivo: "Exclusive", proximamente: "Coming soon" },
@@ -102,9 +87,8 @@ const T = {
     bloques: { briefing: "Briefing", preparacion: "Preparation", practica: "Practice", checkride: "Checkride", debriefing: "Debriefing", cierre: "Wrap-up" },
     min: "min",
     estado: { conectado: "Connected to MSFS", "sin-simulador": "Open MSFS 2020 with the C172", "sin-lector": "Can't find the reader: open it again" },
-    celdas: { altitud: "Altitude", velocidad: "Airspeed", inclinacion: "Bank", bola: "Ball" },
     listo: "Ready, let's start",
-    pasar: "Move on to the checkride",
+    pasar: (c: string) => `Move on to the ${c}`,
     otro: "Another attempt",
     unoMas: "One more attempt",
     siguiente: "Next",
@@ -118,7 +102,7 @@ const T = {
     reintentar: "Retry saving",
     mandar: "Send for review",
     mandado: "Sent. Erik reviews it for your badge.",
-    sinCheckride: "This session had no checkride.",
+    sinCheckride: (c: string) => `This session had no ${c}.`,
     voz: "Voice",
     vozNombre: "Instructor voice",
     velocidad: "Speed",
@@ -142,9 +126,9 @@ const COLOR: Record<Luz, string> = {
   rojo: "border-red-500/50 bg-red-500/20 text-red-200",
 };
 const COLOR_ESTADO = { conectado: "text-emerald-300", "sin-simulador": "text-gold-300", "sin-lector": "text-red-300" } as const;
-const CAMPOS: CampoAviso[] = ["altitud", "velocidad", "inclinacion", "bola"];
 const EN_VUELO: Bloque[] = ["preparacion", "practica", "checkride"];
-const TEMAS: Tema[] = ["viraje-escarpado", "c172"];
+const MATERIAL: Record<ManiobraId, typeof MATERIAL_VIRAJE> = { "viraje-escarpado": MATERIAL_VIRAJE, "recto-nivelado": MATERIAL_RECTO };
+const mayus = (s: string) => `${s[0].toUpperCase()}${s.slice(1)}`;
 
 function leerIdioma(): Idioma {
   try {
@@ -172,6 +156,9 @@ export function InstructorPrograma() {
   const dichoRef = useRef<(textos: string[], tipo: "orden" | "final") => void>(() => {});
   const vozRef = useRef<{ detalle: "detallado" | "necesario" }>({ detalle: "detallado" });
   const preguntarRef = useRef<() => void>(() => {});
+  const def = defDe(sesion.actividad);
+  const calificado = ACTIVIDADES.find((a) => a.id === sesion.actividad)?.calificado ?? { es: "checkride", en: "checkride" };
+  const c = calificado[idioma];
 
   /** Avanza la sesión y dice lo que la sesión pide decir. */
   const evento = useCallback(
@@ -194,27 +181,27 @@ export function InstructorPrograma() {
       const detallado = vozRef.current.detalle === "detallado";
       if (i.modo === "practica") {
         const n = despues.intentos.filter((x) => x.modo === "practica").length;
-        const comentario = comentarioIntento(i, n, idioma);
+        const comentario = comentarioIntento(i, n, idioma, def.explicar);
         dichoRef.current([paraVoz(detallado ? comentario : comentario.split(". ")[0] + ".", idioma)], "orden");
         preguntarRef.current();
       } else {
-        const lectura = lecturaFinalDe(defDe("viraje-escarpado"), i.resultado, idioma);
+        const lectura = lecturaFinalDe(def, i.resultado, idioma);
         dichoRef.current(detallado ? lectura : lectura.slice(0, 1), "final");
       }
     },
-    [evento, idioma],
+    [evento, idioma, def],
   );
 
   const enVuelo = EN_VUELO.includes(sesion.bloque);
   const {
     estado, muestra, modoIntento, ev, resultado, anulado, reiniciar, guardado, guardar, intento, numero, mandar, envio,
-  } = useIntentoViraje({ sesionId: sesion.id, modoFijo: modoDelBloque(sesion.bloque), arma: armaEnBloque(sesion.bloque), alTerminar });
+  } = useIntento(def, { sesionId: sesion.id, modoFijo: modoDelBloque(sesion.bloque), arma: armaEnBloque(sesion.bloque), alTerminar });
 
-  const pasoAntes = useRef<PasoVoz | null>(null);
+  const pasoAntes = useRef<string | null>(null);
   const memoria = useRef<MemoriaAviso>(MEMORIA_VACIA);
-  const paso = enVuelo ? pasoVoz(ev, muestra) : null;
-  const luces = semaforo(enVuelo ? ev : null, muestra);
-  const avisoCrudo = enVuelo ? avisoVoz(ev, muestra, modoIntento, idioma) : null;
+  const paso = enVuelo ? def.paso(ev, muestra) : null;
+  const luces = def.semaforo(enVuelo ? ev : null, muestra);
+  const avisoCrudo = enVuelo ? def.aviso(ev, muestra, modoIntento, idioma) : null;
   const avisoActual = useRef(avisoCrudo);
   avisoActual.current = avisoCrudo;
   const voz = useVoz(idioma, () => avisoActual.current?.clave ?? null);
@@ -236,7 +223,7 @@ export function InstructorPrograma() {
     const s = sesionRef.current;
     if (!voz.preguntas || s.bloque === "checkride" || escucha.fase !== "inactivo") return;
     if (!escucha.supported) return apagarPreguntas();
-    const p = siguientePregunta(BANCO, TEMAS, s.respondidas.map((r) => r.id));
+    const p = siguientePregunta(BANCO, defDe(s.actividad).temas, s.respondidas.map((r) => r.id));
     if (!p) return;
     setPregunta(p);
     escucha.escuchar(paraVoz(p[idioma].pregunta, idioma), "orden", "pregunta", (texto, error) => {
@@ -260,22 +247,22 @@ export function InstructorPrograma() {
 
   // El primer armado en la preparación abre la práctica.
   useEffect(() => {
-    if (sesion.bloque === "preparacion" && ev?.fase === "armado") evento({ tipo: "armado" });
-  }, [sesion.bloque, ev?.fase, evento]);
+    if (sesion.bloque === "preparacion" && ev && def.fase(ev) === "armado") evento({ tipo: "armado" });
+  }, [sesion.bloque, ev, def, evento]);
 
   // Lo que se lee al entrar a cada bloque.
-  const deb = debriefing(sesion.intentos, MATERIAL_VIRAJE, idioma, sesion.respondidas);
+  const deb = debriefing(sesion.intentos, MATERIAL[def.id], idioma, sesion.respondidas, { masFallado: def.masFallado, repetir: def.repetir, calificado });
   const bloqueAntes = useRef<Bloque | null>(null);
   const debriefEmpezo = useRef(false);
   useEffect(() => {
     if (bloqueAntes.current === sesion.bloque) return;
     bloqueAntes.current = sesion.bloque;
-    if (sesion.bloque === "briefing") decir(briefing(idioma).map((x) => paraVoz(x, idioma)), "orden");
+    if (sesion.bloque === "briefing") decir(def.briefing(idioma).map((x) => paraVoz(x, idioma)), "orden");
     if (sesion.bloque === "debriefing") {
       debriefEmpezo.current = false;
       decir(vozDebriefing(deb.lineas, sesion.intentos, voz.detalle).map((x) => paraVoz(x, idioma)), "final");
     }
-  }, [sesion.bloque, decir, idioma, deb.lineas, sesion.intentos, voz.detalle]);
+  }, [sesion.bloque, decir, idioma, deb.lineas, sesion.intentos, voz.detalle, def]);
 
   // Al terminar la lectura del debriefing pasa al cierre.
   useEffect(() => {
@@ -289,13 +276,13 @@ export function InstructorPrograma() {
     const antes = pasoAntes.current;
     pasoAntes.current = paso;
     if (!enVuelo || paso === "terminado") return;
-    const orden = ordenVoz(antes, paso, ev, idioma);
+    const orden = def.orden(antes, paso, ev, idioma);
     if (orden) decir(paraVoz(orden, idioma), paso === "invalido" ? "anulado" : "orden", "paso");
     if (!muestra) return;
     const filtrado = filtrarAviso(memoria.current, aviso, muestra.t);
     memoria.current = filtrado.mem;
     if (filtrado.decir && aviso) decir(paraVoz(filtrado.decir, idioma), "aviso", aviso.clave);
-  }, [enVuelo, paso, ev, muestra, aviso, decir, idioma]);
+  }, [enVuelo, paso, ev, muestra, aviso, decir, idioma, def]);
 
   // Va después del efecto de las órdenes para que la pregunta quede detrás de la orden del paso.
   useEffect(() => {
@@ -323,7 +310,7 @@ export function InstructorPrograma() {
 
   const pasarCheckride = () => {
     evento({ tipo: "pasar-checkride" });
-    if (ev?.fase !== "armado") reiniciar();
+    if (!ev || def.fase(ev) !== "armado") reiniciar();
   };
 
   const practicas = sesion.intentos.filter((i) => i.modo === "practica").length;
@@ -395,18 +382,19 @@ export function InstructorPrograma() {
   }
 
   const guia = GUIA_MIN[sesion.bloque];
+  const Hoja = HOJA[def.id];
 
   return (
     <div className="mx-auto max-w-xl space-y-4 px-4 py-4">
       <header className="space-y-2">
         <div className="flex items-baseline justify-between gap-3">
-          <h1 className="font-display text-base font-bold text-white">{t.titulo}</h1>
+          <h1 className="font-display text-base font-bold text-white">{t.titulo(def.titulo[idioma])}</h1>
           <span className={`text-xs ${COLOR_ESTADO[estado]}`}>{t.estado[estado]}</span>
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
           <span className="font-mono text-lg font-bold text-gold-300">{reloj(transcurrido)}</span>
           <span className="text-white/80">
-            {t.bloques[sesion.bloque]} · {t.min} {guia[0]}–{guia[1]}
+            {sesion.bloque === "checkride" ? mayus(c) : t.bloques[sesion.bloque]} · {t.min} {guia[0]}–{guia[1]}
           </span>
         </div>
         <details className="rounded-lg border border-white/10 bg-navy-900/60 px-3 py-2 text-sm text-white/70">
@@ -473,7 +461,7 @@ export function InstructorPrograma() {
       {sesion.bloque === "briefing" && (
         <section className="space-y-4 rounded-xl border border-white/10 bg-navy-950/60 p-5">
           <ol className="list-decimal space-y-2 pl-5 text-sm leading-relaxed text-white/85">
-            {briefing(idioma).map((l) => (
+            {def.briefing(idioma).map((l) => (
               <li key={l}>{l}</li>
             ))}
           </ol>
@@ -492,7 +480,7 @@ export function InstructorPrograma() {
       {enVuelo && (
         <>
           <ol className="flex flex-wrap gap-1.5 text-xs">
-            {listaPasos(paso, idioma).map((p, k) => (
+            {def.pasos(paso, idioma).map((p, k) => (
               <li
                 key={k}
                 className={`rounded-full border px-2.5 py-1 ${p.estado === "actual" ? "border-gold-500 bg-gold-500/20 font-semibold text-gold-100" : p.estado === "hecho" ? "border-emerald-500/40 text-emerald-200" : "border-white/10 text-white/40"}`}
@@ -505,18 +493,18 @@ export function InstructorPrograma() {
 
           <section className="rounded-xl border border-white/10 bg-navy-950/60 p-5" aria-live="polite">
             <p className="font-display text-2xl font-bold leading-snug text-white">
-              {ev && ev.fase !== "invalido" ? textoPaso(paso, idioma) : estado === "conectado" ? textoEspera(muestra, idioma) : t.estado[estado]}
+              {ev && def.fase(ev) !== "invalido" ? def.textoPaso(paso, ev, idioma) : estado === "conectado" ? textoEspera(muestra, idioma) : t.estado[estado]}
             </p>
-            {queHacer(paso, idioma) && <p className="mt-2 text-sm text-white/70">{queHacer(paso, idioma)}</p>}
-            {anulado && ev?.fase === "armado" && <p className="mt-3 text-sm text-red-200">{t.anuladoAntes(anulado)}</p>}
-            {ev?.fase === "invalido" && <p className="mt-3 text-sm text-red-200">{t.sinCalificar(ev.motivo ?? "")}</p>}
+            {def.queHacer(paso, idioma) && <p className="mt-2 text-sm text-white/70">{def.queHacer(paso, idioma)}</p>}
+            {anulado && ev && def.fase(ev) === "armado" && <p className="mt-3 text-sm text-red-200">{t.anuladoAntes(anulado)}</p>}
+            {ev && def.fase(ev) === "invalido" && <p className="mt-3 text-sm text-red-200">{t.sinCalificar(def.motivo(ev) ?? "")}</p>}
           </section>
 
           <section>
             <div className="grid grid-cols-4 gap-2">
-              {CAMPOS.map((c) => (
-                <div key={c} className={`rounded-lg border px-1 py-3 text-center text-xs font-semibold ${COLOR[luces[c]]}`}>
-                  {t.celdas[c]}
+              {def.celdas.map((x) => (
+                <div key={x.campo} className={`rounded-lg border px-1 py-3 text-center text-xs font-semibold ${COLOR[luces[x.campo]]}`}>
+                  {x.nombre[idioma]}
                 </div>
               ))}
             </div>
@@ -530,14 +518,14 @@ export function InstructorPrograma() {
           {sesion.bloque === "practica" && (
             <div className="flex flex-wrap gap-2">
               {resultado && <Button variant="secondary" onClick={reiniciar}>{practicas >= 3 ? t.unoMas : t.otro}</Button>}
-              <Button onClick={pasarCheckride}>{t.pasar}</Button>
+              <Button onClick={pasarCheckride}>{t.pasar(c)}</Button>
             </div>
           )}
 
           {resultado && (
             <div className="space-y-4">
-              <HojaCheckride resultado={resultado} idioma={idioma} />
-              <Explicacion resultado={resultado} idioma={idioma} />
+              <Hoja resultado={resultado} idioma={idioma} />
+              <Explicacion resultado={resultado} idioma={idioma} def={def} />
               <Guardado guardado={guardado} t={t} reintentar={() => guardar(resultado, modoIntento)} />
             </div>
           )}
@@ -562,7 +550,7 @@ export function InstructorPrograma() {
         <section className="space-y-4">
           {checkride ? (
             <>
-              <ReporteExamen resultado={checkride.resultado} intento={intento} nombre={user?.nombre ?? "Cadete"} numero={numero} idioma={idioma} />
+              <ReporteExamen resultado={checkride.resultado} intento={intento} nombre={user?.nombre ?? "Cadete"} numero={numero} idioma={idioma} def={def} calificado={calificado.es === "checkride" ? "checkride" : "intento"} />
               <div className="text-center text-sm">
                 {intento?.revision === "mandado" ? (
                   <p className="text-emerald-300">{t.mandado}</p>
@@ -573,7 +561,7 @@ export function InstructorPrograma() {
               </div>
             </>
           ) : (
-            <p className="text-sm text-white/60">{t.sinCheckride}</p>
+            <p className="text-sm text-white/60">{t.sinCheckride(c)}</p>
           )}
           {sesion.respondidas.length > 0 && (
             <ul className="space-y-1 rounded-xl border border-white/10 bg-navy-950/60 p-4 text-sm text-white/85">

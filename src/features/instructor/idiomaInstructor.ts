@@ -22,8 +22,16 @@ export function traducirMotivo(motivo: string, idioma: Idioma = "es"): string {
 
 export const AVISO_REPORTE = "Práctica en simulador. No es un documento oficial ni sustituye un examen ante una autoridad aeronáutica.";
 
-/** Etiquetas del reporte: nuestro formato, sin nombres de formularios oficiales. */
-export function textosReporte(idioma: Idioma = "es") {
+/** Etiquetas del reporte: nuestro formato, sin nombres de formularios oficiales. "intento": maniobras fuera del ACS, sin palabra «checkride». */
+export function textosReporte(idioma: Idioma = "es", calificado: "checkride" | "intento" = "checkride") {
+  const t = textosCheckride(idioma);
+  if (calificado === "checkride") return t;
+  return idioma === "en"
+    ? { ...t, titulo: (aprobado: boolean) => `GRADED PRACTICE ATTEMPT — ${aprobado ? "PASSED" : "NOT PASSED"}`, subtitulo: "Simulated flight practice", reexaminar: "Items to repeat:" }
+    : { ...t, titulo: (aprobado: boolean) => `INTENTO CALIFICADO ${aprobado ? "APROBADO" : "NO APROBADO"}`, subtitulo: "Práctica de vuelo simulada", reexaminar: "Elementos a repetir:" };
+}
+
+function textosCheckride(idioma: Idioma) {
   return idioma === "en"
     ? {
         titulo: (aprobado: boolean) => (aprobado ? "PRACTICE CHECKRIDE — PASSED" : "PRACTICE CHECKRIDE — NOT PASSED"),

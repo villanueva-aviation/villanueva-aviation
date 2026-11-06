@@ -50,3 +50,18 @@ test("textos del reporte en inglés sin imitar formularios", () => {
   assert.equal(textosReporte("es").aviso, AVISO_REPORTE);
   assert.equal(textosReporte().titulo(false), "AVISO DE NO APROBACIÓN");
 });
+
+test("el reporte del intento calificado no dice checkride ni Notice of Disapproval", () => {
+  const en = textosReporte("en", "intento");
+  const es = textosReporte("es", "intento");
+  assert.equal(en.titulo(false), "GRADED PRACTICE ATTEMPT — NOT PASSED");
+  assert.equal(en.titulo(true), "GRADED PRACTICE ATTEMPT — PASSED");
+  assert.equal(es.titulo(true), "INTENTO CALIFICADO APROBADO");
+  assert.equal(es.titulo(false), "INTENTO CALIFICADO NO APROBADO");
+  assert.equal(es.subtitulo, "Práctica de vuelo simulada");
+  assert.equal(es.reexaminar, "Elementos a repetir:");
+  const textoEn = JSON.stringify(en) + en.titulo(true) + en.titulo(false);
+  assert.doesNotMatch(textoEn, /[áéíóúñ¿¡]|checkride|Disapproval|certif/i);
+  assert.equal(en.aviso, textosReporte("en").aviso);
+  assert.equal(es.aviso, AVISO_REPORTE);
+});

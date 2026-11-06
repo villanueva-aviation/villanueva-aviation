@@ -1,9 +1,16 @@
-import type { Resultado } from "./evaluador";
-import { explicar, repetir } from "./explicacion";
 import { traducirAviso, type Idioma } from "./idiomaInstructor";
+import { MANIOBRAS, type DefManiobra, type ResultadoComun } from "./maniobras";
 
-export function Explicacion({ resultado, idioma = "es" }: { resultado: Resultado; idioma?: Idioma }) {
-  const rep = repetir(resultado, idioma);
+export function Explicacion({
+  resultado,
+  idioma = "es",
+  def = MANIOBRAS["viraje-escarpado"],
+}: {
+  resultado: ResultadoComun;
+  idioma?: Idioma;
+  def?: DefManiobra;
+}) {
+  const rep = def.repetir(resultado, idioma);
   return (
     <section className="rounded-xl border border-white/10 bg-navy-900/60 p-5">
       <div className="flex items-baseline justify-between gap-3">
@@ -14,7 +21,7 @@ export function Explicacion({ resultado, idioma = "es" }: { resultado: Resultado
         </span>
       </div>
       <ul className="mt-3 space-y-2 text-sm leading-relaxed text-white/85">
-        {explicar(resultado, idioma).map((l) => (
+        {def.explicar(resultado, idioma).map((l) => (
           <li key={l.texto}>
             <span className={l.tipo === "bien" ? "text-emerald-300" : "text-red-300"}>{l.tipo === "bien" ? "✓" : "✗"}</span> {l.texto}
           </li>
