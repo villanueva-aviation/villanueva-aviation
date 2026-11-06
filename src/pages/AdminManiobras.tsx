@@ -6,7 +6,8 @@ import { Button } from "../components/ui/Button";
 import { Container } from "../components/ui/Container";
 import { useAuth } from "../features/auth/AuthContext";
 import { HojaCheckride } from "../features/instructor/HojaCheckride";
-import { fetchPorRevisar, revisarIntento } from "../features/instructor/intentos";
+import { fetchPorRevisar, fetchSesionesRecientes, revisarIntento } from "../features/instructor/intentos";
+import { agruparSesiones, type ResumenSesion } from "../features/instructor/reglasIntentos";
 import { ReporteExamen } from "../features/instructor/ReporteExamen";
 import { FOUNDER_EMAIL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
@@ -20,6 +21,7 @@ export function AdminManiobras() {
   const [abierto, setAbierto] = useState<string | null>(null);
   const [revisando, setRevisando] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [sesiones, setSesiones] = useState<ResumenSesion[] | "error" | null>(null);
 
   useEffect(() => {
     if (authLoading || user?.email !== FOUNDER_EMAIL) return;
@@ -29,6 +31,10 @@ export function AdminManiobras() {
         setEstado("listo");
       },
       () => setEstado("error"),
+    );
+    fetchSesionesRecientes().then(
+      (data) => setSesiones(agruparSesiones(data)),
+      () => setSesiones("error"),
     );
   }, [authLoading, user]);
 
@@ -89,6 +95,40 @@ export function AdminManiobras() {
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        <h2 className="mt-12 font-display text-lg font-semibold text-white">Sesiones del programa</h2>
+        {sesiones === null ? (
+          <p className="mt-3 text-sm text-white/50">Cargando...</p>
+        ) : sesiones === "error" ? (
+          <p className="mt-3 text-sm text-red-300">No se pudieron leer las sesiones. ¿Ya corriste la migración 0023 en Supabase?</p>
+        ) : sesiones.length === 0 ? (
+          <p className="mt-3 text-sm text-white/55">Todavía no hay sesiones desde el programa.</p>
+        ) : (
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="text-white/50">
+                <tr>
+                  <th className="py-1.5 pr-4 font-normal">Fecha</th>
+                  <th className="py-1.5 pr-4 font-normal">Cadete</th>
+                  <th className="py-1.5 pr-4 font-normal">Intentos</th>
+                  <th className="py-1.5 font-normal">Checkride</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sesiones.map((s) => (
+                  <tr key={s.sesionId} className="border-t border-white/5 text-white/80">
+                    <td className="py-1.5 pr-4 whitespace-nowrap">{new Date(s.inicio).toLocaleString("es-MX")}</td>
+                    <td className="py-1.5 pr-4">{s.email ?? "sin correo"}</td>
+                    <td className="py-1.5 pr-4">{s.intentos}</td>
+                    <td className={`py-1.5 ${s.checkride ? (s.checkride.aprobado ? "text-emerald-300" : "text-red-300") : "text-white/40"}`}>
+                      {s.checkride ? `${s.checkride.calificacion}/100 · ${s.checkride.aprobado ? "aprobado" : "no aprobado"}` : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </Container>

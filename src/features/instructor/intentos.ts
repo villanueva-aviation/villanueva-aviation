@@ -3,7 +3,7 @@ import type { Resultado } from "./evaluador.ts";
 import { paraGuardar, type IntentoManiobra } from "./reglasIntentos.ts";
 
 const COLUMNAS =
-  "id, user_id, maniobra, avion, modo, calificacion, aprobado, elementos, detalle, revision, revisado_at, created_at";
+  "id, user_id, maniobra, avion, modo, calificacion, aprobado, elementos, detalle, revision, revisado_at, created_at, sesion_id";
 
 type Escritura = { error: string | null };
 
@@ -17,6 +17,8 @@ export async function guardarIntento(input: {
   avion: string;
   modo: "practica" | "checkride";
   resultado: Resultado;
+  /** Solo desde la sesión del programa. */
+  sesionId?: string;
 }): Promise<{ id: string | null; error: string | null }> {
   const userId = await miUserId();
   if (!userId) return { id: null, error: "Inicia sesión para guardar el intento." };
@@ -32,6 +34,7 @@ export async function guardarIntento(input: {
       aprobado: r.aprobado,
       elementos: r.elementos,
       detalle: paraGuardar(r),
+      ...(input.sesionId ? { sesion_id: input.sesionId } : {}),
     })
     .select("id")
     .single();
@@ -66,6 +69,18 @@ export async function fetchPorRevisar(): Promise<(IntentoManiobra & { email: str
     .select(`${COLUMNAS}, email`)
     .eq("revision", "mandado")
     .order("created_at", { ascending: true });
+  if (error) throw error;
+  return (data as (IntentoManiobra & { email: string | null })[]) ?? [];
+}
+
+/** Intentos de las sesiones del programa, del más nuevo al más viejo (el fundador lee todo). */
+export async function fetchSesionesRecientes(limite = 200): Promise<(IntentoManiobra & { email: string | null })[]> {
+  const { data, error } = await supabase
+    .from("intentos_maniobra")
+    .select(`${COLUMNAS}, email`)
+    .not("sesion_id", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(limite);
   if (error) throw error;
   return (data as (IntentoManiobra & { email: string | null })[]) ?? [];
 }

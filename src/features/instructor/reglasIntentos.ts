@@ -21,6 +21,29 @@ export interface IntentoManiobra {
   revision: Revision;
   revisado_at: string | null;
   created_at: string;
+  /** Sesión de una hora del programa; null en los intentos de la página. */
+  sesion_id: string | null;
+}
+
+export type ResumenSesion = {
+  sesionId: string;
+  email: string | null;
+  inicio: string;
+  intentos: number;
+  checkride: { calificacion: number; aprobado: boolean } | null;
+};
+
+/** Una fila por sesión del programa, la más nueva primero. Los intentos sin sesión no cuentan. */
+export function agruparSesiones(intentos: (IntentoManiobra & { email: string | null })[]): ResumenSesion[] {
+  const porSesion = new Map<string, ResumenSesion>();
+  for (const i of [...intentos].sort((a, b) => a.created_at.localeCompare(b.created_at))) {
+    if (!i.sesion_id) continue;
+    const s = porSesion.get(i.sesion_id) ?? { sesionId: i.sesion_id, email: i.email, inicio: i.created_at, intentos: 0, checkride: null };
+    s.intentos++;
+    if (i.modo === "checkride") s.checkride = { calificacion: i.calificacion, aprobado: i.aprobado };
+    porSesion.set(i.sesion_id, s);
+  }
+  return [...porSesion.values()].sort((a, b) => b.inicio.localeCompare(a.inicio));
 }
 
 export function puedeMandar(i: Pick<IntentoManiobra, "modo" | "aprobado" | "revision">): boolean {

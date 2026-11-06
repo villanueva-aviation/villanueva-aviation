@@ -2,14 +2,44 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { armar, avanzar, crearEvaluacion, type Muestra, type Resultado } from "./evaluador.ts";
 import { simularManiobra } from "./simular.ts";
-import { folio, insigniaManiobraGanada, paraGuardar, puedeMandar, resumenProgreso, type IntentoManiobra } from "./reglasIntentos.ts";
+import { agruparSesiones, folio, insigniaManiobraGanada, paraGuardar, puedeMandar, resumenProgreso, type IntentoManiobra } from "./reglasIntentos.ts";
 
 const calificar = (muestras: Muestra[]): Resultado => muestras.reduce(avanzar, armar(crearEvaluacion(), muestras[0])).resultado!;
 
-const intento = (r: Resultado, created_at: string, modo: "practica" | "checkride" = "practica"): IntentoManiobra => ({
+const intento = (r: Resultado, created_at: string, modo: "practica" | "checkride" = "practica", sesion_id: string | null = null): IntentoManiobra => ({
   id: created_at, user_id: "u", maniobra: "viraje-escarpado", avion: "C172", modo,
   calificacion: r.calificacion, aprobado: r.aprobado, elementos: r.elementos, detalle: paraGuardar(r),
-  revision: "sin_mandar", revisado_at: null, created_at,
+  revision: "sin_mandar", revisado_at: null, created_at, sesion_id,
+});
+
+const conCorreo = (i: IntentoManiobra) => ({ ...i, email: "cadete@x.com" });
+
+test("agrupa por sesión", () => {
+  const r = calificar(simularManiobra());
+  const lista = [
+    intento({ ...r, calificacion: 70 }, "2026-11-05T10:00:00Z", "practica", "A"),
+    intento({ ...r, calificacion: 80 }, "2026-11-05T10:10:00Z", "practica", "A"),
+    intento({ ...r, calificacion: 88, aprobado: true }, "2026-11-05T10:40:00Z", "checkride", "A"),
+    intento(r, "2026-11-05T12:00:00Z", "practica", "B"),
+  ].map(conCorreo);
+  const s = agruparSesiones(lista);
+  assert.equal(s.length, 2);
+  const a = s.find((x) => x.sesionId === "A")!;
+  assert.equal(a.intentos, 3);
+  assert.deepEqual(a.checkride, { calificacion: 88, aprobado: true });
+  assert.equal(a.inicio, "2026-11-05T10:00:00Z");
+  assert.equal(a.email, "cadete@x.com");
+  assert.equal(s.find((x) => x.sesionId === "B")!.checkride, null);
+});
+
+test("los intentos sin sesión no se agrupan", () => {
+  assert.deepEqual(agruparSesiones([conCorreo(intento(calificar(simularManiobra()), "2026-11-05T10:00:00Z"))]), []);
+});
+
+test("la sesión más nueva primero", () => {
+  const r = calificar(simularManiobra());
+  const s = agruparSesiones([intento(r, "2026-11-05T12:00:00Z", "practica", "B"), intento(r, "2026-11-05T10:00:00Z", "practica", "A")].map(conCorreo));
+  assert.deepEqual(s.map((x) => x.sesionId), ["B", "A"]);
 });
 
 test("solo se manda un checkride aprobado sin mandar", () => {
