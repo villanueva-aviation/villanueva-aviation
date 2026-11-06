@@ -52,13 +52,15 @@ export function InstructorPrograma() {
     estado, muestra, modo, cambiarModo, modoIntento, ev, resultado, anulado, enCurso,
     iniciar, guardado, guardar, intento, numero, mandar, envio,
   } = useIntentoViraje();
-  const voz = useVoz();
   const pasoAntes = useRef<PasoVoz | null>(null);
   const memoria = useRef<MemoriaAviso>(MEMORIA_VACIA);
 
   const paso = pasoVoz(ev, muestra);
   const luces = semaforo(ev, muestra);
   const aviso = avisoVoz(ev, muestra, modoIntento);
+  const avisoActual = useRef(aviso);
+  avisoActual.current = aviso;
+  const voz = useVoz("es", () => avisoActual.current?.clave ?? null);
 
   // Órdenes al cambiar de paso, avisos sin repetir y la lectura completa al terminar.
   const { decir } = voz;
@@ -66,16 +68,15 @@ export function InstructorPrograma() {
     const antes = pasoAntes.current;
     pasoAntes.current = paso;
     if (paso === "terminado" && antes !== "terminado" && resultado) {
-      decir(lecturaFinal(resultado), { final: true });
+      decir(lecturaFinal(resultado), "final");
       return;
     }
     const orden = ordenVoz(antes, paso, ev);
-    // Tras un intento anulado se vuelve a armar casi al instante: la orden nueva espera a que termine el motivo.
-    if (orden) decir(paraVoz(orden), { encolar: antes === "invalido" });
+    if (orden) decir(paraVoz(orden), paso === "invalido" ? "anulado" : "orden");
     if (!muestra) return;
     const filtrado = filtrarAviso(memoria.current, aviso, muestra.t);
     memoria.current = filtrado.mem;
-    if (filtrado.decir) decir(paraVoz(filtrado.decir));
+    if (filtrado.decir && aviso) decir(paraVoz(filtrado.decir), "aviso", aviso.clave);
   }, [paso, ev, muestra, aviso, resultado, decir]);
 
   return (
@@ -124,7 +125,7 @@ export function InstructorPrograma() {
           />
           <button
             type="button"
-            onClick={() => voz.decir("Hola, soy tu instructor. Así me vas a escuchar.")}
+            onClick={() => voz.decir("Hola, soy tu instructor. Así me vas a escuchar.", "prueba")}
             className="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold text-white/80"
           >
             Probar voz
