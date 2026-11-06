@@ -118,3 +118,16 @@ test("lectura final completa y en voz", () => {
 test("paraVoz", () => {
   assert.equal(paraVoz("✗ Perdiste 130 ft, vas a 95 kt y 45°"), "Perdiste 130 pies, vas a 95 nudos y 45 grados");
 });
+
+test("en inglés: orden, aviso, paraVoz y lectura final", () => {
+  const { ev, m } = enViraje();
+  assert.equal(ordenVoz("limpieza", "despejado", ev, "en"), "Area clear. Begin your 360-degree steep turn.");
+  const bajo = { ...m, altitud: ev.interno.giro!.ref.altitud - 65 };
+  assert.equal(avisoVoz(ev, bajo, "checkride", "en")!.texto, "Watch your altitude");
+  assert.equal(avisoVoz(ev, bajo, "practica", "en")!.texto, "You're losing altitude: more back pressure");
+  assert.equal(paraVoz("100 ft ±5°", "en"), "100 feet plus or minus 5 degrees");
+  const r = correr(simularManiobra({ caidaAltitud: { lado: 0, ft: 130, segundos: 6, enGrados: 90 } })).resultado!;
+  const l = lecturaFinal(r, "en");
+  assert.equal(l[0], "Not passed. Score: 90 out of 100.");
+  assert.ok(l.every((x) => !/[áéíóúñ]/.test(x)), l.join(" | "));
+});

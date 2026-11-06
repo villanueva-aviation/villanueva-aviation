@@ -35,3 +35,14 @@ test("la serie de altitud se reduce y conserva el extremo", () => {
   assert.ok(s.length <= 300, `largo ${s.length}`);
   assert.equal(Math.round(Math.min(...s.map((p) => p.v))), -130);
 });
+
+test("en inglés: limpieza y repetir", () => {
+  const r = calificar(simularManiobra({ limpieza: false }));
+  assert.equal(explicar(r, "en")[0].texto, "You didn't do clearing turns before entering: look for traffic with a turn of at least 90°.");
+  const dos = calificar(
+    simularManiobra({ caidaAltitud: { lado: 0, ft: 130, segundos: 6, enGrados: 90 }, sobreInclinacion: { lado: 1, grados: 52, segundos: 3.5 } }),
+  );
+  assert.equal(repetir(dos, "en"), "Repeat: both turns");
+  assert.equal(repetir(caida(), "en"), "Repeat: left turn");
+  for (const l of explicar(dos, "en")) assert.doesNotMatch(l.texto, /[áéíóúñ]/, l.texto);
+});
