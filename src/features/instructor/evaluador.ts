@@ -29,7 +29,16 @@ export interface Muestra {
   tasa: number; // velocidad de simulación
   pausa: boolean;
   titulo: string; // título del avión
+  // Desde el lector v1.3; un lector viejo no los manda.
+  cabeceo?: number; // grados, nariz arriba positivo
+  vs?: number; // ft/min
+  perdida?: boolean; // aviso de pérdida sonando
+  flaps?: number; // índice de la palanca, 0 = arriba
+  rpm?: number;
 }
+
+/** Un lector anterior a v1.3 no manda el aviso de pérdida: el vuelo lento no se puede calificar. */
+export const lectorViejo = (m: Muestra) => m.perdida === undefined;
 
 export type Fase = "armado" | "viraje1" | "entre" | "viraje2" | "terminado" | "invalido";
 export type Lado = "izquierda" | "derecha";

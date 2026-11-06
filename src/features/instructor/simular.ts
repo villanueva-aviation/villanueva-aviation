@@ -35,6 +35,80 @@ export function simularRecto(
 }
 
 /**
+ * Vuelo lento a 10 Hz, igual que `--simulado-lento` del lector: flaps completos, 3,500 ft, de 95 kt a 58 kt
+ * (2 kt/s), 35 s recto, 90° a la izquierda y 90° al otro lado a 15°, y salida a 2,450 RPM hasta 80 kt.
+ * `perdidaEn`, `aglDesde` y `caidaKt` cuentan segundos de la simulación.
+ */
+export function simularLento(
+  op: {
+    segundoLado?: Lado;
+    perdidaEn?: number;
+    aglDesde?: { t: number; agl: number };
+    sinSalida?: boolean;
+    velocidadKt?: number;
+    caidaKt?: { desde: number; segundos: number; kt: number };
+    viejo?: boolean;
+  } = {},
+): Muestra[] {
+  const lenta = op.velocidadKt ?? 58;
+  const out: Muestra[] = [];
+  let v = 95;
+  let rumbo = 90;
+  let rpm = 1700;
+  const emitir = (incl: number) => {
+    const t = Math.round(out.length * 100) / 1000;
+    const c = op.caidaKt;
+    const m: Muestra = {
+      t, inclinacion: incl, altitud: 3500, velocidad: c && t >= c.desde && t < c.desde + c.segundos ? c.kt : v, rumbo: norm(rumbo),
+      bola: 0, agl: op.aglDesde && t >= op.aglDesde.t ? op.aglDesde.agl : 2500, peso: 2550, enTierra: false, slew: false, tasa: 1,
+      pausa: false, titulo: "Cessna Skyhawk 172SP",
+    };
+    if (!op.viejo) Object.assign(m, { cabeceo: 0, vs: 0, perdida: op.perdidaEn !== undefined && Math.abs(t - op.perdidaEn) < 0.05, flaps: 3, rpm });
+    out.push(m);
+  };
+  const quieto = (seg: number) => {
+    for (let i = 0; i < seg * 10; i++) emitir(0);
+  };
+  const virar = (sentido: 1 | -1) => {
+    let girado = 0;
+    let tl = 0;
+    for (;;) {
+      const restante = 90 - girado;
+      const incl = Math.min(15, 9 * tl, Math.max(5, restante / 2));
+      const paso = ((1091 * Math.tan((incl * Math.PI) / 180)) / v) * 0.1;
+      if (paso >= restante) {
+        rumbo += sentido * restante;
+        emitir(0);
+        return;
+      }
+      emitir(sentido * incl);
+      rumbo += sentido * paso;
+      girado += paso;
+      tl += 0.1;
+    }
+  };
+  while (v > lenta) {
+    emitir(0);
+    v = Math.max(lenta, v - 0.2);
+  }
+  quieto(35);
+  virar(-1);
+  quieto(2);
+  virar(op.segundoLado === "izquierda" ? -1 : 1);
+  quieto(3);
+  if (op.sinSalida) quieto(35);
+  else {
+    rpm = 2450;
+    while (v < 80) {
+      emitir(0);
+      v = Math.min(80, v + 0.2);
+    }
+  }
+  quieto(10);
+  return out;
+}
+
+/**
  * Muestras sintéticas de un C172 a 3500 ft haciendo virajes escarpados, para las
  * pruebas y para ver la página sin MSFS. Virajes de limpieza a 20°, luego cada
  * viraje de 360° a 45° desde alas niveladas hasta el mismo rumbo.
