@@ -93,7 +93,31 @@ export function useVoz(idioma: Idioma, avisoVigente: () => string | null) {
     u.onerror = fin;
     actual.current = u;
     setHablando(true);
-    sintesis.speak(u);
+    let empezo = false;
+    let veces = 0;
+    u.onstart = () => {
+      empezo = true;
+    };
+    const hablar = () => {
+      veces++;
+      sintesis.speak(u);
+    };
+    hablar();
+    // Guardia: algunas voces de Edge se tragan una frase (sobre todo justo después de cortar otra) o
+    // nunca avisan que terminaron. Sin esto la cola se queda esperando para siempre.
+    let quieto = 0;
+    const guardia = window.setInterval(() => {
+      if (actual.current !== u) return window.clearInterval(guardia);
+      if (sintesis.speaking || sintesis.pending) {
+        quieto = 0;
+        return;
+      }
+      if (++quieto < 2) return;
+      quieto = 0;
+      if (!empezo && veces < 2) return hablar();
+      window.clearInterval(guardia);
+      fin();
+    }, 500);
   }, [sintesis]);
 
   const decir = useCallback(
