@@ -3,6 +3,8 @@ export type Idioma = "es" | "en";
 // ponytail: tabla español→inglés de los textos que arma el evaluador; si gana más, pasar el evaluador a códigos.
 const MOTIVOS_EN: Record<string, string> = {
   "Despega primero: la maniobra se arma en el aire.": "Take off first: the maneuver starts in the air.",
+  "Tu lector es de una versión anterior: baja el nuevo de Descargas para el vuelo lento.":
+    "Your reader is an older version: download the new one from Downloads for slow flight.",
   "Se perdió la conexión con el simulador por más de 2 segundos.": "The connection to the simulator dropped for more than 2 seconds.",
   "Pausaste el simulador: el intento no se califica.": "You paused the simulator: this attempt won't be graded.",
   "Usaste el modo slew: el intento no se califica.": "You used slew mode: this attempt won't be graded.",
@@ -11,6 +13,7 @@ const MOTIVOS_EN: Record<string, string> = {
 
 const AVISOS_EN: Record<string, string> = {
   "Bajaste de 1500 ft sobre el terreno: haz la maniobra más alto.": "You went below 1500 ft above the ground: fly the maneuver higher.",
+  "No saliste del vuelo lento con potencia.": "You didn't recover from slow flight with power.",
 };
 
 export function traducirMotivo(motivo: string, idioma: Idioma = "es"): string {
