@@ -166,6 +166,9 @@ static class LectorInstructor
 
     public static Muestra Ultima() { lock (Candado) return ultima; }
 
+    // SimConnect avisa de un pedido rechazado por OnRecvException y no manda DataEnd: a los 30 s se vuelve a pedir.
+    public static bool PedidoVencido(string icaoPedido, double pedidoEn, double ahora) { return icaoPedido != null && ahora - pedidoEn > 30; }
+
     public static double Ahora() { return Reloj.Elapsed.TotalSeconds; }
 
     public static void Publicar(Muestra m)
@@ -240,7 +243,7 @@ static class LectorInstructor
         var ida = new Muestra { T = 0, Lat = 20.521834, Lon = -103.311234, Xpdr = "1200", Motor = true, Titulo = "Cessna \"172\"\\x" };
         var vuelta = new Muestra { T = 0.5, Lat = 20.5219 };
         var ruta = Path.Combine(Path.GetTempPath(), "villanueva-probar.jsonl");
-        File.WriteAllLines(ruta, new[] { ida.Json(), "{\"aeropuerto\":{\"icao\":\"MMGL\"}}", vuelta.Json() });
+        File.WriteAllLines(ruta, new[] { ida.Json(), "{\"aeropuerto\":{\"icao\":\"MMGL\"}}", vuelta.Json(), "{\"t\":1,\"lat\":20.5" }); // la ultima, cortada
         string aeroGrabado;
         var leidas = Simulado.LeerGrabacion(ruta, out aeroGrabado);
         File.Delete(ruta);
@@ -250,7 +253,11 @@ static class LectorInstructor
             && leidas[0].Json() == ida.Json() && Muestra.Desde(vuelta.Json()).Json() == vuelta.Json()
             && r.Modo == "--reproducir" && r.Archivo == "x.jsonl" && r.Rapido == 10 && g.Grabar == "y.jsonl" && g.Modo == "";
         Console.WriteLine(grabado ? "Grabacion: OK" : "Grabacion: FALLA");
-        return ok && edge && banderas && puerto && json && json14 && aeropuerto && grabado ? 0 : 1;
+
+        // Un pedido de aeropuerto que el simulador rechaza (sin DataEnd) no bloquea los siguientes.
+        var vencido = !PedidoVencido(null, 0, 100) && !PedidoVencido("MMGL", 80, 100) && PedidoVencido("MMGL", 60, 100);
+        Console.WriteLine(vencido ? "Pedido vencido: OK" : "Pedido vencido: FALLA");
+        return ok && edge && banderas && puerto && json && json14 && aeropuerto && grabado && vencido ? 0 : 1;
     }
 
     // Lo que pasaba: Edge heredaba el puerto del lector y, si el lector se cerraba, nadie podia volver a usarlo.
@@ -647,7 +654,12 @@ static class Simulado
         {
             var l = linea.Trim();
             if (l.StartsWith(Aero, StringComparison.Ordinal)) { if (aeropuerto == null) aeropuerto = l.Substring(Aero.Length, l.Length - Aero.Length - 1); }
-            else if (l.StartsWith("{", StringComparison.Ordinal)) muestras.Add(Muestra.Desde(l));
+            else if (l.StartsWith("{", StringComparison.Ordinal))
+            {
+                // Si el lector se cerro a media escritura, la ultima linea queda cortada: se salta.
+                try { muestras.Add(Muestra.Desde(l)); }
+                catch (Exception) { Console.WriteLine("Linea de la grabacion que no se pudo leer: se salta."); }
+            }
         }
         return muestras;
     }
@@ -812,8 +824,8 @@ static class Sim
             var titulo = "";
             Console.WriteLine("Conectado a MSFS.");
             sim.OnRecvQuit += (s, d) => abierto = false;
-            // Un nombre de variable mal escrito no tumba el lector: sale aqui con su indice en Vars.
-            sim.OnRecvException += (s, d) => Console.WriteLine("SimConnect: excepcion " + d.dwException + " en la variable " + d.dwIndex);
+            // Un nombre de variable mal escrito o un pedido de aeropuerto rechazado no tumba el lector: sale aqui.
+            sim.OnRecvException += (s, d) => Console.WriteLine("SimConnect: excepcion " + d.dwException + " en el parametro " + d.dwIndex);
             sim.OnRecvSimobjectData += (s, d) =>
             {
                 if (d.dwRequestID == (uint)Req.Titulo) { titulo = ((Titulo)d.dwData[0]).Valor ?? ""; return; }
@@ -847,6 +859,7 @@ static class Sim
             // Aeropuerto mas cercano: la lista del simulador cada 30 s; los datos solo cuando cambia.
             var cercanos = new List<Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_FACILITY_AIRPORT>();
             string icaoActual = null, icaoPedido = null;
+            double pedidoEn = 0;
             var datoAeropuerto = new DatoAeropuerto();
             var pistas = new List<DatoPista>();
             var frecuencias = new List<DatoFrecuencia>();
@@ -865,6 +878,7 @@ static class Sim
                 foreach (var o in d.rgData) cercanos.Add((Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_FACILITY_AIRPORT)o);
                 if (d.dwEntryNumber + 1 < d.dwOutOf) return;
                 var m = LectorInstructor.Ultima();
+                if (LectorInstructor.PedidoVencido(icaoPedido, pedidoEn, LectorInstructor.Ahora())) icaoPedido = null;
                 if (m == null || cercanos.Count == 0 || icaoPedido != null) return;
                 var cos = Math.Cos(m.Lat * Math.PI / 180);
                 Func<Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_FACILITY_AIRPORT, double> dist = a =>
@@ -873,6 +887,7 @@ static class Sim
                 foreach (var a in cercanos) if (dist(a) < dist(mejor)) mejor = a;
                 if (mejor.Ident == icaoActual) return;
                 icaoPedido = mejor.Ident;
+                pedidoEn = LectorInstructor.Ahora();
                 pistas.Clear();
                 frecuencias.Clear();
                 try { sim.RequestFacilityData(Def.Aeropuerto, Req.DatosAeropuerto, mejor.Ident, mejor.Region ?? ""); }

@@ -27,12 +27,21 @@ export const CARRERA_KT = 30;
 export const QUIETO_KT = 1;
 export const AIRE_SEG = 2;
 export const HUECO_SEG = 2;
+/** Un aeropuerto cuyo punto de referencia está más lejos que esto del avión no es el de salida (dato viejo). */
+export const AEROPUERTO_MAX_NM = 5;
+
+const distNm = (m: Muestra, a: Aeropuerto) => {
+  if (m.lat === undefined || m.lon === undefined) return Infinity;
+  const d = aNm(m.lat, m.lon, a.lat, a.lon);
+  return Math.hypot(d.x, d.y);
+};
+const cercano = (m: Muestra, a: Aeropuerto | null) => (a && distNm(m, a) <= AEROPUERTO_MAX_NM ? a : null);
 
 const invalido = (ev: EvaluacionVuelo, motivo: string): EvaluacionVuelo => ({ ...ev, fase: "invalido", motivo });
 
 export function armarVuelo(m: Muestra, a: Aeropuerto | null): EvaluacionVuelo {
   const ev: EvaluacionVuelo = {
-    fase: "rampa", previo: m, aeropuerto: a, eventos: [], aireDesde: null, tierraDesde: m.enTierra ? m.t : null, pistaCarrera: null, maxDistNm: 0,
+    fase: "rampa", previo: m, aeropuerto: cercano(m, a), eventos: [], aireDesde: null, tierraDesde: m.enTierra ? m.t : null, pistaCarrera: null, maxDistNm: 0,
   };
   if (lectorViejoVuelo(m)) return invalido(ev, "Tu lector es de una versión anterior: baja el nuevo de Descargas para las lecciones.");
   if (!esC172(m.titulo)) return invalido(ev, `En esta versión las lecciones son en el C172 y tu avión es «${m.titulo}».`);
@@ -52,7 +61,9 @@ export function avanzarVuelo(ev: EvaluacionVuelo, m: Muestra, a: Aeropuerto | nu
 
   const eventos = [...ev.eventos];
   if (p && m.t - p.t > HUECO_SEG) eventos.push({ t: m.t, tipo: "sin-conexion", seg: m.t - p.t });
-  const aeropuerto = ev.aeropuerto ?? a;
+  // Hasta la carrera de despegue se toma el aeropuerto más reciente que esté cerca; después ya no cambia.
+  const enPlataforma = ev.fase === "rampa" || ev.fase === "rodaje";
+  const aeropuerto = enPlataforma ? cercano(m, a) ?? ev.aeropuerto : ev.aeropuerto;
   if (p && !!m.motor !== !!p.motor) eventos.push({ t: m.t, tipo: m.motor ? "motor-encendido" : "motor-apagado" });
 
   const aireDesde = m.enTierra ? null : ev.aireDesde ?? m.t;
@@ -61,17 +72,15 @@ export function avanzarVuelo(ev: EvaluacionVuelo, m: Muestra, a: Aeropuerto | nu
   const pista = aeropuerto ? pistaBajo(m, aeropuerto) : null;
   let fase: FaseVuelo = ev.fase;
   let { pistaCarrera, maxDistNm } = ev;
-  if (aeropuerto && m.lat !== undefined && m.lon !== undefined) {
-    const d = aNm(m.lat, m.lon, aeropuerto.lat, aeropuerto.lon);
-    maxDistNm = Math.max(maxDistNm, Math.hypot(d.x, d.y));
-  }
+  if (aeropuerto && m.lat !== undefined) maxDistNm = Math.max(maxDistNm, distNm(m, aeropuerto));
 
   switch (fase) {
     case "rampa":
       if (gs >= RODAJE_KT) { fase = "rodaje"; eventos.push({ t: m.t, tipo: "inicio-rodaje" }); }
       break;
     case "rodaje":
-      if (gs >= CARRERA_KT) { fase = "carrera-despegue"; pistaCarrera = pista; }
+      // Con viento fuerte de frente el C172 puede despegar con menos de 30 kt sobre el suelo.
+      if (gs >= CARRERA_KT || !m.enTierra) { fase = "carrera-despegue"; pistaCarrera = pista; }
       break;
     case "carrera-despegue":
       if (aireDesde !== null && m.t - aireDesde >= AIRE_SEG) { fase = "vuelo"; eventos.push({ t: aireDesde, tipo: "despegue", pista: pistaCarrera }); }

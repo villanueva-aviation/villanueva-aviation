@@ -118,6 +118,7 @@ export function simularVuelo(op: OpcionesVuelo = {}): Muestra[] {
   ir(espera, 10);
   ir(umbral, 10);
   despegar();
+  ir(desde(s.pos, rumbo11, 0.5), 70, { objetivo: ELEV + 2484, fpm: 700 }); // recto sobre la pista antes de virar
   ir(sur, 100, { objetivo: ELEV + 2484, fpm: 700 }); // 7,500 ft
   ir(final, 110, { objetivo: ELEV + 1000, fpm: 700 });
   aproximar();

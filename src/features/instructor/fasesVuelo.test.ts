@@ -49,6 +49,37 @@ test("el aeropuerto del vuelo es el de salida", () => {
   assert.equal(ev.aeropuerto?.icao, "MMGL");
 });
 
+// MMMX, a ~250 NM: lo que mandaría un lector que no ha refrescado desde el vuelo anterior.
+const LEJOS: Aeropuerto = { ...AEROPUERTO_PRUEBA, icao: "MMMX", lat: 19.4361, lon: -99.0719 };
+
+test("un aeropuerto viejo en rampa se cambia por el de salida", () => {
+  const ms = simularVuelo();
+  const { ev } = hasta(ms, (i) => (ms[i].t < 15 ? LEJOS : AEROPUERTO_PRUEBA));
+  assert.equal(ev.aeropuerto?.icao, "MMGL");
+  assert.equal(de(ev, "despegue")[0].pista, "11R");
+});
+
+test("el aeropuerto que llega tarde se toma antes del despegue", () => {
+  const ms = simularVuelo();
+  const { ev } = hasta(ms, (i) => (ms[i].t < 40 ? null : AEROPUERTO_PRUEBA));
+  assert.equal(ev.aeropuerto?.icao, "MMGL");
+  assert.equal(de(ev, "despegue")[0].pista, "11R");
+});
+
+test("un aeropuerto lejano no se toma", () => {
+  const { ev } = hasta(simularVuelo(), () => LEJOS);
+  assert.equal(ev.aeropuerto, null);
+  assert.equal(ev.fase, "terminado");
+});
+
+test("despegar con menos de 30 kt sobre el suelo (viento de frente) sí es despegue", () => {
+  const ms = simularVuelo().map((m) => ({ ...m, gs: Math.min(m.gs ?? 0, 28) }));
+  const { ev, fases } = hasta(ms);
+  assert.ok(fases.includes("vuelo"), fases.join(","));
+  assert.equal(de(ev, "despegue")[0].pista, "11R");
+  assert.equal(ev.fase, "terminado");
+});
+
 test("un hueco anota sin conexión y sigue", () => {
   const { ev } = hasta(simularVuelo({ hueco: { en: 200, seg: 5 } }));
   const h = de(ev, "sin-conexion");

@@ -101,7 +101,7 @@ export function pistaBajo(m: Pick<Muestra, "lat" | "lon" | "rumboV">, a: Aeropue
     const lado = (p.x * Math.cos(h) - p.y * Math.sin(h)) * M_NM;
     if (Math.abs(lado) > anchoFt / FT / 2 + 15 || Math.abs(adelante) > largoFt / FT / 2 + 60) continue;
     for (const e of extremos) if (Math.abs(difAngulo(m.rumboV, e.rumboV)) <= 30) return e.ident;
-    return null; // encima de la pista pero atravesado
+    // Atravesado sobre esta pista: puede ir alineado con otra que la cruza.
   }
   return null;
 }

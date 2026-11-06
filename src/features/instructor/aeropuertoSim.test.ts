@@ -31,6 +31,13 @@ test("pistaBajo reconoce el extremo por el rumbo", () => {
   assert.equal(pistaBajo({ ...centro, rumboV: 200 }, a), null);
 });
 
+test("pistaBajo en el cruce de dos pistas", () => {
+  const cruzada = { ...crudo.pistas[0], rumboV: 20, n1: 2, d1: 0, n2: 20, d2: 0 };
+  const a = leerAeropuerto({ ...crudo, pistas: [cruzada, crudo.pistas[0]] })!;
+  assert.equal(pistaBajo({ lat: 20.5218, lon: -103.3112, rumboV: 112 }, a), "11R");
+  assert.equal(pistaBajo({ lat: 20.5218, lon: -103.3112, rumboV: 200 }, a), "20");
+});
+
 test("pistaBajo fuera de la pista", () => {
   const a = leerAeropuerto(crudo)!;
   // 300 m al norte-noreste del eje (perpendicular a 112° es 22°).
