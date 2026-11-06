@@ -69,6 +69,7 @@ const Comunidad = lazy(() => import("./pages/Comunidad").then((m) => ({ default:
 const Perfil = lazy(() => import("./pages/Perfil").then((m) => ({ default: m.Perfil })));
 const AdminVuelosPractica = lazy(() => import("./pages/AdminVuelosPractica").then((m) => ({ default: m.AdminVuelosPractica })));
 const AdminManiobras = lazy(() => import("./pages/AdminManiobras").then((m) => ({ default: m.AdminManiobras })));
+const AdminVuelo = lazy(() => import("./pages/AdminVuelo").then((m) => ({ default: m.AdminVuelo })));
 const AdminReservas = lazy(() => import("./pages/AdminReservas").then((m) => ({ default: m.AdminReservas })));
 const AdminPruebasRed = lazy(() => import("./pages/AdminPruebasRed").then((m) => ({ default: m.AdminPruebasRed })));
 const AdminFeedback = lazy(() => import("./pages/AdminFeedback").then((m) => ({ default: m.AdminFeedback })));
@@ -373,6 +374,14 @@ function RoutedContent() {
             element={
               <ProtectedRoute>
                 <AdminManiobras />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.adminVuelo}
+            element={
+              <ProtectedRoute>
+                <AdminVuelo />
               </ProtectedRoute>
             }
           />

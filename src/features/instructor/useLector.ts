@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Muestra } from "./evaluador.ts";
 import { LECTOR_INICIAL, recibir } from "./lector.ts";
+import { leerAeropuerto, type Aeropuerto } from "./aeropuertoSim.ts";
 
 const URL_LECTOR = "http://127.0.0.1:8766/muestra";
 const CADA_MS = 100;
@@ -12,9 +13,14 @@ export type EstadoLector = "sin-lector" | "sin-simulador" | "conectado";
  * Chrome frena el temporizador a ~1 s, y por eso pide `?desde=` la última muestra recibida y el lector
  * le manda todas las que se juntaron. `alRecibir` recibe cada lote nuevo, en orden.
  */
-export function useLector(alRecibir?: (muestras: Muestra[]) => void): { estado: EstadoLector; muestra: Muestra | null } {
+export function useLector(alRecibir?: (muestras: Muestra[]) => void): {
+  estado: EstadoLector;
+  muestra: Muestra | null;
+  aeropuerto: Aeropuerto | null;
+} {
   const [estado, setEstado] = useState<EstadoLector>("sin-lector");
   const [muestra, setMuestra] = useState<Muestra | null>(null);
+  const [aeropuerto, setAeropuerto] = useState<Aeropuerto | null>(null);
   const callback = useRef(alRecibir);
   callback.current = alRecibir;
 
@@ -22,13 +28,19 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): { estado: 
     let vivo = true;
     let timer: number | undefined;
     let lectura = LECTOR_INICIAL;
+    let aeropuertoCrudo = "null"; // para no volver a renderizar si no cambio
 
     const leer = async () => {
       try {
         const url = lectura.desde === null ? URL_LECTOR : `${URL_LECTOR}?desde=${lectura.desde}`;
         const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(2000) });
-        const json = (await res.json()) as { conectado: boolean; muestra: Muestra | null; muestras?: Muestra[] };
+        const json = (await res.json()) as { conectado: boolean; muestra: Muestra | null; muestras?: Muestra[]; aeropuerto?: unknown };
         if (!vivo) return;
+        const crudo = JSON.stringify(json.aeropuerto ?? null);
+        if (crudo !== aeropuertoCrudo) {
+          aeropuertoCrudo = crudo;
+          setAeropuerto(leerAeropuerto(json.aeropuerto));
+        }
         setEstado(json.conectado && json.muestra ? "conectado" : "sin-simulador");
         if (json.muestra) {
           const r = recibir(lectura, json.muestra, json.muestras ?? [], Date.now());
@@ -51,5 +63,5 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): { estado: 
     };
   }, []);
 
-  return { estado, muestra };
+  return { estado, muestra, aeropuerto };
 }
