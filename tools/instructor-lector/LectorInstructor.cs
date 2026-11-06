@@ -21,6 +21,9 @@ class Muestra
 {
     public double T, Inclinacion, Altitud, Velocidad, Rumbo, Bola, Agl, Peso, Tasa;
     public bool EnTierra, Slew, Pausa;
+    // v1.3, para vuelo lento y perdidas. Cabeceo: positivo = nariz arriba. Flaps: indice de la palanca, 0 = arriba.
+    public double Cabeceo, Vs, Flaps, Rpm;
+    public bool Perdida;
     public string Titulo = "";
 
     public Muestra Copia() { return (Muestra)MemberwiseClone(); }
@@ -46,6 +49,8 @@ class Muestra
             ",\"velocidad\":" + N(Velocidad) + ",\"rumbo\":" + N(Rumbo) + ",\"bola\":" + N(Bola) +
             ",\"agl\":" + N(Agl) + ",\"peso\":" + N(Peso) + ",\"enTierra\":" + B(EnTierra) +
             ",\"slew\":" + B(Slew) + ",\"tasa\":" + N(Tasa) + ",\"pausa\":" + B(Pausa) +
+            ",\"cabeceo\":" + N(Cabeceo) + ",\"vs\":" + N(Vs) + ",\"perdida\":" + B(Perdida) +
+            ",\"flaps\":" + N(Flaps) + ",\"rpm\":" + N(Rpm) +
             ",\"titulo\":" + Texto(Titulo) + "}";
     }
 }
@@ -61,7 +66,7 @@ class Opciones
         var o = new Opciones();
         for (var i = 0; i < args.Length; i++)
         {
-            if (args[i] == "--simulado" || args[i] == "--simulado-limpio") o.Modo = args[i];
+            if (args[i] == "--simulado" || args[i] == "--simulado-limpio" || args[i] == "--simulado-lento") o.Modo = args[i];
             else if (args[i] == "--sin-ventana") o.SinVentana = true;
             else if (args[i] == "--url" && i + 1 < args.Length) o.Url = args[++i];
         }
@@ -130,7 +135,14 @@ static class LectorInstructor
 
         var puerto = PuertoLibreTrasHijo();
         Console.WriteLine(puerto ? "Puerto libre tras abrir Edge: OK" : "Puerto libre tras abrir Edge: FALLA");
-        return ok && edge && banderas && puerto ? 0 : 1;
+
+        // v1.3: los campos del vuelo lento salen en el JSON y el modo de prueba se reconoce.
+        var j = new Muestra { Cabeceo = 7.5, Vs = -120, Perdida = true, Flaps = 3, Rpm = 1850 }.Json();
+        var json = j.Contains("\"cabeceo\":7.5") && j.Contains("\"vs\":-120") && j.Contains("\"perdida\":true")
+            && j.Contains("\"flaps\":3") && j.Contains("\"rpm\":1850")
+            && Opciones.Leer(new[] { "--simulado-lento" }).Modo == "--simulado-lento";
+        Console.WriteLine(json ? "Json: OK" : "Json: FALLA");
+        return ok && edge && banderas && puerto && json ? 0 : 1;
     }
 
     // Lo que pasaba: Edge heredaba el puerto del lector y, si el lector se cerraba, nadie podia volver a usarlo.
@@ -242,10 +254,10 @@ static class LectorInstructor
         servidor.Start();
         if (!op.SinVentana) AbrirVentana(op.Url);
 
-        if (op.Modo == "--simulado" || op.Modo == "--simulado-limpio")
+        if (op.Modo != "")
         {
             Console.WriteLine("Modo simulado: no se conecta a MSFS.");
-            Simulado.Correr(op.Modo == "--simulado");
+            Simulado.Correr(op.Modo);
             return;
         }
         if (!Dlls.Preparar())
@@ -440,7 +452,7 @@ static class Simulado
         var rumbo = 90.0;
         Action<double, double> emitir = (incl, alt) =>
         {
-            out_.Add(new Muestra { Inclinacion = incl, Altitud = alt, Velocidad = v, Rumbo = Norm(rumbo), Bola = 0, Agl = 2500, Peso = 2550, Tasa = 1, Titulo = "Cessna Skyhawk 172SP" });
+            out_.Add(new Muestra { Inclinacion = incl, Altitud = alt, Velocidad = v, Rumbo = Norm(rumbo), Bola = 0, Agl = 2500, Peso = 2550, Tasa = 1, Rpm = 2300, Titulo = "Cessna Skyhawk 172SP" });
         };
         Action<double> recto = seg => { for (var i = 0; i < Math.Round(seg * hz); i++) emitir(0, 3500); };
         Action<int, double, double, bool> virar = (sentido, angulo, maxima, conCaida) =>
@@ -471,11 +483,52 @@ static class Simulado
         return out_;
     }
 
-    // Repite el escenario sin fin a 10 muestras por segundo.
-    public static void Correr(bool caida)
+    // Vuelo lento limpio, igual que simularLento en el sitio: flaps completos, de 95 a 58 kt, 35 s recto,
+    // 90 grados a la izquierda y 90 a la derecha a 15 de inclinacion, y salida con potencia hasta 80 kt.
+    static List<Muestra> EscenarioLento()
     {
-        var muestras = Escenario(caida);
-        Console.WriteLine("Escenario de " + Math.Round(muestras.Count / 10.0) + " s" + (caida ? " con caida de 130 ft en el viraje izquierdo." : " limpio."));
+        const double hz = 10, dt = 1 / hz;
+        var out_ = new List<Muestra>();
+        double v = 95, rumbo = 90, rpm = 1700;
+        Action<double> emitir = incl =>
+        {
+            out_.Add(new Muestra { Inclinacion = incl, Altitud = 3500, Velocidad = v, Rumbo = Norm(rumbo), Bola = 0, Agl = 2500, Peso = 2550, Tasa = 1,
+                Cabeceo = 0, Vs = 0, Perdida = false, Flaps = 3, Rpm = rpm, Titulo = "Cessna Skyhawk 172SP" });
+        };
+        while (v > 58) { emitir(0); v = Math.Max(58, v - 2 * dt); }
+        for (var i = 0; i < 35 * hz; i++) emitir(0);
+        Action<int> virar = sentido =>
+        {
+            double girado = 0, tl = 0;
+            while (true)
+            {
+                var restante = 90 - girado;
+                var incl = Math.Min(15, Math.Min(9 * tl, Math.Max(5, restante / 2)));
+                var paso = 1091 * Math.Tan(incl * Math.PI / 180) / v * dt;
+                if (paso >= restante) { rumbo += sentido * restante; emitir(0); return; }
+                emitir(sentido * incl);
+                rumbo += sentido * paso;
+                girado += paso;
+                tl += dt;
+            }
+        };
+        virar(-1);
+        for (var i = 0; i < 2 * hz; i++) emitir(0);
+        virar(1);
+        for (var i = 0; i < 3 * hz; i++) emitir(0);
+        rpm = 2450;
+        while (v < 80) { emitir(0); v = Math.Min(80, v + 2 * dt); }
+        for (var i = 0; i < 10 * hz; i++) emitir(0);
+        return out_;
+    }
+
+    // Repite el escenario sin fin a 10 muestras por segundo.
+    public static void Correr(string modo)
+    {
+        var caida = modo == "--simulado";
+        var muestras = modo == "--simulado-lento" ? EscenarioLento() : Escenario(caida);
+        Console.WriteLine("Escenario de " + Math.Round(muestras.Count / 10.0) + " s" +
+            (modo == "--simulado-lento" ? " de vuelo lento." : caida ? " con caida de 130 ft en el viraje izquierdo." : " limpio."));
         var inicio = LectorInstructor.Ahora();
         while (true)
         {
@@ -508,10 +561,16 @@ static class Sim
         new[] { "IS SLEW ACTIVE", "bool" },
         new[] { "SIMULATION RATE", "number" },
         new[] { "SIMULATION TIME", "seconds" },
+        // v1.3
+        new[] { "PLANE PITCH DEGREES", "degrees" },
+        new[] { "VERTICAL SPEED", "feet per minute" },
+        new[] { "STALL WARNING", "bool" },
+        new[] { "FLAPS HANDLE INDEX", "number" },
+        new[] { "GENERAL ENG RPM:1", "rpm" },
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    struct Vuelo { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 11)] public double[] Valores; }
+    struct Vuelo { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)] public double[] Valores; }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     struct Titulo { [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)] public string Valor; }
@@ -537,6 +596,8 @@ static class Sim
                     T = ahora, Inclinacion = x[0], Altitud = x[1], Velocidad = x[2], Rumbo = x[3], Bola = x[4],
                     Agl = x[5], Peso = x[6], EnTierra = x[7] != 0, Slew = x[8] != 0, Tasa = x[9],
                     Pausa = LectorInstructor.Pausado(x[10], ahora, ref simAnterior, ref ultimoAvance), Titulo = titulo,
+                    // SimConnect da el cabeceo con nariz arriba negativo.
+                    Cabeceo = -x[11], Vs = x[12], Perdida = x[13] != 0, Flaps = x[14], Rpm = x[15],
                 });
             };
             foreach (var v in Vars)

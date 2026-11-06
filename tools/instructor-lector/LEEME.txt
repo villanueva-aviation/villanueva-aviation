@@ -1,6 +1,8 @@
 VILLANUEVA AVIATION - LECTOR DEL INSTRUCTOR VIRTUAL
 ====================================================
 
+v1.3: lee cabeceo, régimen vertical, aviso de pérdida, flaps y RPM para el vuelo lento. Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.
+
 Este programa lee tu avión en Microsoft Flight Simulator 2020 y se lo pasa
 a la página del instructor virtual para que califique tu maniobra.
 Solo funciona dentro de tu PC: no manda nada a internet.
