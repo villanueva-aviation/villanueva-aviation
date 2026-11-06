@@ -134,6 +134,11 @@ export function serie(muestras: Muestra[], campo: Campo, ref: number, maxPuntos 
     t: m.t,
     v: campo === "inclinacion" ? Math.abs(m.inclinacion) - INCLINACION_OBJETIVO : m[campo] - ref,
   }));
+  return reducir(puntos, maxPuntos);
+}
+
+/** A lo más maxPuntos, guardando el punto más alejado de cero de cada cubeta. */
+export function reducir(puntos: { t: number; v: number }[], maxPuntos = 300): { t: number; v: number }[] {
   const paso = Math.ceil(puntos.length / maxPuntos);
   if (paso <= 1) return puntos;
   const out: { t: number; v: number }[] = [];

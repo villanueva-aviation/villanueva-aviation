@@ -6,3 +6,8 @@ export const MATERIAL_VIRAJE: Material[] = [
   { titulo: { es: "Simulacro de vuelo: virajes pronunciados", en: "Flight checkride practice: steep turns" }, to: ROUTES.simulacroVuelo, exclusivo: true },
   { titulo: { es: "Checklist del C172", en: "C172 checklist" }, to: ROUTES.checklistC172, exclusivo: false },
 ];
+
+export const MATERIAL_RECTO: Material[] = [
+  { titulo: { es: "Academia: Fundamentos de vuelo", en: "Academy: Flight fundamentals" }, to: ROUTES.academiaModulo("fundamentos"), exclusivo: false },
+  MATERIAL_VIRAJE[1],
+];

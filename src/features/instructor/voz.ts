@@ -19,15 +19,15 @@ type Modo = "practica" | "checkride";
 
 const ASENTAR_SEG = 2;
 const CAMPOS: CampoAviso[] =["altitud", "velocidad", "inclinacion", "bola"];
-const NOMBRE: Record<Idioma, Record<CampoAviso, string>> = {
+export const NOMBRE: Record<Idioma, Record<CampoAviso, string>> = {
   es: { altitud: "altitud", velocidad: "velocidad", inclinacion: "inclinación", bola: "coordinación" },
   en: { altitud: "altitude", velocidad: "airspeed", inclinacion: "bank", bola: "coordination" },
 };
-const CORTO: Record<Idioma, Record<CampoAviso, string>> = {
+export const CORTO: Record<Idioma, Record<CampoAviso, string>> = {
   es: { altitud: "Ojo con tu altitud", velocidad: "Revisa tu velocidad", inclinacion: "Cuida la inclinación", bola: "Centra la bola" },
   en: { altitud: "Watch your altitude", velocidad: "Check your airspeed", inclinacion: "Watch your bank", bola: "Center the ball" },
 };
-const CORRECCION: Record<Idioma, Record<CampoAviso, { mas: string; menos: string }>> = {
+export const CORRECCION: Record<Idioma, Record<CampoAviso, { mas: string; menos: string }>> = {
   es: {
     altitud: { mas: "Estás subiendo: menos presión atrás", menos: "Estás perdiendo altitud: más presión atrás" },
     velocidad: { mas: "Vas muy rápido: reduce potencia", menos: "Vas muy lento: agrega potencia" },
@@ -41,7 +41,7 @@ const CORRECCION: Record<Idioma, Record<CampoAviso, { mas: string; menos: string
     bola: { mas: "Center the ball with the rudder", menos: "Center the ball with the rudder" },
   },
 };
-const FUERA: Record<Idioma, string> = { es: "Fuera de tolerancia", en: "Out of tolerance" };
+export const FUERA: Record<Idioma, string> = { es: "Fuera de tolerancia", en: "Out of tolerance" };
 
 /** Desviación de cada campo contra la entrada, o null si ese campo no se está midiendo ahora. */
 function desviaciones(ev: Evaluacion | null, m: Muestra | null): Record<CampoAviso, number | null> {
@@ -60,7 +60,7 @@ function desviaciones(ev: Evaluacion | null, m: Muestra | null): Record<CampoAvi
   };
 }
 
-function luz(d: number | null, tol: number): Luz {
+export function luz(d: number | null, tol: number): Luz {
   if (d === null) return "gris";
   if (Math.abs(d) > tol) return "rojo";
   if (Math.abs(d) > AVISO_FRACCION * tol) return "ambar";
@@ -72,21 +72,33 @@ export function semaforo(ev: Evaluacion | null, m: Muestra | null): Record<Campo
   return { altitud: luz(d.altitud, TOLERANCIA.altitud), velocidad: luz(d.velocidad, TOLERANCIA.velocidad), inclinacion: luz(d.inclinacion, TOLERANCIA.inclinacion), bola: luz(d.bola, TOLERANCIA.bola) };
 }
 
-/** El aviso más importante ahora: altitud, velocidad, inclinación, bola. */
-export function avisoVoz(ev: Evaluacion | null, m: Muestra | null, modo: Modo, idioma: Idioma = "es"): Aviso | null {
-  const d = desviaciones(ev, m);
-  for (const campo of CAMPOS) {
-    const nivel = luz(d[campo], TOLERANCIA[campo]);
+/** El primer campo en ámbar o rojo, en el orden de `campos`, con su texto según el modo. */
+export function avisoDe<C extends string>(
+  d: Record<C, number | null>,
+  tol: Record<C, number>,
+  campos: C[],
+  textos: { corto: Record<C, string>; correccion: Record<C, { mas: string; menos: string }>; nombre: Record<C, string> },
+  modo: Modo,
+  idioma: Idioma,
+): Aviso | null {
+  for (const campo of campos) {
+    const nivel = luz(d[campo], tol[campo]);
     if (nivel !== "ambar" && nivel !== "rojo") continue;
     const signo = d[campo]! > 0 ? "+" : "-";
-    const practica = CORRECCION[idioma][campo][signo === "+" ? "mas" : "menos"];
+    const practica = textos.correccion[campo][signo === "+" ? "mas" : "menos"];
     const texto =
       nivel === "ambar"
-        ? modo === "checkride" ? CORTO[idioma][campo] : practica
-        : modo === "checkride" ? `${FUERA[idioma]}: ${NOMBRE[idioma][campo]}` : `${FUERA[idioma]}. ${practica}`;
+        ? modo === "checkride" ? textos.corto[campo] : practica
+        : modo === "checkride" ? `${FUERA[idioma]}: ${textos.nombre[campo]}` : `${FUERA[idioma]}. ${practica}`;
     return { clave: `${campo}-${nivel}-${signo}`, nivel, texto };
   }
   return null;
+}
+
+/** El aviso más importante ahora: altitud, velocidad, inclinación, bola. */
+export function avisoVoz(ev: Evaluacion | null, m: Muestra | null, modo: Modo, idioma: Idioma = "es"): Aviso | null {
+  const textos = { corto: CORTO[idioma], correccion: CORRECCION[idioma], nombre: NOMBRE[idioma] };
+  return avisoDe(desviaciones(ev, m), TOLERANCIA, CAMPOS, textos, modo, idioma);
 }
 
 export type MemoriaAviso = { clave: string | null; desde: number; libreDesde: number | null };
@@ -146,7 +158,7 @@ const ORDEN: Record<Idioma, Partial<Record<PasoVoz, string>>> = {
     entre: "Now the other direction.",
   },
 };
-const ANULADO: Record<Idioma, string> = { es: "Intento anulado.", en: "Attempt cancelled." };
+export const ANULADO: Record<Idioma, string> = { es: "Intento anulado.", en: "Attempt cancelled." };
 
 /** La orden del examinador al cambiar de paso; la lectura final va aparte. */
 export function ordenVoz(antes: PasoVoz | null, ahora: PasoVoz | null, ev: Evaluacion | null, idioma: Idioma = "es"): string | null {

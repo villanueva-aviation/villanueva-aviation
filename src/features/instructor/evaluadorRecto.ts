@@ -39,7 +39,7 @@ export const TOLERANCIA_RECTO: Record<CampoRecto, number> = {
 const CODIGO: Record<CampoRecto, CodigoRecto> = { altitud: "1", rumbo: "2", velocidad: "3", bola: "4" };
 
 /** Desviación de una muestra contra el objetivo; el rumbo en el círculo (358 → 004 es +6). */
-export function desvioRecto(m: Muestra, o: Muestra, c: CampoRecto): number {
+export function desvioRecto(m: Muestra, o: Pick<Muestra, "altitud" | "rumbo" | "velocidad">, c: CampoRecto): number {
   if (c === "rumbo") return difRumbo(m.rumbo, o.rumbo);
   if (c === "bola") return m.bola;
   return m[c] - o[c];
