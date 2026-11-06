@@ -1,4 +1,4 @@
-import { difRumbo, TOLERANCIA, type Campo, type Evaluacion, type Muestra, type Resultado } from "./evaluador.ts";
+import { difRumbo, esC172, TOLERANCIA, type Campo, type Evaluacion, type Muestra, type Resultado } from "./evaluador.ts";
 import { explicar, repetir } from "./explicacion.ts";
 import { traducirAviso, traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import {
@@ -189,7 +189,7 @@ export function textoPaso(paso: PasoVoz | null, idioma: Idioma = "es"): string {
 /** Qué falta para que el instructor empiece solo. */
 export function textoEspera(m: Muestra | null, idioma: Idioma = "es"): string {
   const en = idioma === "en";
-  if (m && !/172/.test(m.titulo)) {
+  if (m && !esC172(m.titulo)) {
     return en ? `This maneuver is for the C172 and your aircraft is «${m.titulo}».` : `Esta maniobra es para el C172 y tu avión es «${m.titulo}».`;
   }
   if (m?.enTierra) return en ? "Take off: the instructor starts on its own once you're flying level." : "Despega: el instructor empieza solo cuando vueles nivelado.";

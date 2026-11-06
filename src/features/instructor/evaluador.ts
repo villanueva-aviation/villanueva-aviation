@@ -128,12 +128,15 @@ export function armarSolo(ev: Evaluacion | null, m: Muestra): boolean {
   return !m.enTierra && Math.abs(m.inclinacion) < INCLINACION_NIVELADO && invalidez(m, null) === null;
 }
 
+/** MSFS a veces titula el C172 solo como «Skyhawk» (p. ej. los liveries de la flota). */
+export const esC172 = (titulo: string) => /172|skyhawk/i.test(titulo);
+
 function invalidez(m: Muestra, previo: Muestra | null): string | null {
   if (previo && m.t - previo.t > HUECO_MAX_SEG) return "Se perdió la conexión con el simulador por más de 2 segundos.";
   if (m.pausa) return "Pausaste el simulador: el intento no se califica.";
   if (m.slew) return "Usaste el modo slew: el intento no se califica.";
   if (m.tasa !== 1) return "La velocidad de simulación no estaba en 1×: el intento no se califica.";
-  if (!/172/.test(m.titulo)) return `Esta maniobra es para el C172 y tu avión es «${m.titulo}».`;
+  if (!esC172(m.titulo)) return `Esta maniobra es para el C172 y tu avión es «${m.titulo}».`;
   return null;
 }
 

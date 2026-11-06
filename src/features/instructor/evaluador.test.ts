@@ -108,6 +108,11 @@ test("otro avion invalida", () => {
   assert.equal(ev.fase, "invalido");
 });
 
+test("un Skyhawk sin '172' en el título sí cuenta como C172", () => {
+  const [m] = simularManiobra();
+  assert.equal(armarSolo(null, { ...m, titulo: "Cessna Skyhawk G1000 Villanueva Aviation 2026 XB-VNA" }), true);
+});
+
 test("un lote con muestras repetidas o viejas da lo mismo que una por una", () => {
   const muestras = simularManiobra();
   const unaPorUna = correr(muestras);
