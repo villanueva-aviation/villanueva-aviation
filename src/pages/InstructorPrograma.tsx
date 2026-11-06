@@ -4,7 +4,7 @@ import { AlertTriangle, Check, Volume2, VolumeX } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { MATERIAL_VIRAJE } from "../data/materialInstructor";
 import { useAuth } from "../features/auth/AuthContext";
-import { briefing, debriefing, listaPasos, queHacer } from "../features/instructor/briefing";
+import { briefing, debriefing, listaPasos, queHacer, vozDebriefing } from "../features/instructor/briefing";
 import { Explicacion } from "../features/instructor/ExplicacionInstructor";
 import { HojaCheckride } from "../features/instructor/HojaCheckride";
 import type { Idioma } from "../features/instructor/idiomaInstructor";
@@ -222,10 +222,9 @@ export function InstructorPrograma() {
     if (sesion.bloque === "briefing") decir(briefing(idioma).map((x) => paraVoz(x, idioma)), "orden");
     if (sesion.bloque === "debriefing") {
       debriefEmpezo.current = false;
-      const lineas = voz.detalle === "detallado" ? deb.lineas : deb.lineas.filter((l, k) => k === 0 || l.startsWith("Checkride:"));
-      decir(lineas.map((x) => paraVoz(x, idioma)), "final");
+      decir(vozDebriefing(deb.lineas, sesion.intentos, voz.detalle).map((x) => paraVoz(x, idioma)), "final");
     }
-  }, [sesion.bloque, decir, idioma, deb.lineas, voz.detalle]);
+  }, [sesion.bloque, decir, idioma, deb.lineas, sesion.intentos, voz.detalle]);
 
   // Al terminar la lectura del debriefing pasa al cierre.
   useEffect(() => {

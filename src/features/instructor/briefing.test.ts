@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { armar, avanzar, crearEvaluacion, type Resultado } from "./evaluador.ts";
 import { simularManiobra } from "./simular.ts";
-import { briefing, debriefing, listaPasos, queHacer, type Material } from "./briefing.ts";
+import { briefing, debriefing, listaPasos, queHacer, vozDebriefing, type Material } from "./briefing.ts";
 import type { IntentoSesion } from "./sesion.ts";
 import { ALTURA_SEGURA_AGL, TOLERANCIAS } from "./virajeEscarpado.ts";
 
@@ -59,4 +59,32 @@ test("debriefing en inglés y material en español avisado", () => {
   const d = debriefing([con("practica", 70), con("checkride", 90)], MATERIAL, "en");
   for (const l of d.lineas) assert.doesNotMatch(l, SIN_ACENTOS, l);
   assert.ok(d.material.every((m) => m.titulo.endsWith(" (in Spanish)")));
+});
+
+test("debriefing con todos los intentos iguales no repite mejor y más bajo", () => {
+  const es = debriefing([con("practica", 90), con("checkride", 90)], MATERIAL).lineas.join(" ");
+  assert.ok(es.includes("Los 2 intentos sacaron 90 de 100."), es);
+  assert.doesNotMatch(es, /El mejor|El más bajo/);
+  const en = debriefing([con("practica", 90), con("checkride", 90)], MATERIAL, "en").lineas.join(" ");
+  assert.ok(en.includes("All 2 attempts scored 90 out of 100."), en);
+});
+
+const noAprobado = (modo: "practica" | "checkride"): IntentoSesion => ({ modo, resultado: { ...base, calificacion: 60, aprobado: false }, id: null });
+
+test("en Detallado la voz no repite el «Repite» que ya dijo el checkride", () => {
+  const intentos = [con("practica", 70), noAprobado("checkride")];
+  const d = debriefing(intentos, MATERIAL);
+  assert.ok(d.lineas.at(-1)!.startsWith("Repite"), "la pantalla sí lo muestra");
+  assert.deepEqual(vozDebriefing(d.lineas, intentos, "detallado"), d.lineas.slice(0, -1));
+  // Si lo último fue práctica, su comentario no dijo «Repite»: el debriefing sí lo dice.
+  const practica = [con("checkride", 90), noAprobado("practica")];
+  const p = debriefing(practica, MATERIAL);
+  assert.ok(p.lineas.at(-1)!.startsWith("Repite"), p.lineas.join(" | "));
+  assert.deepEqual(vozDebriefing(p.lineas, practica, "detallado"), p.lineas);
+});
+
+test("en Solo lo necesario la voz lee la primera línea y la del checkride", () => {
+  const intentos = [con("practica", 70), con("checkride", 90)];
+  const d = debriefing(intentos, MATERIAL);
+  assert.deepEqual(vozDebriefing(d.lineas, intentos, "necesario"), [d.lineas[0], "Checkride: aprobado, 90 de 100."]);
 });

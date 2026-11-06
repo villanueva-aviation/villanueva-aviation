@@ -1,3 +1,4 @@
+import type { Detalle } from "./colaVoz.ts";
 import type { Campo } from "./evaluador.ts";
 import { repetir } from "./explicacion.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
@@ -129,9 +130,13 @@ export function debriefing(
     const peor = intentos.reduce((a, b) => (cal(b) < cal(a) ? b : a));
     const num = (i: IntentoSesion) => intentos.indexOf(i) + 1;
     lineas.push(
-      en
-        ? `Best: ${cal(mejor)} out of 100 (attempt ${num(mejor)}). Lowest: ${cal(peor)} out of 100 (attempt ${num(peor)}).`
-        : `El mejor: ${cal(mejor)} de 100 (intento ${num(mejor)}). El más bajo: ${cal(peor)} de 100 (intento ${num(peor)}).`,
+      cal(mejor) === cal(peor)
+        ? en
+          ? `All ${n} attempts scored ${cal(mejor)} out of 100.`
+          : `Los ${n} intentos sacaron ${cal(mejor)} de 100.`
+        : en
+          ? `Best: ${cal(mejor)} out of 100 (attempt ${num(mejor)}). Lowest: ${cal(peor)} out of 100 (attempt ${num(peor)}).`
+          : `El mejor: ${cal(mejor)} de 100 (intento ${num(mejor)}). El más bajo: ${cal(peor)} de 100 (intento ${num(peor)}).`,
     );
   }
   const primera = intentos.find((i) => i.modo === "practica");
@@ -167,9 +172,16 @@ export function debriefing(
     );
   }
   const rep = n ? repetir(intentos[n - 1].resultado, idioma) : null;
-  if (rep) lineas.push(rep);
+  if (rep) lineas.push(rep); // siempre la última línea: vozDebriefing cuenta con eso
   return {
     lineas,
     material: material.map((m) => ({ titulo: en ? `${m.titulo.en} (in Spanish)` : m.titulo.es, to: m.to, exclusivo: m.exclusivo })),
   };
+}
+
+/** Lo que la voz lee del debriefing. Si lo último fue el checkride, su lectura ya dijo «Repite»: no se repite. */
+export function vozDebriefing(lineas: string[], intentos: IntentoSesion[], detalle: Detalle): string[] {
+  if (detalle === "necesario") return lineas.filter((l, k) => k === 0 || l.startsWith("Checkride:"));
+  const yaDicho = intentos.at(-1)?.modo === "checkride" && /^(Repite|Repeat):/.test(lineas.at(-1) ?? "");
+  return yaDicho ? lineas.slice(0, -1) : lineas;
 }
