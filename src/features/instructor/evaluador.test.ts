@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { armar, armarSolo, avanzar, avanzarLote, crearEvaluacion, type Evaluacion, type Muestra } from "./evaluador.ts";
+import { armar, armarSolo, avanzar, avanzarLote, crearEvaluacion, lectorViejoChecklist, type Evaluacion, type Muestra } from "./evaluador.ts";
 import { simularManiobra } from "./simular.ts";
 
 const correr = (muestras: Muestra[]): Evaluacion => muestras.reduce(avanzar, armar(crearEvaluacion(), muestras[0]));
@@ -158,4 +158,10 @@ test("aviso bajo 1500 AGL", () => {
   const r = correr(simularManiobra().map((m) => ({ ...m, agl: 1200 }))).resultado!;
   assert.equal(r.avisos.length, 1);
   assert.equal(r.aprobado, true);
+});
+
+test("lectorViejoChecklist distingue v1.4 de v1.5", () => {
+  const base = simularManiobra()[0];
+  assert.equal(lectorViejoChecklist({ ...base, lat: 1 }), true);
+  assert.equal(lectorViejoChecklist({ ...base, lat: 1, avionica: false }), false);
 });

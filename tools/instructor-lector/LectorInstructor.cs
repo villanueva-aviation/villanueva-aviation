@@ -27,6 +27,9 @@ class Muestra
     // v1.4, para seguir un vuelo completo. RumboV y VientoDir: verdaderos. Mezcla y Acelerador: 0-100. Altimetro y Qnh: inHg.
     public double Lat, Lon, Gs, RumboV, Mezcla, Acelerador, XpdrModo, Altimetro, Qnh, Com1, VientoDir, VientoKt;
     public bool Motor, MagIzq, MagDer, Master, LuzBeacon, LuzNav, LuzAterrizaje, LuzStrobe, LuzTaxi, Freno, Tren;
+    // v1.5, para el checklist por voz. Selector: 0 cerrado, 1 ambos, 2 izq, 3 der. Trim: -100..100 (%).
+    public double Selector, Trim;
+    public bool Avionica, Valvula, Bomba, Autopiloto;
     public string Xpdr = "0000";
     public string Titulo = "";
 
@@ -65,6 +68,8 @@ class Muestra
             ",\"xpdr\":" + Texto(Xpdr) + ",\"xpdrModo\":" + N(XpdrModo) + ",\"altimetro\":" + N2(Altimetro) +
             ",\"qnh\":" + N2(Qnh) + ",\"com1\":" + N(Com1) + ",\"tren\":" + B(Tren) +
             ",\"vientoDir\":" + N(VientoDir) + ",\"vientoKt\":" + N(VientoKt) +
+            ",\"avionica\":" + B(Avionica) + ",\"selector\":" + N(Selector) + ",\"valvula\":" + B(Valvula) +
+            ",\"bomba\":" + B(Bomba) + ",\"autopiloto\":" + B(Autopiloto) + ",\"trim\":" + N(Trim) +
             ",\"titulo\":" + Texto(Titulo) + "}";
     }
 
@@ -231,6 +236,11 @@ static class LectorInstructor
         var v = new Muestra { Lat = 20.52, Xpdr = "1200", Com1 = 118.1, Motor = true }.Json();
         var json14 = v.Contains("\"lat\":20.52") && v.Contains("\"xpdr\":\"1200\"") && v.Contains("\"com1\":118.1") && v.Contains("\"motor\":true");
         Console.WriteLine(json14 ? "Json v1.4: OK" : "Json v1.4: FALLA");
+
+        // v1.5: los campos del checklist por voz.
+        var c = new Muestra { Avionica = true, Selector = 1, Trim = 12.5 }.Json();
+        var json15 = c.Contains("\"avionica\":true") && c.Contains("\"selector\":1") && c.Contains("\"trim\":12.5");
+        Console.WriteLine(json15 ? "Json v1.5: OK" : "Json v1.5: FALLA");
 
         // v1.4: el aeropuerto va en la raiz de /muestra; null mientras no llega.
         var sinAeropuerto = Estado(double.NaN).Contains("\"aeropuerto\":null");
@@ -805,10 +815,17 @@ static class Sim
         new[] { "GEAR HANDLE POSITION", "bool" },
         new[] { "AMBIENT WIND DIRECTION", "degrees" },
         new[] { "AMBIENT WIND VELOCITY", "knots" },
+        // v1.5 (x[40]..x[45])
+        new[] { "AVIONICS MASTER SWITCH", "bool" },
+        new[] { "FUEL TANK SELECTOR:1", "number" },
+        new[] { "GENERAL ENG FUEL VALVE:1", "bool" },
+        new[] { "GENERAL ENG FUEL PUMP SWITCH:1", "bool" },
+        new[] { "AUTOPILOT MASTER", "bool" },
+        new[] { "ELEVATOR TRIM PCT", "percent" },
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    struct Vuelo { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 40)] public double[] Valores; }
+    struct Vuelo { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 46)] public double[] Valores; }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     struct Titulo { [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)] public string Valor; }
@@ -844,6 +861,8 @@ static class Sim
                     // El codigo llega en BCD: 0x1200 es el 1200.
                     Xpdr = ((int)x[32]).ToString("X4"), XpdrModo = x[33], Altimetro = x[34], Qnh = x[35], Com1 = x[36],
                     Tren = x[37] != 0, VientoDir = x[38], VientoKt = x[39],
+                    Avionica = x[40] != 0, Selector = x[41], Valvula = x[42] != 0, Bomba = x[43] != 0,
+                    Autopiloto = x[44] != 0, Trim = x[45],
                 });
             };
             foreach (var v in Vars)

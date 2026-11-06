@@ -60,6 +60,13 @@ export interface Muestra {
   tren?: boolean;
   vientoDir?: number;
   vientoKt?: number;
+  // Desde el lector v1.5, para el checklist. selector: 0 cerrado, 1 ambos, 2 izq, 3 der. trim: −100…100 (%).
+  avionica?: boolean;
+  selector?: number;
+  valvula?: boolean;
+  bomba?: boolean;
+  autopiloto?: boolean;
+  trim?: number;
 }
 
 /** Un lector anterior a v1.3 no manda el aviso de pérdida: el vuelo lento no se puede calificar. */
@@ -67,6 +74,9 @@ export const lectorViejo = (m: Muestra) => m.perdida === undefined;
 
 /** Un lector anterior a v1.4 no manda la posición: no se puede seguir un vuelo completo. */
 export const lectorViejoVuelo = (m: Muestra) => m.lat === undefined;
+
+/** Un lector anterior a v1.5 no manda aviónica ni combustible: esos puntos del checklist solo se oyen. */
+export const lectorViejoChecklist = (m: Muestra) => m.avionica === undefined;
 
 export type Fase = "armado" | "viraje1" | "entre" | "viraje2" | "terminado" | "invalido";
 export type Lado = "izquierda" | "derecha";
