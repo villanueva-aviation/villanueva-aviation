@@ -1,3 +1,4 @@
+import type { ActividadId } from "./actividades.ts";
 import type { Resultado } from "./evaluador.ts";
 import { explicar } from "./explicacion.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
@@ -5,9 +6,9 @@ import type { Idioma } from "./idiomaInstructor.ts";
 // La sesión de una hora: los bloques avanzan por lo que pasa, el reloj solo sugiere.
 
 export type Modo = "practica" | "checkride";
-export type Bloque = "idioma" | "briefing" | "preparacion" | "practica" | "checkride" | "debriefing" | "cierre";
+export type Bloque = "idioma" | "menu" | "briefing" | "preparacion" | "practica" | "checkride" | "debriefing" | "cierre";
 
-export const GUIA_MIN: Record<Exclude<Bloque, "idioma">, [number, number]> = {
+export const GUIA_MIN: Record<Exclude<Bloque, "idioma" | "menu">, [number, number]> = {
   briefing: [0, 5],
   preparacion: [5, 10],
   practica: [10, 35],
@@ -22,6 +23,7 @@ export type IntentoSesion = { modo: Modo; resultado: Resultado; id: string | nul
 export type Sesion = {
   id: string;
   bloque: Bloque;
+  actividad: ActividadId | null;
   inicioMs: number | null;
   intentos: IntentoSesion[];
   sugerido35: boolean;
@@ -30,6 +32,7 @@ export type Sesion = {
 
 export type EventoSesion =
   | { tipo: "idioma" }
+  | { tipo: "elegir"; actividad: ActividadId }
   | { tipo: "listo"; ahoraMs: number }
   | { tipo: "armado" }
   | { tipo: "intento"; intento: IntentoSesion }
@@ -51,7 +54,7 @@ const TEXTO: Record<Idioma, { tres: string; min35: string }> = {
 };
 
 export function crearSesion(id: string): Sesion {
-  return { id, bloque: "idioma", inicioMs: null, intentos: [], sugerido35: false, sugeridoTres: false };
+  return { id, bloque: "idioma", actividad: null, inicioMs: null, intentos: [], sugerido35: false, sugeridoTres: false };
 }
 
 export const modoDelBloque = (b: Bloque): Modo => (b === "checkride" ? "checkride" : "practica");
@@ -62,7 +65,9 @@ export function avanzarSesion(s: Sesion, e: EventoSesion, idioma: Idioma = "es")
   const ir = (cambio: Partial<Sesion>, decir: string[] = []) => ({ sesion: { ...s, ...cambio }, decir });
   switch (e.tipo) {
     case "idioma":
-      return s.bloque === "idioma" ? ir({ bloque: "briefing" }) : igual;
+      return s.bloque === "idioma" ? ir({ bloque: "menu" }) : igual;
+    case "elegir":
+      return s.bloque === "menu" ? ir({ bloque: "briefing", actividad: e.actividad }) : igual;
     case "listo":
       return s.bloque === "briefing" ? ir({ bloque: "preparacion", inicioMs: e.ahoraMs }) : igual;
     case "armado":

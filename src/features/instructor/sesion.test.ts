@@ -20,7 +20,21 @@ function correr(eventos: EventoSesion[], s: Sesion = crearSesion("s1")) {
   return { s, dichos };
 }
 
-const hastaPractica: EventoSesion[] = [{ tipo: "idioma" }, { tipo: "listo", ahoraMs: 0 }, { tipo: "armado" }];
+const hastaPractica: EventoSesion[] = [
+  { tipo: "idioma" },
+  { tipo: "elegir", actividad: "viraje-escarpado" },
+  { tipo: "listo", ahoraMs: 0 },
+  { tipo: "armado" },
+];
+
+test("del idioma al menú y del menú al briefing", () => {
+  let s = avanzarSesion(crearSesion("x"), { tipo: "idioma" }).sesion;
+  assert.equal(s.bloque, "menu");
+  assert.equal(avanzarSesion(s, { tipo: "listo", ahoraMs: 0 }).sesion.bloque, "menu");
+  s = avanzarSesion(s, { tipo: "elegir", actividad: "viraje-escarpado" }).sesion;
+  assert.equal(s.bloque, "briefing");
+  assert.equal(s.actividad, "viraje-escarpado");
+});
 
 test("recorre los bloques", () => {
   let s = crearSesion("s1");
@@ -37,14 +51,14 @@ test("recorre los bloques", () => {
     s = avanzarSesion(s, e).sesion;
     bloques.push(s.bloque);
   }
-  assert.deepEqual(bloques, ["idioma", "briefing", "preparacion", "practica", "practica", "practica", "practica", "checkride", "debriefing", "cierre"]);
+  assert.deepEqual(bloques, ["idioma", "menu", "briefing", "preparacion", "practica", "practica", "practica", "practica", "checkride", "debriefing", "cierre"]);
   assert.equal(s.intentos.length, 4);
   assert.equal(s.inicioMs, 0);
 });
 
 test("la sugerencia de los tres se dice una vez", () => {
   const { dichos } = correr([...hastaPractica, ...Array(4).fill({ tipo: "intento", intento: practica })]);
-  assert.deepEqual(dichos.slice(3), [[], [], ["Ya tienes tres intentos: puedes pasar al checkride o seguir practicando."], []]);
+  assert.deepEqual(dichos.slice(4), [[], [], ["Ya tienes tres intentos: puedes pasar al checkride o seguir practicando."], []]);
 });
 
 test("los 35 minutos sugieren una vez y no cambian de bloque", () => {
@@ -54,7 +68,7 @@ test("los 35 minutos sugieren una vez y no cambian de bloque", () => {
     { tipo: "reloj", ahoraMs: 35 * MIN },
     { tipo: "reloj", ahoraMs: 40 * MIN },
   ]);
-  assert.deepEqual(dichos.slice(3), [[], ["Ya llevamos 35 minutos: cuando quieras pasamos al checkride."], []]);
+  assert.deepEqual(dichos.slice(4), [[], ["Ya llevamos 35 minutos: cuando quieras pasamos al checkride."], []]);
   assert.equal(s.bloque, "practica");
 });
 

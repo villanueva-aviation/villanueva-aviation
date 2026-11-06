@@ -4,6 +4,9 @@ import { AlertTriangle, Check, Volume2, VolumeX } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { MATERIAL_VIRAJE } from "../data/materialInstructor";
 import { useAuth } from "../features/auth/AuthContext";
+import { ACTIVIDADES, estadoActividad } from "../features/instructor/actividades";
+import { usePremiumAccess } from "../features/payments/usePremiumAccess";
+import { ROUTES } from "../lib/routes";
 import { briefing, debriefing, listaPasos, queHacer, vozDebriefing } from "../features/instructor/briefing";
 import { Explicacion } from "../features/instructor/ExplicacionInstructor";
 import { HojaCheckride } from "../features/instructor/HojaCheckride";
@@ -48,6 +51,10 @@ const T = {
   es: {
     titulo: "Instructor virtual · Viraje escarpado C172",
     elegir: "¿En qué idioma quieres tu sesión?",
+    menu: "¿Qué quieres practicar hoy?",
+    acceso: { gratis: "Gratis", exclusivo: "Exclusivo", proximamente: "Próximamente" },
+    candado: "Incluido en Contenido Exclusivo",
+    verExclusivo: "Ver Contenido Exclusivo",
     bloques: { briefing: "Briefing", preparacion: "Preparación", practica: "Práctica", checkride: "Checkride", debriefing: "Debriefing", cierre: "Cierre" },
     min: "min",
     estado: { conectado: "Conectado a MSFS", "sin-simulador": "Abre MSFS 2020 con el C172", "sin-lector": "No encuentro el lector: ábrelo otra vez" },
@@ -81,6 +88,10 @@ const T = {
   en: {
     titulo: "Virtual instructor · C172 steep turn",
     elegir: "Which language do you want for your session?",
+    menu: "What do you want to practice today?",
+    acceso: { gratis: "Free", exclusivo: "Exclusive", proximamente: "Coming soon" },
+    candado: "Included in Exclusive Content",
+    verExclusivo: "See Exclusive Content",
     bloques: { briefing: "Briefing", preparacion: "Preparation", practica: "Practice", checkride: "Checkride", debriefing: "Debriefing", cierre: "Wrap-up" },
     min: "min",
     estado: { conectado: "Connected to MSFS", "sin-simulador": "Open MSFS 2020 with the C172", "sin-lector": "Can't find the reader: open it again" },
@@ -139,6 +150,7 @@ const reloj = (ms: number) => {
 /** El instructor en su propia ventana: una sesión de una hora en bloques, en español o inglés. */
 export function InstructorPrograma() {
   const { user } = useAuth();
+  const { hasAccess } = usePremiumAccess(); // mientras carga es false: Exclusivo se ve con candado
   const [idioma, setIdioma] = useState<Idioma>(leerIdioma);
   const t = T[idioma];
   const [sesion, setSesion] = useState<Sesion>(() => crearSesion(crypto.randomUUID()));
@@ -291,6 +303,50 @@ export function InstructorPrograma() {
             </button>
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (sesion.bloque === "menu") {
+    return (
+      <div className="mx-auto max-w-xl space-y-4 px-4 py-6">
+        <h1 className="font-display text-xl font-bold text-white">{t.menu}</h1>
+        <ul className="space-y-3">
+          {ACTIVIDADES.map((a) => {
+            const e = estadoActividad(a, hasAccess);
+            const etiqueta = e === "proximamente" ? t.acceso.proximamente : t.acceso[a.acceso];
+            const cuerpo = (
+              <>
+                <span className="flex items-baseline justify-between gap-3">
+                  <span className="font-display text-lg font-bold">{a.nombre[idioma]}</span>
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${e === "proximamente" ? "bg-white/10 text-white/50" : a.acceso === "gratis" ? "bg-emerald-500/15 text-emerald-200" : "bg-gold-500/20 text-gold-200"}`}>
+                    {etiqueta}
+                  </span>
+                </span>
+                <span className="mt-1 block text-sm text-white/70">{a.detalle[idioma]} · {a.minutos} {t.min}</span>
+              </>
+            );
+            return (
+              <li key={a.id}>
+                {e === "abierta" ? (
+                  <button type="button" onClick={() => evento({ tipo: "elegir", actividad: a.id })}
+                    className="w-full rounded-2xl border border-gold-500/60 bg-gold-500/10 px-5 py-4 text-left text-white hover:bg-gold-500/20">
+                    {cuerpo}
+                  </button>
+                ) : (
+                  <div aria-disabled="true" className={`rounded-2xl border border-white/10 px-5 py-4 text-white ${e === "proximamente" ? "opacity-60" : ""}`}>
+                    {cuerpo}
+                    {e === "candado" && (
+                      <p className="mt-2 text-sm text-gold-300">
+                        {t.candado} · <Link to={ROUTES.contenidoExclusivo} target="_blank" className="underline">{t.verExclusivo}</Link>
+                      </p>
+                    )}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       </div>
     );
   }
