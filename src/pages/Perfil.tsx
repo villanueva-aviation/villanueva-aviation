@@ -42,10 +42,14 @@ export function Perfil() {
 
   // Insignia del instructor virtual: con error (o sin la tabla todavía) se trata como no ganada.
   const [virajeAprobado, setVirajeAprobado] = useState(false);
+  const [rectoAprobado, setRectoAprobado] = useState(false);
   useEffect(() => {
     let vivo = true;
     fetchMisIntentosManiobra("viraje-escarpado")
       .then((intentos) => vivo && setVirajeAprobado(insigniaManiobraGanada(intentos, "viraje-escarpado")))
+      .catch(() => {});
+    fetchMisIntentosManiobra("recto-nivelado")
+      .then((intentos) => vivo && setRectoAprobado(insigniaManiobraGanada(intentos, "recto-nivelado")))
       .catch(() => {});
     return () => {
       vivo = false;
@@ -70,7 +74,14 @@ export function Perfil() {
     icon: Plane,
     desbloqueado: virajeAprobado,
   };
-  const todosLogros = [...logros, logroRed, logroViraje];
+  const logroRecto: Logro = {
+    id: "maniobra-recto-nivelado-c172",
+    titulo: "Recto y nivelado · C172",
+    descripcion: "Se gana cuando Erik revisa y aprueba tu intento calificado del instructor virtual. Práctica en simulador, no es una evaluación oficial.",
+    icon: Plane,
+    desbloqueado: rectoAprobado,
+  };
+  const todosLogros = [...logros, logroRed, logroRecto, logroViraje];
 
   return (
     <div>

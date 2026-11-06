@@ -5,7 +5,8 @@ import { PageHero } from "../components/layout/PageHero";
 import { Button } from "../components/ui/Button";
 import { Container } from "../components/ui/Container";
 import { useAuth } from "../features/auth/AuthContext";
-import { HojaCheckride } from "../features/instructor/HojaCheckride";
+import { defDe } from "../features/instructor/maniobras";
+import { HOJA } from "../features/instructor/vistasManiobra";
 import { fetchPorRevisar, fetchSesionesRecientes, revisarIntento } from "../features/instructor/intentos";
 import { agruparSesiones, type ResumenSesion } from "../features/instructor/reglasIntentos";
 import { ReporteExamen } from "../features/instructor/ReporteExamen";
@@ -89,8 +90,14 @@ export function AdminManiobras() {
                 </div>
                 {abierto === i.id && (
                   <div className="mt-4 space-y-4">
-                    <HojaCheckride resultado={i.detalle} />
-                    <ReporteExamen resultado={i.detalle} intento={i} nombre={i.email?.split("@")[0] ?? "Cadete"} />
+                    <HojaIntento maniobra={i.maniobra} resultado={i.detalle} />
+                    <ReporteExamen
+                      resultado={i.detalle}
+                      intento={i}
+                      nombre={i.email?.split("@")[0] ?? "Cadete"}
+                      def={defDe(i.maniobra)}
+                      calificado={defDe(i.maniobra).id === "recto-nivelado" ? "intento" : "checkride"}
+                    />
                   </div>
                 )}
               </div>
@@ -134,4 +141,10 @@ export function AdminManiobras() {
       </Container>
     </div>
   );
+}
+
+/** La hoja de la maniobra de ese intento. */
+function HojaIntento({ maniobra, resultado }: { maniobra: string; resultado: unknown }) {
+  const Hoja = HOJA[defDe(maniobra).id];
+  return <Hoja resultado={resultado} idioma="es" />;
 }
