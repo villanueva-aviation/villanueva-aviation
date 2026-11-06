@@ -115,6 +115,10 @@ test("lectura final completa y en voz", () => {
   assert.ok(l.every((x) => !/[✓✗°]|\bft\b/.test(x)), l.join(" | "));
 });
 
+test("paraVoz no lee la flecha de las preguntas falladas", () => {
+  assert.equal(paraVoz("«¿Cuál es la Vs0?» → 40 nudos"), "«¿Cuál es la Vs0?»: 40 nudos");
+});
+
 test("paraVoz", () => {
   assert.equal(paraVoz("✗ Perdiste 130 ft, vas a 95 kt y 45°"), "Perdiste 130 pies, vas a 95 nudos y 45 grados");
 });

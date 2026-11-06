@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { armar, avanzar, crearEvaluacion, type Resultado } from "./evaluador.ts";
 import { simularManiobra } from "./simular.ts";
 import { briefing, debriefing, listaPasos, queHacer, vozDebriefing, type Material } from "./briefing.ts";
+import { BANCO } from "./bancoPreguntas.ts";
 import type { IntentoSesion } from "./sesion.ts";
 import { ALTURA_SEGURA_AGL, TOLERANCIAS } from "./virajeEscarpado.ts";
 
@@ -70,6 +71,14 @@ test("debriefing con todos los intentos iguales no repite mejor y más bajo", ()
 });
 
 const noAprobado = (modo: "practica" | "checkride"): IntentoSesion => ({ modo, resultado: { ...base, calificacion: 60, aprobado: false }, id: null });
+
+test("el debriefing suma las preguntas y la voz las dice en Solo lo necesario", () => {
+  const intentos = [con("practica", 70), noAprobado("checkride")];
+  const d = debriefing(intentos, MATERIAL, "es", [{ id: BANCO[0].id, correcta: false }]);
+  assert.ok(d.lineas.includes("Preguntas: 0 de 1 correctas."));
+  assert.ok(d.lineas.at(-1)!.startsWith("Repite"));
+  assert.ok(vozDebriefing(d.lineas, intentos, "necesario").includes("Preguntas: 0 de 1 correctas."));
+});
 
 test("en Detallado la voz no repite el «Repite» que ya dijo el checkride", () => {
   const intentos = [con("practica", 70), noAprobado("checkride")];

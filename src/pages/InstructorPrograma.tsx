@@ -5,6 +5,9 @@ import { Button } from "../components/ui/Button";
 import { MATERIAL_VIRAJE } from "../data/materialInstructor";
 import { useAuth } from "../features/auth/AuthContext";
 import { ACTIVIDADES, estadoActividad } from "../features/instructor/actividades";
+import { BANCO } from "../features/instructor/bancoPreguntas";
+import { calificarRespuesta, lineasPreguntas, siguientePregunta, type Pregunta, type Tema } from "../features/instructor/preguntas";
+import { useEscucha } from "../features/instructor/useEscucha";
 import { usePremiumAccess } from "../features/payments/usePremiumAccess";
 import { ROUTES } from "../lib/routes";
 import { briefing, debriefing, listaPasos, queHacer, vozDebriefing } from "../features/instructor/briefing";
@@ -84,6 +87,10 @@ const T = {
     probar: "Probar voz",
     prueba: "Hola, soy tu instructor. Así me vas a escuchar.",
     sinVoz: "Tu PC no tiene una voz en español: sigue en texto.",
+    escuchando: "Escuchando…",
+    correcto: "Correcto.",
+    laRespuesta: (r: string) => `La respuesta es: ${r}`,
+    micApagado: "No se pudo usar el micrófono: las preguntas se apagaron.",
   },
   en: {
     titulo: "Virtual instructor · C172 steep turn",
@@ -121,6 +128,10 @@ const T = {
     probar: "Test voice",
     prueba: "Hi, I'm your instructor. This is how I'll sound.",
     sinVoz: "Your PC has no English voice: text only.",
+    escuchando: "Listening…",
+    correcto: "Correct.",
+    laRespuesta: (r: string) => `The answer is: ${r}`,
+    micApagado: "The microphone couldn't be used: questions are off.",
   },
 };
 
@@ -133,6 +144,7 @@ const COLOR: Record<Luz, string> = {
 const COLOR_ESTADO = { conectado: "text-emerald-300", "sin-simulador": "text-gold-300", "sin-lector": "text-red-300" } as const;
 const CAMPOS: CampoAviso[] = ["altitud", "velocidad", "inclinacion", "bola"];
 const EN_VUELO: Bloque[] = ["preparacion", "practica", "checkride"];
+const TEMAS: Tema[] = ["viraje-escarpado", "c172"];
 
 function leerIdioma(): Idioma {
   try {
@@ -159,6 +171,7 @@ export function InstructorPrograma() {
   sesionRef.current = sesion;
   const dichoRef = useRef<(textos: string[], tipo: "orden" | "final") => void>(() => {});
   const vozRef = useRef<{ detalle: "detallado" | "necesario" }>({ detalle: "detallado" });
+  const preguntarRef = useRef<() => void>(() => {});
 
   /** Avanza la sesión y dice lo que la sesión pide decir. */
   const evento = useCallback(
@@ -183,6 +196,7 @@ export function InstructorPrograma() {
         const n = despues.intentos.filter((x) => x.modo === "practica").length;
         const comentario = comentarioIntento(i, n, idioma);
         dichoRef.current([paraVoz(detallado ? comentario : comentario.split(". ")[0] + ".", idioma)], "orden");
+        preguntarRef.current();
       } else {
         const lectura = lecturaFinal(i.resultado, idioma);
         dichoRef.current(detallado ? lectura : lectura.slice(0, 1), "final");
@@ -210,6 +224,30 @@ export function InstructorPrograma() {
   const { decir } = voz;
   dichoRef.current = (textos, tipo) => decir(textos, tipo);
 
+  // Preguntas por micrófono: al entrar a la preparación y después de cada intento de práctica, nunca en el checkride.
+  const escucha = useEscucha(idioma, voz);
+  const [pregunta, setPregunta] = useState<Pregunta | null>(null);
+  const [micApagado, setMicApagado] = useState(false);
+  const apagarPreguntas = () => {
+    voz.setPreguntas(false);
+    setMicApagado(true);
+  };
+  preguntarRef.current = () => {
+    const s = sesionRef.current;
+    if (!voz.preguntas || s.bloque === "checkride" || escucha.fase !== "inactivo") return;
+    if (!escucha.supported) return apagarPreguntas();
+    const p = siguientePregunta(BANCO, TEMAS, s.respondidas.map((r) => r.id));
+    if (!p) return;
+    setPregunta(p);
+    escucha.escuchar(paraVoz(p[idioma].pregunta, idioma), "orden", "pregunta", (texto, error) => {
+      setPregunta(null);
+      if (error && error !== "no-speech") return apagarPreguntas();
+      const correcta = calificarRespuesta(texto, p, idioma);
+      evento({ tipo: "respuesta", respondida: { id: p.id, correcta } });
+      decir(paraVoz(correcta ? t.correcto : t.laRespuesta(p[idioma].respuesta), idioma), "orden", "pregunta");
+    });
+  };
+
   // Reloj de la sesión y la sugerencia de los 35 minutos.
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -226,7 +264,7 @@ export function InstructorPrograma() {
   }, [sesion.bloque, ev?.fase, evento]);
 
   // Lo que se lee al entrar a cada bloque.
-  const deb = debriefing(sesion.intentos, MATERIAL_VIRAJE, idioma);
+  const deb = debriefing(sesion.intentos, MATERIAL_VIRAJE, idioma, sesion.respondidas);
   const bloqueAntes = useRef<Bloque | null>(null);
   const debriefEmpezo = useRef(false);
   useEffect(() => {
@@ -258,6 +296,11 @@ export function InstructorPrograma() {
     memoria.current = filtrado.mem;
     if (filtrado.decir && aviso) decir(paraVoz(filtrado.decir, idioma), "aviso", aviso.clave);
   }, [enVuelo, paso, ev, muestra, aviso, decir, idioma]);
+
+  // Va después del efecto de las órdenes para que la pregunta quede detrás de la orden del paso.
+  useEffect(() => {
+    if (sesion.bloque === "preparacion") preguntarRef.current();
+  }, [sesion.bloque]);
 
   const elegirIdioma = (i: Idioma) => {
     setIdioma(i);
@@ -417,7 +460,15 @@ export function InstructorPrograma() {
             <PruebaMicrofono idioma={idioma} voz={voz} />
           </div>
         </details>
+        {micApagado && <p className="text-sm text-gold-300">{t.micApagado}</p>}
       </header>
+
+      {pregunta && escucha.fase !== "inactivo" && (
+        <section aria-live="polite" className="rounded-xl border border-gold-500/50 bg-gold-500/10 p-4">
+          <p className="font-display font-bold text-white">{pregunta[idioma].pregunta}</p>
+          {escucha.fase === "escuchando" && <p className="mt-1 text-sm font-semibold text-gold-300">{t.escuchando}</p>}
+        </section>
+      )}
 
       {sesion.bloque === "briefing" && (
         <section className="space-y-4 rounded-xl border border-white/10 bg-navy-950/60 p-5">
@@ -523,6 +574,13 @@ export function InstructorPrograma() {
             </>
           ) : (
             <p className="text-sm text-white/60">{t.sinCheckride}</p>
+          )}
+          {sesion.respondidas.length > 0 && (
+            <ul className="space-y-1 rounded-xl border border-white/10 bg-navy-950/60 p-4 text-sm text-white/85">
+              {lineasPreguntas(sesion.respondidas, BANCO, idioma).map((l) => (
+                <li key={l}>{l}</li>
+              ))}
+            </ul>
           )}
           <Material deb={deb} t={t} />
           <Button className="w-full" onClick={nuevaSesion}>

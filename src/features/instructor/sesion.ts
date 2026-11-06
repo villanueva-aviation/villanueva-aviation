@@ -2,6 +2,7 @@ import type { ActividadId } from "./actividades.ts";
 import type { Resultado } from "./evaluador.ts";
 import { explicar } from "./explicacion.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
+import type { Respondida } from "./preguntas.ts";
 
 // La sesión de una hora: los bloques avanzan por lo que pasa, el reloj solo sugiere.
 
@@ -26,6 +27,7 @@ export type Sesion = {
   actividad: ActividadId | null;
   inicioMs: number | null;
   intentos: IntentoSesion[];
+  respondidas: Respondida[];
   sugerido35: boolean;
   sugeridoTres: boolean;
 };
@@ -38,6 +40,7 @@ export type EventoSesion =
   | { tipo: "intento"; intento: IntentoSesion }
   | { tipo: "pasar-checkride" }
   | { tipo: "fin-debriefing" }
+  | { tipo: "respuesta"; respondida: Respondida }
   | { tipo: "reloj"; ahoraMs: number };
 
 const SUGERIR_MIN = 35;
@@ -54,7 +57,7 @@ const TEXTO: Record<Idioma, { tres: string; min35: string }> = {
 };
 
 export function crearSesion(id: string): Sesion {
-  return { id, bloque: "idioma", actividad: null, inicioMs: null, intentos: [], sugerido35: false, sugeridoTres: false };
+  return { id, bloque: "idioma", actividad: null, inicioMs: null, intentos: [], respondidas: [], sugerido35: false, sugeridoTres: false };
 }
 
 export const modoDelBloque = (b: Bloque): Modo => (b === "checkride" ? "checkride" : "practica");
@@ -76,6 +79,8 @@ export function avanzarSesion(s: Sesion, e: EventoSesion, idioma: Idioma = "es")
       return s.bloque === "practica" ? ir({ bloque: "checkride" }) : igual;
     case "fin-debriefing":
       return s.bloque === "debriefing" ? ir({ bloque: "cierre" }) : igual;
+    case "respuesta":
+      return ["idioma", "menu", "cierre"].includes(s.bloque) ? igual : ir({ respondidas: [...s.respondidas, e.respondida] });
     case "intento": {
       if (e.intento.modo !== modoDelBloque(s.bloque) || (s.bloque !== "practica" && s.bloque !== "checkride")) return igual;
       const intentos = [...s.intentos, e.intento];

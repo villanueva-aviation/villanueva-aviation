@@ -102,6 +102,14 @@ test("eventos fuera de lugar no hacen nada", () => {
   assert.deepEqual(r.decir, []);
 });
 
+test("las respuestas se guardan en la sesión sin tocar los intentos", () => {
+  let s = { ...crearSesion("x"), bloque: "practica" as const };
+  s = avanzarSesion(s, { tipo: "respuesta", respondida: { id: "c172-1", correcta: true } }).sesion;
+  assert.deepEqual(s.respondidas, [{ id: "c172-1", correcta: true }]);
+  assert.equal(s.intentos.length, 0);
+  assert.equal(avanzarSesion({ ...s, bloque: "cierre" }, { tipo: "respuesta", respondida: { id: "c172-2", correcta: false } }).sesion.respondidas.length, 1);
+});
+
 test("modo y armado por bloque", () => {
   assert.equal(modoDelBloque("checkride"), "checkride");
   assert.equal(modoDelBloque("practica"), "practica");

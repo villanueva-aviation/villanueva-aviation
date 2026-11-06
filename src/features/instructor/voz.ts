@@ -218,6 +218,7 @@ export function paraVoz(texto: string, idioma: Idioma = "es"): string {
   const en = idioma === "en";
   return texto
     .replace(/[✓✗]/g, "")
+    .replace(/\s*→\s*/g, ": ")
     .replace(/(\d)\s?ft\b/g, en ? "$1 feet" : "$1 pies")
     .replace(/(\d)\s?kt\b/g, en ? "$1 knots" : "$1 nudos")
     .replace(/°/g, en ? " degrees" : " grados")

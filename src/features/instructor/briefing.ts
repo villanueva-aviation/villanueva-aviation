@@ -1,7 +1,9 @@
 import type { Detalle } from "./colaVoz.ts";
 import type { Campo } from "./evaluador.ts";
 import { repetir } from "./explicacion.ts";
+import { BANCO } from "./bancoPreguntas.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
+import { lineasPreguntas, type Respondida } from "./preguntas.ts";
 import type { IntentoSesion } from "./sesion.ts";
 import type { PasoVoz } from "./voz.ts";
 import { ALTURA_SEGURA_AGL, INCLINACION_ENTRADA, INCLINACION_OBJETIVO, LIMPIEZA, TOLERANCIAS } from "./virajeEscarpado.ts";
@@ -116,6 +118,7 @@ export function debriefing(
   intentos: IntentoSesion[],
   material: Material[],
   idioma: Idioma = "es",
+  respondidas: Respondida[] = [],
 ): { lineas: string[]; material: { titulo: string; to: string; exclusivo: boolean }[] } {
   const en = idioma === "en";
   const n = intentos.length;
@@ -171,6 +174,7 @@ export function debriefing(
         : `Checkride: ${r.aprobado ? "aprobado" : "no aprobado"}, ${r.calificacion} de 100.`,
     );
   }
+  lineas.push(...lineasPreguntas(respondidas, BANCO, idioma));
   const rep = n ? repetir(intentos[n - 1].resultado, idioma) : null;
   if (rep) lineas.push(rep); // siempre la última línea: vozDebriefing cuenta con eso
   return {
@@ -181,7 +185,7 @@ export function debriefing(
 
 /** Lo que la voz lee del debriefing. Si lo último fue el checkride, su lectura ya dijo «Repite»: no se repite. */
 export function vozDebriefing(lineas: string[], intentos: IntentoSesion[], detalle: Detalle): string[] {
-  if (detalle === "necesario") return lineas.filter((l, k) => k === 0 || l.startsWith("Checkride:"));
+  if (detalle === "necesario") return lineas.filter((l, k) => k === 0 || /^(Checkride|Preguntas|Questions):/.test(l));
   const yaDicho = intentos.at(-1)?.modo === "checkride" && /^(Repite|Repeat):/.test(lineas.at(-1) ?? "");
   return yaDicho ? lineas.slice(0, -1) : lineas;
 }
