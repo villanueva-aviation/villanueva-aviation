@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { PageHero } from "../components/layout/PageHero";
 import { Container } from "../components/ui/Container";
@@ -8,7 +8,19 @@ import { useAuth } from "../features/auth/AuthContext";
 import { useLector, type EstadoLector } from "../features/instructor/useLector";
 import { armarVuelo, avanzarVuelo, type EvaluacionVuelo, type FaseVuelo } from "../features/instructor/fasesVuelo";
 import type { Aeropuerto } from "../features/instructor/aeropuertoSim";
-import type { Muestra } from "../features/instructor/evaluador";
+import { lectorViejoChecklist, type Muestra } from "../features/instructor/evaluador";
+import {
+  avanzarChecklist,
+  avisoSeccion,
+  crearChecklist,
+  oir,
+  resumenChecklist,
+  type Checklist,
+  type EstadoPunto,
+} from "../features/instructor/checklistVoz";
+import { CHECKLIST_VOZ_C172, type SeccionId } from "../data/checklistVozC172";
+import { useVoz } from "../features/instructor/useVoz";
+import { useChecklistVoz } from "../features/instructor/useChecklistVoz";
 import { FOUNDER_EMAIL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 
@@ -29,6 +41,24 @@ const FASE: Record<FaseVuelo, string> = {
   invalido: "Inválido",
 };
 
+const COLOR: Record<EstadoPunto, string> = {
+  pendiente: "text-white/50",
+  revisando: "text-gold-400",
+  hecho: "text-green-400",
+  dicho: "text-white",
+  "no-hecho": "text-red-400",
+  saltado: "text-red-400",
+};
+const ETIQUETA: Record<EstadoPunto, string> = {
+  pendiente: "",
+  revisando: "revisando",
+  hecho: "hecho",
+  dicho: "dicho",
+  "no-hecho": "dicho, no hecho",
+  saltado: "saltado",
+};
+const nuevoChecklist = () => crearChecklist(CHECKLIST_VOZ_C172);
+
 const mmss = (seg: number) => {
   const s = Math.max(0, Math.round(seg));
   return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
@@ -44,6 +74,34 @@ export function AdminVuelo() {
   const evRef = useRef<EvaluacionVuelo | null>(null);
   const inicio = useRef(0);
   const aeroRef = useRef<Aeropuerto | null>(null);
+  const [cl, setCl] = useState<Checklist>(nuevoChecklist);
+  const clRef = useRef<Checklist>(cl);
+  const ultimaT = useRef(0);
+  const dichos = useRef(new Set<SeccionId>());
+  const [escuchar, setEscuchar] = useState(false);
+  const [oido, setOido] = useState("");
+  const [escrito, setEscrito] = useState("");
+  const voz = useVoz("es", () => null);
+
+  const alOir = (texto: string) => {
+    clRef.current = oir(clRef.current, texto, ultimaT.current);
+    setCl(clRef.current);
+    setOido(texto);
+  };
+  const escucha = useChecklistVoz(escuchar, voz, alOir);
+  const { decir } = escucha;
+
+  // Al cerrar una sección (y terminar sus revisiones) el instructor dice qué faltó, una vez por lectura.
+  useEffect(() => {
+    if (cl.abierta) dichos.current.delete(cl.abierta);
+    for (const s of cl.secciones) {
+      if (dichos.current.has(s.id)) continue;
+      const aviso = avisoSeccion(cl, s.id);
+      if (!aviso) continue;
+      dichos.current.add(s.id);
+      decir(aviso);
+    }
+  }, [cl, decir]);
 
   // Arma con `m` si se puede; si no, deja el motivo y vuelve a intentar con la siguiente muestra.
   const armar = (m: Muestra) => {
@@ -62,8 +120,11 @@ export function AdminVuelo() {
     for (const m of lote) {
       if (!evRef.current) armar(m);
       else evRef.current = avanzarVuelo(evRef.current, m, aeroRef.current);
+      ultimaT.current = m.t;
+      clRef.current = avanzarChecklist(clRef.current, m, { elevacionFt: evRef.current?.aeropuerto?.elevacionFt ?? null });
     }
     setEv(evRef.current);
+    setCl(clRef.current);
   });
   aeroRef.current = aeropuerto;
 
@@ -85,20 +146,32 @@ export function AdminVuelo() {
         ["Tren", m.tren ? "abajo" : "arriba"],
         ["Viento", `${n(m.vientoDir)}° / ${n(m.vientoKt)} kt`],
         ["GS", `${n(m.gs)} kt · ${n(m.altitud)} ft · ${n(m.agl)} ft AGL`],
+        [
+          "Aviónica / combustible",
+          `aviónica ${si(m.avionica)} · selector ${n(m.selector)} · válvula ${si(m.valvula)} · bomba ${si(m.bomba)} · piloto automático ${si(m.autopiloto)} · trim ${n(m.trim, 1)}`,
+        ],
       ]
     : [];
+  const resumen = resumenChecklist(cl);
+  const reiniciar = () => {
+    if (m) armar(m);
+    clRef.current = nuevoChecklist();
+    dichos.current.clear();
+    setCl(clRef.current);
+    setOido("");
+  };
 
   return (
     <div>
       <PageHero
         eyebrow="Panel del fundador"
         title="Vuelo de rampa a rampa"
-        description="Prueba del lector v1.4: fases, pistas y eventos de un vuelo completo en el C172. Todavía sin voz ni calificación."
+        description="Prueba del lector v1.5: fases del vuelo y checklist por voz del C172."
       />
       <Container className="py-12 md:py-16 space-y-8">
         <div className="flex flex-wrap items-center gap-3">
           <Badge tone={ESTADO[estado].tono}>{ESTADO[estado].texto}</Badge>
-          <Button variant="secondary" onClick={() => (m ? armar(m) : undefined)} disabled={!m}>
+          <Button variant="secondary" onClick={reiniciar}>
             Empezar de nuevo
           </Button>
         </div>
@@ -145,6 +218,69 @@ export function AdminVuelo() {
             {ev && <p className="mt-3 text-sm text-white/60">Máxima distancia: {ev.maxDistNm.toFixed(1)} NM</p>}
           </section>
         </div>
+
+        <section className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="font-display text-lg text-white">Checklist por voz</h2>
+            <Button variant={escuchar ? "secondary" : "primary"} onClick={() => setEscuchar((x) => !x)} disabled={!escucha.supported}>
+              {escuchar ? "Dejar de escuchar" : "Escuchar checklist"}
+            </Button>
+            {escucha.escuchando && <Badge tone="green">Escuchando</Badge>}
+            {!escucha.supported && <span className="text-sm text-red-400">Este navegador no reconoce voz.</span>}
+            {escucha.error && <span className="text-sm text-red-400">{escucha.error}</span>}
+          </div>
+          {m && lectorViejoChecklist(m) && (
+            <p className="text-sm text-gold-400">Lector v1.4: 15 puntos se revisan solo por voz. Baja el v1.5 de Descargas.</p>
+          )}
+          <form
+            className="flex flex-wrap gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (escrito.trim()) alOir(escrito.trim());
+              setEscrito("");
+            }}
+          >
+            <input
+              value={escrito}
+              onChange={(e) => setEscrito(e.target.value)}
+              placeholder="Escribe lo que diría el cadete, por ejemplo «checklist antes de arrancar»"
+              aria-label="Texto de prueba para el checklist"
+              className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-white"
+            />
+            <Button type="submit" variant="secondary">
+              Decir
+            </Button>
+          </form>
+          {oido && <p className="text-sm text-white/70">Oí: «{oido}»</p>}
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {cl.secciones.map((s) => (
+              <div
+                key={s.id}
+                className={`rounded-xl border p-4 ${cl.abierta === s.id ? "border-gold-400 bg-gold-400/10" : "border-white/10"}`}
+              >
+                <h3 className="font-semibold text-white">{s.titulo}</h3>
+                <ol className="mt-2 space-y-1 text-sm">
+                  {s.puntos.map((p, k) => {
+                    const e = cl.puntos[s.id][k];
+                    return (
+                      <li key={p.id} className={COLOR[e.estado]}>
+                        {p.dicho}
+                        {ETIQUETA[e.estado] && <span className="text-white/50"> · {ETIQUETA[e.estado]}</span>}
+                        {e.detalle && <span> ({e.detalle})</span>}
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
+            ))}
+          </div>
+          <div className="text-sm text-white/80 space-y-1">
+            <p>Puntos en orden: {resumen.enOrden} de 80</p>
+            {resumen.saltados.length > 0 && <p className="text-red-400">Saltados: {resumen.saltados.join("; ")}</p>}
+            {resumen.noHechos.length > 0 && <p className="text-red-400">Dichos pero no hechos: {resumen.noHechos.join("; ")}</p>}
+            {resumen.noLeidas.length > 0 && <p className="text-white/60">Sin leer: {resumen.noLeidas.join(", ")}</p>}
+          </div>
+        </section>
 
         <section className="rounded-2xl border border-white/10 bg-white/5 p-6">
           <h2 className="font-display text-lg text-white">Última muestra</h2>
