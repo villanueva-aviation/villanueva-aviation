@@ -20,6 +20,12 @@ test("los dígitos dichos uno por uno se juntan, como un rumbo", () => {
   assert.equal(normalizar("40kt", "es"), "40 kt");
 });
 
+test("el separador de miles no parte el número, el punto decimal sí se dice", () => {
+  assert.equal(normalizar("1,500 pies", "es"), "1500 pies");
+  assert.equal(normalizar("2,700 RPM", "en"), "2700 rpm");
+  assert.equal(normalizar("3.8 g", "es"), "3 8 g");
+});
+
 const VS0: Pregunta = {
   id: "t-vs0",
   tema: "c172",

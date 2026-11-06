@@ -61,6 +61,7 @@ export function normalizar(texto: string, idioma: Idioma): string {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
+    .replace(/(\d),(\d{3})(?!\d)/g, "$1$2") // «1,500» es un número, no dos
     .replace(/(\d)([a-z])/g, "$1 $2")
     .replace(/([a-z])(\d)/g, "$1 $2")
     .replace(/[^a-z0-9]+/g, " ")
