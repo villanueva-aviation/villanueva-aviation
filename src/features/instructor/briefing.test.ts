@@ -1,7 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { armar, avanzar, crearEvaluacion, type Resultado } from "./evaluador.ts";
-import { simularManiobra } from "./simular.ts";
+import { simularManiobra, simularRecto } from "./simular.ts";
+import { ACTIVIDADES } from "./actividades.ts";
+import { armarRecto, avanzarRecto } from "./evaluadorRecto.ts";
+import { masFalladoRecto, repetirRecto } from "./explicacionRecto.ts";
 import { briefing, debriefing, listaPasos, queHacer, vozDebriefing, type Material } from "./briefing.ts";
 import { BANCO } from "./bancoPreguntas.ts";
 import type { IntentoSesion } from "./sesion.ts";
@@ -96,4 +99,15 @@ test("en Solo lo necesario la voz lee la primera línea y la del checkride", () 
   const intentos = [con("practica", 70), con("checkride", 90)];
   const d = debriefing(intentos, MATERIAL);
   assert.deepEqual(vozDebriefing(d.lineas, intentos, "necesario"), [d.lineas[0], "Checkride: aprobado, 90 de 100."]);
+});
+
+test("el debriefing de recto y nivelado nombra el intento calificado", () => {
+  const ms = simularRecto({ deriva: { campo: "altitud", valor: -150, desde: 30, segundos: 6 } });
+  const r = ms.slice(1).reduce(avanzarRecto, armarRecto(ms[0])).resultado!;
+  const op = { masFallado: masFalladoRecto, repetir: repetirRecto, calificado: ACTIVIDADES.find((a) => a.id === "recto-nivelado")!.calificado };
+  const intentos: IntentoSesion[] = [{ modo: "checkride", resultado: r, id: null }];
+  const d = debriefing(intentos, MATERIAL, "es", [], op);
+  assert.ok(d.lineas.some((l) => l.startsWith("Intento calificado: no aprobado")), d.lineas.join("\n"));
+  assert.equal(d.lineas.at(-1), "Repite: recto y nivelado");
+  assert.ok(vozDebriefing(d.lineas, intentos, "necesario").some((l) => l.startsWith("Intento calificado:")));
 });

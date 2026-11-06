@@ -3,7 +3,7 @@ import type { Idioma } from "./idiomaInstructor.ts";
 // Preguntas de respuesta corta que el instructor hace en voz alta. Se califican por ideas clave:
 // la respuesta es correcta si contiene una de las aceptadas, comparadas sin acentos y con los números en cifras.
 
-export type Tema = "viraje-escarpado" | "c172";
+export type Tema = "viraje-escarpado" | "recto-nivelado" | "c172";
 export type TextoPregunta = { pregunta: string; respuesta: string; aceptadas: string[] };
 export type Pregunta = { id: string; tema: Tema; es: TextoPregunta; en: TextoPregunta };
 export type Respondida = { id: string; correcta: boolean };

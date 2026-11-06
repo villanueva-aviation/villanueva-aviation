@@ -14,6 +14,7 @@ test("estado de cada opción", () => {
   assert.equal(estadoActividad({ ...ve, acceso: "exclusivo" }, false), "candado");
   assert.equal(estadoActividad({ ...ve, acceso: "exclusivo" }, true), "abierta");
   assert.equal(estadoActividad(ACTIVIDADES[0], true), "proximamente");
+  assert.equal(estadoActividad(ACTIVIDADES.find((a) => a.id === "recto-nivelado")!, false), "abierta");
 });
 
 test("en inglés no hay español", () => {

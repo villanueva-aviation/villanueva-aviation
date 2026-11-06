@@ -15,6 +15,7 @@ import { Explicacion } from "../features/instructor/ExplicacionInstructor";
 import { HojaCheckride } from "../features/instructor/HojaCheckride";
 import { PruebaMicrofono } from "../features/instructor/PruebaMicrofono";
 import type { Idioma } from "../features/instructor/idiomaInstructor";
+import { defDe, lecturaFinalDe } from "../features/instructor/maniobras";
 import { puedeMandar } from "../features/instructor/reglasIntentos";
 import { ReporteExamen } from "../features/instructor/ReporteExamen";
 import {
@@ -34,7 +35,6 @@ import { useVoz } from "../features/instructor/useVoz";
 import {
   avisoVoz,
   filtrarAviso,
-  lecturaFinal,
   MEMORIA_VACIA,
   ordenVoz,
   paraVoz,
@@ -198,7 +198,7 @@ export function InstructorPrograma() {
         dichoRef.current([paraVoz(detallado ? comentario : comentario.split(". ")[0] + ".", idioma)], "orden");
         preguntarRef.current();
       } else {
-        const lectura = lecturaFinal(i.resultado, idioma);
+        const lectura = lecturaFinalDe(defDe("viraje-escarpado"), i.resultado, idioma);
         dichoRef.current(detallado ? lectura : lectura.slice(0, 1), "final");
       }
     },

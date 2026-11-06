@@ -1,5 +1,5 @@
 import type { Detalle } from "./colaVoz.ts";
-import type { Campo } from "./evaluador.ts";
+import type { Campo, Resultado } from "./evaluador.ts";
 import { repetir } from "./explicacion.ts";
 import { BANCO } from "./bancoPreguntas.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
@@ -113,13 +113,33 @@ const CONSEJO: Record<Idioma, Record<Campo, [string, string]>> = {
   },
 };
 
+/** «Lo que más se te salió…» del viraje: el campo con más segundos fuera en todos los lados. */
+export function masFalladoViraje(rs: Resultado[], idioma: Idioma): string | null {
+  const fuera = (c: Campo) => rs.reduce((s, r) => s + r.lados.reduce((t, l) => t + l.fuera[c].reduce((u, tr) => u + tr.fin - tr.inicio, 0), 0), 0);
+  const peorCampo = CAMPOS.reduce((a, b) => (fuera(b) > fuera(a) ? b : a));
+  if (fuera(peorCampo) <= 0) return null;
+  const [nombre, consejo] = CONSEJO[idioma][peorCampo];
+  return idioma === "en" ? `What slipped the most was your ${nombre}: ${consejo}` : `Lo que más se te salió fue ${nombre}: ${consejo}`;
+}
+
+/** Lo que cambia del debriefing según la maniobra. */
+export type OpcionesDebriefing = {
+  masFallado: (rs: any[], idioma: Idioma) => string | null;
+  repetir: (r: any, idioma: Idioma) => string | null;
+  calificado: Record<Idioma, string>;
+};
+export const DEBRIEF_VIRAJE: OpcionesDebriefing = { masFallado: masFalladoViraje, repetir, calificado: { es: "checkride", en: "checkride" } };
+const mayus = (s: string) => `${s[0].toUpperCase()}${s.slice(1)}`;
+
 /** Debriefing de la sesión: comparación de intentos, lo que más falló, qué repetir y material. */
 export function debriefing(
   intentos: IntentoSesion[],
   material: Material[],
   idioma: Idioma = "es",
   respondidas: Respondida[] = [],
+  op: OpcionesDebriefing = DEBRIEF_VIRAJE,
 ): { lineas: string[]; material: { titulo: string; to: string; exclusivo: boolean }[] } {
+  const nombre = op.calificado[idioma];
   const en = idioma === "en";
   const n = intentos.length;
   const lineas = [
@@ -151,31 +171,26 @@ export function debriefing(
       c > a
         ? en ? "You're improving." : "Vas mejorando."
         : c < a
-          ? en ? "You dropped a little: that's normal under checkride pressure." : "Bajaste un poco: es normal con la presión del examen."
+          ? en ? `You dropped a little: that's normal under ${nombre} pressure.` : "Bajaste un poco: es normal con la presión del examen."
           : en ? "You stayed steady." : "Te mantuviste parejo.";
     lineas.push(
       en
-        ? `From your first practice attempt to the checkride you went from ${a} to ${c}. ${tendencia}`
-        : `Del primer intento de práctica al checkride pasaste de ${a} a ${c}. ${tendencia}`,
+        ? `From your first practice attempt to the ${nombre} you went from ${a} to ${c}. ${tendencia}`
+        : `Del primer intento de práctica al ${nombre} pasaste de ${a} a ${c}. ${tendencia}`,
     );
   }
-  const fuera = (c: Campo) =>
-    intentos.reduce((s, i) => s + i.resultado.lados.reduce((t, l) => t + l.fuera[c].reduce((u, tr) => u + tr.fin - tr.inicio, 0), 0), 0);
-  const peorCampo = CAMPOS.reduce((a, b) => (fuera(b) > fuera(a) ? b : a));
-  if (fuera(peorCampo) > 0) {
-    const [nombre, consejo] = CONSEJO[idioma][peorCampo];
-    lineas.push(en ? `What slipped the most was your ${nombre}: ${consejo}` : `Lo que más se te salió fue ${nombre}: ${consejo}`);
-  }
+  const mas = op.masFallado(intentos.map((i) => i.resultado), idioma);
+  if (mas) lineas.push(mas);
   if (checkride) {
     const r = checkride.resultado;
     lineas.push(
       en
-        ? `Checkride: ${r.aprobado ? "passed" : "not passed"}, ${r.calificacion} out of 100.`
-        : `Checkride: ${r.aprobado ? "aprobado" : "no aprobado"}, ${r.calificacion} de 100.`,
+        ? `${mayus(nombre)}: ${r.aprobado ? "passed" : "not passed"}, ${r.calificacion} out of 100.`
+        : `${mayus(nombre)}: ${r.aprobado ? "aprobado" : "no aprobado"}, ${r.calificacion} de 100.`,
     );
   }
   lineas.push(...lineasPreguntas(respondidas, BANCO, idioma));
-  const rep = n ? repetir(intentos[n - 1].resultado, idioma) : null;
+  const rep = n ? op.repetir(intentos[n - 1].resultado, idioma) : null;
   if (rep) lineas.push(rep); // siempre la última línea: vozDebriefing cuenta con eso
   return {
     lineas,
@@ -185,7 +200,7 @@ export function debriefing(
 
 /** Lo que la voz lee del debriefing. Si lo último fue el checkride, su lectura ya dijo «Repite»: no se repite. */
 export function vozDebriefing(lineas: string[], intentos: IntentoSesion[], detalle: Detalle): string[] {
-  if (detalle === "necesario") return lineas.filter((l, k) => k === 0 || /^(Checkride|Preguntas|Questions):/.test(l));
+  if (detalle === "necesario") return lineas.filter((l, k) => k === 0 || /^(Checkride|Intento calificado|Graded attempt|Preguntas|Questions):/.test(l));
   const yaDicho = intentos.at(-1)?.modo === "checkride" && /^(Repite|Repeat):/.test(lineas.at(-1) ?? "");
   return yaDicho ? lineas.slice(0, -1) : lineas;
 }

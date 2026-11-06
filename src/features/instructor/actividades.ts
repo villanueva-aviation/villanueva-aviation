@@ -11,7 +11,11 @@ export type Actividad = {
   minutos: number;
   acceso: "gratis" | "exclusivo";
   disponible: boolean;
+  /** Cómo se llama el intento que se califica: «checkride» o, fuera del ACS, «intento calificado». */
+  calificado: Record<Idioma, string>;
 };
+
+const CHECKRIDE = { es: "checkride", en: "checkride" };
 
 export const ACTIVIDADES: Actividad[] = [
   {
@@ -21,6 +25,7 @@ export const ACTIVIDADES: Actividad[] = [
     minutos: 60,
     acceso: "exclusivo",
     disponible: false,
+    calificado: CHECKRIDE,
   },
   {
     id: "recto-nivelado",
@@ -28,7 +33,8 @@ export const ACTIVIDADES: Actividad[] = [
     detalle: { es: "Mantener altitud, rumbo y velocidad.", en: "Hold altitude, heading and airspeed." },
     minutos: 60,
     acceso: "gratis",
-    disponible: false,
+    disponible: true,
+    calificado: { es: "intento calificado", en: "graded attempt" },
   },
   {
     id: "vuelo-lento",
@@ -37,6 +43,7 @@ export const ACTIVIDADES: Actividad[] = [
     minutos: 60,
     acceso: "exclusivo",
     disponible: false,
+    calificado: CHECKRIDE,
   },
   {
     id: "perdidas",
@@ -45,6 +52,7 @@ export const ACTIVIDADES: Actividad[] = [
     minutos: 60,
     acceso: "exclusivo",
     disponible: false,
+    calificado: CHECKRIDE,
   },
   {
     id: "viraje-escarpado",
@@ -53,6 +61,7 @@ export const ACTIVIDADES: Actividad[] = [
     minutos: 60,
     acceso: "gratis",
     disponible: true,
+    calificado: CHECKRIDE,
   },
 ];
 

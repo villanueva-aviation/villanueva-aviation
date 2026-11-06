@@ -117,3 +117,17 @@ test("modo y armado por bloque", () => {
   assert.equal(armaEnBloque("preparacion"), true);
   assert.equal(armaEnBloque("debriefing"), false);
 });
+
+test("recto y nivelado sugiere el intento calificado", () => {
+  const eventos: EventoSesion[] = [
+    { tipo: "idioma" },
+    { tipo: "elegir", actividad: "recto-nivelado" },
+    { tipo: "listo", ahoraMs: 0 },
+    { tipo: "armado" },
+    { tipo: "intento", intento: practica },
+    { tipo: "intento", intento: practica },
+    { tipo: "intento", intento: practica },
+  ];
+  const { dichos } = correr(eventos);
+  assert.deepEqual(dichos.at(-1), ["Ya tienes tres intentos: puedes pasar al intento calificado o seguir practicando."]);
+});
