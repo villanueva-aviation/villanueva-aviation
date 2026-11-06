@@ -13,7 +13,7 @@ import { ROUTES } from "../lib/routes";
 import { debriefing, vozDebriefing } from "../features/instructor/briefing";
 import { Explicacion } from "../features/instructor/ExplicacionInstructor";
 import { PruebaMicrofono } from "../features/instructor/PruebaMicrofono";
-import type { Idioma } from "../features/instructor/idiomaInstructor";
+import { traducirMotivo, type Idioma } from "../features/instructor/idiomaInstructor";
 import { defDe, lecturaFinalDe, type ManiobraId } from "../features/instructor/maniobras";
 import { HOJA } from "../features/instructor/vistasManiobra";
 import { puedeMandar } from "../features/instructor/reglasIntentos";
@@ -496,8 +496,8 @@ export function InstructorPrograma() {
               {ev && def.fase(ev) !== "invalido" ? def.textoPaso(paso, ev, idioma) : estado === "conectado" ? textoEspera(muestra, idioma) : t.estado[estado]}
             </p>
             {def.queHacer(paso, idioma) && <p className="mt-2 text-sm text-white/70">{def.queHacer(paso, idioma)}</p>}
-            {anulado && ev && def.fase(ev) === "armado" && <p className="mt-3 text-sm text-red-200">{t.anuladoAntes(anulado)}</p>}
-            {ev && def.fase(ev) === "invalido" && <p className="mt-3 text-sm text-red-200">{t.sinCalificar(def.motivo(ev) ?? "")}</p>}
+            {anulado && ev && def.fase(ev) === "armado" && <p className="mt-3 text-sm text-red-200">{t.anuladoAntes(traducirMotivo(anulado, idioma))}</p>}
+            {ev && def.fase(ev) === "invalido" && <p className="mt-3 text-sm text-red-200">{t.sinCalificar(traducirMotivo(def.motivo(ev) ?? "", idioma))}</p>}
           </section>
 
           <section>
