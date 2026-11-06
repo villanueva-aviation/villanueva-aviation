@@ -127,7 +127,48 @@ static class LectorInstructor
         var banderas = o.Modo == "--simulado" && o.Url == "http://localhost:5180/instructor/programa" && o.SinVentana
             && d.Modo == "" && d.Url == UrlPrograma && !d.SinVentana;
         Console.WriteLine(banderas ? "Banderas: OK" : "Banderas: FALLA");
-        return ok && edge && banderas ? 0 : 1;
+
+        var puerto = PuertoLibreTrasHijo();
+        Console.WriteLine(puerto ? "Puerto libre tras abrir Edge: OK" : "Puerto libre tras abrir Edge: FALLA");
+        return ok && edge && banderas && puerto ? 0 : 1;
+    }
+
+    // Lo que pasaba: Edge heredaba el puerto del lector y, si el lector se cerraba, nadie podia volver a usarlo.
+    static bool PuertoLibreTrasHijo()
+    {
+        var l = new TcpListener(IPAddress.Loopback, 0);
+        l.Start();
+        var puerto = ((IPEndPoint)l.LocalEndpoint).Port;
+        var si = SinHeredar(Path.Combine(Environment.SystemDirectory, "ping.exe"), "-n 4 127.0.0.1");
+        si.WindowStyle = ProcessWindowStyle.Hidden;
+        var hijo = Process.Start(si);
+        l.Stop();
+        try
+        {
+            var otra = new TcpListener(IPAddress.Loopback, puerto);
+            otra.Start();
+            otra.Stop();
+            return true;
+        }
+        catch (SocketException) { return false; }
+        finally { try { hijo.Kill(); } catch { } }
+    }
+
+    static bool Responde()
+    {
+        try
+        {
+            var r = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:" + Puerto + "/muestra");
+            r.Timeout = 2000;
+            using (r.GetResponse()) return true;
+        }
+        catch { return false; }
+    }
+
+    public static ProcessStartInfo SinHeredar(string exe, string argumentos)
+    {
+        // Por el shell de Windows el hijo no hereda los handles: el puerto se queda solo con el lector.
+        return new ProcessStartInfo(exe, argumentos) { UseShellExecute = true };
     }
 
     public const string UrlPrograma = "https://villanueva-aviation.pages.dev/instructor/programa";
@@ -168,7 +209,7 @@ static class LectorInstructor
             return;
         }
         var perfil = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"VillanuevaInstructor\Edge");
-        try { Process.Start(new ProcessStartInfo(edge, ArgumentosEdge(url, perfil)) { UseShellExecute = false }); }
+        try { Process.Start(SinHeredar(edge, ArgumentosEdge(url, perfil))); }
         catch (Exception e) { Console.WriteLine("No pude abrir Edge: " + e.Message); }
     }
 
@@ -182,9 +223,18 @@ static class LectorInstructor
         try { escucha.Start(); }
         catch (SocketException)
         {
-            AbrirVentana(op.Url);
-            Console.WriteLine("El lector ya estaba abierto: abri la ventana del instructor.");
-            Thread.Sleep(3000);
+            if (Responde())
+            {
+                AbrirVentana(op.Url);
+                Console.WriteLine("El lector ya estaba abierto: abri la ventana del instructor.");
+                Thread.Sleep(3000);
+            }
+            else
+            {
+                // Una ventana abierta por un lector viejo (v1.1) puede quedarse con el puerto.
+                Console.WriteLine("Algo ocupa el puerto del lector. Cierra todas las ventanas del Instructor virtual y vuelve a abrir el lector.");
+                Thread.Sleep(15000);
+            }
             return;
         }
         var servidor = new Thread(() => Servir(escucha));
