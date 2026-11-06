@@ -13,6 +13,7 @@ const p = (id: string, tema: Tema, es: Texto, en: Texto): Pregunta => ({
 });
 
 const VE = "viraje-escarpado";
+const RN = "recto-nivelado";
 
 export const BANCO: Pregunta[] = [
   // Viraje escarpado
@@ -54,6 +55,46 @@ export const BANCO: Pregunta[] = [
     ["On what heading do you roll out after each turn?", "Your entry heading.", ["entry", "same heading", "initial heading"]]),
   p("ve-19", VE, ["Al nivelar, ¿qué haces con la presión atrás?", "La quitas.", ["quitas", "quitar", "quita", "sueltas", "suelta", "aflojas", "relajas"]],
     ["As you roll out, what do you do with the back pressure?", "Release it.", ["release", "relax", "ease"]]),
+
+  // Recto y nivelado (Academia: Fundamentos e Instrumentos; tolerancias de rectoNivelado.ts)
+  p("rn-1", RN, ["En vuelo recto y nivelado, ¿qué fuerza es igual a la sustentación?", "El peso.", ["peso"]],
+    ["In straight-and-level flight, which force equals lift?", "Weight.", ["weight"]]),
+  p("rn-2", RN, ["¿Y qué fuerza es igual al empuje?", "La resistencia.", ["resistencia"]],
+    ["And which force equals thrust?", "Drag.", ["drag"]]),
+  p("rn-3", RN, ["¿Qué instrumento te confirma que mantienes la altitud?", "El altímetro.", ["altimetro"]],
+    ["Which instrument confirms you're holding altitude?", "The altimeter.", ["altimeter"]]),
+  p("rn-4", RN, ["¿Qué instrumento te dice si mantienes el rumbo?", "El indicador de rumbo.", ["indicador de rumbo", "giro direccional", "direccional", "brujula", "hsi"]],
+    ["Which instrument tells you whether you're holding your heading?", "The heading indicator.", ["heading indicator", "directional gyro", "compass", "hsi"]]),
+  p("rn-5", RN, ["¿Qué instrumento te muestra si las alas van niveladas?", "El indicador de actitud.", ["actitud", "horizonte", "coordinador"]],
+    ["Which instrument shows whether your wings are level?", "The attitude indicator.", ["attitude", "horizon", "turn coordinator"]]),
+  p("rn-6", RN, ["¿Para qué sirve el compensador?", "Para quitar la presión del yugo.", ["presion", "fuerza", "yugo", "soltar"]],
+    ["What is the trim for?", "To take the pressure off the yoke.", ["pressure", "force", "yoke", "hands off"]]),
+  p("rn-7", RN, ["Si la nariz sube sola, ¿qué haces?", "Bajo la nariz y compenso hacia adelante.", ["bajo", "bajar", "baja", "adelante", "compenso", "compensar"]],
+    ["If the nose keeps rising on its own, what do you do?", "Lower the nose and trim forward.", ["lower", "forward", "nose down", "trim"]]),
+  p("rn-8", RN, ["Para corregir unos pocos pies de altitud, ¿qué cambias primero: la actitud o la potencia?", "La actitud: un poco de nariz.", ["actitud", "nariz", "cabeceo"]],
+    ["To fix a few feet of altitude, what do you change first: attitude or power?", "Attitude: a little pitch.", ["attitude", "pitch", "nose"]]),
+  p("rn-9", RN, ["Si la altitud está bien pero la velocidad baja, ¿qué ajustas?", "La potencia.", ["potencia", "acelerador"]],
+    ["If your altitude is fine but your airspeed is dropping, what do you adjust?", "Power.", ["power", "throttle"]]),
+  p("rn-10", RN, ["¿Qué instrumento es el centro de tu ciclo de revisión?", "El indicador de actitud.", ["actitud", "horizonte"]],
+    ["Which instrument is the center of your scan?", "The attitude indicator.", ["attitude", "horizon"]]),
+  p("rn-11", RN, ["En vuelo visual, ¿hacia dónde miras la mayor parte del tiempo?", "Afuera, al horizonte.", ["afuera", "fuera", "horizonte", "exterior"]],
+    ["Flying visually, where do you look most of the time?", "Outside, at the horizon.", ["outside", "horizon"]]),
+  p("rn-12", RN, ["¿Qué te dice la bola descentrada?", "Que el vuelo no está coordinado: hay derrape o resbale.", ["coordinado", "descoordinado", "derrape", "resbale", "derrapando", "resbalando"]],
+    ["What does an off-center ball tell you?", "The flight isn't coordinated: you're slipping or skidding.", ["coordinated", "uncoordinated", "skid", "slip", "skidding", "slipping"]]),
+  p("rn-13", RN, ["Si la bola se va a la derecha, ¿qué pedal pisas?", "El derecho: pisa la bola.", ["derecho", "derecha"]],
+    ["If the ball goes to the right, which rudder pedal do you press?", "The right one: step on the ball.", ["right"]]),
+  p("rn-14", RN, ["Si reduces potencia sin tocar el yugo, ¿qué hace la nariz?", "Baja y el avión desciende.", ["baja", "desciende", "cae"]],
+    ["If you reduce power without touching the yoke, what does the nose do?", "It drops and the airplane descends.", ["drops", "goes down", "descends", "lowers", "pitches down"]]),
+  p("rn-15", RN, ["Si agregas potencia sin tocar el yugo, ¿qué hace la nariz?", "Sube y el avión asciende.", ["sube", "asciende"]],
+    ["If you add power without touching the yoke, what does the nose do?", "It rises and the airplane climbs.", ["rises", "goes up", "climbs", "pitches up"]]),
+  p("rn-16", RN, ["¿Cuál es la tolerancia de altitud en esta práctica?", "Más o menos 100 pies.", ["100"]],
+    ["What is the altitude tolerance in this practice?", "Plus or minus 100 feet.", ["100"]]),
+  p("rn-17", RN, ["¿Cuál es la tolerancia de rumbo?", "Más o menos 10 grados.", ["10"]],
+    ["What is the heading tolerance?", "Plus or minus 10 degrees.", ["10"]]),
+  p("rn-18", RN, ["¿Cuál es la tolerancia de velocidad en esta práctica?", "Más o menos 10 nudos.", ["10"]],
+    ["What is the airspeed tolerance in this practice?", "Plus or minus 10 knots.", ["10"]]),
+  p("rn-19", RN, ["¿Cuánto dura el tramo que se califica?", "Dos minutos.", ["2"]],
+    ["How long is the graded segment?", "Two minutes.", ["2"]]),
 
   // Cessna 172 (C172S)
   p("c172-1", "c172", ["¿Cuál es la Vs0 del C172?", "40 nudos.", ["40"]],

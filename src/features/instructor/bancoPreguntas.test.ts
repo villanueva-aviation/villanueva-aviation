@@ -4,7 +4,7 @@ import { BANCO } from "./bancoPreguntas.ts";
 import { calificarRespuesta, normalizar } from "./preguntas.ts";
 
 test("15 a 20 preguntas por tema", () => {
-  for (const t of ["viraje-escarpado", "c172"] as const) {
+  for (const t of ["viraje-escarpado", "recto-nivelado", "c172"] as const) {
     const n = BANCO.filter((p) => p.tema === t).length;
     assert.ok(n >= 15 && n <= 20, `${t}: ${n}`);
   }
