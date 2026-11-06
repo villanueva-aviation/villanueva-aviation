@@ -68,8 +68,33 @@ test("abajo de 1,500 AGL: no empieza; si baja, S2 NS", () => {
   assert.equal(r.aprobado, false);
 });
 
-test("el segundo viraje al mismo lado no cuenta", () => {
-  assert.equal(hasta(simularLento({ segundoLado: "izquierda" })).ev.fase, "viraje2");
+test("el segundo viraje al mismo lado no cuenta y a los 60 s termina sin pasar", () => {
+  const ms = simularLento({ segundoLado: "izquierda", colaSeg: 40 });
+  assert.ok(hasta(ms).ev.marcas.every((k) => k.fase !== "salida"));
+  const { ev } = hasta(ms);
+  assert.equal(ev.fase, "terminado");
+  assert.equal(ev.resultado!.aprobado, false);
+  assert.ok(ev.resultado!.avisos.includes("No completaste los dos virajes."));
+});
+
+test("un viraje que nunca cierra no deja el intento colgado", () => {
+  // Después del primer viraje se queda recto: nunca hace el segundo.
+  const ms = simularLento({ sinSegundo: true });
+  const { ev } = hasta(ms);
+  assert.equal(ev.fase, "terminado");
+  assert.equal(ev.resultado!.aprobado, false);
+});
+
+test("salir con potencia cuenta por la velocidad, aunque las RPM no lleguen a 2,300 (aeródromos altos)", () => {
+  const r = hasta(simularLento({ rpmSalida: 2150 })).ev.resultado!;
+  assert.equal(r.salio, true);
+  assert.equal(r.aprobado, true);
+});
+
+test("el rumbo al salir se califica: pasarse 30° en el primer viraje deja S5 NS", () => {
+  const r = hasta(simularLento({ giro1: 120 })).ev.resultado!;
+  assert.equal(r.elementos["PA.VII.A.S5"], "NS");
+  assert.ok(Math.abs(r.peor.rumbo) >= 25, String(r.peor.rumbo));
 });
 
 test("sin salida con potencia termina a los 30 s y no pasa", () => {

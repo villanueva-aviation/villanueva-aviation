@@ -10,5 +10,7 @@ export const RECTO_SEG = 30;
 /** Segundos estable en la banda para tomar el objetivo. */
 export const ENTRADA_SEG = 3;
 export const GIRO_GRADOS = 90;
-/** Fuera del vuelo lento = potencia y velocidad; si no sale en maxSeg, no pasa. */
-export const SALIDA = { rpm: 2300, kt: 70, maxSeg: 30 } as const;
+/** Salir = llegar a kt con potencia (se mide por la velocidad: las RPM a fondo cambian con la altura del campo); si no sale en maxSeg, no pasa. */
+export const SALIDA = { kt: 70, maxSeg: 30 } as const;
+/** Cada viraje tiene este tiempo para cerrarse; si no, el intento termina sin pasar. */
+export const VIRAJE_MAX_SEG = 60;

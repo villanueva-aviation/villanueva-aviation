@@ -16,7 +16,7 @@ const FILAS: Fila[] = [
   { clave: "altitud", nombre: { es: `Altitud ±${TOL.altitudFt} ft`, en: `Altitude ±${TOL.altitudFt} ft` }, bien: (r) => !r.fuera.altitud.length, valor: (r) => `${signo(r.peor.altitud)} ft` },
   {
     clave: "rumbo",
-    nombre: { es: `Rumbo ±${TOL.rumboGrados}° (tramo recto)`, en: `Heading ±${TOL.rumboGrados}° (straight leg)` },
+    nombre: { es: `Rumbo ±${TOL.rumboGrados}° (tramos rectos)`, en: `Heading ±${TOL.rumboGrados}° (straight legs)` },
     bien: (r) => !r.fuera.rumbo.length,
     valor: (r) => `${signo(r.peor.rumbo)}°`,
   },

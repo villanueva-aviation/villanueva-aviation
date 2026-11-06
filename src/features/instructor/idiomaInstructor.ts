@@ -14,6 +14,7 @@ const MOTIVOS_EN: Record<string, string> = {
 const AVISOS_EN: Record<string, string> = {
   "Bajaste de 1500 ft sobre el terreno: haz la maniobra más alto.": "You went below 1500 ft above the ground: fly the maneuver higher.",
   "No saliste del vuelo lento con potencia.": "You didn't recover from slow flight with power.",
+  "No completaste los dos virajes.": "You didn't complete both turns.",
 };
 
 export function traducirMotivo(motivo: string, idioma: Idioma = "es"): string {

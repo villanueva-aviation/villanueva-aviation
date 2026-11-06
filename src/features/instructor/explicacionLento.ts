@@ -106,7 +106,8 @@ export function explicarLento(r: ResultadoLento, idioma: Idioma): Linea[] {
     );
   }
   if (r.bajo) mal(en ? `You went below ${ALTURA} ft above the ground: start higher.` : `Bajaste de ${ALTURA} ft sobre el terreno: empieza más alto.`);
-  if (!r.salio) mal(en ? "You didn't recover with power: full power first, then flaps up in stages." : "No saliste con potencia: primero potencia completa, luego flaps arriba por etapas.");
+  if (r.virajes === false) mal(en ? "You didn't complete both turns: after the first one, turn 90° the other way." : "No completaste los dos virajes: después del primero, vira 90° al lado contrario.");
+  else if (!r.salio) mal(en ? "You didn't recover with power: full power first, then flaps up in stages." : "No saliste con potencia: primero potencia completa, luego flaps arriba por etapas.");
   const bajo = r.fuera.altitud.filter((tr) => tr.peor < 0);
   const alto = r.fuera.altitud.filter((tr) => tr.peor > 0);
   if (bajo.length) {
@@ -119,7 +120,7 @@ export function explicarLento(r: ResultadoLento, idioma: Idioma): Linea[] {
   }
   if (r.fuera.rumbo.length) {
     const g = Math.round(Math.abs(r.peor.rumbo));
-    mal(en ? `You drifted ${g}° off heading on the straight leg. ${mayus(c.rumbo[1])}` : `Te desviaste ${g}° del rumbo en el tramo recto. ${mayus(c.rumbo[1])}`);
+    mal(en ? `You drifted ${g}° off heading on a straight leg. ${mayus(c.rumbo[1])}` : `Te desviaste ${g}° del rumbo en un tramo recto. ${mayus(c.rumbo[1])}`);
   }
   if (r.fuera.velocidad.length) {
     const kt = Math.round(OBJETIVO_KT + r.peor.velocidad);
@@ -151,6 +152,7 @@ export function repetirLento(r: ResultadoLento, idioma: Idioma): string | null {
   const en = idioma === "en";
   if (r.perdidas.length) return en ? "Repeat: slow flight without the stall warning" : "Repite: vuelo lento sin que suene el aviso de pérdida";
   if (r.bajo) return en ? `Repeat: slow flight at ${ALTURA} ft above the ground or higher` : `Repite: vuelo lento a ${ALTURA} ft sobre el terreno o más`;
+  if (r.virajes === false) return en ? "Repeat: slow flight with both turns" : "Repite: vuelo lento con los dos virajes";
   if (!r.salio) return en ? "Repeat: slow flight and the recovery with power" : "Repite: vuelo lento y la salida con potencia";
   return en ? "Repeat: slow flight" : "Repite: vuelo lento";
 }

@@ -48,6 +48,10 @@ export function simularLento(
     velocidadKt?: number;
     caidaKt?: { desde: number; segundos: number; kt: number };
     viejo?: boolean;
+    sinSegundo?: boolean;
+    rpmSalida?: number;
+    giro1?: number;
+    colaSeg?: number;
   } = {},
 ): Muestra[] {
   const lenta = op.velocidadKt ?? 58;
@@ -69,11 +73,11 @@ export function simularLento(
   const quieto = (seg: number) => {
     for (let i = 0; i < seg * 10; i++) emitir(0);
   };
-  const virar = (sentido: 1 | -1) => {
+  const virar = (sentido: 1 | -1, angulo = 90) => {
     let girado = 0;
     let tl = 0;
     for (;;) {
-      const restante = 90 - girado;
+      const restante = angulo - girado;
       const incl = Math.min(15, 9 * tl, Math.max(5, restante / 2));
       const paso = ((1091 * Math.tan((incl * Math.PI) / 180)) / v) * 0.1;
       if (paso >= restante) {
@@ -92,19 +96,20 @@ export function simularLento(
     v = Math.max(lenta, v - 0.2);
   }
   quieto(35);
-  virar(-1);
+  virar(-1, op.giro1 ?? 90);
   quieto(2);
-  virar(op.segundoLado === "izquierda" ? -1 : 1);
+  if (op.sinSegundo) quieto(70);
+  else virar(op.segundoLado === "izquierda" ? -1 : 1);
   quieto(3);
   if (op.sinSalida) quieto(35);
   else {
-    rpm = 2450;
+    rpm = op.rpmSalida ?? 2450;
     while (v < 80) {
       emitir(0);
       v = Math.min(80, v + 0.2);
     }
   }
-  quieto(10);
+  quieto(op.colaSeg ?? 10);
   return out;
 }
 

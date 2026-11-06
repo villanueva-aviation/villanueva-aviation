@@ -23,6 +23,7 @@ const enFase = (f: EvaluacionLento["fase"], ms = simularLento()) => hasta(ms, (e
 const limpio = hasta(simularLento()).ev.resultado!;
 const conPerdida = hasta(simularLento({ perdidaEn: 30 })).ev.resultado!;
 const sinSalida = hasta(simularLento({ sinSalida: true })).ev.resultado!;
+const sinVirajes = hasta(simularLento({ sinSegundo: true })).ev.resultado!;
 const { ev: evRecto, m: mRecto } = hasta(simularLento(), (ev, m) => ev.fase === "recto" && m.t - ev.objetivo!.t > 5);
 const { ev: evViraje, m: mViraje } = hasta(simularLento(), (ev) => ev.fase === "viraje1" && Math.abs(ev.giro) > 40);
 const { ev: evTrasIzquierda } = enFase("viraje2");
@@ -81,6 +82,14 @@ test("la explicación menciona el aviso de pérdida y repetir lo pide primero", 
   assert.match(repetirLento(sinSalida, "es")!, /potencia/);
 });
 
+test("sin los dos virajes, la explicación y repetir lo dicen (no hablan de la salida)", () => {
+  const mal = explicarLento(sinVirajes, "es").filter((l) => l.tipo === "mal").map((l) => l.texto);
+  assert.ok(mal.some((t) => /dos virajes/.test(t)), mal.join(" | "));
+  assert.ok(!mal.some((t) => /potencia/.test(t)), mal.join(" | "));
+  assert.match(repetirLento(sinVirajes, "es")!, /virajes/);
+  assert.equal(traducirAviso("No completaste los dos virajes.", "en"), "You didn't complete both turns.");
+});
+
 test("masFallado usa el aviso de pérdida antes que los campos", () => {
   assert.match(masFalladoLento([limpio, conPerdida], "es")!, /pérdida/);
   assert.equal(masFalladoLento([limpio], "es"), null);
@@ -98,8 +107,9 @@ test("en inglés no hay español", () => {
     ...briefingLento("en"),
     traducirMotivo(motivo, "en"),
     traducirAviso("No saliste del vuelo lento con potencia.", "en"),
+    traducirAviso("No completaste los dos virajes.", "en"),
     masFalladoLento([conPerdida], "en") ?? "",
-    ...[limpio, conPerdida, sinSalida].flatMap((r) => [...explicarLento(r, "en").map((l) => l.texto), repetirLento(r, "en") ?? ""]),
+    ...[limpio, conPerdida, sinSalida, sinVirajes].flatMap((r) => [...explicarLento(r, "en").map((l) => l.texto), repetirLento(r, "en") ?? ""]),
     ...TODOS.map((p) => textoPasoLento(p, evTrasIzquierda, "en") + queHacerLento(p, "en")),
     ...listaPasosLento("sal", "en").map((p) => p.nombre),
     avisoLento(evRecto, { ...mRecto, perdida: true }, "practica", "en")!.texto,

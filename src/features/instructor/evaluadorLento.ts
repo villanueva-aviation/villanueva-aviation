@@ -1,7 +1,7 @@
 import { analizar, difRumbo, invalidez, lectorViejo, type Lado, type Muestra, type Tramo } from "./evaluador.ts";
 import { ESTABLE } from "./rectoNivelado.ts";
 import { ALTURA_SEGURA_AGL, BOLA_TOLERANCIA, INCLINACION_NIVELADO } from "./virajeEscarpado.ts";
-import { ENTRADA_SEG, GIRO_GRADOS, INCLINACION_VIRAJE, OBJETIVO_KT, RECTO_SEG, SALIDA, TOLERANCIAS_LENTO } from "./vueloLento.ts";
+import { ENTRADA_SEG, GIRO_GRADOS, INCLINACION_VIRAJE, OBJETIVO_KT, RECTO_SEG, SALIDA, TOLERANCIAS_LENTO, VIRAJE_MAX_SEG } from "./vueloLento.ts";
 
 export type CampoLento = "altitud" | "rumbo" | "velocidad" | "inclinacion" | "bola";
 export type CodigoLento = "PA.VII.A.S2" | "PA.VII.A.S3" | "PA.VII.A.S4" | "PA.VII.A.S5";
@@ -20,7 +20,8 @@ export interface ResultadoLento {
   perdidas: number[]; // t en que empezó a sonar cada aviso de pérdida
   bajo: boolean; // pasó por debajo de ALTURA_SEGURA_AGL
   salio: boolean; // salió con potencia antes de SALIDA.maxSeg
-  primerLado: Lado;
+  virajes: boolean; // cerró los dos virajes, a lados contrarios, antes de VIRAJE_MAX_SEG cada uno
+  primerLado: Lado | null;
   flaps: number; // palanca al tomar el objetivo
   avisos: string[];
   muestras: Muestra[]; // desde el objetivo hasta el final
@@ -55,6 +56,7 @@ export const TOLERANCIA_LENTO: Record<CampoLento, number> = {
 const MITAD_BANDA = TOLERANCIAS_LENTO.velocidadMasKt / 2;
 const MOTIVO_VIEJO = "Tu lector es de una versión anterior: baja el nuevo de Descargas para el vuelo lento.";
 export const AVISO_SIN_SALIDA = "No saliste del vuelo lento con potencia.";
+export const AVISO_SIN_VIRAJES = "No completaste los dos virajes.";
 
 export function desvioLento(m: Muestra, o: Pick<Muestra, "altitud" | "rumbo">, c: CampoLento): number {
   if (c === "rumbo") return difRumbo(m.rumbo, o.rumbo);
@@ -101,12 +103,12 @@ const ladoDe = (giro: number): Lado => (giro < 0 ? "izquierda" : "derecha");
 /** El viraje cierra con el giro hecho y las alas casi niveladas (más estricto que INCLINACION_NIVELADO para no cortar el final). */
 const cerro = (giro: number, m: Muestra) => Math.abs(giro) >= GIRO_GRADOS - 10 && Math.abs(m.inclinacion) < ESTABLE.inclinacion;
 
-function resultado(ev: EvaluacionLento, salio: boolean): ResultadoLento {
+function resultado(ev: EvaluacionLento, salio: boolean, virajes = true): ResultadoLento {
   const o = ev.objetivo!;
   const { tramo, marcas } = ev;
   const cuenta: Record<CampoLento, (k: Marca) => boolean> = {
     altitud: () => true,
-    rumbo: (k) => k.fase === "recto",
+    rumbo: (k) => k.fase === "recto" || k.fase === "salida",
     velocidad: (k) => k.fase === "recto" || k.fase === "viraje1" || k.fase === "viraje2",
     inclinacion: (k) => (k.fase === "viraje1" || k.fase === "viraje2") && Math.abs(k.giro) > 15 && Math.abs(k.giro) < GIRO_GRADOS - 15,
     bola: () => true,
@@ -135,7 +137,7 @@ function resultado(ev: EvaluacionLento, salio: boolean): ResultadoLento {
   puntos -= (perdidas.length ? 30 : 0) + (bajo ? 20 : 0) + (salio ? 0 : 20);
   return {
     maniobra: "vuelo-lento",
-    aprobado: salio && Object.values(elementos).every((e) => e === "S"),
+    aprobado: salio && virajes && Object.values(elementos).every((e) => e === "S"),
     calificacion: Math.max(0, Math.round(puntos)),
     elementos,
     objetivo: { t: o.t, altitud: o.altitud, rumbo: o.rumbo, velocidad: OBJETIVO_KT },
@@ -145,9 +147,10 @@ function resultado(ev: EvaluacionLento, salio: boolean): ResultadoLento {
     perdidas,
     bajo,
     salio,
-    primerLado: ev.primerLado!,
+    virajes,
+    primerLado: ev.primerLado,
     flaps: o.flaps ?? 0,
-    avisos: salio ? [] : [AVISO_SIN_SALIDA],
+    avisos: !virajes ? [AVISO_SIN_VIRAJES] : salio ? [] : [AVISO_SIN_SALIDA],
     muestras: tramo,
   };
 }
@@ -170,6 +173,9 @@ export function avanzarLento(ev: EvaluacionLento, m: Muestra): EvaluacionLento {
   const sigue = { ...ev, giro, previo: m, tramo: [...ev.tramo, m], marcas: [...ev.marcas, { fase: ev.fase, giro }] };
   const nueva = (fase: FaseLento, extra: Partial<EvaluacionLento> = {}): EvaluacionLento => ({ ...sigue, fase, inicioFase: m, giro: 0, ...extra });
 
+  const tarde = (ev.fase === "viraje1" || ev.fase === "viraje2") && m.t - ev.inicioFase!.t >= VIRAJE_MAX_SEG;
+  if (tarde) return { ...sigue, fase: "terminado", resultado: resultado(sigue, false, false) };
+
   switch (ev.fase) {
     case "recto":
       return m.t - ev.objetivo!.t >= RECTO_SEG ? nueva("viraje1") : sigue;
@@ -178,7 +184,7 @@ export function avanzarLento(ev: EvaluacionLento, m: Muestra): EvaluacionLento {
     case "viraje2":
       return cerro(giro, m) && ladoDe(giro) !== ev.primerLado ? nueva("salida") : sigue;
     case "salida": {
-      const salio = (m.rpm ?? 0) >= SALIDA.rpm && m.velocidad >= SALIDA.kt;
+      const salio = m.velocidad >= SALIDA.kt;
       if (!salio && m.t - ev.inicioFase!.t < SALIDA.maxSeg) return sigue;
       return { ...sigue, fase: "terminado", resultado: resultado(sigue, salio) };
     }
