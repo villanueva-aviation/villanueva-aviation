@@ -34,6 +34,8 @@ export interface UseSpeechRecognitionResult {
   listening: boolean;
   transcript: string;
   error: string | null;
+  /** El código crudo del navegador ("not-allowed", "no-speech"…), para textos en otro idioma. */
+  errorCode: string | null;
   start: () => void;
   stop: () => void;
   reset: () => void;
@@ -51,6 +53,7 @@ export function useSpeechRecognition(lang = "es-MX"): UseSpeechRecognitionResult
   const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
@@ -68,6 +71,7 @@ export function useSpeechRecognition(lang = "es-MX"): UseSpeechRecognitionResult
     };
     recognition.onerror = (event) => {
       if (event.error === "aborted") return;
+      setErrorCode(event.error);
       setError(ERROR_MESSAGES[event.error] ?? "No se pudo procesar el audio, intenta de nuevo.");
       setListening(false);
     };
@@ -84,6 +88,7 @@ export function useSpeechRecognition(lang = "es-MX"): UseSpeechRecognitionResult
     if (!recognitionRef.current) return;
     setTranscript("");
     setError(null);
+    setErrorCode(null);
     setListening(true);
     recognitionRef.current.start();
   }, []);
@@ -96,8 +101,9 @@ export function useSpeechRecognition(lang = "es-MX"): UseSpeechRecognitionResult
     recognitionRef.current?.abort();
     setTranscript("");
     setError(null);
+    setErrorCode(null);
     setListening(false);
   }, []);
 
-  return { supported: !!SpeechRecognitionCtor, listening, transcript, error, start, stop, reset };
+  return { supported: !!SpeechRecognitionCtor, listening, transcript, error, errorCode, start, stop, reset };
 }

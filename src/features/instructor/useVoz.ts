@@ -4,8 +4,8 @@ import type { Idioma } from "./idiomaInstructor";
 
 const CLAVE = "instructor-voz";
 
-type Ajustes = { activa: boolean; volumen: number; velocidad: Velocidad; detalle: Detalle; voz: Partial<Record<Idioma, string>> };
-const BASE: Ajustes = { activa: true, volumen: 1, velocidad: "normal", detalle: "detallado", voz: {} };
+type Ajustes = { activa: boolean; volumen: number; velocidad: Velocidad; detalle: Detalle; voz: Partial<Record<Idioma, string>>; preguntas: boolean };
+const BASE: Ajustes = { activa: true, volumen: 1, velocidad: "normal", detalle: "detallado", voz: {}, preguntas: true };
 
 /** Lee también el formato viejo { activa, volumen }. */
 function leer(): Ajustes {
@@ -18,6 +18,7 @@ function leer(): Ajustes {
       velocidad: v.velocidad && v.velocidad in RITMO ? v.velocidad : "normal",
       detalle: v.detalle === "necesario" ? "necesario" : "detallado",
       voz: typeof v.voz === "object" && v.voz ? v.voz : {},
+      preguntas: v.preguntas !== false,
     };
   } catch {
     return BASE;
@@ -62,8 +63,15 @@ export function useVoz(idioma: Idioma, avisoVigente: () => string | null) {
       return nuevo;
     });
 
+  // Mientras el micrófono escucha no empieza ninguna pieza: la voz no debe grabarse como respuesta.
+  const retenido = useRef(false);
+
   const reproducir = useCallback(() => {
     if (!sintesis || actual.current) return;
+    if (retenido.current) {
+      setHablando(false);
+      return;
+    }
     const { pieza, cola: resto } = siguiente(cola.current, vigente.current());
     cola.current = resto;
     if (!pieza) {
@@ -134,5 +142,15 @@ export function useVoz(idioma: Idioma, avisoVigente: () => string | null) {
     vaciar: () => {
       cola.current = [];
     },
+    preguntas: ajustes.preguntas,
+    setPreguntas: (preguntas: boolean) => cambiar({ preguntas }),
+    /** true: no empieza ninguna pieza nueva (la que suena termina). false: sigue con la cola. */
+    retener: useCallback(
+      (on: boolean) => {
+        retenido.current = on;
+        if (!on) reproducir();
+      },
+      [reproducir],
+    ),
   };
 }

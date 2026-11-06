@@ -7,6 +7,7 @@ import { useAuth } from "../features/auth/AuthContext";
 import { briefing, debriefing, listaPasos, queHacer, vozDebriefing } from "../features/instructor/briefing";
 import { Explicacion } from "../features/instructor/ExplicacionInstructor";
 import { HojaCheckride } from "../features/instructor/HojaCheckride";
+import { PruebaMicrofono } from "../features/instructor/PruebaMicrofono";
 import type { Idioma } from "../features/instructor/idiomaInstructor";
 import { puedeMandar } from "../features/instructor/reglasIntentos";
 import { ReporteExamen } from "../features/instructor/ReporteExamen";
@@ -357,6 +358,7 @@ export function InstructorPrograma() {
             <button type="button" onClick={() => voz.decir(t.prueba, "prueba")} className="justify-self-start rounded-full border border-white/20 px-3 py-1 text-xs font-semibold text-white/80">
               {t.probar}
             </button>
+            <PruebaMicrofono idioma={idioma} voz={voz} />
           </div>
         </details>
       </header>
