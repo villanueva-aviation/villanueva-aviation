@@ -4,7 +4,8 @@ import { CHECKLIST_VOZ_C172 } from "../../data/checklistVozC172.ts";
 import { ES_V15 } from "./revisionSim.ts";
 import type { Muestra } from "./evaluador.ts";
 import { simularVuelo } from "./simularVuelo.ts";
-import { avanzarChecklist, avisoSeccion, crearChecklist, oir, resumenChecklist, type Checklist } from "./checklistVoz.ts";
+import { avanzarChecklist, avisoSeccion, avisosPorDecir, crearChecklist, oir, PIEZA_AVISO, resumenChecklist, type Checklist } from "./checklistVoz.ts";
+import { encolar, siguiente } from "./colaVoz.ts";
 
 const PUNTOS = CHECKLIST_VOZ_C172.flatMap((s) => s.puntos);
 
@@ -121,4 +122,31 @@ test("el aviso espera a las revisiones pendientes", () => {
 
 test("resumen cuenta las secciones no leidas", () => {
   assert.equal(resumenChecklist(abrirAA()).noLeidas.length, 10);
+});
+test("el aviso del checklist si se dice en la cola de voz", () => {
+  assert.notEqual(siguiente(encolar([], { tipo: PIEZA_AVISO, texto: "Antes de arrancar: completo." }).cola, null).pieza, null);
+});
+
+test("repetir un punto que comparte palabra con los siguientes no salta nada", () => {
+  const casos: [string, string[], string][] = [
+    ["checklist arranque", ["acelerador", "mezcla corte", "helice", "master", "beacon", "bomba de combustible auxiliar encendida"], "bomba de combustible auxiliar encendida"],
+    ["checklist apagado", ["freno", "equipo electrico", "piloto automatico apagado", "avionica master apagado"], "avionica master apagado"],
+    ["checklist antes de despegar", ["radios configurados", "trim electrico configurado"], "trim electrico configurado"],
+  ];
+  for (const [abrir, frases, repetida] of casos) {
+    const una = decir(nuevo(), [abrir, ...frases]);
+    const dos = oir(una, repetida, 0);
+    assert.equal(dos.siguiente, una.siguiente, repetida);
+    assert.deepEqual(estados(dos, una.abierta!), estados(una, una.abierta!), repetida);
+  }
+});
+
+test("los avisos esperan a que no haya seccion abierta", () => {
+  let cl = decir(abrirAA(), ["freno puesto"]);
+  cl = avanzarChecklist(cl, con({ t: 1, freno: true }), ctx);
+  cl = decir(cl, ["checklist completo", "checklist arranque"]);
+  assert.deepEqual(avisosPorDecir(cl, new Set()), []);
+  cl = oir(cl, "checklist completo", 2);
+  assert.deepEqual(avisosPorDecir(cl, new Set()).map((a) => a.id), ["antes-arrancar", "arranque"]);
+  assert.deepEqual(avisosPorDecir(cl, new Set(["antes-arrancar"])).map((a) => a.id), ["arranque"]);
 });

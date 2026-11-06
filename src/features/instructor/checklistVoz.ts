@@ -4,6 +4,7 @@ import type { Muestra } from "./evaluador.ts";
 import { normalizar } from "./preguntas.ts";
 import { revisar, ventana, type ContextoRevision } from "./revisionSim.ts";
 import type { SeccionId, SeccionVoz } from "../../data/checklistVozC172.ts";
+import type { TipoPieza } from "./colaVoz.ts";
 
 export type EstadoPunto = "pendiente" | "revisando" | "hecho" | "dicho" | "no-hecho" | "saltado";
 export type Punto = { estado: EstadoPunto; t?: number; detalle?: string };
@@ -16,6 +17,8 @@ export interface Checklist {
   muestras: Muestra[]; // últimos BUFFER_SEG
 }
 
+/** El tipo de pieza del aviso de sección: un «aviso» de la cola sin clave vigente se descarta y no sonaría. */
+export const PIEZA_AVISO: TipoPieza = "orden";
 export const ADELANTE = 3; // puntos que se buscan desde el siguiente
 export const BUFFER_SEG = 60;
 
@@ -68,15 +71,19 @@ function puntosDichos(cl: Checklist, d: string, pos: number, t: number) {
   while (cl.abierta) {
     const sec = cl.secciones.find((s) => s.id === cl.abierta)!;
     const estado = cl.puntos[sec.id];
-    let hallado: { k: number; fin: number } | null = null;
-    for (let k = cl.siguiente; k < Math.min(sec.puntos.length, cl.siguiente + ADELANTE); k++) {
+    // El punto recién dicho también se busca: repetirlo no debe saltar los que comparten palabra con él.
+    // Gana la coincidencia que empieza antes en la frase; si empatan, el anterior (es repetición) y luego el más cercano.
+    let hallado: { k: number; inicio: number; fin: number } | null = null;
+    for (let k = Math.max(0, cl.siguiente - 1); k < Math.min(sec.puntos.length, cl.siguiente + ADELANTE); k++) {
+      if (k < cl.siguiente && estado[k].estado === "pendiente") continue;
       const b = buscar(d, sec.puntos[k].claves, pos);
-      if (b) {
-        hallado = { k, fin: b.fin };
-        break;
-      }
+      if (b && (!hallado || b.inicio < hallado.inicio)) hallado = { k, ...b };
     }
     if (!hallado) return;
+    if (hallado.k < cl.siguiente) {
+      pos = hallado.fin;
+      continue;
+    }
     for (let k = cl.siguiente; k < hallado.k; k++) estado[k] = { estado: "saltado" };
     estado[hallado.k] = sec.puntos[hallado.k].revisa ? { estado: "revisando", t } : { estado: "dicho", t };
     pos = hallado.fin;
@@ -158,6 +165,15 @@ export function avisoSeccion(cl: Checklist, id: SeccionId): string | null {
   return [s.titulo + ".", saltados.length ? `Te faltó: ${saltados.join(", ")}.` : "", noHechos.length ? `No vi hecho: ${noHechos.join(", ")}.` : ""]
     .filter(Boolean)
     .join(" ");
+}
+
+/** Los avisos listos que no se han dicho. Esperan a que no haya sección abierta, para no hablar encima del cadete. */
+export function avisosPorDecir(cl: Checklist, dichos: ReadonlySet<SeccionId>): { id: SeccionId; texto: string }[] {
+  if (cl.abierta) return [];
+  return cl.secciones.flatMap((s) => {
+    const texto = dichos.has(s.id) ? null : avisoSeccion(cl, s.id);
+    return texto ? [{ id: s.id, texto }] : [];
+  });
 }
 
 export function resumenChecklist(cl: Checklist): { enOrden: number; saltados: string[]; noHechos: string[]; noLeidas: string[] } {

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSpeechRecognition } from "../academia/useSpeechRecognition";
 import type { useVoz } from "./useVoz";
+import { PIEZA_AVISO } from "./checklistVoz";
 
 const REINICIO_MS = 250;
 const VOZ_NO_EMPIEZA_MS = 3000;
@@ -45,7 +46,7 @@ export function useChecklistVoz(activo: boolean, voz: ReturnType<typeof useVoz>,
       hablo.current = false;
       setPausa(true);
       stop();
-      decirVoz(texto, "aviso");
+      decirVoz(texto, PIEZA_AVISO);
     },
     [stop, decirVoz],
   );

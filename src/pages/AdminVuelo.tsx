@@ -11,7 +11,7 @@ import type { Aeropuerto } from "../features/instructor/aeropuertoSim";
 import { lectorViejoChecklist, type Muestra } from "../features/instructor/evaluador";
 import {
   avanzarChecklist,
-  avisoSeccion,
+  avisosPorDecir,
   crearChecklist,
   oir,
   resumenChecklist,
@@ -94,12 +94,9 @@ export function AdminVuelo() {
   // Al cerrar una sección (y terminar sus revisiones) el instructor dice qué faltó, una vez por lectura.
   useEffect(() => {
     if (cl.abierta) dichos.current.delete(cl.abierta);
-    for (const s of cl.secciones) {
-      if (dichos.current.has(s.id)) continue;
-      const aviso = avisoSeccion(cl, s.id);
-      if (!aviso) continue;
-      dichos.current.add(s.id);
-      decir(aviso);
+    for (const a of avisosPorDecir(cl, dichos.current)) {
+      dichos.current.add(a.id);
+      decir(a.texto);
     }
   }, [cl, decir]);
 
