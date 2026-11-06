@@ -24,11 +24,17 @@ class Muestra
     // v1.3, para vuelo lento y perdidas. Cabeceo: positivo = nariz arriba. Flaps: indice de la palanca, 0 = arriba.
     public double Cabeceo, Vs, Flaps, Rpm;
     public bool Perdida;
+    // v1.4, para seguir un vuelo completo. RumboV y VientoDir: verdaderos. Mezcla y Acelerador: 0-100. Altimetro y Qnh: inHg.
+    public double Lat, Lon, Gs, RumboV, Mezcla, Acelerador, XpdrModo, Altimetro, Qnh, Com1, VientoDir, VientoKt;
+    public bool Motor, MagIzq, MagDer, Master, LuzBeacon, LuzNav, LuzAterrizaje, LuzStrobe, LuzTaxi, Freno, Tren;
+    public string Xpdr = "0000";
     public string Titulo = "";
 
     public Muestra Copia() { return (Muestra)MemberwiseClone(); }
 
     static string N(double x) { return x.ToString("0.###", CultureInfo.InvariantCulture); }
+    static string N6(double x) { return x.ToString("0.######", CultureInfo.InvariantCulture); }
+    static string N2(double x) { return x.ToString("0.##", CultureInfo.InvariantCulture); }
     static string B(bool x) { return x ? "true" : "false"; }
 
     static string Texto(string s)
@@ -51,6 +57,14 @@ class Muestra
             ",\"slew\":" + B(Slew) + ",\"tasa\":" + N(Tasa) + ",\"pausa\":" + B(Pausa) +
             ",\"cabeceo\":" + N(Cabeceo) + ",\"vs\":" + N(Vs) + ",\"perdida\":" + B(Perdida) +
             ",\"flaps\":" + N(Flaps) + ",\"rpm\":" + N(Rpm) +
+            ",\"lat\":" + N6(Lat) + ",\"lon\":" + N6(Lon) + ",\"gs\":" + N(Gs) + ",\"rumboV\":" + N(RumboV) +
+            ",\"motor\":" + B(Motor) + ",\"mezcla\":" + N(Mezcla) + ",\"acelerador\":" + N(Acelerador) +
+            ",\"magIzq\":" + B(MagIzq) + ",\"magDer\":" + B(MagDer) + ",\"master\":" + B(Master) +
+            ",\"luzBeacon\":" + B(LuzBeacon) + ",\"luzNav\":" + B(LuzNav) + ",\"luzAterrizaje\":" + B(LuzAterrizaje) +
+            ",\"luzStrobe\":" + B(LuzStrobe) + ",\"luzTaxi\":" + B(LuzTaxi) + ",\"freno\":" + B(Freno) +
+            ",\"xpdr\":" + Texto(Xpdr) + ",\"xpdrModo\":" + N(XpdrModo) + ",\"altimetro\":" + N2(Altimetro) +
+            ",\"qnh\":" + N2(Qnh) + ",\"com1\":" + N(Com1) + ",\"tren\":" + B(Tren) +
+            ",\"vientoDir\":" + N(VientoDir) + ",\"vientoKt\":" + N(VientoKt) +
             ",\"titulo\":" + Texto(Titulo) + "}";
     }
 }
@@ -142,7 +156,12 @@ static class LectorInstructor
             && j.Contains("\"flaps\":3") && j.Contains("\"rpm\":1850")
             && Opciones.Leer(new[] { "--simulado-lento" }).Modo == "--simulado-lento";
         Console.WriteLine(json ? "Json: OK" : "Json: FALLA");
-        return ok && edge && banderas && puerto && json ? 0 : 1;
+
+        // v1.4: los campos del vuelo completo.
+        var v = new Muestra { Lat = 20.52, Xpdr = "1200", Com1 = 118.1, Motor = true }.Json();
+        var json14 = v.Contains("\"lat\":20.52") && v.Contains("\"xpdr\":\"1200\"") && v.Contains("\"com1\":118.1") && v.Contains("\"motor\":true");
+        Console.WriteLine(json14 ? "Json v1.4: OK" : "Json v1.4: FALLA");
+        return ok && edge && banderas && puerto && json && json14 ? 0 : 1;
     }
 
     // Lo que pasaba: Edge heredaba el puerto del lector y, si el lector se cerraba, nadie podia volver a usarlo.
@@ -567,10 +586,35 @@ static class Sim
         new[] { "STALL WARNING", "bool" },
         new[] { "FLAPS HANDLE INDEX", "number" },
         new[] { "GENERAL ENG RPM:1", "rpm" },
+        // v1.4 (x[16]..x[39])
+        new[] { "PLANE LATITUDE", "degrees" },
+        new[] { "PLANE LONGITUDE", "degrees" },
+        new[] { "GROUND VELOCITY", "knots" },
+        new[] { "PLANE HEADING DEGREES TRUE", "degrees" },
+        new[] { "GENERAL ENG COMBUSTION:1", "bool" },
+        new[] { "GENERAL ENG MIXTURE LEVER POSITION:1", "percent" },
+        new[] { "GENERAL ENG THROTTLE LEVER POSITION:1", "percent" },
+        new[] { "RECIP ENG LEFT MAGNETO:1", "bool" },
+        new[] { "RECIP ENG RIGHT MAGNETO:1", "bool" },
+        new[] { "ELECTRICAL MASTER BATTERY", "bool" },
+        new[] { "LIGHT BEACON", "bool" },
+        new[] { "LIGHT NAV", "bool" },
+        new[] { "LIGHT LANDING", "bool" },
+        new[] { "LIGHT STROBE", "bool" },
+        new[] { "LIGHT TAXI", "bool" },
+        new[] { "BRAKE PARKING POSITION", "bool" },
+        new[] { "TRANSPONDER CODE:1", "Bco16" },
+        new[] { "TRANSPONDER STATE:1", "number" },
+        new[] { "KOHLSMAN SETTING HG:1", "inHg" },
+        new[] { "SEA LEVEL PRESSURE", "inHg" },
+        new[] { "COM ACTIVE FREQUENCY:1", "MHz" },
+        new[] { "GEAR HANDLE POSITION", "bool" },
+        new[] { "AMBIENT WIND DIRECTION", "degrees" },
+        new[] { "AMBIENT WIND VELOCITY", "knots" },
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    struct Vuelo { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)] public double[] Valores; }
+    struct Vuelo { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 40)] public double[] Valores; }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     struct Titulo { [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)] public string Valor; }
@@ -586,6 +630,8 @@ static class Sim
             var titulo = "";
             Console.WriteLine("Conectado a MSFS.");
             sim.OnRecvQuit += (s, d) => abierto = false;
+            // Un nombre de variable mal escrito no tumba el lector: sale aqui con su indice en Vars.
+            sim.OnRecvException += (s, d) => Console.WriteLine("SimConnect: excepcion " + d.dwException + " en la variable " + d.dwIndex);
             sim.OnRecvSimobjectData += (s, d) =>
             {
                 if (d.dwRequestID == (uint)Req.Titulo) { titulo = ((Titulo)d.dwData[0]).Valor ?? ""; return; }
@@ -598,6 +644,12 @@ static class Sim
                     Pausa = LectorInstructor.Pausado(x[10], ahora, ref simAnterior, ref ultimoAvance), Titulo = titulo,
                     // SimConnect da el cabeceo con nariz arriba negativo.
                     Cabeceo = -x[11], Vs = x[12], Perdida = x[13] != 0, Flaps = x[14], Rpm = x[15],
+                    Lat = x[16], Lon = x[17], Gs = x[18], RumboV = x[19], Motor = x[20] != 0, Mezcla = x[21], Acelerador = x[22],
+                    MagIzq = x[23] != 0, MagDer = x[24] != 0, Master = x[25] != 0, LuzBeacon = x[26] != 0, LuzNav = x[27] != 0,
+                    LuzAterrizaje = x[28] != 0, LuzStrobe = x[29] != 0, LuzTaxi = x[30] != 0, Freno = x[31] != 0,
+                    // El codigo llega en BCD: 0x1200 es el 1200.
+                    Xpdr = ((int)x[32]).ToString("X4"), XpdrModo = x[33], Altimetro = x[34], Qnh = x[35], Com1 = x[36],
+                    Tren = x[37] != 0, VientoDir = x[38], VientoKt = x[39],
                 });
             };
             foreach (var v in Vars)
