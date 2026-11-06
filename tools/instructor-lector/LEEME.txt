@@ -1,6 +1,7 @@
 VILLANUEVA AVIATION - LECTOR DEL INSTRUCTOR VIRTUAL
 ====================================================
 
+v1.5: para el checklist por voz lee el interruptor de aviónica, el selector y la válvula de combustible, la bomba auxiliar, el piloto automático y el trim. Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.
 v1.4: para las lecciones de vuelo completo lee la posición, el motor, las luces, el freno, el transponder, el altímetro, el radio COM1, el tren y el viento, y el aeropuerto más cercano con sus pistas y frecuencias. Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.
 v1.3: lee cabeceo, régimen vertical, aviso de pérdida, flaps y RPM para el vuelo lento. Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.
 
@@ -40,11 +41,11 @@ Si solo quieres el lector para la página, ábrelo con --sin-ventana
 
 GRABAR UN VUELO
 Si te pedimos un vuelo grabado para revisar el instructor, abre el lector
-con --grabar y un nombre de archivo, por ejemplo:
-  VillanuevaInstructorLector.exe --grabar vuelo.jsonl
+con --grabar y un nombre de archivo. En PowerShell, dentro de la carpeta del lector:
+  .\VillanuevaInstructorLector.exe --grabar vuelo.jsonl
 Vuela de rampa a rampa y cierra el lector al terminar. El archivo queda en
 la misma carpeta; mándalo por el Discord. Para verlo otra vez:
-  VillanuevaInstructorLector.exe --reproducir vuelo.jsonl --rapido 10
+  .\VillanuevaInstructorLector.exe --reproducir vuelo.jsonl --rapido 10
 
 ABRIRLO SOLO AL PRENDER LA PC
 Da doble clic en "Iniciar con Windows.bat". Vuelve a darle doble clic
