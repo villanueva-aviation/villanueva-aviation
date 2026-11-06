@@ -1,6 +1,38 @@
 import type { Lado, Muestra } from "./evaluador.ts";
+import { DURACION_SEG, ESTABLE } from "./rectoNivelado.ts";
 
 const norm = (r: number) => ((r % 360) + 360) % 360;
+
+/**
+ * Recto y nivelado a 10 Hz: 3,500 ft, 95 kt, alas niveladas. `subidaSeg` sube antes a 300 ft/min;
+ * `deriva` y `pausaEn` cuentan segundos desde que el avión queda estable (subida + ESTABLE.seg).
+ */
+export function simularRecto(
+  op: {
+    rumbo?: number;
+    subidaSeg?: number;
+    deriva?: { campo: "altitud" | "rumbo" | "velocidad"; valor: number; desde: number; segundos: number };
+    pausaEn?: number;
+  } = {},
+): Muestra[] {
+  const subida = op.subidaSeg ?? 0;
+  const total = subida + ESTABLE.seg + DURACION_SEG + 5;
+  const out: Muestra[] = [];
+  for (let n = 0; n < Math.round(total * 10); n++) {
+    const t = Math.round(n * 100) / 1000;
+    const s = t - subida - ESTABLE.seg;
+    const m: Muestra = {
+      t, inclinacion: 0, altitud: t < subida ? 3500 - 5 * (subida - t) : 3500, velocidad: 95, rumbo: op.rumbo ?? 90,
+      bola: 0, agl: 2500, peso: 2550, enTierra: false, slew: false, tasa: 1, pausa: false, titulo: "Cessna Skyhawk 172SP",
+    };
+    const d = op.deriva;
+    if (d && s >= d.desde && s < d.desde + d.segundos) m[d.campo] += d.valor;
+    m.rumbo = norm(m.rumbo);
+    if (op.pausaEn !== undefined && s >= op.pausaEn) m.pausa = true;
+    out.push(m);
+  }
+  return out;
+}
 
 /**
  * Muestras sintéticas de un C172 a 3500 ft haciendo virajes escarpados, para las
