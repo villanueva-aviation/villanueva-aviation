@@ -130,5 +130,9 @@ export function useVoz(idioma: Idioma, avisoVigente: () => string | null) {
     setNombreVoz: (nombre: string) => cambiar({ voz: { ...ajustes.voz, [idioma]: nombre } }),
     hablando,
     decir,
+    /** Olvida lo que falta por decir; la frase en curso termina. */
+    vaciar: () => {
+      cola.current = [];
+    },
   };
 }

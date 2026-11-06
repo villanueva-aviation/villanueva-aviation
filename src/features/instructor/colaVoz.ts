@@ -12,7 +12,13 @@ export const RITMO: Record<Velocidad, number> = { lenta: 0.85, normal: 1, rapida
 export function encolar(cola: Pieza[], p: Pieza): { cola: Pieza[]; cortar: boolean } {
   if (p.tipo === "anulado" || p.tipo === "prueba") return { cola: [p], cortar: true };
   if (p.tipo === "aviso") return { cola: [...cola.filter((x) => x.tipo !== "aviso"), p], cortar: false };
-  return { cola: [...cola, p], cortar: false };
+  // Una orden con clave (el paso) reemplaza la que no se alcanzó a decir: nada llega tarde.
+  return { cola: [...(p.clave ? descartar(cola, p.clave) : cola), p], cortar: false };
+}
+
+/** Quita de la cola lo que falta de una clave (p. ej. el resto del briefing al presionar «Listo»). */
+export function descartar(cola: Pieza[], clave: string): Pieza[] {
+  return cola.filter((x) => x.clave !== clave);
 }
 
 /** La próxima pieza; un aviso que ya no aplica se descarta. */
