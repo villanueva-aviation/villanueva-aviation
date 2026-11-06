@@ -43,6 +43,7 @@ export function Perfil() {
   // Insignia del instructor virtual: con error (o sin la tabla todavía) se trata como no ganada.
   const [virajeAprobado, setVirajeAprobado] = useState(false);
   const [rectoAprobado, setRectoAprobado] = useState(false);
+  const [lentoAprobado, setLentoAprobado] = useState(false);
   useEffect(() => {
     let vivo = true;
     fetchMisIntentosManiobra("viraje-escarpado")
@@ -50,6 +51,9 @@ export function Perfil() {
       .catch(() => {});
     fetchMisIntentosManiobra("recto-nivelado")
       .then((intentos) => vivo && setRectoAprobado(insigniaManiobraGanada(intentos, "recto-nivelado")))
+      .catch(() => {});
+    fetchMisIntentosManiobra("vuelo-lento")
+      .then((intentos) => vivo && setLentoAprobado(insigniaManiobraGanada(intentos, "vuelo-lento")))
       .catch(() => {});
     return () => {
       vivo = false;
@@ -81,7 +85,14 @@ export function Perfil() {
     icon: Plane,
     desbloqueado: rectoAprobado,
   };
-  const todosLogros = [...logros, logroRed, logroRecto, logroViraje];
+  const logroLento: Logro = {
+    id: "maniobra-vuelo-lento-c172",
+    titulo: "Vuelo lento · C172",
+    descripcion: "Se gana cuando Erik revisa y aprueba tu checkride del instructor virtual. Práctica en simulador, no es una evaluación oficial.",
+    icon: Plane,
+    desbloqueado: lentoAprobado,
+  };
+  const todosLogros = [...logros, logroRed, logroRecto, logroLento, logroViraje];
 
   return (
     <div>

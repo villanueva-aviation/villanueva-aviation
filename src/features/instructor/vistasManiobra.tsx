@@ -1,5 +1,6 @@
 import type { JSX } from "react";
 import { HojaCheckride } from "./HojaCheckride";
+import { HojaLento } from "./HojaLento";
 import { HojaRecto } from "./HojaRecto";
 import type { Idioma } from "./idiomaInstructor";
 import type { ManiobraId } from "./maniobras";
@@ -8,4 +9,5 @@ import type { ManiobraId } from "./maniobras";
 export const HOJA: Record<ManiobraId, (p: { resultado: any; idioma: Idioma }) => JSX.Element> = {
   "viraje-escarpado": HojaCheckride,
   "recto-nivelado": HojaRecto,
+  "vuelo-lento": HojaLento,
 };

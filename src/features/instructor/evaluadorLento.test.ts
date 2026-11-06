@@ -47,7 +47,9 @@ test("lector viejo: no arma y pide actualizar", () => {
   assert.equal(m.perdida, undefined);
   assert.equal(armarLento(m).fase, "invalido");
   assert.match(armarLento(m).motivo!, /Descargas/);
-  assert.equal(armarSoloLento(null, m), false);
+  // Se arma una sola vez, para que el programa diga el motivo; ya anulado, no se vuelve a armar en cada muestra.
+  assert.equal(armarSoloLento(null, m), true);
+  assert.equal(armarSoloLento(armarLento(m), m), false);
   assert.equal(armarSoloLento(null, base), true);
 });
 

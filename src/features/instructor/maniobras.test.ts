@@ -4,7 +4,7 @@ import { armar, avanzar, crearEvaluacion, type Evaluacion } from "./evaluador.ts
 import { explicar, repetir } from "./explicacion.ts";
 import { defDe, lecturaFinalDe, MANIOBRAS } from "./maniobras.ts";
 import { paraGuardar } from "./reglasIntentos.ts";
-import { simularManiobra, simularRecto } from "./simular.ts";
+import { simularLento, simularManiobra, simularRecto } from "./simular.ts";
 import { avisoVoz, ordenVoz, pasoVoz, semaforo, textoPaso, type PasoVoz } from "./voz.ts";
 
 test("defViraje dice lo mismo que las funciones del viraje", () => {
@@ -52,4 +52,31 @@ test("las celdas en inglés no tienen español", () => {
     const textos = [...d.celdas.map((c) => c.nombre.en), d.titulo.en, d.tarea.en, ...d.elementosReporte.map((x) => x.textoEn)];
     for (const t of textos) assert.doesNotMatch(t, /[áéíóúñ¿¡]/, `${d.id}: ${t}`);
   }
+});
+
+test("vuelo lento tiene su def con los códigos del ACS Área VII Tarea A", () => {
+  const d = defDe("vuelo-lento");
+  assert.equal(d.id, "vuelo-lento");
+  assert.equal(d.insignia, "maniobra-vuelo-lento-c172");
+  assert.deepEqual(d.elementosReporte.map((e) => e.codigo), ["PA.VII.A.S2", "PA.VII.A.S3", "PA.VII.A.S4", "PA.VII.A.S5"]);
+  assert.equal(d.tarea.es, "Área VII · Tarea A: Vuelo lento");
+  assert.equal(d.tarea.en, "Area VII · Task A: Slow flight");
+  assert.deepEqual(d.temas, ["vuelo-lento", "c172"]);
+  for (const e of d.elementosReporte) assert.doesNotMatch(e.textoEn, /[áéíóúñ¿¡]/, e.codigo);
+});
+
+test("la def de vuelo lento corre un intento simulado de punta a punta", () => {
+  const d = defDe("vuelo-lento");
+  const ms = simularLento();
+  let e = d.armar(ms[0]);
+  const fases = new Set<string>();
+  for (const m of ms.slice(1)) {
+    e = d.avanzar(e, m);
+    fases.add(d.fase(e));
+  }
+  assert.deepEqual([...fases], ["armado", "en-curso", "terminado"]);
+  const r = d.resultado(e)!;
+  assert.equal(r.aprobado, true);
+  for (const t of lecturaFinalDe(d, r, "en")) assert.doesNotMatch(t, /[áéíóúñ¿¡]/, t);
+  assert.equal("muestras" in d.paraGuardar(r), false);
 });

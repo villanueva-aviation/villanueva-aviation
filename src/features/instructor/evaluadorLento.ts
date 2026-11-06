@@ -86,8 +86,10 @@ export function armarLento(m: Muestra): EvaluacionLento {
 }
 
 export function armarSoloLento(ev: EvaluacionLento | null, m: Muestra): boolean {
+  // Lector viejo: se arma una vez para que el programa diga el motivo; ya anulado, no se repite en cada muestra.
+  if (lectorViejo(m)) return ev === null;
   if (ev && ev.fase !== "invalido") return false;
-  return !lectorViejo(m) && !m.enTierra && Math.abs(m.inclinacion) < INCLINACION_NIVELADO && invalidez(m, null) === null;
+  return!m.enTierra && Math.abs(m.inclinacion) < INCLINACION_NIVELADO && invalidez(m, null) === null;
 }
 
 /** Grados girados en la fase, contando la muestra m. */

@@ -74,7 +74,7 @@ export function AdminManiobras() {
               <div key={i.id} className="rounded-xl border border-gold-500/20 bg-gold-500/[0.05] p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <button type="button" className="text-left" onClick={() => setAbierto(abierto === i.id ? null : i.id)} aria-expanded={abierto === i.id}>
-                    <p className="text-sm font-medium text-white">Viraje escarpado · {i.avion} · {i.calificacion}/100</p>
+                    <p className="text-sm font-medium text-white">{defDe(i.maniobra).titulo.es} · {i.calificacion}/100</p>
                     <p className="mt-1 text-xs text-white/55">
                       {i.email ?? "sin correo"} · {new Date(i.created_at).toLocaleString("es-MX")} · {abierto === i.id ? "ocultar" : "ver reporte"}
                     </p>

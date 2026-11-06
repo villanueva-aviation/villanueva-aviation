@@ -11,3 +11,8 @@ export const MATERIAL_RECTO: Material[] = [
   { titulo: { es: "Academia: Fundamentos de vuelo", en: "Academy: Flight fundamentals" }, to: ROUTES.academiaModulo("fundamentos"), exclusivo: false },
   MATERIAL_VIRAJE[1],
 ];
+
+export const MATERIAL_LENTO: Material[] = [
+  { titulo: { es: "Academia: Aerodinámica", en: "Academy: Aerodynamics" }, to: ROUTES.academiaModulo("aerodinamica"), exclusivo: false },
+  MATERIAL_VIRAJE[1],
+];

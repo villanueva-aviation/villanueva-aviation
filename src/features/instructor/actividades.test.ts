@@ -20,3 +20,10 @@ test("estado de cada opción", () => {
 test("en inglés no hay español", () => {
   for (const a of ACTIVIDADES) assert.doesNotMatch(`${a.nombre.en} ${a.detalle.en}`, /[áéíóúñ¿¡]/, a.id);
 });
+
+test("vuelo lento abre solo con Exclusivo y su intento se llama checkride", () => {
+  const a = ACTIVIDADES.find((x) => x.id === "vuelo-lento")!;
+  assert.equal(estadoActividad(a, false), "candado");
+  assert.equal(estadoActividad(a, true), "abierta");
+  assert.equal(a.calificado.es, "checkride");
+});

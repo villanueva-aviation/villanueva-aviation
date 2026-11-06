@@ -42,7 +42,7 @@ export const ACTIVIDADES: Actividad[] = [
     detalle: { es: "Volar justo arriba de la pérdida con control total.", en: "Fly just above the stall with full control." },
     minutos: 60,
     acceso: "exclusivo",
-    disponible: false,
+    disponible: true,
     calificado: CHECKRIDE,
   },
   {

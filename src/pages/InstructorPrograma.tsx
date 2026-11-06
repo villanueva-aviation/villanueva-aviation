@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Check, Volume2, VolumeX } from "lucide-react";
 import { Button } from "../components/ui/Button";
-import { MATERIAL_RECTO, MATERIAL_VIRAJE } from "../data/materialInstructor";
+import { MATERIAL_LENTO, MATERIAL_RECTO, MATERIAL_VIRAJE } from "../data/materialInstructor";
 import { useAuth } from "../features/auth/AuthContext";
 import { ACTIVIDADES, estadoActividad } from "../features/instructor/actividades";
 import { BANCO } from "../features/instructor/bancoPreguntas";
@@ -127,7 +127,7 @@ const COLOR: Record<Luz, string> = {
 };
 const COLOR_ESTADO = { conectado: "text-emerald-300", "sin-simulador": "text-gold-300", "sin-lector": "text-red-300" } as const;
 const EN_VUELO: Bloque[] = ["preparacion", "practica", "checkride"];
-const MATERIAL: Record<ManiobraId, typeof MATERIAL_VIRAJE> = { "viraje-escarpado": MATERIAL_VIRAJE, "recto-nivelado": MATERIAL_RECTO };
+const MATERIAL: Record<ManiobraId, typeof MATERIAL_VIRAJE> = { "viraje-escarpado": MATERIAL_VIRAJE, "recto-nivelado": MATERIAL_RECTO, "vuelo-lento": MATERIAL_LENTO };
 const mayus = (s: string) => `${s[0].toUpperCase()}${s.slice(1)}`;
 
 function leerIdioma(): Idioma {
