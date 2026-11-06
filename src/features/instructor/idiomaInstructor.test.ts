@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { armar, avanzar, crearEvaluacion, type Muestra } from "./evaluador.ts";
 import { simularManiobra } from "./simular.ts";
-import { traducirAviso, traducirMotivo } from "./idiomaInstructor.ts";
+import { AVISO_REPORTE, textosReporte, traducirAviso, traducirMotivo } from "./idiomaInstructor.ts";
 
 /** Cada motivo con el que el evaluador puede anular un intento. */
 function motivos(): string[] {
@@ -39,4 +39,14 @@ test("el aviso de altura tiene inglés", () => {
     traducirAviso("Bajaste de 1500 ft sobre el terreno: haz la maniobra más alto.", "en"),
     "You went below 1500 ft above the ground: fly the maneuver higher.",
   );
+});
+
+test("textos del reporte en inglés sin imitar formularios", () => {
+  const en = textosReporte("en");
+  assert.equal(en.aviso, "Simulator practice. Not an official document and does not replace an exam before an aviation authority.");
+  assert.equal(en.titulo(false), "PRACTICE CHECKRIDE — NOT PASSED");
+  assert.equal(en.titulo(true), "PRACTICE CHECKRIDE — PASSED");
+  assert.doesNotMatch(JSON.stringify(en), /Disapproval|FAA|certif/i);
+  assert.equal(textosReporte("es").aviso, AVISO_REPORTE);
+  assert.equal(textosReporte().titulo(false), "AVISO DE NO APROBACIÓN");
 });

@@ -51,12 +51,12 @@ export function vaPorPeso(pesoLb: number): number {
 
 export type CodigoAcs = "PA.V.A.S1" | "PA.V.A.S2" | "PA.V.A.S3" | "PA.V.A.S4" | "PA.V.A.S5";
 
-export const ELEMENTOS_ACS: { codigo: CodigoAcs; texto: string }[] = [
-  { codigo: "PA.V.A.S1", texto: "Despejar el área" },
-  { codigo: "PA.V.A.S2", texto: "Velocidad de entrada ≤ Va" },
-  { codigo: "PA.V.A.S3", texto: "360° coordinado a ~45°" },
-  { codigo: "PA.V.A.S4", texto: "Repetir al lado contrario" },
-  { codigo: "PA.V.A.S5", texto: "Alt ±100 · Vel ±10 · Incl ±5 · Rumbo ±10" },
+export const ELEMENTOS_ACS: { codigo: CodigoAcs; texto: string; textoEn: string }[] = [
+  { codigo: "PA.V.A.S1", texto: "Despejar el área", textoEn: "Clear the area" },
+  { codigo: "PA.V.A.S2", texto: "Velocidad de entrada ≤ Va", textoEn: "Entry airspeed ≤ Va" },
+  { codigo: "PA.V.A.S3", texto: "360° coordinado a ~45°", textoEn: "Coordinated 360° at ~45°" },
+  { codigo: "PA.V.A.S4", texto: "Repetir al lado contrario", textoEn: "Repeat in the opposite direction" },
+  { codigo: "PA.V.A.S5", texto: "Alt ±100 · Vel ±10 · Incl ±5 · Rumbo ±10", textoEn: "Alt ±100 · Spd ±10 · Bank ±5 · Hdg ±10" },
 ];
 
 export const MANIOBRAS: { id: "viraje-escarpado"; avion: "C172"; nombre: string; acceso: "gratis" | "exclusivo" }[] = [
