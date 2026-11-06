@@ -67,6 +67,46 @@ class Muestra
             ",\"vientoDir\":" + N(VientoDir) + ",\"vientoKt\":" + N(VientoKt) +
             ",\"titulo\":" + Texto(Titulo) + "}";
     }
+
+    // Lee lo que escribe Json(): un objeto plano de numeros, booleanos y textos. Cada clave es el campo con minuscula inicial.
+    public static Muestra Desde(string json)
+    {
+        var m = new Muestra();
+        var i = 0;
+        while (true)
+        {
+            var k0 = json.IndexOf('"', i);
+            if (k0 < 0) return m;
+            var k1 = json.IndexOf('"', k0 + 1);
+            var clave = json.Substring(k0 + 1, k1 - k0 - 1);
+            i = json.IndexOf(':', k1) + 1;
+            string valor;
+            if (json[i] == '"')
+            {
+                var sb = new StringBuilder();
+                for (i++; json[i] != '"'; i++)
+                {
+                    if (json[i] != '\\') { sb.Append(json[i]); continue; }
+                    i++;
+                    if (json[i] == 'u') { sb.Append((char)Convert.ToInt32(json.Substring(i + 1, 4), 16)); i += 4; }
+                    else sb.Append(json[i]);
+                }
+                valor = sb.ToString();
+                i++;
+            }
+            else
+            {
+                var fin = json.IndexOfAny(new[] { ',', '}' }, i);
+                valor = json.Substring(i, fin - i);
+                i = fin;
+            }
+            var campo = typeof(Muestra).GetField(char.ToUpperInvariant(clave[0]) + clave.Substring(1));
+            if (campo == null) continue;
+            if (campo.FieldType == typeof(double)) campo.SetValue(m, double.Parse(valor, CultureInfo.InvariantCulture));
+            else if (campo.FieldType == typeof(bool)) campo.SetValue(m, valor == "true");
+            else campo.SetValue(m, valor);
+        }
+    }
 }
 
 class Opciones
@@ -74,6 +114,8 @@ class Opciones
     public string Modo = "";
     public string Url = LectorInstructor.UrlPrograma;
     public bool SinVentana;
+    public string Grabar, Archivo;
+    public double Rapido = 1;
 
     public static Opciones Leer(string[] args)
     {
@@ -81,6 +123,9 @@ class Opciones
         for (var i = 0; i < args.Length; i++)
         {
             if (args[i] == "--simulado" || args[i] == "--simulado-limpio" || args[i] == "--simulado-lento") o.Modo = args[i];
+            else if (args[i] == "--reproducir" && i + 1 < args.Length) { o.Modo = args[i]; o.Archivo = args[++i]; }
+            else if (args[i] == "--rapido" && i + 1 < args.Length) o.Rapido = Math.Max(0.1, double.Parse(args[++i], CultureInfo.InvariantCulture));
+            else if (args[i] == "--grabar" && i + 1 < args.Length) o.Grabar = args[++i];
             else if (args[i] == "--sin-ventana") o.SinVentana = true;
             else if (args[i] == "--url" && i + 1 < args.Length) o.Url = args[++i];
         }
@@ -100,8 +145,25 @@ static class LectorInstructor
     static readonly List<Muestra> Historial = new List<Muestra>();
     const double GuardarSeg = 120;
     static string aeropuerto; // JSON del aeropuerto mas cercano; null mientras no llega
+    // --grabar: una linea JSON por muestra, a lo mas 5 por segundo, y una {"aeropuerto":...} cuando cambia.
+    static StreamWriter grabacion;
+    static double grabada = double.NegativeInfinity;
 
-    public static void PonerAeropuerto(string json) { lock (Candado) aeropuerto = json; }
+    public static void Grabar(string ruta)
+    {
+        lock (Candado) grabacion = new StreamWriter(ruta, true, new UTF8Encoding(false)) { AutoFlush = true };
+        Console.WriteLine("Grabando el vuelo en " + Path.GetFullPath(ruta));
+    }
+
+    public static void PonerAeropuerto(string json)
+    {
+        lock (Candado)
+        {
+            if (grabacion != null && json != null && json != aeropuerto) grabacion.WriteLine("{\"aeropuerto\":" + json + "}");
+            aeropuerto = json;
+        }
+    }
+
     public static Muestra Ultima() { lock (Candado) return ultima; }
 
     public static double Ahora() { return Reloj.Elapsed.TotalSeconds; }
@@ -110,6 +172,7 @@ static class LectorInstructor
     {
         lock (Candado)
         {
+            if (grabacion != null && m.T - grabada >= 0.2) { grabacion.WriteLine(m.Json()); grabada = m.T; }
             ultima = m;
             recibida = Ahora();
             Historial.Add(m);
@@ -172,7 +235,22 @@ static class LectorInstructor
         var aeropuerto = sinAeropuerto && Estado(double.NaN).Contains("\"aeropuerto\":{\"icao\":\"MMGL\"}");
         PonerAeropuerto(null);
         Console.WriteLine(aeropuerto ? "Aeropuerto: OK" : "Aeropuerto: FALLA");
-        return ok && edge && banderas && puerto && json && json14 && aeropuerto ? 0 : 1;
+
+        // v1.4: --grabar / --reproducir. Una muestra leida y vuelta a escribir queda igual.
+        var ida = new Muestra { T = 0, Lat = 20.521834, Lon = -103.311234, Xpdr = "1200", Motor = true, Titulo = "Cessna \"172\"\\x" };
+        var vuelta = new Muestra { T = 0.5, Lat = 20.5219 };
+        var ruta = Path.Combine(Path.GetTempPath(), "villanueva-probar.jsonl");
+        File.WriteAllLines(ruta, new[] { ida.Json(), "{\"aeropuerto\":{\"icao\":\"MMGL\"}}", vuelta.Json() });
+        string aeroGrabado;
+        var leidas = Simulado.LeerGrabacion(ruta, out aeroGrabado);
+        File.Delete(ruta);
+        var r = Opciones.Leer(new[] { "--reproducir", "x.jsonl", "--rapido", "10" });
+        var g = Opciones.Leer(new[] { "--grabar", "y.jsonl" });
+        var grabado = leidas.Count == 2 && leidas[0].T == 0 && leidas[1].T == 0.5 && aeroGrabado == "{\"icao\":\"MMGL\"}"
+            && leidas[0].Json() == ida.Json() && Muestra.Desde(vuelta.Json()).Json() == vuelta.Json()
+            && r.Modo == "--reproducir" && r.Archivo == "x.jsonl" && r.Rapido == 10 && g.Grabar == "y.jsonl" && g.Modo == "";
+        Console.WriteLine(grabado ? "Grabacion: OK" : "Grabacion: FALLA");
+        return ok && edge && banderas && puerto && json && json14 && aeropuerto && grabado ? 0 : 1;
     }
 
     // Lo que pasaba: Edge heredaba el puerto del lector y, si el lector se cerraba, nadie podia volver a usarlo.
@@ -284,12 +362,18 @@ static class LectorInstructor
         servidor.Start();
         if (!op.SinVentana) AbrirVentana(op.Url);
 
+        if (op.Modo == "--reproducir")
+        {
+            Simulado.Reproducir(op.Archivo, op.Rapido);
+            return;
+        }
         if (op.Modo != "")
         {
             Console.WriteLine("Modo simulado: no se conecta a MSFS.");
             Simulado.Correr(op.Modo);
             return;
         }
+        if (op.Grabar != null) Grabar(op.Grabar);
         if (!Dlls.Preparar())
         {
             Console.WriteLine("No encontre las librerias de SimConnect en esta PC.");
@@ -550,6 +634,54 @@ static class Simulado
         while (v < 80) { emitir(0); v = Math.Min(80, v + 2 * dt); }
         for (var i = 0; i < 10 * hz; i++) emitir(0);
         return out_;
+    }
+
+    // Lee un vuelo grabado con --grabar. aeropuerto: el primero que aparece (null si no hay).
+    // ponytail: un solo aeropuerto por grabacion; guardar el momento de cada cambio si se graban vuelos de travesia.
+    public static List<Muestra> LeerGrabacion(string ruta, out string aeropuerto)
+    {
+        const string Aero = "{\"aeropuerto\":";
+        aeropuerto = null;
+        var muestras = new List<Muestra>();
+        foreach (var linea in File.ReadLines(ruta))
+        {
+            var l = linea.Trim();
+            if (l.StartsWith(Aero, StringComparison.Ordinal)) { if (aeropuerto == null) aeropuerto = l.Substring(Aero.Length, l.Length - Aero.Length - 1); }
+            else if (l.StartsWith("{", StringComparison.Ordinal)) muestras.Add(Muestra.Desde(l));
+        }
+        return muestras;
+    }
+
+    // Publica la grabacion con sus tiempos (divididos entre rapido) y se queda en la ultima muestra.
+    // Los t publicados conservan la separacion original: el evaluador ve el vuelo a su ritmo real.
+    public static void Reproducir(string ruta, double rapido)
+    {
+        string aeropuerto;
+        var muestras = LeerGrabacion(ruta, out aeropuerto);
+        if (muestras.Count == 0) { Console.WriteLine("La grabacion no tiene muestras: " + ruta); return; }
+        LectorInstructor.PonerAeropuerto(aeropuerto);
+        var t0 = muestras[0].T;
+        var duracion = muestras[muestras.Count - 1].T - t0;
+        Console.WriteLine("Reproduciendo " + muestras.Count + " muestras (" + Math.Round(duracion) + " s de vuelo) a x" + rapido + ".");
+        var inicio = LectorInstructor.Ahora();
+        foreach (var g in muestras)
+        {
+            var espera = (g.T - t0) / rapido - (LectorInstructor.Ahora() - inicio);
+            if (espera > 0) Thread.Sleep((int)(espera * 1000));
+            var m = g.Copia();
+            m.T = inicio + (g.T - t0);
+            LectorInstructor.Publicar(m);
+        }
+        Console.WriteLine("Fin de la grabacion: el lector se queda en la ultima muestra.");
+        var ultima = LectorInstructor.Ultima();
+        var fin = LectorInstructor.Ahora();
+        while (true)
+        {
+            Thread.Sleep(100);
+            var m = ultima.Copia();
+            m.T = ultima.T + (LectorInstructor.Ahora() - fin);
+            LectorInstructor.Publicar(m);
+        }
     }
 
     // Repite el escenario sin fin a 10 muestras por segundo.

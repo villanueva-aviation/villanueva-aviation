@@ -38,6 +38,14 @@ La página del sitio (Instructor > Viraje escarpado) sigue funcionando igual.
 Si solo quieres el lector para la página, ábrelo con --sin-ventana
 (por ejemplo, en un acceso directo).
 
+GRABAR UN VUELO
+Si te pedimos un vuelo grabado para revisar el instructor, abre el lector
+con --grabar y un nombre de archivo, por ejemplo:
+  VillanuevaInstructorLector.exe --grabar vuelo.jsonl
+Vuela de rampa a rampa y cierra el lector al terminar. El archivo queda en
+la misma carpeta; mándalo por el Discord. Para verlo otra vez:
+  VillanuevaInstructorLector.exe --reproducir vuelo.jsonl --rapido 10
+
 ABRIRLO SOLO AL PRENDER LA PC
 Da doble clic en "Iniciar con Windows.bat". Vuelve a darle doble clic
 para quitarlo. Así se abre solo el lector, sin ventana; cuando vayas a
