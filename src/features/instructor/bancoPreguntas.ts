@@ -14,6 +14,7 @@ const p = (id: string, tema: Tema, es: Texto, en: Texto): Pregunta => ({
 
 const VE = "viraje-escarpado";
 const RN = "recto-nivelado";
+const VL = "vuelo-lento";
 
 export const BANCO: Pregunta[] = [
   // Viraje escarpado
@@ -96,6 +97,43 @@ export const BANCO: Pregunta[] = [
   p("rn-19", RN, ["¿Cuánto dura el tramo que se califica?", "Dos minutos.", ["2"]],
     ["How long is the graded segment?", "Two minutes.", ["2"]]),
 
+  // Vuelo lento (constantes de vueloLento.ts y briefing de explicacionLento.ts; Academia: Aerodinámica)
+  p("vl-1", VL, ["En vuelo lento, ¿qué controla la velocidad?", "La nariz: el cabeceo.", ["nariz", "cabeceo", "actitud", "elevador"]],
+    ["In slow flight, what controls the airspeed?", "Pitch.", ["pitch", "nose", "elevator", "attitude"]]),
+  p("vl-2", VL, ["¿Y qué controla la altitud?", "La potencia.", ["potencia", "acelerador", "motor"]],
+    ["And what controls the altitude?", "Power.", ["power", "throttle"]]),
+  p("vl-3", VL, ["¿A qué velocidad te pide el instructor el vuelo lento?", "A 55 nudos.", ["55"]],
+    ["What airspeed does the instructor ask for in slow flight?", "55 knots.", ["55"]]),
+  p("vl-4", VL, ["¿Cuántos nudos te puedes pasar arriba de 55?", "10 nudos.", ["10"]],
+    ["How many knots above 55 can you go?", "10 knots.", ["10"]]),
+  p("vl-5", VL, ["¿Y cuántos abajo de 55?", "Nada: 0 nudos.", ["0", "nada", "ninguno"]],
+    ["And how many below 55?", "None: 0 knots.", ["0", "none", "nothing"]]),
+  p("vl-6", VL, ["¿Qué tolerancia de altitud tienes en vuelo lento?", "Más menos 100 pies.", ["100"]],
+    ["What altitude tolerance do you have in slow flight?", "Plus or minus 100 feet.", ["100"]]),
+  p("vl-7", VL, ["¿Qué pasa con el intento si suena el aviso de pérdida?", "No pasa.", ["no pasa", "reprueba", "no se aprueba", "no apruebas", "falla"]],
+    ["What happens to the attempt if the stall warning sounds?", "It does not pass.", ["not pass", "fail", "fails", "doesn t pass"]]),
+  p("vl-8", VL, ["¿A qué altura mínima sobre el terreno se vuela?", "1,500 pies.", ["1500"]],
+    ["What is the minimum height above the ground for it?", "1,500 feet.", ["1500"]]),
+  p("vl-9", VL, ["¿Qué flaps usas en el vuelo lento del instructor?", "Flaps completos.", ["completos", "30", "todos", "abajo"]],
+    ["What flaps do you use in the instructor's slow flight?", "Full flaps.", ["full", "30", "all"]]),
+  p("vl-10", VL, ["¿Por qué los flaps bajan la velocidad de pérdida?", "Aumentan la curvatura del ala y la sustentación.", ["curvatura", "sustentacion", "combadura"]],
+    ["Why do flaps lower the stall speed?", "They increase wing camber and lift.", ["camber", "lift"]]),
+  p("vl-11", VL, ["¿Por qué el viraje en vuelo lento va suave?", "Porque al inclinar sube la velocidad de pérdida.", ["perdida", "factor de carga", "carga"]],
+    ["Why is the turn in slow flight gentle?", "Because bank raises the stall speed.", ["stall", "load factor", "load"]]),
+  p("vl-12", VL, ["¿Cuántos grados de inclinación pide el instructor en los virajes?", "15 grados.", ["15"]],
+    ["How many degrees of bank does the instructor ask for in the turns?", "15 degrees.", ["15"]]),
+  p("vl-13", VL, ["A baja velocidad, ¿por qué necesitas más pedal?", "Por la guiñada adversa y el efecto del motor.", ["guinada", "adversa", "factor p", "torque", "motor", "helice"]],
+    ["At low airspeed, why do you need more rudder?", "Adverse yaw and engine effects.", ["yaw", "p factor", "torque", "engine"]]),
+  p("vl-14", VL, ["¿Cómo sales del vuelo lento?", "Potencia completa y flaps arriba por etapas.", ["potencia"]],
+    ["How do you recover from slow flight?", "Full power, then flaps up in stages.", ["power"]]),
+  p("vl-15", VL, ["Al salir, ¿cómo subes los flaps?", "Por etapas, poco a poco.", ["etapas", "poco a poco", "gradual"]],
+    ["On the recovery, how do you raise the flaps?", "In stages, a little at a time.", ["stages", "gradually", "little at a time", "steps"]]),
+  p("vl-16", VL, ["¿Para qué sirve practicar vuelo lento?", "Para controlar el avión cerca de la pérdida, como en el despegue y el aterrizaje.", ["perdida", "aterrizaje", "despegue", "control"]],
+    ["Why practice slow flight?", "To control the airplane near the stall, like on takeoff and landing.", ["stall", "landing", "takeoff", "control"]]),
+  p("vl-17", VL, ["¿Qué tolerancia de rumbo tienes en el tramo recto?", "Más menos 10 grados.", ["10"]],
+    ["What heading tolerance do you have on the straight leg?", "Plus or minus 10 degrees.", ["10"]]),
+  p("vl-18", VL, ["Si la velocidad baja de 55 y quieres mantener la altitud, ¿qué haces?", "Bajo un poco la nariz y agrego potencia.", ["potencia", "nariz"]],
+    ["If the airspeed drops below 55 and you want to hold altitude, what do you do?", "Lower the nose a little and add power.", ["power", "nose"]]),
   // Cessna 172 (C172S)
   p("c172-1", "c172", ["¿Cuál es la Vs0 del C172?", "40 nudos.", ["40"]],
     ["What is the C172's Vs0?", "40 knots.", ["40"]]),
