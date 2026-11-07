@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { CHECKLIST_VOZ_C172 } from "../../data/checklistVozC172.ts";
+import { AVIONES_VOZ } from "../../data/checklistVozAviones.ts";
 import { ES_V15 } from "./revisionSim.ts";
 import type { Muestra } from "./evaluador.ts";
 import { simularVuelo } from "./simularVuelo.ts";
@@ -153,6 +154,38 @@ test("los avisos esperan a que no haya seccion abierta", () => {
 test("brakers como lo escribe el reconocimiento cuenta como breakers", () => {
   const cl = decir(abrirAA(), ["asientos", "freno", "brakers adentro"]);
   assert.equal(cl.puntos["antes-arrancar"][2].estado, "dicho");
+});
+
+for (const [id, puntos] of [["c152", 74], ["arrow", 88]] as const) {
+  const secciones = AVIONES_VOZ[id].secciones;
+  const todos = secciones.flatMap((s) => s.puntos);
+
+  test(`${id}: ${puntos} puntos en las 11 secciones, ids sin repetir y claves sin acentos`, () => {
+    assert.deepEqual(secciones.map((s) => s.id), CHECKLIST_VOZ_C172.map((s) => s.id));
+    assert.equal(todos.length, puntos);
+    assert.equal(new Set(todos.map((p) => p.id)).size, puntos);
+    for (const c of [...secciones, ...todos]) {
+      assert.ok(c.claves.length > 0, c.id);
+      for (const k of c.claves) assert.match(k, /^[a-z0-9 ]+$/, `${c.id}: ${k}`);
+    }
+  });
+
+  test(`${id}: cada punto dicho tal cual se reconoce como el siguiente`, () => {
+    let cl = crearChecklist(secciones);
+    for (const s of secciones) {
+      cl = oir(cl, `checklist ${s.claves[0]}`, 0);
+      assert.equal(cl.abierta, s.id);
+      for (const p of s.puntos) cl = oir(cl, p.dicho, 0);
+      assert.ok(!estados(cl, s.id).includes("saltado"), `${s.id}: ${estados(cl, s.id).join(",")}`);
+      assert.equal(cl.abierta, null, s.id);
+    }
+  });
+}
+
+test("carb heat como lo dice la escuela cuenta como calentador de carburador", () => {
+  let cl = oir(crearChecklist(AVIONES_VOZ.c152.secciones), "checklist arranque", 0);
+  cl = decir(cl, ["mezcla rica", "carb heat frio"]);
+  assert.deepEqual(estados(cl, "arranque").slice(0, 2), ["revisando", "dicho"]);
 });
 
 test("dream como lo escribe el reconocimiento cuenta como trim", () => {

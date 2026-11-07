@@ -7,18 +7,18 @@ export type SeccionId = "antes-arrancar" | "arranque" | "antes-rodar" | "prueba-
 export type PuntoVoz = { id: string; dicho: string; claves: string[]; revisa?: Revision; nota?: string };
 export type SeccionVoz = { id: SeccionId; titulo: string; claves: string[]; puntos: PuntoVoz[] };
 
-type Renglon = [dicho: string, claves: string[], revisa?: Revision, nota?: string];
+export type Renglon = [dicho: string, claves: string[], revisa?: Revision, nota?: string];
 
-const FLAPS = ["flaps", "flap"];
-const LUZ_ATT = ["aterrizaje", "landing"];
-const LUZ_TAXI = ["rodaje", "taxi"];
-const STROBE = ["estroboscopicas", "estroboscopica", "strobes", "strobe"];
-const AP = ["piloto automatico", "autopiloto"];
-const AVIONICA = ["avionica master", "avionica"];
+export const FLAPS = ["flaps", "flap"];
+export const LUZ_ATT = ["aterrizaje", "landing"];
+export const LUZ_TAXI = ["rodaje", "taxi"];
+export const STROBE = ["estroboscopicas", "estroboscopica", "strobes", "strobe"];
+export const AP = ["piloto automatico", "autopiloto"];
+export const AVIONICA = ["avionica master", "avionica"];
 // El reconocimiento en español suele escribir «trim» como «dream».
-const TRIM = ["trim", "dream", "drim", "trin"];
+export const TRIM = ["trim", "dream", "drim", "trin"];
 
-const S = (id: SeccionId, titulo: string, claves: string[], renglones: Renglon[]): SeccionVoz => ({
+export const S = (id: SeccionId, titulo: string, claves: string[], renglones: Renglon[]): SeccionVoz => ({
   id,
   titulo,
   claves,
@@ -71,7 +71,7 @@ export const CHECKLIST_VOZ_C172: SeccionVoz[] = [
     ["Combustible — cantidad verificada", ["cantidad de combustible", "cantidad"]],
     ["Selector de combustible — ambos", ["selector"], "selector-ambos"],
     ["Mezcla — ajustada", ["mezcla"], "mezcla-aeropuerto", "Se saca la mezcla hasta que quede balanceada con el aire."],
-    ["Acelerador — 1,800 RPM", ["acelerador", "1800"], "rpm-1800"],
+    ["Acelerador — 1,800 RPM", ["acelerador", "1800"], "rpm-prueba"],
     ["Magnetos — probados", ["magnetos", "magneto"], "magnetos"],
     ["Amperímetro — revisado", ["amperimetro"]],
     ["Panel de anunciadores — sin luces", ["anunciadores", "anunciador"]],

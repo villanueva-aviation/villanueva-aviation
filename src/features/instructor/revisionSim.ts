@@ -5,24 +5,41 @@ export type Revision =
   | "freno" | "acelerador-cuarto" | "mezcla-corte" | "mezcla-rica" | "mezcla-aeropuerto" | "mezcla-empobrecida"
   | "master-on" | "master-off" | "beacon-on" | "nav-on" | "taxi-on" | "aterrizaje-on" | "aterrizaje-off"
   | "strobe-on" | "strobe-off" | "arranque-motor" | "corte-motor" | "magnetos" | "magnetos-off"
-  | "flaps-arriba" | "flaps-despegue" | "altimetro" | "rpm-1800" | "ralenti" | "xpdr-alt"
+  | "flaps-arriba" | "flaps-despegue" | "altimetro" | "rpm-prueba" | "ralenti" | "xpdr-alt"
   | "vel-ascenso" | "potencia-crucero" | "vel-aproximacion"
   // v1.5
   | "avionica-on" | "avionica-off" | "selector-ambos" | "selector-tanque" | "valvula-abierta"
-  | "bomba-on" | "bomba-off" | "autopiloto-off" | "trim-despegue";
+  | "bomba-on" | "bomba-off" | "autopiloto-off" | "trim-despegue"
+  // C152 y Arrow
+  | "acelerador-media" | "rpm-1000" | "rpm-calentamiento" | "acelerador-cerrado" | "tren-arriba" | "tren-abajo";
 
 export const ES_V15: ReadonlySet<Revision> = new Set<Revision>([
   "avionica-on", "avionica-off", "selector-ambos", "selector-tanque", "valvula-abierta",
   "bomba-on", "bomba-off", "autopiloto-off", "trim-despegue",
 ]);
 
-export type ContextoRevision = { elevacionFt: number | null };
+/** Lo que cambia de un avión a otro. Rangos [mín, máx]. */
+export type Limites = {
+  rpmPrueba: [number, number];
+  caidaMag: number;
+  velAscenso: [number, number];
+  crucero: [number, number];
+  aproximacion: { flaps: [number, number]; limpio: [number, number] };
+};
+export const LIMITES_C172: Limites = {
+  rpmPrueba: [1700, 1900],
+  caidaMag: 150,
+  velAscenso: [65, 85],
+  crucero: [2100, 2700],
+  aproximacion: { flaps: [60, 70], limpio: [65, 75] },
+};
+
+export type ContextoRevision = { elevacionFt: number | null; limites?: Limites };
 export type Revisado = { ok: boolean; detalle?: string };
 
 // En el C172 de MSFS la marca de despegue lee 7.4 % (Erik, 2026-11-06); se acepta ±10.
 export const TRIM_DESPEGUE = { min: -2.6, max: 17.4 };
 const AEROPUERTO_ALTO_FT = 3000;
-const CAIDA_MAX = 150;
 const DIFERENCIA_MAX = 50;
 
 const VENTANAS: Partial<Record<Revision, { antes: number; despues: number }>> = {
@@ -43,7 +60,7 @@ const entre = (x: number | undefined, a: number, b: number) => (x === undefined 
 const no = (x: boolean | undefined) => (x === undefined ? undefined : !x);
 const y = (a: boolean | undefined, b: boolean | undefined) => (a === undefined || b === undefined ? undefined : a && b);
 
-type Regla = (m: Muestra, elevFt: number) => boolean | undefined;
+type Regla = (m: Muestra, elevFt: number, l: Limites) => boolean | undefined;
 
 const ESTADO: Record<Exclude<Revision, "magnetos">, Regla> = {
   freno: (m) => m.freno,
@@ -67,12 +84,12 @@ const ESTADO: Record<Exclude<Revision, "magnetos">, Regla> = {
   "flaps-arriba": (m) => (m.flaps === undefined ? undefined : m.flaps === 0),
   "flaps-despegue": (m) => entre(m.flaps, 0, 1),
   altimetro: (m) => (m.altimetro === undefined || m.qnh === undefined ? undefined : Math.abs(m.altimetro - m.qnh) <= 0.02 + 1e-9),
-  "rpm-1800": (m) => entre(m.rpm, 1700, 1900),
+  "rpm-prueba": (m, _, l) => entre(m.rpm, ...l.rpmPrueba),
   ralenti: (m) => y(m.acelerador === undefined ? undefined : m.acelerador < 5, entre(m.rpm, -Infinity, 1050)),
   "xpdr-alt": (m) => (m.xpdrModo === undefined ? undefined : m.xpdrModo === 4),
-  "vel-ascenso": (m) => !m.enTierra && m.velocidad >= 65 && m.velocidad <= 85,
-  "potencia-crucero": (m) => entre(m.rpm, 2100, 2700),
-  "vel-aproximacion": (m) => (m.flaps === undefined ? undefined : m.flaps > 0 ? entre(m.velocidad, 60, 70) : entre(m.velocidad, 65, 75)),
+  "vel-ascenso": (m, _, l) => !m.enTierra && (entre(m.velocidad, ...l.velAscenso) as boolean),
+  "potencia-crucero": (m, _, l) => entre(m.rpm, ...l.crucero),
+  "vel-aproximacion": (m, _, l) => (m.flaps === undefined ? undefined : entre(m.velocidad, ...(m.flaps > 0 ? l.aproximacion.flaps : l.aproximacion.limpio))),
   "avionica-on": (m) => m.avionica,
   "avionica-off": (m) => no(m.avionica),
   "selector-ambos": (m) => (m.selector === undefined ? undefined : m.selector === 1),
@@ -82,10 +99,17 @@ const ESTADO: Record<Exclude<Revision, "magnetos">, Regla> = {
   "bomba-off": (m) => no(m.bomba),
   "autopiloto-off": (m) => no(m.autopiloto),
   "trim-despegue": (m) => entre(m.trim, TRIM_DESPEGUE.min, TRIM_DESPEGUE.max),
+  "acelerador-media": (m) => entre(m.acelerador, 5, 25),
+  "rpm-1000": (m) => entre(m.rpm, -Infinity, 1050),
+  "rpm-calentamiento": (m) => entre(m.rpm, 1350, 1550),
+  "acelerador-cerrado": (m) => (m.acelerador === undefined ? undefined : m.acelerador < 5),
+  // GEAR HANDLE POSITION: verdadero es abajo.
+  "tren-arriba": (m) => no(m.tren),
+  "tren-abajo": (m) => m.tren,
 };
 
 /** Cada magneto solo, la caída contra la última rpm con los dos, y al final los dos encendidos. */
-function magnetos(ms: Muestra[]): Revisado | null {
+function magnetos(ms: Muestra[], caidaMax: number): Revisado | null {
   if (ms.some((m) => m.magIzq === undefined || m.magDer === undefined || m.rpm === undefined)) return null;
   const primero = ms.findIndex((m) => m.magIzq !== m.magDer);
   if (primero < 0) return { ok: false };
@@ -99,16 +123,17 @@ function magnetos(ms: Muestra[]): Revisado | null {
   if (!izq.length || !der.length || !despues) return { ok: false };
   const caidaIzq = Math.round(base - Math.min(...izq.map((m) => m.rpm!)));
   const caidaDer = Math.round(base - Math.min(...der.map((m) => m.rpm!)));
-  const ok = caidaIzq <= CAIDA_MAX && caidaDer <= CAIDA_MAX && Math.abs(caidaIzq - caidaDer) <= DIFERENCIA_MAX;
+  const ok = caidaIzq <= caidaMax && caidaDer <= caidaMax && Math.abs(caidaIzq - caidaDer) <= DIFERENCIA_MAX;
   return ok ? { ok } : { ok, detalle: `caída izq ${caidaIzq} RPM, der ${caidaDer} RPM` };
 }
 
 /** null si las muestras no traen el campo (lector viejo): el punto queda solo por voz. */
 export function revisar(r: Revision, muestras: Muestra[], ctx: ContextoRevision): Revisado | null {
   if (!muestras.length) return null;
-  if (r === "magnetos") return magnetos(muestras);
+  const l = ctx.limites ?? LIMITES_C172;
+  if (r === "magnetos") return magnetos(muestras, l.caidaMag);
   const regla = ESTADO[r];
   const elev = ctx.elevacionFt ?? muestras[0].altitud - muestras[0].agl;
-  if (regla(muestras[muestras.length - 1], elev) === undefined) return null;
-  return { ok: muestras.some((m) => regla(m, elev) === true) };
+  if (regla(muestras[muestras.length - 1], elev, l) === undefined) return null;
+  return { ok: muestras.some((m) => regla(m, elev, l) === true) };
 }

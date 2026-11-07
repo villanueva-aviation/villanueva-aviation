@@ -18,7 +18,8 @@ import {
   type Checklist,
   type EstadoPunto,
 } from "../features/instructor/checklistVoz";
-import { CHECKLIST_VOZ_C172, type SeccionId } from "../data/checklistVozC172";
+import type { SeccionId } from "../data/checklistVozC172";
+import { AVIONES_VOZ, type AvionVoz } from "../data/checklistVozAviones";
 import { useVoz } from "../features/instructor/useVoz";
 import { useChecklistVoz } from "../features/instructor/useChecklistVoz";
 import { FOUNDER_EMAIL } from "../lib/constants";
@@ -57,7 +58,7 @@ const ETIQUETA: Record<EstadoPunto, string> = {
   "no-hecho": "dicho, no hecho",
   saltado: "saltado",
 };
-const nuevoChecklist = () => crearChecklist(CHECKLIST_VOZ_C172);
+const nuevoChecklist = (a: AvionVoz) => crearChecklist(AVIONES_VOZ[a].secciones);
 
 const mmss = (seg: number) => {
   const s = Math.max(0, Math.round(seg));
@@ -74,7 +75,9 @@ export function AdminVuelo() {
   const evRef = useRef<EvaluacionVuelo | null>(null);
   const inicio = useRef(0);
   const aeroRef = useRef<Aeropuerto | null>(null);
-  const [cl, setCl] = useState<Checklist>(nuevoChecklist);
+  const [avion, setAvion] = useState<AvionVoz>("c172");
+  const avionRef = useRef<AvionVoz>(avion);
+  const [cl, setCl] = useState<Checklist>(() => nuevoChecklist("c172"));
   const clRef = useRef<Checklist>(cl);
   const ultimaT = useRef(0);
   const dichos = useRef(new Set<SeccionId>());
@@ -120,7 +123,10 @@ export function AdminVuelo() {
       if (!evRef.current) armar(m);
       else evRef.current = avanzarVuelo(evRef.current, m, aeroRef.current);
       ultimaT.current = m.t;
-      clRef.current = avanzarChecklist(clRef.current, m, { elevacionFt: evRef.current?.aeropuerto?.elevacionFt ?? null });
+      clRef.current = avanzarChecklist(clRef.current, m, {
+        elevacionFt: evRef.current?.aeropuerto?.elevacionFt ?? null,
+        limites: AVIONES_VOZ[avionRef.current].limites,
+      });
     }
     setEv(evRef.current);
     setCl(clRef.current);
@@ -154,10 +160,17 @@ export function AdminVuelo() {
   const resumen = resumenChecklist(cl);
   const reiniciar = () => {
     if (m) armar(m);
-    clRef.current = nuevoChecklist();
+    clRef.current = nuevoChecklist(avionRef.current);
     dichos.current.clear();
     setCl(clRef.current);
     setOido("");
+  };
+  const cambiarAvion = (a: AvionVoz) => {
+    avionRef.current = a;
+    setAvion(a);
+    clRef.current = nuevoChecklist(a);
+    dichos.current.clear();
+    setCl(clRef.current);
   };
 
   return (
@@ -165,7 +178,7 @@ export function AdminVuelo() {
       <PageHero
         eyebrow="Panel del fundador"
         title="Vuelo de rampa a rampa"
-        description="Prueba del lector v1.5: fases del vuelo y checklist por voz del C172."
+        description="Prueba del lector v1.5: fases del vuelo y checklist por voz del C172, C152 y Arrow."
       />
       <Container className="py-12 md:py-16 space-y-8">
         <div className="flex flex-wrap items-center gap-3">
@@ -228,8 +241,15 @@ export function AdminVuelo() {
             {!escucha.supported && <span className="text-sm text-red-400">Este navegador no reconoce voz.</span>}
             {escucha.error && <span className="text-sm text-red-400">{escucha.error}</span>}
           </div>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Avión del checklist">
+            {(Object.keys(AVIONES_VOZ) as AvionVoz[]).map((a) => (
+              <Button key={a} variant={a === avion ? "primary" : "secondary"} onClick={() => cambiarAvion(a)} aria-pressed={a === avion}>
+                {AVIONES_VOZ[a].nombre}
+              </Button>
+            ))}
+          </div>
           {m && lectorViejoChecklist(m) && (
-            <p className="text-sm text-gold-400">Lector v1.4: 15 puntos se revisan solo por voz. Baja el v1.5 de Descargas.</p>
+            <p className="text-sm text-gold-400">Lector v1.4: aviónica, combustible, piloto automático y trim se revisan solo por voz. Baja el v1.5 de Descargas.</p>
           )}
           <form
             className="flex flex-wrap gap-2"
