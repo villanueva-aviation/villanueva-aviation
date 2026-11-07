@@ -19,8 +19,8 @@ export const ES_V15: ReadonlySet<Revision> = new Set<Revision>([
 export type ContextoRevision = { elevacionFt: number | null };
 export type Revisado = { ok: boolean; detalle?: string };
 
-// ponytail: provisional, se calibra con la marca de despegue en MSFS (Tarea 6)
-export const TRIM_DESPEGUE = { min: -5, max: 25 };
+// En el C172 de MSFS la marca de despegue lee 7.4 % (Erik, 2026-11-06); se acepta ±10.
+export const TRIM_DESPEGUE = { min: -2.6, max: 17.4 };
 const AEROPUERTO_ALTO_FT = 3000;
 const CAIDA_MAX = 150;
 const DIFERENCIA_MAX = 50;

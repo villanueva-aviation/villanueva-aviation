@@ -74,3 +74,9 @@ test("ventana del arranque es 30 s", () => {
   assert.deepEqual(ventana("magnetos"), { antes: 15, despues: 30 });
   assert.deepEqual(ventana("freno"), { antes: 0, despues: 10 });
 });
+
+test("trim de despegue calibrado en MSFS: 7.4 cumple, 20 y -5 no", () => {
+  assert.equal(revisar("trim-despegue", [con({ trim: 7.4 })], sin)?.ok, true);
+  assert.equal(revisar("trim-despegue", [con({ trim: 20 })], sin)?.ok, false);
+  assert.equal(revisar("trim-despegue", [con({ trim: -5 })], sin)?.ok, false);
+});
