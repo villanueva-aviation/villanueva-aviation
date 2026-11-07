@@ -154,3 +154,10 @@ test("brakers como lo escribe el reconocimiento cuenta como breakers", () => {
   const cl = decir(abrirAA(), ["asientos", "freno", "brakers adentro"]);
   assert.equal(cl.puntos["antes-arrancar"][2].estado, "dicho");
 });
+
+test("dream como lo escribe el reconocimiento cuenta como trim", () => {
+  const ad = decir(nuevo(), ["checklist antes de despegar", "radios configurados", "dream electrico configurado", "piloto automatico apagado", "dream despegue"]);
+  assert.deepEqual(estados(ad, "antes-despegar").slice(0, 4), ["dicho", "dicho", "revisando", "revisando"]);
+  const cr = decir(nuevo(), ["checklist crucero", "potencia", "dream ajustado"]);
+  assert.equal(cr.puntos.crucero[1].estado, "dicho");
+});

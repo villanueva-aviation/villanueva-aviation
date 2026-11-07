@@ -15,6 +15,8 @@ const LUZ_TAXI = ["rodaje", "taxi"];
 const STROBE = ["estroboscopicas", "estroboscopica", "strobes", "strobe"];
 const AP = ["piloto automatico", "autopiloto"];
 const AVIONICA = ["avionica master", "avionica"];
+// El reconocimiento en español suele escribir «trim» como «dream».
+const TRIM = ["trim", "dream", "drim", "trin"];
 
 const S = (id: SeccionId, titulo: string, claves: string[], renglones: Renglon[]): SeccionVoz => ({
   id,
@@ -78,9 +80,9 @@ export const CHECKLIST_VOZ_C172: SeccionVoz[] = [
   ]),
   S("antes-despegar", "Antes de despegar", ["antes de despegar", "antes del despegue"], [
     ["Radios y aviónica — configurados", ["radios", "radio", "avionica"], undefined, "En las lecciones con torre se revisa que COM1 esté en la frecuencia de torre."],
-    ["Trim eléctrico — configurado", ["trim electrico"]],
+    ["Trim eléctrico — configurado", TRIM.map((t) => `${t} electrico`)],
     ["Piloto automático — apagado", AP, "autopiloto-off"],
-    ["Trim de elevador — despegue", ["trim"], "trim-despegue"],
+    ["Trim de elevador — despegue", TRIM, "trim-despegue"],
     ["Flaps — 0 a 10 grados", FLAPS, "flaps-despegue"],
     ["Transponder — ALT", ["transponder", "transpondedor"], "xpdr-alt"],
     ["Luz de aterrizaje — encendida", LUZ_ATT, "aterrizaje-on"],
@@ -94,7 +96,7 @@ export const CHECKLIST_VOZ_C172: SeccionVoz[] = [
   ]),
   S("crucero", "Crucero", ["crucero"], [
     ["Potencia — 2,100 a 2,700 RPM", ["potencia"], "potencia-crucero"],
-    ["Trim — ajustado", ["trim"]],
+    ["Trim — ajustado", TRIM],
     ["Mezcla — empobrecida", ["mezcla"], "mezcla-empobrecida"],
     ["Vigilancia de tránsito — constante", ["vigilancia", "transito"]],
   ]),
