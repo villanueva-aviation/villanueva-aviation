@@ -80,3 +80,9 @@ test("trim de despegue calibrado en MSFS: 7.4 cumple, 20 y -5 no", () => {
   assert.equal(revisar("trim-despegue", [con({ trim: 20 })], sin)?.ok, false);
   assert.equal(revisar("trim-despegue", [con({ trim: -5 })], sin)?.ok, false);
 });
+
+test("las velocidades esperan 45 s y el ralenti 30 s", () => {
+  assert.deepEqual(ventana("vel-aproximacion"), { antes: 0, despues: 45 });
+  assert.deepEqual(ventana("vel-ascenso"), { antes: 0, despues: 45 });
+  assert.deepEqual(ventana("ralenti"), { antes: 0, despues: 30 });
+});

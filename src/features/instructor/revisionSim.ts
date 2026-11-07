@@ -28,6 +28,10 @@ const DIFERENCIA_MAX = 50;
 const VENTANAS: Partial<Record<Revision, { antes: number; despues: number }>> = {
   "arranque-motor": { antes: 0, despues: 30 },
   magnetos: { antes: 15, despues: 30 },
+  // Volando, la velocidad tarda en quedar en el rango (Erik, prueba en vivo 2026-11-06).
+  "vel-ascenso": { antes: 0, despues: 45 },
+  "vel-aproximacion": { antes: 0, despues: 45 },
+  ralenti: { antes: 0, despues: 30 },
 };
 
 /** Segundos antes y después de oír el punto en que se busca. Por defecto {antes: 0, despues: 10}. */
