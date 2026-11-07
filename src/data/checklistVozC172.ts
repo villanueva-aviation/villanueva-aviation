@@ -33,7 +33,7 @@ export const CHECKLIST_VOZ_C172: SeccionVoz[] = [
   S("antes-arrancar", "Antes de arrancar", ["antes de arrancar", "antes del arranque"], [
     ["Asientos y cinturones — ajustados y asegurados", ["asientos", "cinturones"]],
     ["Freno de estacionamiento — puesto", ["freno"], "freno"],
-    ["Breakers — adentro", ["breakers", "breaker"]],
+    ["Breakers — adentro", ["breakers", "breaker", "brakers", "braker"]],
     ["Equipo eléctrico — apagado", ["electrico"]],
     ["Aviónica master — apagado", AVIONICA, "avionica-off"],
     ["Selector de combustible — ambos", ["selector"], "selector-ambos"],

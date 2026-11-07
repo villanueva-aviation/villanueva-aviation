@@ -150,3 +150,7 @@ test("los avisos esperan a que no haya seccion abierta", () => {
   assert.deepEqual(avisosPorDecir(cl, new Set()).map((a) => a.id), ["antes-arrancar", "arranque"]);
   assert.deepEqual(avisosPorDecir(cl, new Set(["antes-arrancar"])).map((a) => a.id), ["arranque"]);
 });
+test("brakers como lo escribe el reconocimiento cuenta como breakers", () => {
+  const cl = decir(abrirAA(), ["asientos", "freno", "brakers adentro"]);
+  assert.equal(cl.puntos["antes-arrancar"][2].estado, "dicho");
+});

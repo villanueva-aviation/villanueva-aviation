@@ -80,6 +80,7 @@ export function AdminVuelo() {
   const dichos = useRef(new Set<SeccionId>());
   const [escuchar, setEscuchar] = useState(false);
   const [oido, setOido] = useState("");
+  const [oidos, setOidos] = useState<string[]>([]);
   const [escrito, setEscrito] = useState("");
   const voz = useVoz("es", () => null);
 
@@ -87,6 +88,7 @@ export function AdminVuelo() {
     clRef.current = oir(clRef.current, texto, ultimaT.current);
     setCl(clRef.current);
     setOido(texto);
+    setOidos((xs) => [texto, ...xs].slice(0, 12));
   };
   const escucha = useChecklistVoz(escuchar, voz, alOir);
   const { decir } = escucha;
@@ -249,6 +251,16 @@ export function AdminVuelo() {
             </Button>
           </form>
           {oido && <p className="text-sm text-white/70">Oí: «{oido}»</p>}
+          {oidos.length > 1 && (
+            <details className="text-sm text-white/60">
+              <summary className="cursor-pointer">Todo lo que oí ({oidos.length})</summary>
+              <ol className="mt-1 space-y-0.5 font-mono">
+                {oidos.map((x, i) => (
+                  <li key={i}>«{x}»</li>
+                ))}
+              </ol>
+            </details>
+          )}
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {cl.secciones.map((s) => (
               <div
