@@ -304,7 +304,7 @@ export function AdminVuelo() {
             ))}
           </div>
           <div className="text-sm text-white/80 space-y-1">
-            <p>Puntos en orden: {resumen.enOrden} de 80</p>
+            <p>Puntos en orden: {resumen.enOrden} de {cl.secciones.reduce((k, s) => k + s.puntos.length, 0)}</p>
             {resumen.saltados.length > 0 && <p className="text-red-400">Saltados: {resumen.saltados.join("; ")}</p>}
             {resumen.noHechos.length > 0 && <p className="text-red-400">Dichos pero no hechos: {resumen.noHechos.join("; ")}</p>}
             {resumen.noLeidas.length > 0 && <p className="text-white/60">Sin leer: {resumen.noLeidas.join(", ")}</p>}
