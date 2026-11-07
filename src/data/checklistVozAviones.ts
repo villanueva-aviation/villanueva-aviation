@@ -1,6 +1,6 @@
 // Checklists por voz del C152 y del Arrow, con las mismas secciones del C172. Los revisó Erik el 2026-11-07.
 // El calentador de carburador y la palanca de la hélice quedan solo por voz: el lector no los lee todavía.
-// El trim de despegue del C152 queda por voz (Erik, 2026-11-07); el del Arrow, hasta medir su marca en MSFS.
+// El trim de despegue del C152 y del Arrow queda por voz (Erik, 2026-11-07).
 import { LIMITES_C172, type Limites } from "../features/instructor/revisionSim.ts";
 import { AP, AVIONICA, CHECKLIST_VOZ_C172, FLAPS, LUZ_ATT, LUZ_TAXI, S, STROBE, TRIM, type Renglon, type SeccionId, type SeccionVoz } from "./checklistVozC172.ts";
 
@@ -171,7 +171,7 @@ export const CHECKLIST_VOZ_ARROW: SeccionVoz[] = [
     HELICE_ADELANTE,
     ["Cinturones y puertas — asegurados", ["cinturones", "puertas"]],
     ["Flaps — arriba", FLAPS, "flaps-despegue", "Arriba en el despegue normal."],
-    ["Trim de elevador — despegue", TRIM, undefined, "Se revisa en el simulador cuando midamos la marca de despegue del Arrow."],
+    ["Trim de elevador — despegue", TRIM],
     ["Controles de vuelo — libres y correctos", ["controles"]],
     ["Piloto automático — apagado", AP, "autopiloto-off"],
     ["Aire acondicionado — apagado", ["aire acondicionado", "acondicionado"]],
