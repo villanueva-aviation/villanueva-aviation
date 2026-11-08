@@ -32,6 +32,21 @@ test("agrupa por sesión", () => {
   assert.equal(s.find((x) => x.sesionId === "B")!.checkride, null);
 });
 
+test("el repaso general: su renglón es la lección, no un intento ni el checkride", () => {
+  const r = calificar(simularManiobra());
+  const leccion = { ...intento({ ...r, calificacion: 75, aprobado: false }, "2026-11-08T11:00:00Z", "checkride", "R"), maniobra: "repaso-general", detalle: { maniobras: [{}, {}, {}, {}] } };
+  const lista = [
+    intento({ ...r, calificacion: 90, aprobado: true }, "2026-11-08T10:20:00Z", "checkride", "R"),
+    intento({ ...r, calificacion: 60, aprobado: false }, "2026-11-08T10:30:00Z", "checkride", "R"),
+    leccion,
+  ].map(conCorreo);
+  const s = agruparSesiones(lista)[0];
+  assert.equal(s.intentos, 2);
+  assert.deepEqual(s.checkride, { calificacion: 60, aprobado: false });
+  assert.deepEqual(s.leccion, { nombre: "Repaso general", modo: "checkride", calificacion: 75, aprobado: false });
+  assert.equal(agruparSesiones([conCorreo(intento(r, "2026-11-05T10:00:00Z", "practica", "A"))])[0].leccion, null);
+});
+
 test("los intentos sin sesión no se agrupan", () => {
   assert.deepEqual(agruparSesiones([conCorreo(intento(calificar(simularManiobra()), "2026-11-05T10:00:00Z"))]), []);
 });

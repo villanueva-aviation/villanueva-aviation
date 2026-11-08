@@ -31,16 +31,25 @@ export type ResumenSesion = {
   inicio: string;
   intentos: number;
   checkride: { calificacion: number; aprobado: boolean } | null;
+  /** La lección del vuelo completo (repaso general) que agrupa los intentos de la sesión. */
+  leccion: { nombre: string; modo: "practica" | "checkride"; calificacion: number; aprobado: boolean } | null;
 };
+
+/** Renglones de intentos_maniobra que son una lección entera, no una maniobra. */
+export const LECCIONES_GUARDADAS: Record<string, string> = { "repaso-general": "Repaso general" };
 
 /** Una fila por sesión del programa, la más nueva primero. Los intentos sin sesión no cuentan. */
 export function agruparSesiones(intentos: (IntentoManiobra & { email: string | null })[]): ResumenSesion[] {
   const porSesion = new Map<string, ResumenSesion>();
   for (const i of [...intentos].sort((a, b) => a.created_at.localeCompare(b.created_at))) {
     if (!i.sesion_id) continue;
-    const s = porSesion.get(i.sesion_id) ?? { sesionId: i.sesion_id, email: i.email, inicio: i.created_at, intentos: 0, checkride: null };
-    s.intentos++;
-    if (i.modo === "checkride") s.checkride = { calificacion: i.calificacion, aprobado: i.aprobado };
+    const s = porSesion.get(i.sesion_id) ?? { sesionId: i.sesion_id, email: i.email, inicio: i.created_at, intentos: 0, checkride: null, leccion: null };
+    const leccion = LECCIONES_GUARDADAS[i.maniobra];
+    if (leccion) s.leccion = { nombre: leccion, modo: i.modo, calificacion: i.calificacion, aprobado: i.aprobado };
+    else {
+      s.intentos++;
+      if (i.modo === "checkride") s.checkride = { calificacion: i.calificacion, aprobado: i.aprobado };
+    }
     porSesion.set(i.sesion_id, s);
   }
   return [...porSesion.values()].sort((a, b) => b.inicio.localeCompare(a.inicio));

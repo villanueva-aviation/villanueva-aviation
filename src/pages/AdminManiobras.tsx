@@ -120,7 +120,8 @@ export function AdminManiobras() {
                   <th className="py-1.5 pr-4 font-normal">Fecha</th>
                   <th className="py-1.5 pr-4 font-normal">Cadete</th>
                   <th className="py-1.5 pr-4 font-normal">Intentos</th>
-                  <th className="py-1.5 font-normal">Checkride</th>
+                  <th className="py-1.5 pr-4 font-normal">Checkride</th>
+                  <th className="py-1.5 font-normal">Lección</th>
                 </tr>
               </thead>
               <tbody>
@@ -129,8 +130,13 @@ export function AdminManiobras() {
                     <td className="py-1.5 pr-4 whitespace-nowrap">{new Date(s.inicio).toLocaleString("es-MX")}</td>
                     <td className="py-1.5 pr-4">{s.email ?? "sin correo"}</td>
                     <td className="py-1.5 pr-4">{s.intentos}</td>
-                    <td className={`py-1.5 ${s.checkride ? (s.checkride.aprobado ? "text-emerald-300" : "text-red-300") : "text-white/40"}`}>
+                    <td className={`py-1.5 pr-4 ${s.checkride ? (s.checkride.aprobado ? "text-emerald-300" : "text-red-300") : "text-white/40"}`}>
                       {s.checkride ? `${s.checkride.calificacion}/100 · ${s.checkride.aprobado ? "aprobado" : "no aprobado"}` : "—"}
+                    </td>
+                    <td className={`py-1.5 ${!s.leccion ? "text-white/40" : s.leccion.modo === "practica" ? "" : s.leccion.aprobado ? "text-emerald-300" : "text-red-300"}`}>
+                      {s.leccion
+                        ? `${s.leccion.nombre} · ${s.leccion.calificacion}/100 · ${s.leccion.modo === "practica" ? "práctica" : s.leccion.aprobado ? "aprobado" : "no aprobado"}`
+                        : "—"}
                     </td>
                   </tr>
                 ))}
