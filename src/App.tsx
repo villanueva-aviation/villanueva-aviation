@@ -16,6 +16,7 @@ import { Home } from "./pages/Home";
 const Academia = lazy(() => import("./pages/Academia").then((m) => ({ default: m.Academia })));
 const AcademiaModulo = lazy(() => import("./pages/AcademiaModulo").then((m) => ({ default: m.AcademiaModulo })));
 const ExamenTipo = lazy(() => import("./pages/ExamenTipo").then((m) => ({ default: m.ExamenTipo })));
+const HojasInstructor = lazy(() => import("./pages/HojasInstructor").then((m) => ({ default: m.HojasInstructor })));
 const GuiaEstudioPdf = lazy(() => import("./pages/GuiaEstudioPdf").then((m) => ({ default: m.GuiaEstudioPdf })));
 const MiFormacion = lazy(() => import("./pages/MiFormacion").then((m) => ({ default: m.MiFormacion })));
 const Tracker = lazy(() => import("./pages/Tracker").then((m) => ({ default: m.Tracker })));
@@ -111,6 +112,7 @@ const TITULOS: Record<string, string> = {
   [ROUTES.instructorVirajeEscarpado]: "Instructor virtual: viraje escarpado del C172 — Villanueva Aviation",
   [ROUTES.instructorPrograma]: "Instructor virtual — Villanueva Aviation",
   [ROUTES.instructorRepaso]: "Repaso general — Villanueva Aviation",
+  [ROUTES.hojasInstructor]: "Briefings y checklists por voz (PDF gratis) — Villanueva Aviation",
   [ROUTES.overlayGratis]: "Overlay gratis para streamers de simulador (OBS) — Villanueva Aviation",
   [RUTAS_EN.home]: "Villanueva Aviation — Learn to fly for real in your simulator",
   [RUTAS_EN.coaching]: "One-on-one flight sim coaching — Villanueva Aviation",
@@ -319,6 +321,7 @@ function RoutedContent() {
           <Route path={ROUTES.aeropuertoMMUN} element={<AeropuertoMMUN />} />
           <Route path={ROUTES.aeropuertoMMPR} element={<AeropuertoMMPR />} />
           <Route path={ROUTES.overlayGratis} element={<OverlayGratis />} />
+          <Route path={ROUTES.hojasInstructor} element={<HojasInstructor />} />
           <Route path={ROUTES.eventos} element={<Eventos />} />
           <Route path={ROUTES.resumenHsi} element={<ResumenHsi />} />
           <Route

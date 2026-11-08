@@ -71,6 +71,7 @@ export const ROUTES = {
   instructorVirajeEscarpado: "/instructor/viraje-escarpado",
   instructorPrograma: "/instructor/programa",
   instructorRepaso: "/instructor/repaso",
+  hojasInstructor: "/instructor/hojas",
   adminAventura: "/admin/aventura",
 } as const;
 

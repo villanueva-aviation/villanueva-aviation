@@ -46,6 +46,17 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
     archivoHref: "/downloads/villanueva-instructor-lector.zip",
   },
   {
+    id: "hojas-instructor",
+    categoria: "Checklists",
+    nombre: "Briefings y checklists por voz del instructor",
+    descripcion: "El briefing de cada maniobra y el checklist por voz del C172, C152 y Arrow III, con las mismas palabras que reconoce el micrófono. Para imprimir o guardar en PDF.",
+    version: "v1.0",
+    fecha: "2026-11-08",
+    imagen: "/images/descargas-simhub-c172.jpg",
+    interactivoHref: "/instructor/hojas",
+    soloInteractivo: true,
+  },
+  {
     id: "simhub-c172",
     categoria: "SimHub Dashboards",
     nombre: "Dashboard SimHub — Cessna 172",
