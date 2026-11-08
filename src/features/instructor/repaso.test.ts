@@ -194,6 +194,44 @@ test("no es C172: anulada desde la rampa", () => {
   assert.doesNotMatch(en.e.motivo ?? "", /[áéíóúñ¿¡]/);
 });
 
+/** La lección hasta que entra a la zona, y la muestra con la que entró. */
+function enLaZona() {
+  const ms = simularVuelo();
+  let e = crearRepaso("practica", [...SORTEO]);
+  for (const m of ms) {
+    e = alMuestrearRepaso(e, m, A, "es", () => 0).estado;
+    if (e.etapa === "maniobra") return { e, m };
+  }
+  throw new Error("no entró a la zona");
+}
+
+test("zona con margen: a 1,450 ft AGL sigue en la zona; a 1,350 sale", () => {
+  const { e, m } = enLaZona();
+  const a1450 = alMuestrearRepaso(e, { ...m, t: m.t + 0.1, agl: 1450 }, A, "es").estado;
+  assert.equal(a1450.etapa, "maniobra");
+  const a1350 = alMuestrearRepaso(a1450, { ...m, t: m.t + 0.2, agl: 1350 }, A, "es");
+  assert.equal(a1350.estado.etapa, "fuera-de-zona");
+  assert.deepEqual(a1350.decir, ["Regresa a la zona de trabajo."]);
+});
+
+test("se pierde la conexión en vuelo más de 10 s: anula; en tierra no", () => {
+  const ms = simularVuelo();
+  const i = ms.findIndex((m) => m.agl > 1000);
+  const conHueco = ms.filter((m) => m.t < ms[i].t || m.t > ms[i].t + 15);
+  const { e } = correr(crearRepaso("practica", [...SORTEO]), conHueco);
+  assert.equal(e.etapa, "invalido");
+  assert.equal(e.motivo, "Se perdió la conexión con el simulador en vuelo: la lección no se califica.");
+  const en = correr(crearRepaso("practica", [...SORTEO]), conHueco, { idioma: "en" });
+  assert.equal(en.e.motivo, "The connection to the simulator dropped in flight: this lesson won't be graded.");
+  const enRampa = ms.filter((m) => m.t < 5 || m.t > 20);
+  assert.notEqual(correr(crearRepaso("practica", [...SORTEO]), enRampa).e.etapa, "invalido");
+});
+
+test("sin aeropuerto no se sabe si tocó en la pista", () => {
+  const { e } = correr(crearRepaso("practica", [...SORTEO]), simularVuelo(), { aero: () => null });
+  assert.equal(e.tomas.tocoEnPista, null);
+});
+
 test("textos en inglés sin acentos", () => {
   const { decir, e } = correr(crearRepaso("practica", [...SORTEO]), simularVuelo(), {
     idioma: "en",

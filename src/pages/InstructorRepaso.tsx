@@ -5,7 +5,7 @@ import { AVIONES_VOZ } from "../data/checklistVozAviones";
 import type { SeccionId } from "../data/checklistVozC172";
 import { useAuth } from "../features/auth/AuthContext";
 import { avanzarChecklist, crearChecklist, oir, porDecir, type Checklist, type EstadoPunto } from "../features/instructor/checklistVoz";
-import { debriefingRepaso, paraGuardarRepaso } from "../features/instructor/debriefingRepaso";
+import { debriefingRepaso, esperaApagado, paraGuardarRepaso } from "../features/instructor/debriefingRepaso";
 import type { Muestra } from "../features/instructor/evaluador";
 import { textosReporte, type Idioma } from "../features/instructor/idiomaInstructor";
 import { guardarIntento } from "../features/instructor/intentos";
@@ -63,6 +63,8 @@ const T = {
     nueva: "Nueva lección",
     menu: "Volver al menú",
     salir: "Salir de la lección (no se guarda)",
+    esperaApagado: "Termina el checklist de apagado. El debriefing empieza al cerrar la sección o en un minuto.",
+    terminar: "Terminar y ver el debriefing",
     candado: "El repaso general todavía no está abierto. Muy pronto.",
   },
   en: {
@@ -99,6 +101,8 @@ const T = {
     nueva: "New lesson",
     menu: "Back to the menu",
     salir: "Leave the lesson (not saved)",
+    esperaApagado: "Finish the shutdown checklist. The debriefing starts when you close the section or in one minute.",
+    terminar: "Finish and see the debriefing",
     candado: "The general review is not open yet. Coming soon.",
   },
 };
@@ -178,8 +182,13 @@ export function InstructorRepaso() {
   const intento = useIntento(def, { sesionId, modoFijo: modo, arma: !!repaso && armaManiobra(repaso), alTerminar, alLote });
   const { estado, muestra, aeropuerto, ev, resultado, enCurso, reiniciar } = intento;
   aeroRef.current = aeropuerto;
-  enCursoRef.current = enCurso;
+  // Solo una maniobra ya empezada sigue fuera de la zona; una armada sin empezar se desarma (abajo).
+  const fase = ev ? def.fase(ev) : null;
+  enCursoRef.current = enCurso && fase === "en-curso";
   reiniciarRef.current = reiniciar;
+  useEffect(() => {
+    if (repaso?.etapa === "fuera-de-zona" && fase === "armado") reiniciarRef.current();
+  }, [repaso?.etapa, fase]);
 
   // Órdenes de la maniobra al cambiar de paso, y sus avisos sin repetir.
   const enManiobra = !!actualId;
@@ -204,9 +213,24 @@ export function InstructorRepaso() {
     if (filtrado.decir && avisoCrudo) decir(paraVoz(filtrado.decir, idioma), "aviso", avisoCrudo.clave);
   }, [enManiobra, paso, ev, muestra, avisoCrudo, decir, idioma, def]);
 
+  // Al apagar el motor todavía faltan puntos del «Apagado»: el debriefing espera a que cierre la sección (hasta 60 s).
+  const terminado = repaso?.etapa === "terminado";
+  const [finEn, setFinEn] = useState<number | null>(null);
+  const [listo, setListo] = useState(false);
+  useEffect(() => {
+    if (terminado && finEn === null) setFinEn(Date.now());
+  }, [terminado, finEn]);
+  useEffect(() => {
+    if (!terminado || finEn === null || listo) return;
+    const seg = (Date.now() - finEn) / 1000;
+    if (!esperaApagado(cl, seg)) return setListo(true);
+    const id = window.setTimeout(() => setListo(true), Math.max(0, 60 - seg) * 1000);
+    return () => window.clearTimeout(id);
+  }, [terminado, finEn, listo, cl]);
+
   // Checklist por voz, en español, mientras dura la lección. Al cerrar una sección el instructor dice qué faltó.
   const enVuelo = !!repaso && repaso.etapa !== "terminado" && repaso.etapa !== "invalido";
-  const escucha = useChecklistVoz(enVuelo, voz, (texto) => {
+  const escucha = useChecklistVoz(enVuelo || (terminado && !listo), voz, (texto) => {
     clRef.current = oir(clRef.current, texto, ultimaT.current);
     setCl(clRef.current);
   });
@@ -220,8 +244,7 @@ export function InstructorRepaso() {
   }, [cl, decirChecklist]);
 
   // Al terminar: debriefing leído y la lección guardada una vez.
-  const terminado = repaso?.etapa === "terminado";
-  const deb = repaso && terminado ? debriefingRepaso(repaso, cl, idioma) : null;
+  const deb = repaso && terminado && listo ? debriefingRepaso(repaso, cl, idioma) : null;
   const guardarLeccion = useCallback(async () => {
     const e = repasoRef.current;
     if (!e) return;
@@ -251,10 +274,14 @@ export function InstructorRepaso() {
     dichos.current.clear();
     leido.current = false;
     setGuardado({ estado: "no" });
+    setFinEn(null);
+    setListo(false);
     poner(crearRepaso(modo, sortear(Object.keys(MANIOBRAS) as (keyof typeof MANIOBRAS)[])));
   };
   const nueva = () => {
     reiniciar();
+    setFinEn(null);
+    setListo(false);
     setSesionId(crypto.randomUUID());
     poner(null);
   };
@@ -308,7 +335,8 @@ export function InstructorRepaso() {
 
   const Hoja = HOJA[def.id];
   const seccion = cl.secciones.find((s) => s.id === cl.abierta) ?? null;
-  const noAprobada = repaso.modo === "practica" && !!resultado && !resultado.aprobado && !!actualId;
+  // Los botones salen cuando el resultado ya quedó guardado en su maniobra; antes, «Siguiente» lo pondría en la que sigue.
+  const noAprobada = repaso.modo === "practica" && !!resultado && !resultado.aprobado && !!actualId && repaso.hechas[repaso.actual]?.resultado === resultado;
 
   return (
     <div className="mx-auto max-w-xl space-y-4 px-4 py-4">
@@ -366,6 +394,17 @@ export function InstructorRepaso() {
               <p className="font-semibold text-gold-200">{p.titulo}</p>
               {p.bien.map((x) => <p key={x} className="text-emerald-200">✓ {x}</p>)}
               {p.repetir.map((x) => <p key={x} className="text-red-200">✗ {x}</p>)}
+              {p.id === "maniobras" &&
+                repaso.hechas.map((h, i) => {
+                  if (!h.resultado) return null;
+                  const HojaDe = HOJA[h.id];
+                  return (
+                    <details key={i} className="mt-2 rounded-lg border border-white/10 px-3 py-2">
+                      <summary className="cursor-pointer text-white/80">{nombreManiobra(h.id, idioma)} · {h.resultado.calificacion}/100</summary>
+                      <div className="mt-2"><HojaDe resultado={h.resultado} idioma={idioma} /></div>
+                    </details>
+                  );
+                })}
             </div>
           ))}
           <p className="text-xs text-white/50">{textosReporte(idioma).aviso}</p>
@@ -376,6 +415,13 @@ export function InstructorRepaso() {
               {t.noGuardado(guardado.error ?? "")} <button type="button" onClick={guardarLeccion} className="underline">{t.reintentar}</button>
             </p>
           )}
+        </section>
+      )}
+
+      {terminado && !listo && (
+        <section className="space-y-2 rounded-xl border border-white/10 p-4 text-sm text-white/85">
+          <p>{t.esperaApagado}</p>
+          <Button className="w-full" onClick={() => setListo(true)}>{t.terminar}</Button>
         </section>
       )}
 

@@ -63,6 +63,15 @@ export function enZona(m: Muestra, z: Zona): boolean {
   return Math.hypot(d.x, d.y) <= z.radioNm && m.agl >= ALTURA_SEGURA_AGL;
 }
 
+/** Para salir hace falta pasarse del margen: así el aviso no se repite al volar justo en el borde. */
+const MARGEN_NM = 0.5;
+const MARGEN_FT = 100;
+export function fueraDeZona(m: Muestra, z: Zona): boolean {
+  if (m.lat === undefined || m.lon === undefined) return true;
+  const d = aNm(m.lat, m.lon, z.lat, z.lon);
+  return Math.hypot(d.x, d.y) > z.radioNm + MARGEN_NM || m.agl < ALTURA_SEGURA_AGL - MARGEN_FT;
+}
+
 // ── La lección de rampa a rampa ──
 
 export type EtapaRepaso = "rampa" | "salida" | "maniobra" | "fuera-de-zona" | "regreso" | "terminado" | "invalido";
@@ -87,11 +96,13 @@ type Paso = { estado: EstadoRepaso; decir: string[] };
 /** Un avión que se mueve más de esto entre dos muestras, más rápido que SALTO_KT, se movió de golpe. */
 const SALTO_NM = 2;
 const SALTO_KT = 200;
+const HUECO_AIRE_SEG = 10;
 
 const T = {
   es: {
     espera: "Esperando el aeropuerto del simulador.",
     salto: "El avión se movió de golpe: la lección no se califica.",
+    hueco: "Se perdió la conexión con el simulador en vuelo: la lección no se califica.",
     salida: (z: string) => `Ve a la zona de trabajo: ${z}, a 1,500 pies sobre el terreno o más.`,
     enZona: (m: string) => `Estás en la zona. Primera maniobra: ${m}.`,
     fuera: "Regresa a la zona de trabajo.",
@@ -102,6 +113,7 @@ const T = {
   en: {
     espera: "Waiting for the simulator's airport.",
     salto: "The aircraft jumped to another position: this lesson won't be graded.",
+    hueco: "The connection to the simulator dropped in flight: this lesson won't be graded.",
     salida: (z: string) => `Head to the practice area: ${z}, at 1,500 feet above the ground or higher.`,
     enZona: (m: string) => `You're in the area. First maneuver: ${m}.`,
     fuera: "Head back to the practice area.",
@@ -146,12 +158,15 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
     const nm = Math.hypot(d.x, d.y);
     if (nm > SALTO_NM && (nm / (m.t - previo.t)) * 3600 > SALTO_KT) return { estado: { ...e, etapa: "invalido", motivo: t.salto }, decir: [] };
   }
+  // MSFS se cerró o se colgó en el aire: al volver el avión aparece en otro lado y no se puede seguir el vuelo.
+  if (previo && !previo.enTierra && m.t - previo.t > HUECO_AIRE_SEG) return { estado: { ...e, etapa: "invalido", motivo: t.hueco }, decir: [] };
   const vuelo = avanzarVuelo(e.vuelo, m, a);
   if (vuelo.fase === "invalido") return anular({ ...e, vuelo }, vuelo.motivo ?? "", idioma);
   const nuevos = vuelo.eventos.slice(e.vuelo.eventos.length);
   let tomas = medirTomas(e.tomas, previo, m, vuelo.fase, e.etapa === "regreso");
   const aterrizo = nuevos.find((x) => x.tipo === "aterrizaje");
-  if (aterrizo) tomas = { ...tomas, tocoEnPista: aterrizo.pista != null };
+  // Sin aeropuerto no hay pistas con qué comparar: no se sabe.
+  if (aterrizo) tomas = { ...tomas, tocoEnPista: vuelo.aeropuerto ? aterrizo.pista != null : null };
 
   let etapa: EtapaRepaso = e.etapa;
   let { zona, motivo } = e;
@@ -171,7 +186,7 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
       decir.push(t.enZona(nombreManiobra(e.sorteo[e.actual], idioma)));
     }
   } else if (etapa === "maniobra") {
-    if (zona && !enCurso && !enZona(m, zona)) {
+    if (zona && !enCurso && fueraDeZona(m, zona)) {
       etapa = "fuera-de-zona";
       decir.push(t.fuera);
     }

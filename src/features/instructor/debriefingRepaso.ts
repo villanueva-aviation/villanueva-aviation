@@ -76,6 +76,14 @@ export function debriefingRepaso(e: EstadoRepaso, cl: Checklist, idioma: Idioma)
   return { partes: [checklist, despegue, maniobras, aterrizaje], aprobado };
 }
 
+const ESPERA_APAGADO_SEG = 60;
+
+/** Después de cortar la mezcla todavía faltan puntos del «Apagado»: se espera a que cierre la sección, hasta 60 s. */
+export function esperaApagado(cl: Checklist, segDesdeFin: number): boolean {
+  if (segDesdeFin >= ESPERA_APAGADO_SEG) return false;
+  return !cl.leidas.includes("apagado") || cl.abierta === "apagado";
+}
+
 /** El renglón de intentos_maniobra con maniobra «repaso-general». */
 export function paraGuardarRepaso(e: EstadoRepaso, cl: Checklist) {
   const { partes, aprobado } = debriefingRepaso(e, cl, "es");

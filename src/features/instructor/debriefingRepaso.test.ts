@@ -4,7 +4,7 @@ import { CHECKLIST_VOZ_C172 } from "../../data/checklistVozC172.ts";
 import { crearChecklist, type Checklist } from "./checklistVoz.ts";
 import type { ResultadoComun } from "./maniobras.ts";
 import { crearRepaso, type EstadoRepaso } from "./repaso.ts";
-import { debriefingRepaso, paraGuardarRepaso } from "./debriefingRepaso.ts";
+import { debriefingRepaso, esperaApagado, paraGuardarRepaso } from "./debriefingRepaso.ts";
 
 const res = (aprobado: boolean, calificacion = aprobado ? 90 : 50): ResultadoComun => ({ aprobado, calificacion, elementos: {}, avisos: [], muestras: [] });
 const SORTEO = ["recto-nivelado", "viraje-escarpado", "vuelo-lento", "recto-nivelado"] as const;
@@ -81,6 +81,14 @@ test("despegue y aterrizaje dentro de tolerancia van a lo que salió bien", () =
 test("textos en inglés sin acentos, también con puntos saltados", () => {
   const d = debriefingRepaso(repaso("checkride", [res(true), res(false), null, null]), checklist((cl) => { saltado(cl); noHecho(cl); cl.leidas = []; }), "en");
   for (const p of d.partes) for (const t of [p.titulo, ...p.bien, ...p.repetir]) assert.doesNotMatch(t, /[áéíóúñ¿¡]/, t);
+});
+
+test("al apagar se espera el resto de la sección «Apagado», hasta 60 s", () => {
+  const abierto = checklist((cl) => { cl.leidas = cl.leidas.filter((s) => s !== "apagado"); });
+  assert.equal(esperaApagado(abierto, 5), true);
+  assert.equal(esperaApagado(checklist((cl) => { cl.abierta = "apagado"; }), 30), true);
+  assert.equal(esperaApagado(checklist(), 5), false, "sección leída y cerrada");
+  assert.equal(esperaApagado(abierto, 60), false, "se acabó el tiempo");
 });
 
 test("lo que se guarda", () => {
