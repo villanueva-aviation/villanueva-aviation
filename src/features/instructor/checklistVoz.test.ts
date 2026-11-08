@@ -118,6 +118,7 @@ test("el aviso espera a las revisiones pendientes", () => {
   assert.equal(avisoSeccion(cl, "antes-arrancar"), null);
   cl = avanzarChecklist(cl, con({ t: 1, freno: true }), ctx);
   const aviso = avisoSeccion(cl, "antes-arrancar");
+  assert.ok(aviso?.startsWith("Checklist antes de arrancar."), aviso ?? "null");
   assert.ok(aviso?.includes("Te faltó"), aviso ?? "null");
   assert.ok(!aviso?.includes("No vi hecho"), aviso ?? "null");
 });
@@ -223,7 +224,7 @@ test("copiloto: la respuesta del ultimo punto va antes del aviso de la seccion",
   for (let t = 1; t <= 11; t++) cl = avanzarChecklist(cl, con({ t, freno: true, avionica: false, selector: 1, valvula: true }), ctx);
   const textos = porDecir(cl, new Set(), new Set()).map((x) => x.texto);
   assert.equal(textos.at(-2), "Sin X rojas.");
-  assert.equal(textos.at(-1), "Antes de arrancar: completo.");
+  assert.equal(textos.at(-1), "Checklist antes de arrancar completado.");
 });
 
 test("sin copiloto solo salen los avisos", () => {

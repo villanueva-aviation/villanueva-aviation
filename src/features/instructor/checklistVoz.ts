@@ -161,8 +161,9 @@ export function avisoSeccion(cl: Checklist, id: SeccionId): string | null {
   if (ps.some((p) => p.estado === "revisando")) return null;
   const saltados = lista(s, ps, "saltado");
   const noHechos = lista(s, ps, "no-hecho");
-  if (!saltados.length && !noHechos.length) return `${s.titulo}: completo.`;
-  return [s.titulo + ".", saltados.length ? `Te faltó: ${saltados.join(", ")}.` : "", noHechos.length ? `No vi hecho: ${noHechos.join(", ")}.` : ""]
+  const nombre = `Checklist ${s.titulo.toLowerCase()}`;
+  if (!saltados.length && !noHechos.length) return `${nombre} completado.`;
+  return [nombre + ".", saltados.length ? `Te faltó: ${saltados.join(", ")}.` : "", noHechos.length ? `No vi hecho: ${noHechos.join(", ")}.` : ""]
     .filter(Boolean)
     .join(" ");
 }
