@@ -7,7 +7,7 @@ import type { Idioma } from "./idiomaInstructor.ts";
 import type { ResultadoComun } from "./maniobras.ts";
 import { simularVuelo } from "./simularVuelo.ts";
 import {
-  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, enZona, maniobraActual, siguienteManiobra, sortear, zonaRepaso,
+  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, enZona, maniobraActual, nombreManiobra, siguienteManiobra, sortear, zonaRepaso,
   type EstadoRepaso, type Zona,
 } from "./repaso.ts";
 
@@ -212,6 +212,12 @@ test("zona con margen: a 1,450 ft AGL sigue en la zona; a 1,350 sale", () => {
   const a1350 = alMuestrearRepaso(a1450, { ...m, t: m.t + 0.2, agl: 1350 }, A, "es");
   assert.equal(a1350.estado.etapa, "fuera-de-zona");
   assert.deepEqual(a1350.decir, ["Regresa a la zona de trabajo."]);
+  // al volver a la zona, el instructor repite la maniobra que toca
+  const vuelta = alMuestrearRepaso(a1350.estado, { ...m, t: m.t + 0.3, agl: 1600 }, A, "es");
+  assert.equal(vuelta.estado.etapa, "maniobra");
+  assert.deepEqual(vuelta.decir, [`De vuelta en la zona. Maniobra: ${nombreManiobra(e.sorteo[e.actual], "es")}.`]);
+  const en = alMuestrearRepaso(a1350.estado, { ...m, t: m.t + 0.3, agl: 1600 }, A, "en");
+  assert.deepEqual(en.decir, [`Back in the area. Maneuver: ${nombreManiobra(e.sorteo[e.actual], "en")}.`]);
 });
 
 test("se pierde la conexión en vuelo más de 10 s: anula; en tierra no", () => {

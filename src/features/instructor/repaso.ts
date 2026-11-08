@@ -106,6 +106,7 @@ const T = {
     salida: (z: string) => `Ve a la zona de trabajo: ${z}, a 1,500 pies sobre el terreno o más.`,
     enZona: (m: string) => `Estás en la zona. Primera maniobra: ${m}.`,
     fuera: "Regresa a la zona de trabajo.",
+    devuelta: (m: string) => `De vuelta en la zona. Maniobra: ${m}.`,
     siguiente: (m: string, otra: boolean) => `Recto y nivelado. Siguiente maniobra: ${m}${otra ? ", con otro rumbo" : ""}.`,
     repetir: "Puedes repetirla o pasar a la siguiente.",
     regreso: "Terminamos las maniobras. Regresa al aeropuerto y aterriza.",
@@ -117,6 +118,7 @@ const T = {
     salida: (z: string) => `Head to the practice area: ${z}, at 1,500 feet above the ground or higher.`,
     enZona: (m: string) => `You're in the area. First maneuver: ${m}.`,
     fuera: "Head back to the practice area.",
+    devuelta: (m: string) => `Back in the area. Maneuver: ${m}.`,
     siguiente: (m: string, otra: boolean) => `Straight and level. Next maneuver: ${m}${otra ? ", on a different heading" : ""}.`,
     repetir: "You can repeat it or move on to the next one.",
     regreso: "We're done with the maneuvers. Head back to the airport and land.",
@@ -191,7 +193,10 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
       decir.push(t.fuera);
     }
   } else if (etapa === "fuera-de-zona") {
-    if (zona && enZona(m, zona)) etapa = "maniobra";
+    if (zona && enZona(m, zona)) {
+      etapa = "maniobra";
+      decir.push(t.devuelta(nombreManiobra(e.sorteo[e.actual], idioma)));
+    }
   }
   if (aterrizo && etapa !== "regreso") etapa = "regreso";
   if (vuelo.fase === "terminado") etapa = "terminado";
