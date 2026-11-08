@@ -1,4 +1,5 @@
 // Checklists por voz del C152 y del Arrow, con las mismas secciones del C172. Los revisó Erik el 2026-11-07.
+// El Arrow se completó con los procedimientos normales del PA28R (Carenado) el 2026-11-07.
 // El calentador de carburador y la palanca de la hélice quedan solo por voz: el lector no los lee todavía.
 // El trim de despegue del C152 y del Arrow queda por voz (Erik, 2026-11-07).
 import { LIMITES_C172, type Limites } from "../features/instructor/revisionSim.ts";
@@ -122,11 +123,14 @@ const BOMBA_OFF: Renglon = ["Bomba de combustible eléctrica — apagada", BOMBA
 export const CHECKLIST_VOZ_ARROW: SeccionVoz[] = [
   sec("antes-arrancar", [
     ["Asientos y cinturones — ajustados y asegurados", ["asientos", "cinturones"]],
+    ["Seguro del volante — quitado", ["seguro", "volante"]],
+    ["Palanca del tren — abajo", ["tren", "gear"], "tren-abajo"],
     FRENO,
     ["Breakers — adentro", ["breakers", "breaker", "brakers", "braker"]],
     ["Aire alterno — cerrado", ["aire alterno", "alterno", "alternate air"]],
     HELICE_ADELANTE,
     ["Aviónica master — apagado", AVIONICA, "avionica-off"],
+    ["Interruptores eléctricos — apagados", ["interruptores", "electrico", "switches"]],
     SELECTOR,
   ]),
   sec("arranque", [
@@ -138,14 +142,20 @@ export const CHECKLIST_VOZ_ARROW: SeccionVoz[] = [
     ["Área de la hélice — despejada", ["helice"], undefined, "El cadete puede decir «¡libre hélice!»"],
     ["Llave de encendido — arranque", ["llave", "magnetos"], "arranque-motor"],
     ["Mezcla — rica", ["mezcla"], "mezcla-rica"],
+    ["Acelerador — ajustado", ["acelerador"]],
     ["Presión de aceite — verificada", ["aceite"], undefined, "Debe subir en los primeros 30 segundos."],
+    ["Amperímetro — cargando", ["amperimetro"], undefined, "Sin carga del alternador no se vuela."],
     ["Luces de navegación — encendidas", ["navegacion", "nav"], "nav-on"],
     ["Aviónica master — encendido", AVIONICA, "avionica-on"],
   ]),
   sec("antes-rodar", [
     ["Calentamiento — 1,400 a 1,500 RPM", ["calentamiento"], "rpm-calentamiento"],
-    ["Frenos — probados", ["frenos", "freno"], undefined, "Se dice al empezar a moverse."],
     ["Luz de rodaje — encendida", LUZ_TAXI, "taxi-on"],
+    ["Área de rodaje — despejada", ["area de rodaje", "area"]],
+    ["Freno de estacionamiento — quitado", ["freno de estacionamiento", "estacionamiento"], "freno-quitado"],
+    ["Hélice — altas RPM", ["helice", "prop"]],
+    ["Frenos — probados", ["frenos", "freno"], undefined, "Se dice al empezar a moverse."],
+    ["Dirección — probada", ["direccion", "steering"]],
     ["Instrumentos de vuelo — verificados en los virajes", ["instrumentos"]],
   ]),
   sec("prueba-motor", [
@@ -155,10 +165,11 @@ export const CHECKLIST_VOZ_ARROW: SeccionVoz[] = [
     ["Acelerador — 2,000 RPM", ["acelerador", "2000"], "rpm-prueba"],
     ["Magnetos — probados", ["magnetos", "magneto"], "magnetos"],
     ["Succión, aceite y amperímetro — en verde", ["succion", "aceite", "amperimetro"], undefined, "Succión entre 4.8 y 5.1."],
-    ["Panel de anunciadores — sin luces", ["anunciadores", "anunciador"]],
+    ["Panel de anunciadores — probado", ["anunciadores", "anunciador"]],
     ["Aire alterno — probado", ["aire alterno", "alterno", "alternate air"]],
     ["Hélice — ejercitada", ["helice", "prop"], undefined, "Se mueve la palanca atrás y adelante 2 o 3 veces y se ve la caída de RPM."],
     [BOMBA_OFF[0], BOMBA_OFF[1], BOMBA_OFF[2], "Se apaga para probar la bomba del motor."],
+    ["Presión de combustible — verificada", ["presion de combustible", "presion"]],
     ["Acelerador — atrás", ["acelerador"], "acelerador-cerrado"],
   ]),
   sec("antes-despegar", [
@@ -166,10 +177,13 @@ export const CHECKLIST_VOZ_ARROW: SeccionVoz[] = [
     ["Instrumentos de vuelo — verificados", ["instrumentos"]],
     [SELECTOR[0], SELECTOR[1], SELECTOR[2]],
     BOMBA_ON,
+    ["Instrumentos del motor — revisados", ["instrumentos del motor", "motor"]],
     ["Aire alterno — cerrado", ["aire alterno", "alterno", "alternate air"]],
+    ["Respaldos — verticales", ["respaldos", "respaldo"]],
     MEZCLA_AJUSTADA,
     HELICE_ADELANTE,
     ["Cinturones y puertas — asegurados", ["cinturones", "puertas"]],
+    ["Asientos vacíos — cinturones abrochados", ["asientos vacios", "vacios"]],
     ["Flaps — arriba", FLAPS, "flaps-despegue", "Arriba en el despegue normal."],
     ["Trim de elevador — despegue", TRIM],
     ["Controles de vuelo — libres y correctos", ["controles"]],
@@ -182,7 +196,7 @@ export const CHECKLIST_VOZ_ARROW: SeccionVoz[] = [
   ]),
   sec("despues-despegar", [
     ["Tren — arriba", ["tren", "gear"], "tren-arriba", "Con ascenso positivo y abajo de 107 nudos."],
-    ["Velocidad de ascenso — 90 nudos", ["velocidad", "ascenso"], "vel-ascenso"],
+    ["Velocidad de ascenso — 90 nudos", ["velocidad", "ascenso"], "vel-ascenso", "Ya en ruta, 104 nudos."],
     ["Flaps — arriba", FLAPS, "flaps-arriba"],
     [BOMBA_OFF[0], BOMBA_OFF[1], BOMBA_OFF[2], "Se apaga ya a una altitud segura."],
     MEZCLA_AJUSTADA,
@@ -200,17 +214,20 @@ export const CHECKLIST_VOZ_ARROW: SeccionVoz[] = [
     [SELECTOR[0], SELECTOR[1], SELECTOR[2]],
   ]),
   sec("antes-aterrizar", [
-    ["Cinturones — asegurados", ["cinturones", "cinturon"]],
     [SELECTOR[0], SELECTOR[1], SELECTOR[2]],
+    ["Respaldos — verticales", ["respaldos", "respaldo"]],
+    ["Cinturones — asegurados", ["cinturones", "cinturon"]],
     BOMBA_ON,
     MEZCLA_AJUSTADA,
     HELICE_ADELANTE,
     ["Tren — abajo, tres verdes", ["tren", "gear", "tres verdes"], "tren-abajo", "Abajo de 129 nudos."],
     ["Flaps — abajo de 103 nudos", FLAPS],
+    ["Aire acondicionado — apagado", ["aire acondicionado", "acondicionado"]],
     ["Luz de aterrizaje — encendida", LUZ_ATT, "aterrizaje-on"],
     ["Luz de rodaje — encendida", LUZ_TAXI, "taxi-on"],
     ["Piloto automático — apagado", AP, "autopiloto-off"],
     ["Velocidad — 75 nudos en final con flaps", ["velocidad"], "vel-aproximacion"],
+    ["Trim — ajustado para 75 nudos", TRIM],
     ["Aproximación — estabilizada", ["aproximacion"]],
   ]),
   sec("despues-aterrizar", [
@@ -221,14 +238,17 @@ export const CHECKLIST_VOZ_ARROW: SeccionVoz[] = [
   ]),
   sec("apagado", [
     FRENO,
-    ["Equipo eléctrico — apagado", ["electrico"]],
+    ["Aire acondicionado — apagado", ["aire acondicionado", "acondicionado"]],
     ["Aviónica master — apagado", AVIONICA, "avionica-off"],
+    ["Equipo eléctrico — apagado", ["electrico"]],
+    HELICE_ADELANTE,
+    ["Acelerador — cerrado", ["acelerador"], "acelerador-cerrado"],
     ["Mezcla — corte", ["mezcla"], "corte-motor"],
     ["Llave de encendido — apagada", ["llave", "magnetos"], "magnetos-off"],
     ["Alternador y master — apagados", ["alternador", "master"], "master-off"],
     ["Volante — asegurado", ["volante", "seguro"]],
     ["Bitácora — anotada", ["bitacora"]],
-    ["Avión asegurado — calzas", ["calzas", "calzos", "avion asegurado"]],
+    ["Avión asegurado — calzas y amarres", ["calzas", "calzos", "amarres", "avion asegurado"]],
   ]),
 ];
 

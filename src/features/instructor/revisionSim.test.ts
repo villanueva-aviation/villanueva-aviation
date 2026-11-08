@@ -119,6 +119,11 @@ test("velocidades por avion: ascenso, crucero y aproximacion", () => {
   assert.equal(revisar("vel-aproximacion", vuelo({ velocidad: 58, flaps: 2 }), C152)?.ok, true);
 });
 
+test("freno de estacionamiento quitado", () => {
+  assert.equal(revisar("freno-quitado", [con({ freno: false })], ARROW)?.ok, true);
+  assert.equal(revisar("freno-quitado", [con({ freno: true })], ARROW)?.ok, false);
+});
+
 test("tren arriba y abajo con la palanca", () => {
   assert.equal(revisar("tren-arriba", [con({ tren: false })], ARROW)?.ok, true);
   assert.equal(revisar("tren-arriba", [con({ tren: true })], ARROW)?.ok, false);

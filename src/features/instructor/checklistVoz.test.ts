@@ -156,7 +156,7 @@ test("brakers como lo escribe el reconocimiento cuenta como breakers", () => {
   assert.equal(cl.puntos["antes-arrancar"][2].estado, "dicho");
 });
 
-for (const [id, puntos] of [["c152", 74], ["arrow", 88]] as const) {
+for (const [id, puntos] of [["c152", 74], ["arrow", 107]] as const) {
   const secciones = AVIONES_VOZ[id].secciones;
   const todos = secciones.flatMap((s) => s.puntos);
 
