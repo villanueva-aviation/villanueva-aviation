@@ -14,6 +14,7 @@ import {
   avisosPorDecir,
   crearChecklist,
   oir,
+  respuestasCopiloto,
   resumenChecklist,
   type Checklist,
   type EstadoPunto,
@@ -81,6 +82,8 @@ export function AdminVuelo() {
   const clRef = useRef<Checklist>(cl);
   const ultimaT = useRef(0);
   const dichos = useRef(new Set<SeccionId>());
+  const [copiloto, setCopiloto] = useState(false);
+  const respondidas = useRef(new Set<string>());
   const [escuchar, setEscuchar] = useState(false);
   const [oido, setOido] = useState("");
   const [oidos, setOidos] = useState<string[]>([]);
@@ -104,6 +107,20 @@ export function AdminVuelo() {
       decir(a.texto);
     }
   }, [cl, decir]);
+
+  // Copiloto a bordo: contesta cada punto cuando lo ve hecho en el simulador.
+  useEffect(() => {
+    if (!copiloto) return;
+    for (const r of respuestasCopiloto(cl, respondidas.current)) {
+      respondidas.current.add(r.clave);
+      decir(r.texto);
+    }
+  }, [cl, copiloto, decir]);
+  // Al encenderlo no contesta lo que ya se había dicho.
+  const alternarCopiloto = () => {
+    if (!copiloto) for (const r of respuestasCopiloto(clRef.current, respondidas.current)) respondidas.current.add(r.clave);
+    setCopiloto((x) => !x);
+  };
 
   // Arma con `m` si se puede; si no, deja el motivo y vuelve a intentar con la siguiente muestra.
   const armar = (m: Muestra) => {
@@ -162,6 +179,7 @@ export function AdminVuelo() {
     if (m) armar(m);
     clRef.current = nuevoChecklist(avionRef.current);
     dichos.current.clear();
+    respondidas.current.clear();
     setCl(clRef.current);
     setOido("");
   };
@@ -170,6 +188,7 @@ export function AdminVuelo() {
     setAvion(a);
     clRef.current = nuevoChecklist(a);
     dichos.current.clear();
+    respondidas.current.clear();
     setCl(clRef.current);
   };
 
@@ -237,6 +256,10 @@ export function AdminVuelo() {
             <Button variant={escuchar ? "secondary" : "primary"} onClick={() => setEscuchar((x) => !x)} disabled={!escucha.supported}>
               {escuchar ? "Dejar de escuchar" : "Escuchar checklist"}
             </Button>
+            <label htmlFor="copiloto" className="flex items-center gap-2 text-sm text-white/80">
+              <input id="copiloto" type="checkbox" checked={copiloto} onChange={alternarCopiloto} />
+              Copiloto a bordo
+            </label>
             {escucha.escuchando && <Badge tone="green">Escuchando</Badge>}
             {!escucha.supported && <span className="text-sm text-red-400">Este navegador no reconoce voz.</span>}
             {escucha.error && <span className="text-sm text-red-400">{escucha.error}</span>}

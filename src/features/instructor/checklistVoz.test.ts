@@ -5,7 +5,7 @@ import { AVIONES_VOZ } from "../../data/checklistVozAviones.ts";
 import { ES_V15 } from "./revisionSim.ts";
 import type { Muestra } from "./evaluador.ts";
 import { simularVuelo } from "./simularVuelo.ts";
-import { avanzarChecklist, avisoSeccion, avisosPorDecir, crearChecklist, oir, PIEZA_AVISO, resumenChecklist, type Checklist } from "./checklistVoz.ts";
+import { avanzarChecklist, avisoSeccion, avisosPorDecir, crearChecklist, oir, PIEZA_AVISO, respuestasCopiloto, resumenChecklist, type Checklist } from "./checklistVoz.ts";
 import { encolar, siguiente } from "./colaVoz.ts";
 
 const PUNTOS = CHECKLIST_VOZ_C172.flatMap((s) => s.puntos);
@@ -187,6 +187,34 @@ test("carb heat como lo dice la escuela cuenta como calentador de carburador", (
   let cl = oir(crearChecklist(AVIONES_VOZ.c152.secciones), "checklist arranque", 0);
   cl = decir(cl, ["mezcla rica", "carb heat frio"]);
   assert.deepEqual(estados(cl, "arranque").slice(0, 2), ["revisando", "dicho"]);
+});
+
+const copiloto = (cl: Checklist, ya: Set<string> = new Set()) => respuestasCopiloto(cl, ya).map((r) => r.texto);
+
+test("copiloto: un punto de solo voz se contesta en cuanto se dice", () => {
+  const cl = decir(abrirAA(), ["asientos y cinturones", "freno"]);
+  assert.deepEqual(copiloto(oir(cl, "breakers", 0)).slice(-1), ["Adentro."]);
+});
+
+test("copiloto: un punto del simulador se contesta hasta que se ve hecho", () => {
+  let cl = decir(abrirAA(), ["asientos y cinturones", "freno de estacionamiento"]);
+  assert.ok(!copiloto(cl).includes("Puesto."));
+  cl = avanzarChecklist(cl, con({ t: 3, freno: true }), ctx);
+  assert.ok(copiloto(cl).includes("Puesto."));
+});
+
+test("copiloto: si se vence sin hacerse pide revisarlo", () => {
+  let cl = decir(abrirAA(), ["asientos y cinturones", "freno de estacionamiento"]);
+  for (let t = 1; t <= 11; t++) cl = avanzarChecklist(cl, con({ t, freno: false }), ctx);
+  assert.ok(copiloto(cl).includes("Revisa freno de estacionamiento."));
+});
+
+test("copiloto: no repite lo ya contestado ni contesta lo saltado", () => {
+  const cl = oir(abrirAA(), "breakers adentro", 0);
+  const una = respuestasCopiloto(cl, new Set());
+  assert.deepEqual(una.map((r) => r.texto).slice(-1), ["Adentro."]);
+  assert.equal(una.filter((r) => r.texto === "Ajustados y asegurados.").length, 0);
+  assert.deepEqual(respuestasCopiloto(cl, new Set(una.map((r) => r.clave))), []);
 });
 
 test("dream como lo escribe el reconocimiento cuenta como trim", () => {

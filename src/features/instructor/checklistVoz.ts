@@ -176,6 +176,29 @@ export function avisosPorDecir(cl: Checklist, dichos: ReadonlySet<SeccionId>): {
   });
 }
 
+const respuesta = (dicho: string) => {
+  const r = dicho.split(" — ")[1] ?? "";
+  return r.charAt(0).toUpperCase() + r.slice(1) + ".";
+};
+
+/**
+ * «Copiloto a bordo»: el cadete dice el reto y el copiloto contesta la respuesta cuando lo ve hecho en el simulador
+ * (o en cuanto se dice, si no se puede ver). Si se vence sin hacerse, pide revisarlo. `clave` cambia al releer la sección.
+ */
+export function respuestasCopiloto(cl: Checklist, ya: ReadonlySet<string>): { clave: string; texto: string }[] {
+  return cl.secciones.flatMap((s) =>
+    s.puntos.flatMap((punto, k) => {
+      const p = cl.puntos[s.id][k];
+      const clave = `${punto.id}@${p.t}`;
+      if (ya.has(clave)) return [];
+      if (p.estado === "hecho" || p.estado === "dicho") return [{ clave, texto: respuesta(punto.dicho) }];
+      if (p.estado === "no-hecho")
+        return [{ clave, texto: `Revisa ${reto(punto.dicho).toLowerCase()}${p.detalle ? `: ${p.detalle}` : ""}.` }];
+      return [];
+    }),
+  );
+}
+
 export function resumenChecklist(cl: Checklist): { enOrden: number; saltados: string[]; noHechos: string[]; noLeidas: string[] } {
   let enOrden = 0;
   const saltados: string[] = [];
