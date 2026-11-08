@@ -1,6 +1,7 @@
 VILLANUEVA AVIATION - LECTOR DEL INSTRUCTOR VIRTUAL
 ====================================================
 
+v1.5.1: le pide al simulador los aeropuertos cercanos solo al llegar o al moverte, ya no cada 30 segundos con el avión parado. Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.
 v1.5: para el checklist por voz lee el interruptor de aviónica, el selector y la válvula de combustible, la bomba auxiliar, el piloto automático y el trim. Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.
 v1.4: para las lecciones de vuelo completo lee la posición, el motor, las luces, el freno, el transponder, el altímetro, el radio COM1, el tren y el viento, y el aeropuerto más cercano con sus pistas y frecuencias. Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.
 v1.3: lee cabeceo, régimen vertical, aviso de pérdida, flaps y RPM para el vuelo lento. Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.

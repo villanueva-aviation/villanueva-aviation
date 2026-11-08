@@ -174,6 +174,16 @@ static class LectorInstructor
     // SimConnect avisa de un pedido rechazado por OnRecvException y no manda DataEnd: a los 30 s se vuelve a pedir.
     public static bool PedidoVencido(string icaoPedido, double pedidoEn, double ahora) { return icaoPedido != null && ahora - pedidoEn > 30; }
 
+    // v1.5.1: la lista de aeropuertos cercanos es pesada para el simulador. Solo se pide sin aeropuerto todavia o
+    // despues de moverse mas de 3 NM desde el ultimo pedido (antes: cada 30 s aunque el avion estuviera parado).
+    public static bool PedirLista(string icaoActual, double[] pos, double lat, double lon)
+    {
+        if (icaoActual == null || pos == null) return true;
+        var dLat = (lat - pos[0]) * 60;
+        var dLon = (lon - pos[1]) * 60 * Math.Cos(lat * Math.PI / 180);
+        return Math.Sqrt(dLat * dLat + dLon * dLon) > 3;
+    }
+
     public static double Ahora() { return Reloj.Elapsed.TotalSeconds; }
 
     public static void Publicar(Muestra m)
@@ -267,7 +277,11 @@ static class LectorInstructor
         // Un pedido de aeropuerto que el simulador rechaza (sin DataEnd) no bloquea los siguientes.
         var vencido = !PedidoVencido(null, 0, 100) && !PedidoVencido("MMGL", 80, 100) && PedidoVencido("MMGL", 60, 100);
         Console.WriteLine(vencido ? "Pedido vencido: OK" : "Pedido vencido: FALLA");
-        return ok && edge && banderas && puerto && json && json14 && aeropuerto && grabado && vencido ? 0 : 1;
+        // Parado en MMGL no se vuelve a pedir la lista; a 0.06 grados (3.6 NM) al norte, si; sin aeropuerto, siempre.
+        var lista = !PedirLista("MMGL", new[] { 20.52, -103.31 }, 20.521, -103.311) && PedirLista("MMGL", new[] { 20.52, -103.31 }, 20.58, -103.31)
+            && PedirLista(null, new[] { 20.52, -103.31 }, 20.52, -103.31) && PedirLista("MMGL", null, 20.52, -103.31);
+        Console.WriteLine(lista ? "Lista de aeropuertos: OK" : "Lista de aeropuertos: FALLA");
+        return ok && edge && banderas && puerto && json && json14 && aeropuerto && grabado && vencido && lista ? 0 : 1;
     }
 
     // Lo que pasaba: Edge heredaba el puerto del lector y, si el lector se cerraba, nadie podia volver a usarlo.
@@ -928,12 +942,15 @@ static class Sim
                 Console.WriteLine("Aeropuerto: " + icaoActual + " (" + pistas.Count + " pistas, " + frecuencias.Count + " frecuencias)");
             };
             double ultimaLista = -100;
+            double[] posLista = null;
             while (abierto)
             {
                 if (senal.WaitOne(10000)) sim.ReceiveMessage();
-                if (conAeropuertos && LectorInstructor.Ultima() != null && LectorInstructor.Ahora() - ultimaLista > 30)
+                var u = LectorInstructor.Ultima();
+                if (conAeropuertos && u != null && LectorInstructor.Ahora() - ultimaLista > 30 && LectorInstructor.PedirLista(icaoActual, posLista, u.Lat, u.Lon))
                 {
                     ultimaLista = LectorInstructor.Ahora();
+                    posLista = new[] { u.Lat, u.Lon };
                     try { sim.RequestFacilitiesList(Microsoft.FlightSimulator.SimConnect.SIMCONNECT_FACILITY_LIST_TYPE.AIRPORT, Req.Aeropuertos); }
                     catch (Exception e) { Console.WriteLine("Lista de aeropuertos: " + e.Message); }
                 }
