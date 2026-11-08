@@ -5,6 +5,8 @@ import { Button } from "../components/ui/Button";
 import { MATERIAL_LENTO, MATERIAL_RECTO, MATERIAL_VIRAJE } from "../data/materialInstructor";
 import { useAuth } from "../features/auth/AuthContext";
 import { ACTIVIDADES, estadoActividad } from "../features/instructor/actividades";
+import { estadoLeccion, LECCIONES } from "../features/instructor/lecciones";
+import { FOUNDER_EMAIL } from "../lib/constants";
 import { BANCO } from "../features/instructor/bancoPreguntas";
 import { calificarRespuesta, lineasPreguntas, siguientePregunta, type Pregunta } from "../features/instructor/preguntas";
 import { useEscucha } from "../features/instructor/useEscucha";
@@ -41,6 +43,8 @@ const T = {
     titulo: (m: string) => `Instructor virtual · ${m}`,
     elegir: "¿En qué idioma quieres tu sesión?",
     menu: "¿Qué quieres practicar hoy?",
+    lecciones: "Lecciones",
+    actividades: "Maniobras sueltas",
     acceso: { gratis: "Gratis", exclusivo: "Exclusivo", proximamente: "Próximamente" },
     candado: "Incluido en Contenido Exclusivo",
     verExclusivo: "Ver Contenido Exclusivo",
@@ -81,6 +85,8 @@ const T = {
     titulo: (m: string) => `Virtual instructor · ${m}`,
     elegir: "Which language do you want for your session?",
     menu: "What do you want to practice today?",
+    lecciones: "Lessons",
+    actividades: "Single maneuvers",
     acceso: { gratis: "Free", exclusivo: "Exclusive", proximamente: "Coming soon" },
     candado: "Included in Exclusive Content",
     verExclusivo: "See Exclusive Content",
@@ -341,6 +347,28 @@ export function InstructorPrograma() {
     return (
       <div className="mx-auto max-w-xl space-y-4 px-4 py-6">
         <h1 className="font-display text-xl font-bold text-white">{t.menu}</h1>
+        <h2 className="font-display text-sm font-bold uppercase tracking-wide text-gold-300">{t.lecciones}</h2>
+        <ol className="space-y-1.5">
+          {LECCIONES.map((l) => {
+            const e = estadoLeccion(l, { fundador: user?.email === FOUNDER_EMAIL, exclusivo: hasAccess });
+            const fila = (
+              <span className="flex items-baseline justify-between gap-3">
+                <span><span className="mr-2 font-mono text-white/50">{l.numero}</span>{l.nombre[idioma]}</span>
+                {e !== "abierta" && <span className="shrink-0 text-xs text-white/50">{t.acceso.proximamente}</span>}
+              </span>
+            );
+            return (
+              <li key={l.numero}>
+                {e === "abierta" ? (
+                  <Link to={ROUTES.instructorRepaso} className="block rounded-xl border border-gold-500/60 bg-gold-500/10 px-4 py-2.5 font-semibold text-white hover:bg-gold-500/20">{fila}</Link>
+                ) : (
+                  <div aria-disabled="true" className="rounded-xl border border-white/10 px-4 py-2.5 text-white opacity-60">{fila}</div>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+        <h2 className="pt-2 font-display text-sm font-bold uppercase tracking-wide text-gold-300">{t.actividades}</h2>
         <ul className="space-y-3">
           {ACTIVIDADES.map((a) => {
             const e = estadoActividad(a, hasAccess);

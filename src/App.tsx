@@ -62,6 +62,7 @@ const GimnasioAutorizaciones = lazy(() =>
 );
 const ResumenHsi = lazy(() => import("./pages/ResumenHsi").then((m) => ({ default: m.ResumenHsi })));
 const InstructorPrograma = lazy(() => import("./pages/InstructorPrograma").then((m) => ({ default: m.InstructorPrograma })));
+const InstructorRepaso = lazy(() => import("./pages/InstructorRepaso").then((m) => ({ default: m.InstructorRepaso })));
 const InstructorVirajeEscarpado = lazy(() =>
   import("./pages/InstructorVirajeEscarpado").then((m) => ({ default: m.InstructorVirajeEscarpado })),
 );
@@ -109,6 +110,7 @@ const TITULOS: Record<string, string> = {
   [ROUTES.eventos]: "Eventos de IVAO y VATSIM en español, en grupo — Villanueva Aviation",
   [ROUTES.instructorVirajeEscarpado]: "Instructor virtual: viraje escarpado del C172 — Villanueva Aviation",
   [ROUTES.instructorPrograma]: "Instructor virtual — Villanueva Aviation",
+  [ROUTES.instructorRepaso]: "Repaso general — Villanueva Aviation",
   [ROUTES.overlayGratis]: "Overlay gratis para streamers de simulador (OBS) — Villanueva Aviation",
   [RUTAS_EN.home]: "Villanueva Aviation — Learn to fly for real in your simulator",
   [RUTAS_EN.coaching]: "One-on-one flight sim coaching — Villanueva Aviation",
@@ -328,6 +330,14 @@ function RoutedContent() {
             }
           />
           <Route
+            path={ROUTES.instructorRepaso}
+            element={
+              <ProtectedRoute>
+                <InstructorRepaso />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path={ROUTES.instructorVirajeEscarpado}
             element={
               <ProtectedRoute>
@@ -472,6 +482,7 @@ function App() {
   const aterrizaje =
     pathname === ROUTES.empieza ||
     pathname === ROUTES.instructorPrograma ||
+    pathname === ROUTES.instructorRepaso ||
     (pathname === ROUTES.ingresar && new URLSearchParams(search).get("from") === ROUTES.instructorPrograma);
   const ingles = esIngles(pathname);
   return (

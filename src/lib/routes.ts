@@ -70,6 +70,7 @@ export const ROUTES = {
   resumenHsi: "/resumen-hsi",
   instructorVirajeEscarpado: "/instructor/viraje-escarpado",
   instructorPrograma: "/instructor/programa",
+  instructorRepaso: "/instructor/repaso",
   adminAventura: "/admin/aventura",
 } as const;
 

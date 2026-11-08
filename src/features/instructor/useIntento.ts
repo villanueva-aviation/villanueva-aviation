@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchMisIntentosManiobra, guardarIntento, mandarARevision } from "./intentos";
+import type { Muestra } from "./evaluador.ts";
 import type { DefManiobra, ResultadoComun } from "./maniobras.ts";
 import type { IntentoManiobra } from "./reglasIntentos.ts";
 import type { IntentoSesion, Modo } from "./sesion.ts";
@@ -13,6 +14,8 @@ export type Opciones = {
   arma?: boolean;
   /** Una vez por resultado calificado, ya guardado (id null si no se pudo). */
   alTerminar?: (i: IntentoSesion) => void;
+  /** Cada lote del lector, después de pasarlo a la maniobra (el repaso sigue el vuelo completo con él). */
+  alLote?: (lote: Muestra[]) => void;
 };
 
 /** Todo el intento de una maniobra: lector, evaluación, armado solo, guardado y revisión. */
@@ -20,7 +23,10 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
   const defRef = useRef(def);
   defRef.current = def;
   // Cada lote del lector entra a la evaluación; avanzar ignora las muestras repetidas.
-  const { estado, muestra } = useLector((lote) => setEv((e: unknown) => (e ? lote.reduce((x, m) => defRef.current.avanzar(x, m), e) : e)));
+  const { estado, muestra, aeropuerto } = useLector((lote) => {
+    setEv((e: unknown) => (e ? lote.reduce((x, m) => defRef.current.avanzar(x, m), e) : e));
+    op.current.alLote?.(lote);
+  });
   const [modoSelector, setModo] = useState<Modo>("practica");
   const modo = opciones.modoFijo ?? modoSelector;
   const arma = opciones.arma !== false;
@@ -108,5 +114,5 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
     if (!error) cargarIntentos();
   };
 
-  return { estado, muestra, modo, cambiarModo, modoIntento, ev, resultado, anulado, enCurso, iniciar, reiniciar, guardado, guardar, intento, numero, intentos, mandar, envio, aprobadoPorErik };
+  return { estado, muestra, aeropuerto, modo, cambiarModo, modoIntento, ev, resultado, anulado, enCurso, iniciar, reiniciar, guardado, guardar, intento, numero, intentos, mandar, envio, aprobadoPorErik };
 }
