@@ -10,19 +10,19 @@ import { encolar, siguiente } from "./colaVoz.ts";
 
 const PUNTOS = CHECKLIST_VOZ_C172.flatMap((s) => s.puntos);
 
-test("el C172 tiene 80 puntos en 11 secciones", () => {
+test("el C172 tiene 103 puntos en 11 secciones", () => {
   assert.equal(CHECKLIST_VOZ_C172.length, 11);
-  assert.equal(PUNTOS.length, 80);
+  assert.equal(PUNTOS.length, 103);
 });
 
-test("37 se revisan hoy, 15 con v1.5 y 28 solo por voz", () => {
-  assert.equal(PUNTOS.filter((p) => p.revisa && !ES_V15.has(p.revisa)).length, 37);
+test("42 se revisan con el lector v1.4, 15 con v1.5 y 46 solo por voz", () => {
+  assert.equal(PUNTOS.filter((p) => p.revisa && !ES_V15.has(p.revisa)).length, 42);
   assert.equal(PUNTOS.filter((p) => p.revisa && ES_V15.has(p.revisa)).length, 15);
-  assert.equal(PUNTOS.filter((p) => !p.revisa).length, 28);
+  assert.equal(PUNTOS.filter((p) => !p.revisa).length, 46);
 });
 
 test("los ids no se repiten", () => {
-  assert.equal(new Set(PUNTOS.map((p) => p.id)).size, 80);
+  assert.equal(new Set(PUNTOS.map((p) => p.id)).size, 103);
 });
 
 test("cada punto y cada seccion tiene claves sin acentos", () => {
@@ -36,12 +36,13 @@ const base: Muestra = { ...simularVuelo()[0], avionica: false, selector: 1, valv
 const con = (c: Partial<Muestra>): Muestra => ({ ...base, ...c });
 const ctx = { elevacionFt: 5016 };
 const nuevo = () => crearChecklist(CHECKLIST_VOZ_C172);
-const abrirAA = () => oir(nuevo(), "checklist antes de arrancar", 0);
+// Los dos primeros puntos ya dichos: las pruebas empiezan en «Asientos y cinturones» (índice 2).
+const abrirAA = () => decir(nuevo(), ["checklist antes de arrancar", "briefing de pasajeros completo", "seguro de control quitado"]);
 const estados = (cl: Checklist, id: keyof Checklist["puntos"]) => cl.puntos[id].map((p) => p.estado);
 const decir = (cl: Checklist, frases: string[], t = 0) => frases.reduce((c, f) => oir(c, f, t), cl);
 
 test("checklist antes de arrancar abre la seccion", () => {
-  const cl = abrirAA();
+  const cl = oir(nuevo(), "checklist antes de arrancar", 0);
   assert.equal(cl.abierta, "antes-arrancar");
   assert.equal(cl.siguiente, 0);
 });
@@ -63,14 +64,14 @@ test("cada punto dicho tal cual se reconoce como el siguiente", () => {
 
 test("saltarse un punto lo anota", () => {
   const cl = oir(abrirAA(), "breakers adentro", 0);
-  assert.deepEqual(estados(cl, "antes-arrancar").slice(0, 3), ["saltado", "saltado", "dicho"]);
-  assert.equal(cl.siguiente, 3);
+  assert.deepEqual(estados(cl, "antes-arrancar").slice(2, 5), ["saltado", "saltado", "dicho"]);
+  assert.equal(cl.siguiente, 5);
 });
 
 test("una frase de un punto lejano no salta nada", () => {
   for (const f of ["bitacora anotada", "valvula abierta"]) {
     const cl = oir(abrirAA(), f, 0);
-    assert.equal(cl.siguiente, 0, f);
+    assert.equal(cl.siguiente, 2, f);
     assert.ok(!estados(cl, "antes-arrancar").includes("saltado"), f);
   }
 });
@@ -78,7 +79,7 @@ test("una frase de un punto lejano no salta nada", () => {
 test("repetir el punto anterior no cambia nada", () => {
   const una = decir(abrirAA(), ["asientos y cinturones ajustados", "freno puesto"]);
   const dos = oir(una, "freno puesto", 0);
-  assert.equal(dos.siguiente, 2);
+  assert.equal(dos.siguiente, 4);
   assert.deepEqual(estados(dos, "antes-arrancar"), estados(una, "antes-arrancar"));
 });
 
@@ -90,26 +91,26 @@ test("dos puntos en una frase cuentan los dos", () => {
 
 test("freno dicho y puesto queda hecho", () => {
   const cl = avanzarChecklist(decir(abrirAA(), ["asientos y cinturones", "freno puesto"]), con({ t: 1, freno: true }), ctx);
-  assert.equal(cl.puntos["antes-arrancar"][1].estado, "hecho");
+  assert.equal(cl.puntos["antes-arrancar"][3].estado, "hecho");
 });
 
 test("freno dicho y no puesto a los 10 s queda no hecho", () => {
   let cl = decir(abrirAA(), ["asientos y cinturones", "freno puesto"]);
   for (let t = 1; t <= 11; t++) cl = avanzarChecklist(cl, con({ t, freno: false }), ctx);
-  assert.equal(cl.puntos["antes-arrancar"][1].estado, "no-hecho");
+  assert.equal(cl.puntos["antes-arrancar"][3].estado, "no-hecho");
 });
 
 test("sin datos v1.5 el punto queda dicho", () => {
   const { avionica: _, ...viejo } = con({ t: 1 });
   let cl = decir(abrirAA(), ["asientos", "freno", "breakers", "equipo electrico", "avionica master apagado"]);
   cl = avanzarChecklist(cl, viejo, ctx);
-  assert.equal(cl.puntos["antes-arrancar"][4].estado, "dicho");
+  assert.equal(cl.puntos["antes-arrancar"][6].estado, "dicho");
 });
 
 test("checklist completo cierra y anota los pendientes", () => {
   const cl = oir(abrirAA(), "checklist completo", 0);
   assert.equal(cl.abierta, null);
-  assert.ok(estados(cl, "antes-arrancar").every((e) => e === "saltado"));
+  assert.ok(estados(cl, "antes-arrancar").slice(2).every((e) => e === "saltado"));
 });
 
 test("el aviso espera a las revisiones pendientes", () => {
@@ -153,10 +154,10 @@ test("los avisos esperan a que no haya seccion abierta", () => {
 });
 test("brakers como lo escribe el reconocimiento cuenta como breakers", () => {
   const cl = decir(abrirAA(), ["asientos", "freno", "brakers adentro"]);
-  assert.equal(cl.puntos["antes-arrancar"][2].estado, "dicho");
+  assert.equal(cl.puntos["antes-arrancar"][4].estado, "dicho");
 });
 
-for (const [id, puntos] of [["c152", 74], ["arrow", 107]] as const) {
+for (const [id, puntos] of [["c152", 92], ["arrow", 107]] as const) {
   const secciones = AVIONES_VOZ[id].secciones;
   const todos = secciones.flatMap((s) => s.puntos);
 

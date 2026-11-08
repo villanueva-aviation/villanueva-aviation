@@ -11,11 +11,12 @@ export type Revision =
   | "avionica-on" | "avionica-off" | "selector-ambos" | "selector-tanque" | "valvula-abierta"
   | "bomba-on" | "bomba-off" | "autopiloto-off" | "trim-despegue"
   // C152 y Arrow
-  | "acelerador-media" | "rpm-1000" | "rpm-calentamiento" | "acelerador-cerrado" | "tren-arriba" | "tren-abajo" | "freno-quitado";
+  | "acelerador-media" | "rpm-1000" | "rpm-calentamiento" | "acelerador-cerrado" | "tren-arriba" | "tren-abajo" | "freno-quitado"
+  | "rpm-800" | "acelerador-completo" | "valvula-cerrada";
 
 export const ES_V15: ReadonlySet<Revision> = new Set<Revision>([
   "avionica-on", "avionica-off", "selector-ambos", "selector-tanque", "valvula-abierta",
-  "bomba-on", "bomba-off", "autopiloto-off", "trim-despegue",
+  "bomba-on", "bomba-off", "autopiloto-off", "trim-despegue", "valvula-cerrada",
 ]);
 
 /** Lo que cambia de un avión a otro. Rangos [mín, máx]. */
@@ -65,6 +66,9 @@ type Regla = (m: Muestra, elevFt: number, l: Limites) => boolean | undefined;
 const ESTADO: Record<Exclude<Revision, "magnetos">, Regla> = {
   freno: (m) => m.freno,
   "freno-quitado": (m) => no(m.freno),
+  "rpm-800": (m) => entre(m.rpm, 650, 950),
+  "acelerador-completo": (m) => (m.acelerador === undefined ? undefined : m.acelerador >= 95),
+  "valvula-cerrada": (m) => no(m.valvula),
   "acelerador-cuarto": (m) => entre(m.acelerador, 5, 20),
   "mezcla-corte": (m) => (m.mezcla === undefined ? undefined : m.mezcla < 5),
   "mezcla-rica": (m) => (m.mezcla === undefined ? undefined : m.mezcla > 80),

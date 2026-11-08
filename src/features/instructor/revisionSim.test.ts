@@ -66,8 +66,8 @@ test("sin el campo v1.5 regresa null", () => {
   assert.equal(revisar("avionica-on", [viejo], sin), null);
 });
 
-test("ES_V15 tiene 9 revisiones", () => {
-  assert.equal(ES_V15.size, 9);
+test("ES_V15 tiene 10 revisiones", () => {
+  assert.equal(ES_V15.size, 10);
 });
 
 test("ventana del arranque es 30 s", () => {
@@ -117,6 +117,15 @@ test("velocidades por avion: ascenso, crucero y aproximacion", () => {
   assert.equal(revisar("vel-aproximacion", vuelo({ velocidad: 75, flaps: 3 }), ARROW)?.ok, true);
   assert.equal(revisar("vel-aproximacion", vuelo({ velocidad: 75, flaps: 0 }), ARROW)?.ok, false);
   assert.equal(revisar("vel-aproximacion", vuelo({ velocidad: 58, flaps: 2 }), C152)?.ok, true);
+});
+
+test("800 rpm despues de arrancar, acelerador todo abierto y valvula cerrada", () => {
+  assert.equal(revisar("rpm-800", [con({ rpm: 820 })], sin)?.ok, true);
+  assert.equal(revisar("rpm-800", [con({ rpm: 1100 })], sin)?.ok, false);
+  assert.equal(revisar("acelerador-completo", [con({ acelerador: 98 })], sin)?.ok, true);
+  assert.equal(revisar("acelerador-completo", [con({ acelerador: 80 })], sin)?.ok, false);
+  assert.equal(revisar("valvula-cerrada", [con({ valvula: false })], sin)?.ok, true);
+  assert.equal(revisar("valvula-cerrada", [con({ valvula: true })], sin)?.ok, false);
 });
 
 test("freno de estacionamiento quitado", () => {
