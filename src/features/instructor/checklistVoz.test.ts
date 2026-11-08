@@ -5,7 +5,7 @@ import { AVIONES_VOZ } from "../../data/checklistVozAviones.ts";
 import { ES_V15 } from "./revisionSim.ts";
 import type { Muestra } from "./evaluador.ts";
 import { simularVuelo } from "./simularVuelo.ts";
-import { avanzarChecklist, avisoSeccion, avisosPorDecir, crearChecklist, oir, PIEZA_AVISO, respuestasCopiloto, resumenChecklist, type Checklist } from "./checklistVoz.ts";
+import { avanzarChecklist, avisoSeccion, avisosPorDecir, crearChecklist, oir, PIEZA_AVISO, porDecir, respuestasCopiloto, resumenChecklist, type Checklist } from "./checklistVoz.ts";
 import { encolar, siguiente } from "./colaVoz.ts";
 
 const PUNTOS = CHECKLIST_VOZ_C172.flatMap((s) => s.puntos);
@@ -215,6 +215,20 @@ test("copiloto: no repite lo ya contestado ni contesta lo saltado", () => {
   assert.deepEqual(una.map((r) => r.texto).slice(-1), ["Adentro."]);
   assert.equal(una.filter((r) => r.texto === "Ajustados y asegurados.").length, 0);
   assert.deepEqual(respuestasCopiloto(cl, new Set(una.map((r) => r.clave))), []);
+});
+
+test("copiloto: la respuesta del ultimo punto va antes del aviso de la seccion", () => {
+  const ultimo = CHECKLIST_VOZ_C172[0].puntos.slice(2).map((p) => p.dicho);
+  let cl = decir(abrirAA(), ultimo);
+  for (let t = 1; t <= 11; t++) cl = avanzarChecklist(cl, con({ t, freno: true, avionica: false, selector: 1, valvula: true }), ctx);
+  const textos = porDecir(cl, new Set(), new Set()).map((x) => x.texto);
+  assert.equal(textos.at(-2), "Sin X rojas.");
+  assert.equal(textos.at(-1), "Antes de arrancar: completo.");
+});
+
+test("sin copiloto solo salen los avisos", () => {
+  const cl = decir(abrirAA(), [...CHECKLIST_VOZ_C172[0].puntos.slice(2).map((p) => p.dicho), "checklist completo"]);
+  assert.ok(porDecir(cl, new Set(), null).every((x) => x.tipo === "aviso"));
 });
 
 test("dream como lo escribe el reconocimiento cuenta como trim", () => {

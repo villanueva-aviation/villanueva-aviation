@@ -11,9 +11,9 @@ import type { Aeropuerto } from "../features/instructor/aeropuertoSim";
 import { lectorViejoChecklist, type Muestra } from "../features/instructor/evaluador";
 import {
   avanzarChecklist,
-  avisosPorDecir,
-  crearChecklist,
+ crearChecklist,
   oir,
+  porDecir,
   respuestasCopiloto,
   resumenChecklist,
   type Checklist,
@@ -99,21 +99,14 @@ export function AdminVuelo() {
   const escucha = useChecklistVoz(escuchar, voz, alOir);
   const { decir } = escucha;
 
-  // Al cerrar una sección (y terminar sus revisiones) el instructor dice qué faltó, una vez por lectura.
+  // El copiloto contesta cada punto cuando lo ve hecho; al cerrar una sección el instructor dice qué faltó,
+  // una vez por lectura. Todo en el orden de porDecir: la última respuesta va antes del aviso.
   useEffect(() => {
     if (cl.abierta) dichos.current.delete(cl.abierta);
-    for (const a of avisosPorDecir(cl, dichos.current)) {
-      dichos.current.add(a.id);
-      decir(a.texto);
-    }
-  }, [cl, decir]);
-
-  // Copiloto a bordo: contesta cada punto cuando lo ve hecho en el simulador.
-  useEffect(() => {
-    if (!copiloto) return;
-    for (const r of respuestasCopiloto(cl, respondidas.current)) {
-      respondidas.current.add(r.clave);
-      decir(r.texto);
+    for (const x of porDecir(cl, dichos.current, copiloto ? respondidas.current : null)) {
+      if (x.tipo === "aviso") dichos.current.add(x.id);
+      else respondidas.current.add(x.clave);
+      decir(x.texto);
     }
   }, [cl, copiloto, decir]);
   // Al encenderlo no contesta lo que ya se había dicho.

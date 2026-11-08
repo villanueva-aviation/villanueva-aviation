@@ -199,6 +199,18 @@ export function respuestasCopiloto(cl: Checklist, ya: ReadonlySet<string>): { cl
   );
 }
 
+/** Todo lo que toca decir, en orden: primero el copiloto (null = sin copiloto) y después el aviso de la sección. */
+export function porDecir(
+  cl: Checklist,
+  avisosDichos: ReadonlySet<SeccionId>,
+  respondidas: ReadonlySet<string> | null,
+): ({ tipo: "copiloto"; clave: string; texto: string } | { tipo: "aviso"; id: SeccionId; texto: string })[] {
+  return [
+    ...(respondidas ? respuestasCopiloto(cl, respondidas).map((r) => ({ tipo: "copiloto" as const, ...r })) : []),
+    ...avisosPorDecir(cl, avisosDichos).map((a) => ({ tipo: "aviso" as const, ...a })),
+  ];
+}
+
 export function resumenChecklist(cl: Checklist): { enOrden: number; saltados: string[]; noHechos: string[]; noLeidas: string[] } {
   let enOrden = 0;
   const saltados: string[] = [];
