@@ -62,6 +62,7 @@ const T = {
     reintentar: "Reintentar",
     nueva: "Nueva lección",
     menu: "Volver al menú",
+    salir: "Salir de la lección (no se guarda)",
     candado: "El repaso general todavía no está abierto. Muy pronto.",
   },
   en: {
@@ -97,6 +98,7 @@ const T = {
     reintentar: "Retry",
     nueva: "New lesson",
     menu: "Back to the menu",
+    salir: "Leave the lesson (not saved)",
     candado: "The general review is not open yet. Coming soon.",
   },
 };
@@ -375,6 +377,10 @@ export function InstructorRepaso() {
             </p>
           )}
         </section>
+      )}
+
+      {enVuelo && (
+        <button type="button" onClick={nueva} className="text-sm text-white/60 underline">{t.salir}</button>
       )}
 
       {(terminado || repaso.etapa === "invalido") && (
