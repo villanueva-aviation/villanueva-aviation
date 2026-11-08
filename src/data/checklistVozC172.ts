@@ -89,7 +89,7 @@ export const CHECKLIST_VOZ_C172: SeccionVoz[] = [
     ["Fricción del acelerador — ajustada", ["friccion"]],
   ]),
   S("antes-despegar", "Antes de despegar", ["antes de despegar", "antes del despegue"], [
-    ["Radios y aviónica — configurados", ["radios", "radio", "avionica"], undefined, "En las lecciones con torre se revisa que COM1 esté en la frecuencia de torre."],
+    ["Radios y aviónica — configurados", ["radios", "radio", "avionica"]],
     ["Trim eléctrico — configurado", TRIM.map((t) => `${t} electrico`)],
     ["Piloto automático — apagado", AP, "autopiloto-off"],
     ["Trim de elevador — despegue", TRIM, "trim-despegue"],

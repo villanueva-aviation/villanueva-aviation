@@ -72,7 +72,7 @@ export const CHECKLIST_VOZ_C152: SeccionVoz[] = [
     ["Fricción del acelerador — ajustada", ["friccion"]],
   ]),
   sec("antes-despegar", [
-    ["Radios — configurados", ["radios", "radio"], undefined, "En las lecciones con torre se revisa que COM1 esté en la frecuencia de torre."],
+    ["Radios — configurados", ["radios", "radio"]],
     ["Flaps — 0 a 10 grados", FLAPS, "flaps-despegue"],
     ["Transponder — ALT", ["transponder", "transpondedor"], "xpdr-alt"],
     ["Luz de aterrizaje — encendida", LUZ_ATT, "aterrizaje-on"],
