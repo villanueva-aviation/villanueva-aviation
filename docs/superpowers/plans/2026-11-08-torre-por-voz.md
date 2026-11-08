@@ -46,7 +46,7 @@ export type TipoElemento = "pista" | "qnh" | "codigo" | "punto-espera" | "matric
 export type Elemento = { tipo: TipoElemento; valor: string }; // pista "29L", qnh "3002", codigo "4521", punto-espera "P1", matricula "XB-VNA", punto-vfr "Cajititlán", frecuencia "134.1"
 export type Etapa = "atis" | "terrestre-llamada" | "terrestre-colacion" | "rampa-llamada" | "rampa-colacion" | "rodando"
   | "torre-llamada" | "torre-despegue-colacion" | "zona" | "regreso-llamada" | "regreso-colacion" | "piramide"
-  | "viento-cola" | "base" | "final" | "aterrizado" | "rampa-regreso-llamada" | "rampa-regreso-colacion" | "fin";
+  | "viento-cola" | "cola-reportada" | "base" | "final" | "autorizado" | "rampa-regreso-llamada" | "rampa-regreso-colacion" | "fin";
 export type Quien = "terrestre" | "rampa" | "torre" | "instructor";
 export interface Mensaje { quien: Quien; texto: string }
 export type TipoNota = "faltante" | "ininteligible" | "frecuencia-tarde" | "fuera-de-frecuencia" | "reporte-lejos";
@@ -63,7 +63,7 @@ export interface ContextoAtc {
 }
 export interface EstadoAtc {
   etapa: Etapa; ordenFrecuencia: { mhz: number; t: number; avisada: boolean } | null;
-  notas: Nota[]; registros: Registro[]; pos: { lat: number; lon: number } | null;
+  notas: Nota[]; registros: Registro[]; pos: { lat: number; lon: number } | null; pasoCola: boolean;
 }
 export interface Salida { estado: EstadoAtc; decir: Mensaje[] }
 
@@ -99,8 +99,11 @@ Archivos: `src/features/instructor/colacion.ts`, `colacion.test.ts`. Reusa `norm
 export interface Calificacion { ok: Elemento[]; faltan: Elemento[] }
 export function calificar(esperados: Elemento[], dicho: string): Calificacion;
 
-export interface EstadoHabla { atc: EstadoAtc; yaDichos: TipoElemento[]; pidio: boolean; repeticiones: number }
-export function crearHabla(): EstadoHabla;
+export interface EstadoHabla { atc: EstadoAtc; etapa: Etapa; yaDichos: TipoElemento[]; pidio: boolean; repeticiones: number; zona: ContextoAtc["zona"] | null }
+export function crearHabla(atc: EstadoAtc): EstadoHabla;
+export function muestrearHabla(h: EstadoHabla, m: Muestra, c: ContextoAtc): { habla: EstadoHabla; decir: Mensaje[] };
+export function zonaDicha(texto: string): ContextoAtc["zona"] | null;
+export function distanciaAlPunto(texto: string, zona: ContextoAtc["zona"], pos: { lat: number; lon: number }): { punto: string; nm: number } | null;
 /** Lo que dijo el cadete con el botón apretado. `com1` decide quién contesta. */
 export function hablar(h: EstadoHabla, texto: string, com1: number | null, c: ContextoAtc, t: number): { habla: EstadoHabla; decir: Mensaje[] };
 ```
@@ -119,4 +122,41 @@ Pruebas: cada elemento bien y mal; matrícula abreviada; QNH con otros números 
 
 ## Estado al cierre
 
-(Se llena al terminar.)
+Rama `torre-por-voz` (solo esa rama sube; nada a main, sin PR). Al cierre: `npm test` 414 pruebas pasan, `npx tsc -b --noEmit` y `npm run build` sin errores (queda el aviso de chunk de 500 kB que ya existía).
+
+### Hecho
+
+| Tarea | Commit |
+| --- | --- |
+| Plan | a1ceae1 |
+| 0. Campos `ptt` y `atcId` y `lectorViejoTorre` | e4a2eba |
+| a. `rodaje.ts` (Dijkstra, sin pistas, nombres sin repetir) | 6340bb4 |
+| b. `atcMmgl.ts` (flujo ATIS → Terrestre → Rampa → Torre → regreso → Rampa) | 1b47622 |
+| c. `colacion.ts` (elementos, «repita», pedir lo faltante, COM1) | 962ff9a |
+
+### Falta (se hace en la PC de Erik con el simulador)
+
+- Lector C# v1.6: `ptt`, `atcId`, endpoint de calles (forma de `DatosCalles`), puntos de espera de pista y «asignar botón» (ver la sección de arriba).
+- Página: botón «Asignar botón», escuchar solo con `ptt` apretado (al soltar se manda a `hablar`), voz propia del ATC por `Mensaje.quien`, ciclo del ATIS con `textoAtis`, armar el `ContextoAtc` (rutas con `rodaje.ts`, P1, umbral de la 29L, QNH y viento de la muestra, código con `codigoTransponder`) y mostrar el resumen de notas y registros en el debriefing. `AdminVuelo.tsx` no se tocó.
+- Revisión de Erik de todos los textos del ATC que no dictó él (Terrestre, ATIS, «enterado», «correcto», «repita», «colacione …», «indique …»).
+- Afinar con el simulador: `DIST_RAMPA_A_TORRE_NM` (0.15), `BASE_NM`, `FINAL_NM`, `ALINEADO_NM`, `VEL_TOMA_KT` (40) y la posición aproximada del aeropuerto y de los puntos VFR en `colacion.ts`.
+- Obtener el punto de espera de P1 y la ruta de regreso de los datos reales de calles (los de las pruebas son sintéticos; no hay datos reales de MMGL en el repo).
+
+### Decisiones mías
+
+- **Campos nuevos en `Muestra`** (`ptt`, `atcId`) en vez de un tipo aparte: es lo mínimo y sigue el patrón de v1.4/v1.5.
+- **Tramos tipo 3:** `inicio` es índice de estacionamiento y `fin` de punto; no está confirmado con el simulador (anotado arriba).
+- **Peso del grafo:** distancia en NM entre extremos; un estacionamiento solo se conecta por sus tramos tipo 3.
+- **Elementos por llamada:** Terrestre pide matrícula y zona; su colación pide código, 134.1 y matrícula; Rampa pide matrícula y su colación pista, punto de espera (solo la calle final, P1) y matrícula; Torre: matrícula y punto de espera; colación de despegue: pista y matrícula; regreso: pista, QNH y «Pirámide» (como aprobó Erik). La ruta de regreso de Rampa no se colaciona (solo matrícula). No se exige la letra del ATIS.
+- **Matrícula:** vale completa o las tres últimas letras («Victor November Alpha»), como se dice en la práctica y porque el reconocimiento de voz falla con matrículas largas.
+- **QNH y código:** se juntan las rachas de números seguidos; «treinta cero cero dos» no se entiende (da 32), solo «tres cero cero dos» o cifras.
+- **Zonas:** «Cajititlán» y «Chapala» valen una por otra en los reportes y «área de trabajo» vale cualquier punto del vuelo, porque el diseño dice que el ATC acepta cualquiera. El aviso de «más de 2 NM» usa rumbo/distancia de `mmgl.ts` copiados aquí (no se importa `mmgl.ts` porque arrastra `.tsx`), con la pista «Sur» = 180° y «Sur-sureste» = 157.5°, y el aeropuerto en 20.5218, −103.3111 (aproximado).
+- **Rampa → Torre:** a 0.15 NM de P1, y si el cadete ya está en 118.1 en el rodaje y llama, se pasa a Torre sin esperar (así nunca se atora si el lector no manda posición).
+- **Circuito:** la base solo se ordena si antes estuvo en viento en cola (a la izquierda del eje y después de la cabecera), para que el cadete que viene de Pirámide no reciba «vire a base» al instante. Si ya está alineado con el eje a menos de 4 NM, Torre salta a «autorizado a aterrizar». Sin el umbral de la pista (`pista: null`) no hay circuito por geometría y la etapa se queda esperando.
+- **Después del aterrizaje:** «abandone pista…» sale al estar en tierra a menos de 40 kt.
+- **Sin COM1** (`null`) el ATC contesta (no se puede comprobar); un lector viejo se anula antes con `lectorViejoTorre`.
+- **Botón apretado sin palabras** no cuenta como «no entendí».
+- **Código de transponder:** también se rechaza 0000.
+- **Etapas añadidas** respecto al borrador del plan: `cola-reportada` y `autorizado` (y sin `aterrizado`).
+- **QNH hablado** «QNH 3-0-0-2» y viento «viento 2-7-0 grados 8 nudos» (dirección dígito por dígito, velocidad en número).
+
