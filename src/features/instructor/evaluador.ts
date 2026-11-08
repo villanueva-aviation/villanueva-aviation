@@ -67,6 +67,9 @@ export interface Muestra {
   bomba?: boolean;
   autopiloto?: boolean;
   trim?: number;
+  // Desde el lector v1.6, para la torre por voz. ptt: botón de radio apretado. atcId: matrícula del avión en el simulador ("XB-VNA").
+  ptt?: boolean;
+  atcId?: string;
 }
 
 /** Un lector anterior a v1.3 no manda el aviso de pérdida: el vuelo lento no se puede calificar. */
@@ -77,6 +80,9 @@ export const lectorViejoVuelo = (m: Muestra) => m.lat === undefined;
 
 /** Un lector anterior a v1.5 no manda aviónica ni combustible: esos puntos del checklist solo se oyen. */
 export const lectorViejoChecklist = (m: Muestra) => m.avionica === undefined;
+
+/** Un lector anterior a v1.6 no manda el botón de radio: la torre por voz no se puede usar. */
+export const lectorViejoTorre = (m: Muestra) => m.ptt === undefined;
 
 export type Fase = "armado" | "viraje1" | "entre" | "viraje2" | "terminado" | "invalido";
 export type Lado = "izquierda" | "derecha";

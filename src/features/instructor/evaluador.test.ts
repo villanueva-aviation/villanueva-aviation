@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { armar, armarSolo, avanzar, avanzarLote, crearEvaluacion, lectorViejoChecklist, type Evaluacion, type Muestra } from "./evaluador.ts";
+import { armar, armarSolo, avanzar, avanzarLote, crearEvaluacion, lectorViejoChecklist, lectorViejoTorre, type Evaluacion, type Muestra } from "./evaluador.ts";
 import { simularManiobra } from "./simular.ts";
 
 const correr = (muestras: Muestra[]): Evaluacion => muestras.reduce(avanzar, armar(crearEvaluacion(), muestras[0]));
@@ -164,4 +164,10 @@ test("lectorViejoChecklist distingue v1.4 de v1.5", () => {
   const base = simularManiobra()[0];
   assert.equal(lectorViejoChecklist({ ...base, lat: 1 }), true);
   assert.equal(lectorViejoChecklist({ ...base, lat: 1, avionica: false }), false);
+});
+
+test("lectorViejoTorre distingue v1.5 de v1.6", () => {
+  const base = simularManiobra()[0];
+  assert.equal(lectorViejoTorre({ ...base, lat: 1, avionica: false }), true);
+  assert.equal(lectorViejoTorre({ ...base, ptt: false }), false);
 });
