@@ -9,6 +9,12 @@ const MOTIVOS_EN: Record<string, string> = {
   "Pausaste el simulador: el intento no se califica.": "You paused the simulator: this attempt won't be graded.",
   "Usaste el modo slew: el intento no se califica.": "You used slew mode: this attempt won't be graded.",
   "La velocidad de simulación no estaba en 1×: el intento no se califica.": "Simulation rate wasn't 1×: this attempt won't be graded.",
+  // Las del vuelo completo (fasesVuelo.ts).
+  "Tu lector es de una versión anterior: baja el nuevo de Descargas para las lecciones.":
+    "Your reader is an older version: download the new one from Downloads for the lessons.",
+  "Empieza en tierra, detenido en la plataforma.": "Start on the ground, stopped on the ramp.",
+  "Usaste el modo slew: la lección no se califica.": "You used slew mode: this lesson won't be graded.",
+  "La velocidad de simulación no estaba en 1×: la lección no se califica.": "Simulation rate wasn't 1×: this lesson won't be graded.",
 };
 
 const AVISOS_EN: Record<string, string> = {
@@ -21,6 +27,8 @@ export function traducirMotivo(motivo: string, idioma: Idioma = "es"): string {
   if (idioma === "es") return motivo;
   const avion = /^Esta maniobra es para el C172 y tu avión es «(.*)»\.$/.exec(motivo);
   if (avion) return `This maneuver is for the C172 and your aircraft is «${avion[1]}».`;
+  const leccion = /^En esta versión las lecciones son en el C172 y tu avión es «(.*)»\.$/.exec(motivo);
+  if (leccion) return `For now the lessons are in the C172 and your aircraft is «${leccion[1]}».`;
   return MOTIVOS_EN[motivo] ?? motivo;
 }
 
