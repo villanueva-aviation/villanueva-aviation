@@ -63,6 +63,14 @@ test("final: 63–72 kt vale; un cuadro a 78 kt no; sin regreso no se mide", () 
   assert.equal(calificarTomas(medir(sinRegreso)).aterrizaje.final, null);
 });
 
+test("final por nivel: 78 kt vale en Fácil (−10/+15) y no en Difícil", () => {
+  const t = medir(final([65, 78, 65]));
+  assert.equal(calificarTomas(t, undefined, 1).aterrizaje.final, true);
+  assert.equal(calificarTomas(t, undefined, 2).aterrizaje.final, false);
+  assert.equal(calificarTomas(medir(final([58, 65]))).aterrizaje.final, false);
+  assert.equal(calificarTomas(medir(final([58, 65])), undefined, 2).aterrizaje.final, true);
+});
+
 test("en pista: lo pone la página; sin dato es null", () => {
   assert.equal(calificarTomas(crearTomas()).aterrizaje.enPista, null);
   assert.equal(calificarTomas({ ...crearTomas(), tocoEnPista: false }).aterrizaje.enPista, false);

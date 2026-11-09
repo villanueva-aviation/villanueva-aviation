@@ -6,6 +6,7 @@ import { Button } from "../components/ui/Button";
 import { Container } from "../components/ui/Container";
 import { useAuth } from "../features/auth/AuthContext";
 import { defDe } from "../features/instructor/maniobras";
+import { NOMBRE_NIVEL } from "../features/instructor/nivel";
 import { HOJA } from "../features/instructor/vistasManiobra";
 import { fetchPorRevisar, fetchSesionesRecientes, revisarIntento } from "../features/instructor/intentos";
 import { agruparSesiones, type ResumenSesion } from "../features/instructor/reglasIntentos";
@@ -120,6 +121,7 @@ export function AdminManiobras() {
                   <th className="py-1.5 pr-4 font-normal">Fecha</th>
                   <th className="py-1.5 pr-4 font-normal">Cadete</th>
                   <th className="py-1.5 pr-4 font-normal">Intentos</th>
+                  <th className="py-1.5 pr-4 font-normal">Nivel de práctica</th>
                   <th className="py-1.5 pr-4 font-normal">Checkride</th>
                   <th className="py-1.5 font-normal">Lección</th>
                 </tr>
@@ -130,12 +132,13 @@ export function AdminManiobras() {
                     <td className="py-1.5 pr-4 whitespace-nowrap">{new Date(s.inicio).toLocaleString("es-MX")}</td>
                     <td className="py-1.5 pr-4">{s.email ?? "sin correo"}</td>
                     <td className="py-1.5 pr-4">{s.intentos}</td>
+                    <td className="py-1.5 pr-4">{s.niveles.length ? s.niveles.map((n) => NOMBRE_NIVEL.es[n]).join(", ") : "—"}</td>
                     <td className={`py-1.5 pr-4 ${s.checkride ? (s.checkride.aprobado ? "text-emerald-300" : "text-red-300") : "text-white/40"}`}>
                       {s.checkride ? `${s.checkride.calificacion}/100 · ${s.checkride.aprobado ? "aprobado" : "no aprobado"}` : "—"}
                     </td>
                     <td className={`py-1.5 ${!s.leccion ? "text-white/40" : s.leccion.modo === "practica" ? "" : s.leccion.aprobado ? "text-emerald-300" : "text-red-300"}`}>
                       {s.leccion
-                        ? `${s.leccion.nombre} · ${s.leccion.calificacion}/100 · ${s.leccion.modo === "practica" ? "práctica" : s.leccion.aprobado ? "aprobado" : "no aprobado"}`
+                        ? `${s.leccion.nombre} · ${s.leccion.calificacion}/100 · ${s.leccion.modo === "practica" ? `práctica en ${NOMBRE_NIVEL.es[s.leccion.nivel]}` : s.leccion.aprobado ? "aprobado" : "no aprobado"}`
                         : "—"}
                     </td>
                   </tr>

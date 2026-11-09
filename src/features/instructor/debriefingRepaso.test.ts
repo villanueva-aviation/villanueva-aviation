@@ -78,6 +78,15 @@ test("despegue y aterrizaje dentro de tolerancia van a lo que salió bien", () =
   assert.equal(parte(dm, "aterrizaje").repetir.length, 2);
 });
 
+test("Fácil: final de 60 a 80 kt va a lo bueno, con su tolerancia; el checkride siempre es Difícil", () => {
+  const facil = { ...repaso("practica", CUATRO), nivel: 1 as const };
+  facil.tomas = { ...facil.tomas, final: { min: 60, max: 80, n: 4 } };
+  assert.ok(parte(debriefingRepaso(facil, checklist(), "es"), "aterrizaje").bien.includes("Final entre 60 y 80 kt (65 -10/+15)"));
+  assert.equal(paraGuardarRepaso(facil, checklist()).detalle.nivel, 1);
+  assert.equal(crearRepaso("checkride", [...SORTEO], 1).nivel, 3);
+  assert.equal(crearRepaso("practica", [...SORTEO], 2).nivel, 2);
+});
+
 test("textos en inglés sin acentos, también con puntos saltados", () => {
   const d = debriefingRepaso(repaso("checkride", [res(true), res(false), null, null]), checklist((cl) => { saltado(cl); noHecho(cl); cl.leidas = []; }), "en");
   for (const p of d.partes) for (const t of [p.titulo, ...p.bien, ...p.repetir]) assert.doesNotMatch(t, /[áéíóúñ¿¡]/, t);

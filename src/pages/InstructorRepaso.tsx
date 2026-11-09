@@ -18,6 +18,8 @@ import {
 import type { IntentoSesion, Modo } from "../features/instructor/sesion";
 import { useChecklistVoz } from "../features/instructor/useChecklistVoz";
 import { useIntento } from "../features/instructor/useIntento";
+import { SelectorNivel } from "../features/instructor/SelectorNivel";
+import { NOMBRE_NIVEL } from "../features/instructor/nivel";
 import { useVoz } from "../features/instructor/useVoz";
 import { HOJA } from "../features/instructor/vistasManiobra";
 import { filtrarAviso, MEMORIA_VACIA, paraVoz, type MemoriaAviso } from "../features/instructor/voz";
@@ -180,7 +182,7 @@ export function InstructorRepaso() {
   );
 
   const intento = useIntento(def, { sesionId, modoFijo: modo, arma: !!repaso && armaManiobra(repaso), alTerminar, alLote });
-  const { estado, muestra, aeropuerto, ev, resultado, enCurso, reiniciar } = intento;
+  const { estado, muestra, aeropuerto, ev, resultado, enCurso, reiniciar, nivel, cambiarNivel } = intento;
   aeroRef.current = aeropuerto;
   // Solo una maniobra ya empezada sigue fuera de la zona; una armada sin empezar se desarma (abajo).
   const fase = ev ? def.fase(ev) : null;
@@ -276,7 +278,7 @@ export function InstructorRepaso() {
     setGuardado({ estado: "no" });
     setFinEn(null);
     setListo(false);
-    poner(crearRepaso(modo, sortear(Object.keys(MANIOBRAS) as (keyof typeof MANIOBRAS)[])));
+    poner(crearRepaso(modo, sortear(Object.keys(MANIOBRAS) as (keyof typeof MANIOBRAS)[]), nivel));
   };
   const nueva = () => {
     reiniciar();
@@ -323,6 +325,7 @@ export function InstructorRepaso() {
             </button>
           ))}
         </div>
+        <SelectorNivel nivel={nivel} cambiar={cambiarNivel} checkride={modo === "checkride"} idioma={idioma} />
         <ol className="list-decimal space-y-2 rounded-xl border border-white/10 bg-navy-950/60 p-5 pl-9 text-sm leading-relaxed text-white/85">
           {t.briefing.map((l) => <li key={l}>{l}</li>)}
         </ol>
@@ -342,7 +345,7 @@ export function InstructorRepaso() {
     <div className="mx-auto max-w-xl space-y-4 px-4 py-4">
       {cabecera}
       <section className="space-y-1 rounded-xl border border-white/10 bg-navy-950/60 p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-gold-300">{t.modo[repaso.modo]} · {t.etapa[repaso.etapa]}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-gold-300">{t.modo[repaso.modo]} · {NOMBRE_NIVEL[idioma][repaso.nivel]} · {t.etapa[repaso.etapa]}</p>
         {actualId && <p className="font-display text-lg font-bold text-white">{t.maniobra(repaso.actual + 1, repaso.sorteo.length, nombreManiobra(actualId, idioma))}</p>}
         {repaso.zona && !actualId && repaso.etapa === "salida" && <p className="text-white">{repaso.zona.nombre[idioma]}</p>}
         {repaso.motivo && <p className="text-sm text-gold-300">{repaso.motivo}</p>}
@@ -388,7 +391,7 @@ export function InstructorRepaso() {
 
       {deb && (
         <section className="space-y-3 rounded-xl border border-gold-500/40 bg-navy-950/60 p-5">
-          <h2 className="font-display text-lg font-bold text-white">{deb.aprobado === null ? t.practicaFin : t.aprobado(deb.aprobado)}</h2>
+          <h2 className="font-display text-lg font-bold text-white">{deb.aprobado === null ? t.practicaFin : t.aprobado(deb.aprobado)} · {NOMBRE_NIVEL[idioma][repaso.nivel]}</h2>
           {deb.partes.map((p) => (
             <div key={p.id} className="text-sm">
               <p className="font-semibold text-gold-200">{p.titulo}</p>

@@ -1,6 +1,7 @@
 // Despegue y aterrizaje del vuelo completo: rotación, ascenso a Vy y velocidad en final. Puro.
 import type { Muestra } from "./evaluador.ts";
 import type { FaseVuelo } from "./fasesVuelo.ts";
+import { tolFinal, type Nivel } from "./nivel.ts";
 
 /** POH del C172S, en KIAS. Erik las revisa antes de publicar. */
 export const VEL_C172 = { vr: 55, vy: 74, aprox: 65 };
@@ -47,15 +48,16 @@ export function medirTomas(t: Tomas, previo: Muestra | null, m: Muestra, fase: F
 
 const dentro = (kt: number, objetivo: number) => kt >= objetivo - MENOS && kt <= objetivo + MAS;
 
-/** null = no se midió. */
-export function calificarTomas(t: Tomas, v = VEL_C172) {
+/** null = no se midió. El final se califica con la tolerancia del nivel; rotación y Vy, siempre −5/+10. */
+export function calificarTomas(t: Tomas, v = VEL_C172, nivel: Nivel = 3) {
+  const f = tolFinal(nivel);
   return {
     despegue: {
       rotacion: t.rotacionKt === null ? null : dentro(t.rotacionKt, v.vr),
       vy: t.vy.n === 0 ? null : dentro(t.vy.suma / t.vy.n, v.vy),
     },
     aterrizaje: {
-      final: t.final.n === 0 ? null : t.final.min >= v.aprox - MENOS && t.final.max <= v.aprox + MAS,
+      final: t.final.n === 0 ? null : t.final.min >= v.aprox - f.menos && t.final.max <= v.aprox + f.mas,
       enPista: t.tocoEnPista,
     },
   };

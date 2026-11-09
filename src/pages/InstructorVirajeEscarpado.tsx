@@ -5,7 +5,8 @@ import { PageHero } from "../components/layout/PageHero";
 import { Button } from "../components/ui/Button";
 import { Container } from "../components/ui/Container";
 import { useAuth } from "../features/auth/AuthContext";
-import { TOLERANCIA, type Campo } from "../features/instructor/evaluador";
+import { toleranciaViraje, type Campo } from "../features/instructor/evaluador";
+import { SelectorNivel } from "../features/instructor/SelectorNivel";
 import { Explicacion } from "../features/instructor/ExplicacionInstructor";
 import { Grafica } from "../features/instructor/Grafica";
 import { HojaCheckride } from "../features/instructor/HojaCheckride";
@@ -79,7 +80,7 @@ export function InstructorVirajeEscarpado() {
   const { user } = useAuth();
   const {
     estado, muestra, modo, cambiarModo, modoIntento, ev, resultado, series, anulado, bajo, enCurso,
-    iniciar, guardado, guardar, intento, numero, intentos, mandar, envio, aprobadoPorErik,
+    iniciar, guardado, guardar, intento, numero, intentos, mandar, envio, aprobadoPorErik, nivel, cambiarNivel, subir,
   } = useIntentoViraje();
   const [sonido, setSonido] = useState(leerSonido);
   const ultimoPitido = useRef(0);
@@ -160,6 +161,9 @@ export function InstructorVirajeEscarpado() {
               </button>
             )}
           </div>
+          <div className="mt-3">
+            <SelectorNivel nivel={nivel} cambiar={cambiarNivel} subir={subir} checkride={modo === "checkride"} />
+          </div>
           <p className="mt-3 text-sm text-white/55">
             {modo === "practica"
               ? "Práctica: te avisa en vivo cuando te sales de una tolerancia."
@@ -215,7 +219,7 @@ export function InstructorVirajeEscarpado() {
                 </h3>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {GRAFICAS.map((g) => (
-                    <Grafica key={g.campo} puntos={s[g.campo]} tol={TOLERANCIA[g.campo]} titulo={g.nombre} unidad={g.unidad} />
+                    <Grafica key={g.campo} puntos={s[g.campo]} tol={toleranciaViraje(resultado.nivel)[g.campo]} titulo={g.nombre} unidad={g.unidad} />
                   ))}
                 </div>
               </section>

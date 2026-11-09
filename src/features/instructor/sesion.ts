@@ -2,6 +2,7 @@ import { ACTIVIDADES, type ActividadId } from "./actividades.ts";
 import { explicar as explicarViraje, type Linea } from "./explicacion.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
 import type { ResultadoComun } from "./maniobras.ts";
+import type { Nivel } from "./nivel.ts";
 import type { Respondida } from "./preguntas.ts";
 
 // La sesión de una hora: los bloques avanzan por lo que pasa, el reloj solo sugiere.
@@ -18,8 +19,8 @@ export const GUIA_MIN: Record<Exclude<Bloque, "idioma" | "menu">, [number, numbe
   cierre: [55, 60],
 };
 
-/** Solo intentos calificados: los anulados nunca entran. */
-export type IntentoSesion = { modo: Modo; resultado: ResultadoComun; id: string | null };
+/** Solo intentos calificados: los anulados nunca entran. `subir`: el nivel al que ya puede pasar tras dos prácticas aprobadas seguidas. */
+export type IntentoSesion = { modo: Modo; resultado: ResultadoComun; id: string | null; subir?: Nivel | null };
 
 export type Sesion = {
   id: string;

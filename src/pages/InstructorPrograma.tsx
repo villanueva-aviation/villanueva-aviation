@@ -33,6 +33,8 @@ import {
   type Sesion,
 } from "../features/instructor/sesion";
 import { useIntento } from "../features/instructor/useIntento";
+import { SelectorNivel } from "../features/instructor/SelectorNivel";
+import { INVITA_SUBIR, NOMBRE_NIVEL } from "../features/instructor/nivel";
 import { useVoz } from "../features/instructor/useVoz";
 import { filtrarAviso, MEMORIA_VACIA, paraVoz, textoEspera, type Luz, type MemoriaAviso } from "../features/instructor/voz";
 
@@ -56,6 +58,7 @@ const T = {
     otro: "Otro intento",
     unoMas: "Un intento más",
     siguiente: "Siguiente",
+    practicaEn: "Práctica en",
     nueva: "Nueva sesión",
     anuladoAntes: (m: string) => `El intento anterior no se calificó: ${m} Ya empezó otro.`,
     sinCalificar: (m: string) => `Intento sin calificar: ${m}`,
@@ -98,6 +101,7 @@ const T = {
     otro: "Another attempt",
     unoMas: "One more attempt",
     siguiente: "Next",
+    practicaEn: "Practice on",
     nueva: "New session",
     anuladoAntes: (m: string) => `The last attempt wasn't graded: ${m} A new one has started.`,
     sinCalificar: (m: string) => `Attempt not graded: ${m}`,
@@ -188,7 +192,9 @@ export function InstructorPrograma() {
       if (i.modo === "practica") {
         const n = despues.intentos.filter((x) => x.modo === "practica").length;
         const comentario = comentarioIntento(i, n, idioma, def.explicar);
-        dichoRef.current([paraVoz(detallado ? comentario : comentario.split(". ")[0] + ".", idioma)], "orden");
+        const textos = [detallado ? comentario : comentario.split(". ")[0] + "."];
+        if (i.subir) textos.push(INVITA_SUBIR[idioma](i.subir));
+        dichoRef.current(textos.map((x) => paraVoz(x, idioma)), "orden");
         preguntarRef.current();
       } else {
         const lectura = lecturaFinalDe(def, i.resultado, idioma);
@@ -200,7 +206,7 @@ export function InstructorPrograma() {
 
   const enVuelo = EN_VUELO.includes(sesion.bloque);
   const {
-    estado, muestra, modoIntento, ev, resultado, anulado, reiniciar, guardado, guardar, intento, numero, mandar, envio,
+    estado, muestra, modoIntento, ev, resultado, anulado, reiniciar, guardado, guardar, intento, numero, mandar, envio, nivel, cambiarNivel, subir,
   } = useIntento(def, { sesionId: sesion.id, modoFijo: modoDelBloque(sesion.bloque), arma: armaEnBloque(sesion.bloque), alTerminar });
 
   const pasoAntes = useRef<string | null>(null);
@@ -263,12 +269,12 @@ export function InstructorPrograma() {
   useEffect(() => {
     if (bloqueAntes.current === sesion.bloque) return;
     bloqueAntes.current = sesion.bloque;
-    if (sesion.bloque === "briefing") decir(def.briefing(idioma).map((x) => paraVoz(x, idioma)), "orden");
+    if (sesion.bloque === "briefing") decir(def.briefing(idioma, nivel).map((x) => paraVoz(x, idioma)), "orden");
     if (sesion.bloque === "debriefing") {
       debriefEmpezo.current = false;
       decir(vozDebriefing(deb.lineas, sesion.intentos, voz.detalle).map((x) => paraVoz(x, idioma)), "final");
     }
-  }, [sesion.bloque, decir, idioma, deb.lineas, sesion.intentos, voz.detalle, def]);
+  }, [sesion.bloque, decir, idioma, deb.lineas, sesion.intentos, voz.detalle, def, nivel]);
 
   // Al terminar la lectura del debriefing pasa al cierre.
   useEffect(() => {
@@ -488,8 +494,9 @@ export function InstructorPrograma() {
 
       {sesion.bloque === "briefing" && (
         <section className="space-y-4 rounded-xl border border-white/10 bg-navy-950/60 p-5">
+          <SelectorNivel nivel={nivel} cambiar={cambiarNivel} subir={subir} idioma={idioma} />
           <ol className="list-decimal space-y-2 pl-5 text-sm leading-relaxed text-white/85">
-            {def.briefing(idioma).map((l) => (
+            {def.briefing(idioma, nivel).map((l) => (
               <li key={l}>{l}</li>
             ))}
           </ol>
@@ -543,6 +550,8 @@ export function InstructorPrograma() {
             )}
           </section>
 
+          <SelectorNivel nivel={nivel} cambiar={cambiarNivel} subir={subir} idioma={idioma} checkride={sesion.bloque === "checkride"} />
+
           {sesion.bloque === "practica" && (
             <div className="flex flex-wrap gap-2">
               {resultado && <Button variant="secondary" onClick={reiniciar}>{practicas >= 3 ? t.unoMas : t.otro}</Button>}
@@ -562,6 +571,11 @@ export function InstructorPrograma() {
 
       {sesion.bloque === "debriefing" && (
         <section className="space-y-4 rounded-xl border border-white/10 bg-navy-950/60 p-5">
+          {practicas > 0 && (
+            <p className="text-xs font-semibold uppercase tracking-wide text-gold-300">
+              {t.practicaEn} {[...new Set(sesion.intentos.filter((i) => i.modo === "practica").map((i) => i.resultado.nivel ?? 3))].sort().map((n) => NOMBRE_NIVEL[idioma][n]).join(", ")}
+            </p>
+          )}
           <ul className="space-y-2 text-sm leading-relaxed text-white/85">
             {deb.lineas.map((l) => (
               <li key={l}>{l}</li>

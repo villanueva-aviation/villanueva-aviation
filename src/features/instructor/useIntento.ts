@@ -5,6 +5,18 @@ import type { DefManiobra, ResultadoComun } from "./maniobras.ts";
 import type { IntentoManiobra } from "./reglasIntentos.ts";
 import type { IntentoSesion, Modo } from "./sesion.ts";
 import { useLector } from "./useLector.ts";
+import { sugerirNivel, type Nivel } from "./nivel.ts";
+
+const CLAVE_NIVEL = "instructor-nivel";
+/** El último nivel que escogió el cadete; la primera vez, Fácil. */
+function leerNivel(): Nivel {
+  try {
+    const n = Number(localStorage.getItem(CLAVE_NIVEL));
+    return n === 2 || n === 3 ? n : 1;
+  } catch {
+    return 1;
+  }
+}
 
 export type Opciones = {
   sesionId?: string;
@@ -29,12 +41,25 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
   });
   const [modoSelector, setModo] = useState<Modo>("practica");
   const modo = opciones.modoFijo ?? modoSelector;
+  const [nivelSelector, setNivelSelector] = useState<Nivel>(leerNivel);
+  // El checkride es el simulacro del examen: siempre con las tolerancias de Difícil.
+  const nivel: Nivel = modo === "checkride" ? 3 : nivelSelector;
+  const cambiarNivel = (n: Nivel) => {
+    setNivelSelector(n);
+    try {
+      localStorage.setItem(CLAVE_NIVEL, String(n));
+    } catch {
+      /* sin almacenamiento: dura lo que la página */
+    }
+  };
   const arma = opciones.arma !== false;
   const op = useRef(opciones);
   op.current = opciones;
   const [ev, setEv] = useState<any>(null);
   const [modoIntento, setModoIntento] = useState<Modo>("practica");
   const [intentos, setIntentos] = useState<IntentoManiobra[]>([]);
+  const intentosRef = useRef(intentos);
+  intentosRef.current = intentos;
   const [guardado, setGuardado] = useState<{ id: string | null; error: string | null; guardando: boolean }>({ id: null, error: null, guardando: false });
   const [envio, setEnvio] = useState<string | null>(null);
   const [anulado, setAnulado] = useState<string | null>(null);
@@ -65,7 +90,10 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
   useEffect(() => {
     if (!resultado || guardadoPara.current === resultado) return;
     guardadoPara.current = resultado;
-    guardar(resultado, modoIntento).then((id) => op.current.alTerminar?.({ modo: modoIntento, resultado, id }));
+    // Con los intentos de antes de este resultado más este: ¿ya van dos aprobadas seguidas?
+    const este = { modo: modoIntento, aprobado: resultado.aprobado, detalle: { nivel: resultado.nivel } };
+    const subir = modoIntento === "practica" ? sugerirNivel([...intentosRef.current, este], resultado.nivel ?? 3) : null;
+    guardar(resultado, modoIntento).then((id) => op.current.alTerminar?.({ modo: modoIntento, resultado, id, subir }));
   }, [resultado, modoIntento, guardar]);
 
   const iniciar = () => {
@@ -74,7 +102,7 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
     setGuardado({ id: null, error: null, guardando: false });
     setEnvio(null);
     setAnulado(null);
-    setEv(def.armar(muestra));
+    setEv(def.armar(muestra, nivel));
   };
 
   // Se arma sola en el aire y nivelada, también tras un intento anulado (pausa, slew...), nunca encima de un resultado.
@@ -82,14 +110,16 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
     if (!arma || !muestra || !def.armarSolo(ev, muestra)) return;
     setModoIntento(modo);
     setAnulado(ev && def.fase(ev) === "invalido" ? (def.motivo(ev) ?? null) : null);
-    setEv(def.armar(muestra));
-  }, [ev, muestra, modo, arma, def]);
+    setEv(def.armar(muestra, nivel));
+  }, [ev, muestra, modo, arma, def, nivel]);
 
   const fase = ev ? def.fase(ev) : null;
-  // Un intento armado que todavía no empieza toma el modo nuevo (p. ej. al pasar al checkride).
+  // Un intento armado que todavía no empieza toma el modo y el nivel nuevos (p. ej. al pasar al checkride); uno empezado conserva los suyos.
   useEffect(() => {
-    if (fase === "armado") setModoIntento(modo);
-  }, [modo, fase]);
+    if (fase !== "armado") return;
+    setModoIntento(modo);
+    setEv((e: { nivel?: Nivel } | null) => (e && (e.nivel ?? 3) !== nivel ? { ...e, nivel } : e));
+  }, [modo, fase, nivel]);
 
   const cambiarModo = (m: Modo) => setModo(m);
 
@@ -114,5 +144,8 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
     if (!error) cargarIntentos();
   };
 
-  return { estado, muestra, aeropuerto, modo, cambiarModo, modoIntento, ev, resultado, anulado, enCurso, iniciar, reiniciar, guardado, guardar, intento, numero, intentos, mandar, envio, aprobadoPorErik };
+  // Dos prácticas aprobadas seguidas en el nivel de ahora: invitar a subir.
+  const subir = modo === "practica" ? sugerirNivel(intentos, nivelSelector) : null;
+
+  return { estado, muestra, aeropuerto, modo, cambiarModo, nivel, nivelSelector, cambiarNivel, subir, modoIntento, ev, resultado, anulado, enCurso, iniciar, reiniciar, guardado, guardar, intento, numero, intentos, mandar, envio, aprobadoPorErik };
 }

@@ -43,8 +43,18 @@ test("el repaso general: su renglón es la lección, no un intento ni el checkri
   const s = agruparSesiones(lista)[0];
   assert.equal(s.intentos, 2);
   assert.deepEqual(s.checkride, { calificacion: 60, aprobado: false });
-  assert.deepEqual(s.leccion, { nombre: "Repaso general", modo: "checkride", calificacion: 75, aprobado: false });
+  assert.deepEqual(s.leccion, { nombre: "Repaso general", modo: "checkride", calificacion: 75, aprobado: false, nivel: 3 });
   assert.equal(agruparSesiones([conCorreo(intento(r, "2026-11-05T10:00:00Z", "practica", "A"))])[0].leccion, null);
+});
+
+test("la sesión dice en qué niveles practicó y en cuál fue la lección", () => {
+  const r = calificar(simularManiobra());
+  const en = (nivel: 1 | 2, at: string) => ({ ...intento({ ...r, nivel }, at, "practica", "N"), detalle: { ...paraGuardar({ ...r, nivel }) } });
+  const leccion = { ...intento(r, "2026-11-08T11:00:00Z", "practica", "N"), maniobra: "repaso-general", detalle: { nivel: 1 } };
+  const s = agruparSesiones([en(2, "2026-11-08T10:10:00Z"), en(1, "2026-11-08T10:00:00Z"), en(1, "2026-11-08T10:20:00Z"), leccion].map(conCorreo))[0];
+  assert.deepEqual(s.niveles, [1, 2]);
+  assert.equal(s.leccion?.nivel, 1);
+  assert.deepEqual(agruparSesiones([conCorreo(intento(r, "2026-11-05T10:00:00Z", "practica", "A"))])[0].niveles, [3], "sin nivel guardado = Difícil");
 });
 
 test("los intentos sin sesión no se agrupan", () => {

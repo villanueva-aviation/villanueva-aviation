@@ -8,6 +8,7 @@ import type { Modo } from "./sesion.ts";
 import { crearTomas, medirTomas, type Tomas } from "./tomas.ts";
 import { ALTURA_SEGURA_AGL } from "./virajeEscarpado.ts";
 import { aNm } from "../home/navGeo.ts";
+import type { Nivel } from "./nivel.ts";
 
 const RAD = Math.PI / 180;
 
@@ -94,6 +95,8 @@ export interface EstadoRepaso {
   vuelo: EvaluacionVuelo | null;
   tomas: Tomas;
   motivo?: string;
+  /** Tolerancias de las maniobras y del final; el checkride siempre en Difícil. */
+  nivel: Nivel;
 }
 type Paso = { estado: EstadoRepaso; decir: string[] };
 
@@ -135,8 +138,8 @@ export function nombreManiobra(id: ManiobraId, idioma: Idioma): string {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
-export const crearRepaso = (modo: Modo, sorteo: ManiobraId[]): EstadoRepaso => ({
-  etapa: "rampa", modo, sorteo, actual: 0, hechas: sorteo.map((id) => ({ id, resultado: null, intentoId: null })), zona: null, vuelo: null, tomas: crearTomas(),
+export const crearRepaso = (modo: Modo, sorteo: ManiobraId[], nivel: Nivel = 3): EstadoRepaso => ({
+  etapa: "rampa", modo, sorteo, nivel: modo === "checkride" ? 3 : nivel, actual: 0, hechas: sorteo.map((id) => ({ id, resultado: null, intentoId: null })), zona: null, vuelo: null, tomas: crearTomas(),
 });
 
 const anular = (e: EstadoRepaso, motivo: string, idioma: Idioma): Paso => ({ estado: { ...e, etapa: "invalido", motivo: traducirMotivo(motivo, idioma) }, decir: [] });

@@ -3,6 +3,7 @@ import { resumenChecklist, type Checklist } from "./checklistVoz.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
 import { nombreManiobra, type EstadoRepaso } from "./repaso.ts";
 import { calificarTomas, VEL_C172 as V } from "./tomas.ts";
+import { tolFinal } from "./nivel.ts";
 
 export interface Parte {
   id: "checklist" | "despegue" | "maniobras" | "aterrizaje";
@@ -23,7 +24,7 @@ const T = {
     noLeidas: (l: string[]) => l.map((s) => `No leíste: ${s}`),
     rotacion: (ok: boolean, v: number) => (ok ? `Rotaste a ${v} kt (Vr ${V.vr})` : `Rotaste a ${v} kt: rota a ${V.vr} kt`),
     vy: (ok: boolean, v: number) => (ok ? `Ascenso a ${v} kt (Vy ${V.vy})` : `Ascendiste a ${v} kt: sube a Vy, ${V.vy} kt`),
-    final: (ok: boolean, a: number, b: number) => (ok ? `Final entre ${a} y ${b} kt (${V.aprox} -5/+10)` : `Final entre ${a} y ${b} kt: mantén ${V.aprox} kt, -5/+10`),
+    final: (ok: boolean, a: number, b: number, f: string) => (ok ? `Final entre ${a} y ${b} kt (${V.aprox} ${f})` : `Final entre ${a} y ${b} kt: mantén ${V.aprox} kt, ${f}`),
     pista: (ok: boolean) => (ok ? "Tocaste en la pista" : "Tocaste fuera de la pista"),
     noVolada: "No se voló",
   },
@@ -35,7 +36,7 @@ const T = {
     noLeidas: (l: string[]) => (l.length ? [`${l.length} sections not read`] : []),
     rotacion: (ok: boolean, v: number) => (ok ? `Rotated at ${v} kt (Vr ${V.vr})` : `Rotated at ${v} kt: rotate at ${V.vr} kt`),
     vy: (ok: boolean, v: number) => (ok ? `Climb at ${v} kt (Vy ${V.vy})` : `Climbed at ${v} kt: climb at Vy, ${V.vy} kt`),
-    final: (ok: boolean, a: number, b: number) => (ok ? `Final between ${a} and ${b} kt (${V.aprox} -5/+10)` : `Final between ${a} and ${b} kt: hold ${V.aprox} kt, -5/+10`),
+    final: (ok: boolean, a: number, b: number, f: string) => (ok ? `Final between ${a} and ${b} kt (${V.aprox} ${f})` : `Final between ${a} and ${b} kt: hold ${V.aprox} kt, ${f}`),
     pista: (ok: boolean) => (ok ? "Touched down on the runway" : "Touched down off the runway"),
     noVolada: "Not flown",
   },
@@ -50,7 +51,8 @@ export function debriefingRepaso(e: EstadoRepaso, cl: Checklist, idioma: Idioma)
   const t = T[idioma];
   const nueva = (id: Parte["id"]): Parte => ({ id, titulo: t.titulos[id], bien: [], repetir: [] });
   const r = resumenChecklist(cl);
-  const c = calificarTomas(e.tomas);
+  const c = calificarTomas(e.tomas, undefined, e.nivel);
+  const tf = tolFinal(e.nivel);
 
   const checklist = nueva("checklist");
   checklist.bien.push(t.enOrden(r.enOrden));
@@ -68,7 +70,7 @@ export function debriefingRepaso(e: EstadoRepaso, cl: Checklist, idioma: Idioma)
   }
 
   const aterrizaje = nueva("aterrizaje");
-  poner(aterrizaje, c.aterrizaje.final, t.final(!!c.aterrizaje.final, kt(e.tomas.final.min), kt(e.tomas.final.max)));
+  poner(aterrizaje, c.aterrizaje.final, t.final(!!c.aterrizaje.final, kt(e.tomas.final.min), kt(e.tomas.final.max), `-${tf.menos}/+${tf.mas}`));
   poner(aterrizaje, c.aterrizaje.enPista, t.pista(!!c.aterrizaje.enPista));
 
   const aprobado =
@@ -99,7 +101,8 @@ export function paraGuardarRepaso(e: EstadoRepaso, cl: Checklist) {
         id, calificacion: resultado?.calificacion ?? null, aprobado: resultado?.aprobado ?? null, intentoId,
       })),
       checklist: resumenChecklist(cl),
-      tomas: calificarTomas(e.tomas),
+      tomas: calificarTomas(e.tomas, undefined, e.nivel),
+      nivel: e.nivel,
     },
   };
 }

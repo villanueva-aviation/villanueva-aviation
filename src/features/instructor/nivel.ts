@@ -44,6 +44,11 @@ export const tolLento = (n: Nivel = 3) => ({
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */
 export const tolFinal = (n: Nivel = 3) => ({ menos: por(n, 10, 7, 5), mas: por(n, 15, 12, 10) });
 
+export const INVITA_SUBIR: Record<Idioma, (n: Nivel) => string> = {
+  es: (n) => `Aprobaste dos seguidas: ya puedes intentarlo en ${NOMBRE_NIVEL.es[n]}.`,
+  en: (n) => `Two passes in a row: you can try it on ${NOMBRE_NIVEL.en[n]} now.`,
+};
+
 /** El nivel guardado en el detalle de un intento; los viejos no lo tienen y fueron con las tolerancias de Difícil. */
 export function nivelDe(detalle: unknown): Nivel {
   const n = (detalle as { nivel?: unknown } | null | undefined)?.nivel;
