@@ -38,13 +38,17 @@ const punto = (a: Aeropuerto, rumbo: number, nm: number) => ({
   lon: a.lon + (nm * Math.sin(rumbo * RAD)) / 60 / Math.cos(a.lat * RAD),
 });
 
+/** Aeródromo de Chapala en la orilla norte del lago (MSFS lo llama Paco Airport). */
+const AERODROMO_CHAPALA = { lat: 20.308378, lon: -103.159506 };
+
 /** MMGL: Cajititlán o Chapala, al azar. Otro aeropuerto: 10 NM al través de la pista más larga. */
 export function zonaRepaso(a: Aeropuerto | null, azar = Math.random): Zona | null {
   if (!a) return null;
   if (a.icao === "MMGL") {
     return azar() < 0.5
       ? { nombre: { es: "Cajititlán", en: "Cajititlan" }, ...punto(a, 180, 5), radioNm: 3 }
-      : { nombre: { es: "Chapala", en: "Chapala" }, ...punto(a, 157.5, 15), radioNm: 5 };
+      : // Sobre el agua, no sobre el cerro de la orilla: 4.5 NM al sur del aeródromo.
+        { nombre: { es: "el lago de Chapala, al sur del aeródromo", en: "Lake Chapala, south of the airfield" }, lat: AERODROMO_CHAPALA.lat - 4.5 / 60, lon: AERODROMO_CHAPALA.lon, radioNm: 3 };
   }
   const larga = [...a.pistas].sort((x, y) => y.largoFt - x.largoFt)[0];
   // ponytail: rumbo verdadero redondeado a 10°; la declinación local no la manda el lector.

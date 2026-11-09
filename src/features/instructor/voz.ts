@@ -1,10 +1,9 @@
-import { difRumbo, esC172, TOLERANCIA, type Campo, type Evaluacion, type Muestra, type Resultado } from "./evaluador.ts";
+import { difRumbo, esC172, inicioEstablecido, TOLERANCIA, type Campo, type Evaluacion, type Muestra, type Resultado } from "./evaluador.ts";
 import { explicar, repetir } from "./explicacion.ts";
 import { traducirAviso, traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import {
   ALTURA_SEGURA_AGL,
   AVISO_FRACCION,
-  INCLINACION_ESTABLECIDA,
   INCLINACION_OBJETIVO,
   LIMPIEZA,
   REPETIR_AVISO_SEG,
@@ -18,6 +17,7 @@ export type Aviso = { clave: string; nivel: "ambar" | "rojo"; texto: string };
 type Modo = "practica" | "checkride";
 
 const ASENTAR_SEG = 2;
+const ESPERA_BAJO_SEG = 5;
 const CAMPOS: CampoAviso[] =["altitud", "velocidad", "inclinacion", "bola"];
 export const NOMBRE: Record<Idioma, Record<CampoAviso, string>> = {
   es: { altitud: "altitud", velocidad: "velocidad", inclinacion: "inclinación", bola: "coordinación" },
@@ -49,9 +49,10 @@ function desviaciones(ev: Evaluacion | null, m: Muestra | null): Record<CampoAvi
   const giro = ev?.interno.giro;
   if (!m || !giro) return nada;
   // Inclinación y bola: en la ventana que se califica, pero ASENTAR_SEG después de llegar a 40°,
-  // para no avisar mientras el cadete todavía está entrando a 45°.
-  const llego = [...giro.muestras, m].find((x) => Math.abs(x.inclinacion) >= INCLINACION_ESTABLECIDA);
-  const ventana = !!llego && m.t - llego.t >= ASENTAR_SEG && Math.abs(giro.girado) < 330;
+  // para no avisar mientras el cadete todavía está entrando a 45°. Si se queda abajo de 40°, ESPERA_BAJO_SEG desde la entrada.
+  const todas = [...giro.muestras, m];
+  const { k, llego } = inicioEstablecido(todas);
+  const ventana = k >= 0 && m.t - todas[k].t >= (llego ? ASENTAR_SEG : ESPERA_BAJO_SEG) && Math.abs(giro.girado) < 330;
   return {
     altitud: m.altitud - giro.ref.altitud,
     velocidad: m.velocidad - giro.ref.velocidad,
@@ -160,10 +161,30 @@ const ORDEN: Record<Idioma, Partial<Record<PasoVoz, string>>> = {
 };
 export const ANULADO: Record<Idioma, string> = { es: "Intento anulado.", en: "Attempt cancelled." };
 
+const rumboDicho = (r: number) => String(Math.round(r) % 360 || 360).padStart(3, "0");
+const DESCARTE: Record<Idioma, { entrada: (r: string) => string; corto: (g: number, r: string) => string; lado: string }> = {
+  es: {
+    entrada: (r) => `Rumbo de entrada ${r}.`,
+    corto: (g, r) => `Nivelaste antes de completar la vuelta: llevabas ${g} grados. Repite el viraje y nivela en tu rumbo de entrada, ${r}.`,
+    lado: "Ese viraje fue al mismo lado. El segundo va al lado contrario.",
+  },
+  en: {
+    entrada: (r) => `Entry heading ${r}.`,
+    corto: (g, r) => `You rolled out before completing the turn: ${g} degrees. Do it again and roll out on your entry heading, ${r}.`,
+    lado: "That turn was the same direction. The second one goes the other way.",
+  },
+};
+const VIRANDO: PasoVoz[] = ["viraje1", "nivelar1", "viraje2", "nivelar2"];
+
 /** La orden del examinador al cambiar de paso; la lectura final va aparte. */
 export function ordenVoz(antes: PasoVoz | null, ahora: PasoVoz | null, ev: Evaluacion | null, idioma: Idioma = "es"): string | null {
   if (!ahora || ahora === antes) return null;
   if (ahora === "invalido") return `${ANULADO[idioma]} ${traducirMotivo(ev?.motivo ?? "", idioma)}`.trim();
+  const d = ev?.interno.descartado;
+  // Un viraje que no contó: decir por qué, en vez de volver a la orden de antes sin explicar.
+  if (d && antes && VIRANDO.includes(antes)) return d.motivo === "lado" ? DESCARTE[idioma].lado : DESCARTE[idioma].corto(Math.round(d.grados), rumboDicho(d.rumbo));
+  const giro = ev?.interno.giro;
+  if ((ahora === "viraje1" || ahora === "viraje2") && giro && !(antes && VIRANDO.includes(antes))) return DESCARTE[idioma].entrada(rumboDicho(giro.ref.rumbo));
   return ORDEN[idioma][ahora] ?? null;
 }
 

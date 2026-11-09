@@ -86,8 +86,10 @@ test("órdenes de una maniobra completa, en orden", () => {
   assert.deepEqual(dichas, [
     "Despeje el área con sus virajes de limpieza.",
     "Área despejada. Inicie el viraje de 360 grados.",
+    "Rumbo de entrada 089.",
     "Nivele en su rumbo de entrada.",
     "Ahora al lado contrario.",
+    "Rumbo de entrada 090.",
     "Nivele en su rumbo de entrada.",
   ]);
 });
@@ -117,6 +119,45 @@ test("lectura final completa y en voz", () => {
 
 test("paraVoz no lee la flecha de las preguntas falladas", () => {
   assert.equal(paraVoz("«¿Cuál es la Vs0?» → 40 nudos"), "«¿Cuál es la Vs0?»: 40 nudos");
+});
+
+const dichasDe = (muestras: Muestra[]) => {
+  let ev = armar(crearEvaluacion(), muestras[0]);
+  let paso: PasoVoz | null = null;
+  const dichas: string[] = [];
+  for (const m of muestras) {
+    ev = avanzar(ev, m);
+    const p = pasoVoz(ev, m);
+    const o = ordenVoz(paso, p, ev);
+    if (o) dichas.push(o);
+    paso = p;
+  }
+  return dichas;
+};
+
+test("al entrar al viraje dice el rumbo de entrada", () => {
+  const dichas = dichasDe(simularManiobra());
+  assert.equal(dichas.filter((d) => /^Rumbo de entrada 0(89|90)\.$/.test(d)).length, 2);
+});
+
+test("viraje corto: la voz dice cuántos grados llevaba y el rumbo de entrada", () => {
+  const dichas = dichasDe(simularManiobra({ angulo: 318, lados: ["izquierda"] }));
+  assert.match(dichas.at(-1)!, /^Nivelaste antes de completar la vuelta: llevabas 318 grados\. Repite el viraje y nivela en tu rumbo de entrada, 0(89|90)\.$/);
+});
+
+test("segundo viraje al mismo lado: la voz pide el lado contrario", () => {
+  const dichas = dichasDe(simularManiobra({ lados: ["izquierda", "izquierda"] }));
+  assert.equal(dichas.at(-1), "Ese viraje fue al mismo lado. El segundo va al lado contrario.");
+});
+
+test("a 32° sin llegar a 40°, avisa que falta inclinación a los 5 s, no antes", () => {
+  const muestras = simularManiobra({ inclinacion: 32 });
+  const i = muestras.findIndex((x) => Math.abs(x.inclinacion) > 30 && x.t > 60);
+  const en = (seg: number) => muestras.findIndex((x) => x.t >= muestras[i].t + seg);
+  const j = en(5.1);
+  assert.match(avisoVoz(correr(muestras.slice(0, j + 1)), muestras[j], "practica")?.texto ?? "", /Te falta inclinación/);
+  const k = en(3);
+  assert.equal(semaforo(correr(muestras.slice(0, k + 1)), muestras[k]).inclinacion, "gris");
 });
 
 test("paraVoz", () => {

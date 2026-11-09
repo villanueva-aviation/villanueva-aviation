@@ -122,6 +122,8 @@ interface Interno {
   lados: ResultadoLado[];
   refs: Muestra[]; // ref de cada lado contado
   faseAntes: "armado" | "entre";
+  /** El último viraje que no contó, para que la voz diga por qué. Se borra al empezar otro. */
+  descartado: { motivo: "corto" | "lado"; grados: number; rumbo: number } | null;
 }
 
 export interface Evaluacion {
@@ -157,6 +159,7 @@ const vacio = (): Interno => ({
   lados: [],
   refs: [],
   faseAntes: "armado",
+  descartado: null,
 });
 
 export function crearEvaluacion(): Evaluacion {
@@ -208,11 +211,18 @@ export function analizar(puntos: { t: number; v: number }[], tol: number) {
   return { peor, tramos, ns };
 }
 
-/** Inclinación y bola se califican desde que el viraje se establece (40°) hasta los 330°. `muestras` empieza en la entrada nivelada. */
+/** Desde dónde se mide la inclinación: al llegar a 40°; si nunca llega, desde la entrada (30°), para que un viraje bajo no se salve. */
+export function inicioEstablecido(muestras: Muestra[]): { k: number; llego: boolean } {
+  const k = muestras.findIndex((m) => Math.abs(m.inclinacion) >= INCLINACION_ESTABLECIDA);
+  if (k >= 0) return { k, llego: true };
+  return { k: muestras.findIndex((m) => Math.abs(m.inclinacion) > INCLINACION_ENTRADA), llego: false };
+}
+
+/** Inclinación y bola se califican desde que el viraje se establece hasta los 330°. `muestras` empieza en la entrada nivelada. */
 export function virajeEstablecido(muestras: Muestra[]): Muestra[] {
   let g = 0;
   const vuelta = muestras.map((m, k) => (k === 0 ? 0 : Math.abs((g += difRumbo(m.rumbo, muestras[k - 1].rumbo)))));
-  const inicio = muestras.findIndex((m) => Math.abs(m.inclinacion) >= INCLINACION_ESTABLECIDA);
+  const inicio = inicioEstablecido(muestras).k;
   return muestras.filter((_, k) => inicio >= 0 && k >= inicio && vuelta[k] < 330);
 }
 
@@ -311,7 +321,7 @@ export function avanzar(ev: Evaluacion, m: Muestra): Evaluacion {
     const muestras = i.ultimaNivelada ? [i.ultimaNivelada, ...tramo] : tramo;
     return {
       fase: i.lados.length === 0 ? "viraje1" : "viraje2",
-      interno: { ...sig, giro: { ref, muestras, girado: acumulado }, tramo: [], acumulado: 0, faseAntes: ev.fase === "entre" ? "entre" : "armado" },
+      interno: { ...sig, giro: { ref, muestras, girado: acumulado }, tramo: [], acumulado: 0, faseAntes: ev.fase === "entre" ? "entre" : "armado", descartado: null },
     };
   }
 
@@ -320,11 +330,12 @@ export function avanzar(ev: Evaluacion, m: Muestra): Evaluacion {
 
   const base: Interno = { ...sig, ...nivelado, giro: null };
   // Niveló antes de los 330°: entrada abortada o viraje incompleto. Se repite sin calificar.
-  if (Math.abs(giro.girado) < 330) return { fase: i.faseAntes, interno: base };
+  const descartado = (motivo: "corto" | "lado") => ({ ...base, descartado: { motivo, grados: Math.abs(giro.girado), rumbo: giro.ref.rumbo } });
+  if (Math.abs(giro.girado) < 330) return { fase: i.faseAntes, interno: descartado("corto") };
 
   const lado = evaluarLado(giro);
   // El segundo viraje tiene que ser al lado contrario.
-  if (i.lados.length === 1 && lado.lado === i.lados[0].lado) return { fase: "entre", interno: base };
+  if (i.lados.length === 1 && lado.lado === i.lados[0].lado) return { fase: "entre", interno: descartado("lado") };
   const lados = [...i.lados, lado];
   const refs = [...i.refs, giro.ref];
   if (lados.length < 2) return { fase: "entre", interno: { ...base, lados, refs } };

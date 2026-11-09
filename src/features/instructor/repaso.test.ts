@@ -32,9 +32,11 @@ test("zona en MMGL: Cajititlán o Chapala", () => {
   assert.ok(Math.abs(dist(caji.lat, caji.lon) - 5) < 0.1);
   assert.ok(caji.lat < A.lat, "al sur");
   const chapala = zonaRepaso(A, () => 0.99)!;
-  assert.equal(chapala.nombre.es, "Chapala");
-  assert.equal(chapala.radioNm, 5);
-  assert.ok(Math.abs(dist(chapala.lat, chapala.lon) - 15) < 0.1);
+  // Sobre el agua: 4.5 NM al sur del aeródromo de Chapala (MSFS: Paco Airport, 20.308 N 103.160 W), radio 3.
+  assert.equal(chapala.nombre.es, "el lago de Chapala, al sur del aeródromo");
+  assert.equal(chapala.radioNm, 3);
+  assert.ok(Math.abs(chapala.lat - (20.308378 - 4.5 / 60)) < 0.001);
+  assert.ok(Math.abs(chapala.lon - -103.159506) < 0.001);
 });
 
 test("otro aeropuerto: 10 NM al través de la pista más larga; sin aeropuerto, null", () => {

@@ -160,6 +160,27 @@ test("aviso bajo 1500 AGL", () => {
   assert.equal(r.aprobado, true);
 });
 
+test("viraje a 32° que nunca llega a 40° reprueba la inclinación", () => {
+  const ev = correr(simularManiobra({ inclinacion: 32 }));
+  assert.equal(ev.fase, "terminado");
+  assert.equal(ev.resultado!.lados[0].ns.inclinacion, true);
+  assert.equal(ev.resultado!.elementos["PA.V.A.S5"], "NS");
+});
+
+test("viraje corto: se descarta y guarda cuántos grados llevaba y el rumbo de entrada", () => {
+  const ev = correr(simularManiobra({ angulo: 318, lados: ["izquierda"] }));
+  assert.equal(ev.fase, "armado");
+  const d = ev.interno.descartado!;
+  assert.equal(d.motivo, "corto");
+  assert.equal(Math.round(d.grados), 318);
+  assert.ok(Math.abs(d.rumbo - 90) < 1.5, String(d.rumbo));
+});
+
+test("segundo viraje al mismo lado: se descarta con motivo lado", () => {
+  const ev = correr(simularManiobra({ lados: ["izquierda", "izquierda"] }));
+  assert.equal(ev.interno.descartado?.motivo, "lado");
+});
+
 test("lectorViejoChecklist distingue v1.4 de v1.5", () => {
   const base = simularManiobra()[0];
   assert.equal(lectorViejoChecklist({ ...base, lat: 1 }), true);

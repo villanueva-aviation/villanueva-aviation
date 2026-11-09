@@ -126,6 +126,9 @@ export function simularManiobra(
     rumboInicial?: number;
     caidaAltitud?: { lado: 0 | 1; ft: number; segundos: number; enGrados: number };
     sobreInclinacion?: { lado: 0 | 1; grados: number; segundos: number };
+    /** Inclinación y grados de cada viraje de la maniobra (45° y 360° si no se dicen). */
+    inclinacion?: number;
+    angulo?: number;
     hz?: number;
   } = {},
 ): Muestra[] {
@@ -191,7 +194,7 @@ export function simularManiobra(
   const lados = op.lados ?? ["izquierda", "derecha"];
   lados.forEach((lado, i) => {
     if (i > 0) recto(3);
-    virar(lado === "izquierda" ? -1 : 1, 360, 45, i as 0 | 1);
+    virar(lado === "izquierda" ? -1 : 1, op.angulo ?? 360, op.inclinacion ?? 45, i as 0 | 1);
   });
   recto(5);
   return out;
