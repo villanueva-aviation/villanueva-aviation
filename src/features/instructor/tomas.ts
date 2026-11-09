@@ -8,8 +8,13 @@ export const VEL_C172 = { vr: 55, vy: 74, aprox: 65 };
 const MENOS = 5;
 const MAS = 10;
 
+/** Grados que sube la nariz sobre su actitud de carrera para contar como rotación. */
+const ROTA_GRADOS = 3;
+
 export interface Tomas {
   rotacionKt: number | null;
+  /** El cabeceo más bajo de la carrera de despegue, para ver cuándo sube la nariz. */
+  cabeceoCarrera: number | null;
   vy: { suma: number; n: number };
   /** Ya pasó 1000 ft AGL una vez: el ascenso inicial terminó. */
   pasoMil: boolean;
@@ -17,11 +22,19 @@ export interface Tomas {
   tocoEnPista: boolean | null;
 }
 
-export const crearTomas = (): Tomas => ({ rotacionKt: null, vy: { suma: 0, n: 0 }, pasoMil: false, final: { min: Infinity, max: -Infinity, n: 0 }, tocoEnPista: null });
+export const crearTomas = (): Tomas => ({ rotacionKt: null, cabeceoCarrera: null, vy: { suma: 0, n: 0 }, pasoMil: false, final: { min: Infinity, max: -Infinity, n: 0 }, tocoEnPista: null });
 
 export function medirTomas(t: Tomas, previo: Muestra | null, m: Muestra, fase: FaseVuelo, regreso: boolean): Tomas {
-  let { rotacionKt, vy, pasoMil, final } = t;
-  if (rotacionKt === null && fase === "carrera-despegue" && previo?.enTierra && !m.enTierra) rotacionKt = m.velocidad;
+  let { rotacionKt, cabeceoCarrera, vy, pasoMil, final } = t;
+  if (rotacionKt === null && fase === "carrera-despegue") {
+    // Rotar es subir la nariz, no despegar las ruedas: en el C172 eso pasa unos 10–15 kt después.
+    if (m.enTierra && m.cabeceo !== undefined) {
+      if (cabeceoCarrera !== null && m.cabeceo - cabeceoCarrera >= ROTA_GRADOS) rotacionKt = m.velocidad;
+      else cabeceoCarrera = Math.min(cabeceoCarrera ?? m.cabeceo, m.cabeceo);
+    }
+    // Sin cabeceo (lector viejo) o sin subir la nariz antes: la velocidad al despegar.
+    if (rotacionKt === null && previo?.enTierra && !m.enTierra) rotacionKt = m.velocidad;
+  }
   if (fase === "vuelo" && !pasoMil) {
     if (m.agl > 1000) pasoMil = true;
     else if ((m.vs ?? 0) > 0 && m.agl >= 200) vy = { suma: vy.suma + m.velocidad, n: vy.n + 1 };
@@ -29,7 +42,7 @@ export function medirTomas(t: Tomas, previo: Muestra | null, m: Muestra, fase: F
   if (regreso && fase === "vuelo" && m.agl >= 50 && m.agl <= 500 && (m.vs ?? 0) < 0) {
     final = { min: Math.min(final.min, m.velocidad), max: Math.max(final.max, m.velocidad), n: final.n + 1 };
   }
-  return { ...t, rotacionKt, vy, pasoMil, final };
+  return { ...t, rotacionKt, cabeceoCarrera, vy, pasoMil, final };
 }
 
 const dentro = (kt: number, objetivo: number) => kt >= objetivo - MENOS && kt <= objetivo + MAS;

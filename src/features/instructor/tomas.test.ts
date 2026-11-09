@@ -34,6 +34,17 @@ test("rotación a 57 kt vale; a 45 kt no", () => {
   assert.equal(calificarTomas(medir(carrera(45))).despegue.rotacion, false);
 });
 
+test("rotación: la velocidad al subir la nariz, no la de despegar las ruedas", () => {
+  const t = medir([
+    { fase: "carrera-despegue", enTierra: true, velocidad: 40, cabeceo: 1 },
+    { fase: "carrera-despegue", enTierra: true, velocidad: 50, cabeceo: 0.6 },
+    { fase: "carrera-despegue", enTierra: true, velocidad: 55, cabeceo: 5 },
+    { fase: "carrera-despegue", enTierra: true, velocidad: 64, cabeceo: 8 },
+    { fase: "carrera-despegue", enTierra: false, velocidad: 72, cabeceo: 9 },
+  ]);
+  assert.equal(t.rotacionKt, 55);
+});
+
 test("ascenso a Vy: 72–78 kt vale, 90 kt no, sin ascenso es null", () => {
   assert.equal(calificarTomas(medir(ascenso([72, 74, 76, 78]))).despegue.vy, true);
   assert.equal(calificarTomas(medir(ascenso([90, 90, 90]))).despegue.vy, false);
