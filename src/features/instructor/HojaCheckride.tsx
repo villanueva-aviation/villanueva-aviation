@@ -1,12 +1,14 @@
 import type { Resultado, ResultadoLado } from "./evaluador.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
-import { INCLINACION_OBJETIVO, TOLERANCIAS } from "./virajeEscarpado.ts";
+import { INCLINACION_OBJETIVO } from "./virajeEscarpado.ts";
+import { tolViraje, type Nivel } from "./nivel.ts";
 
 const signo = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(Math.round(v))}`;
 
 type Fila = { nombre: Record<Idioma, string>; valor: (l: ResultadoLado, idioma: Idioma) => string; bien: (l: ResultadoLado) => boolean };
 
-const FILAS: Fila[] = [
+/** Las filas con las tolerancias del nivel con que se voló. */
+const filas = (TOLERANCIAS: ReturnType<typeof tolViraje>): Fila[] => [
   {
     nombre: {
       es: `Inclinación ${INCLINACION_OBJETIVO}° ±${TOLERANCIAS.inclinacionGrados}`,
@@ -43,8 +45,9 @@ const T = {
 };
 
 /** Cada tolerancia con su peor valor, por lado, como la hoja de un examinador. */
-export function HojaCheckride({ resultado, idioma = "es" }: { resultado: Pick<Resultado, "aprobado" | "lados">; idioma?: Idioma }) {
+export function HojaCheckride({ resultado, idioma = "es" }: { resultado: Pick<Resultado, "aprobado" | "lados"> & { nivel?: Nivel }; idioma?: Idioma }) {
   const { lados, aprobado } = resultado;
+  const FILAS = filas(tolViraje(resultado.nivel));
   const t = T[idioma];
   const total = FILAS.length * lados.length;
   const malos = FILAS.reduce((s, f) => s + lados.filter((l) => !f.bien(l)).length, 0);

@@ -7,13 +7,13 @@ import { briefingLento, explicarLento, listaPasosLento, masFalladoLento, paraGua
 import { briefingRecto, explicarRecto, listaPasosRecto, masFalladoRecto, paraGuardarRecto, queHacerRecto, repetirRecto } from "./explicacionRecto.ts";
 import { textosReporte, traducirAviso, type Idioma } from "./idiomaInstructor.ts";
 import type { Tema } from "./preguntas.ts";
-import { TOLERANCIAS_RECTO as TOL } from "./rectoNivelado.ts";
 import { paraGuardar } from "./reglasIntentos.ts";
-import { ELEMENTOS_ACS } from "./virajeEscarpado.ts";
+import { elementosAcs } from "./virajeEscarpado.ts";
+import { tolLento, tolRecto, type Nivel } from "./nivel.ts";
 import { avisoVoz, ordenVoz, paraVoz, pasoVoz, semaforo, textoPaso, type Aviso, type Luz, type PasoVoz } from "./voz.ts";
 import { avisoLento, ordenLento, pasoLento, semaforoLento, textoPasoLento, type PasoLento } from "./vozLento.ts";
 import { avisoRecto, ordenRecto, pasoRecto, semaforoRecto, textoPasoRecto, type PasoRecto } from "./vozRecto.ts";
-import { INCLINACION_VIRAJE, OBJETIVO_KT, TOLERANCIAS_LENTO as TL } from "./vueloLento.ts";
+import { INCLINACION_VIRAJE, OBJETIVO_KT } from "./vueloLento.ts";
 import { ALTURA_SEGURA_AGL } from "./virajeEscarpado.ts";
 
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
@@ -26,6 +26,8 @@ export interface ResultadoComun {
   elementos: Record<string, "S" | "NS">;
   avisos: string[];
   muestras: Muestra[];
+  /** Falta en los intentos de antes de los niveles = Difícil. */
+  nivel?: Nivel;
 }
 
 /** Métodos con sintaxis de método: cada definición tipa su E y su R, y el registro las guarda como DefManiobra. */
@@ -35,10 +37,11 @@ export interface DefManiobra<E = any, R extends ResultadoComun = any> {
   avion: "C172";
   titulo: Record<Idioma, string>;
   tarea: Record<Idioma, string>;
-  elementosReporte: { codigo: string; texto: string; textoEn: string }[];
+  /** Con las tolerancias del nivel (falta = Difícil). */
+  elementosReporte(nivel?: Nivel): { codigo: string; texto: string; textoEn: string }[];
   celdas: { campo: string; nombre: Record<Idioma, string> }[];
   temas: Tema[];
-  armar(m: Muestra): E;
+  armar(m: Muestra, nivel?: Nivel): E;
   avanzar(e: E, m: Muestra): E;
   armarSolo(e: E | null, m: Muestra): boolean;
   fase(e: E): FaseComun;
@@ -51,7 +54,7 @@ export interface DefManiobra<E = any, R extends ResultadoComun = any> {
   queHacer(paso: string | null, idioma: Idioma): string;
   semaforo(e: E | null, m: Muestra | null): Record<string, Luz>;
   aviso(e: E | null, m: Muestra | null, modo: "practica" | "checkride", idioma: Idioma): Aviso | null;
-  briefing(idioma: Idioma): string[];
+  briefing(idioma: Idioma, nivel?: Nivel): string[];
   explicar(r: R, idioma: Idioma): Linea[];
   repetir(r: R, idioma: Idioma): string | null;
   masFallado(rs: R[], idioma: Idioma): string | null;
@@ -66,10 +69,10 @@ const defViraje: DefManiobra<Evaluacion, Resultado> = {
   avion: "C172",
   titulo: { es: "Viraje escarpado C172", en: "C172 steep turn" },
   tarea: { es: textosReporte("es").tarea, en: textosReporte("en").tarea },
-  elementosReporte: ELEMENTOS_ACS,
+  elementosReporte: elementosAcs,
   celdas: [celda("altitud", "Altitud", "Altitude"), celda("velocidad", "Velocidad", "Airspeed"), celda("inclinacion", "Inclinación", "Bank"), celda("bola", "Bola", "Ball")],
   temas: ["viraje-escarpado", "c172"],
-  armar: (m) => armar(crearEvaluacion(), m),
+  armar: (m, nivel) => armar(crearEvaluacion(), m, nivel),
   avanzar,
   armarSolo,
   fase: (e) => (e.fase === "viraje1" || e.fase === "entre" || e.fase === "viraje2" ? "en-curso" : e.fase),
@@ -95,12 +98,15 @@ const defRecto: DefManiobra<EvaluacionRecto, ResultadoRecto> = {
   avion: "C172",
   titulo: { es: "Recto y nivelado C172", en: "C172 straight and level" },
   tarea: { es: "Práctica · Recto y nivelado", en: "Practice · Straight and level" },
-  elementosReporte: [
+  elementosReporte: (n) => {
+    const TOL = tolRecto(n);
+    return [
     { codigo: "1", texto: `Mantiene la altitud ±${TOL.altitudFt} ft`, textoEn: `Maintains altitude ±${TOL.altitudFt} ft` },
     { codigo: "2", texto: `Mantiene el rumbo ±${TOL.rumboGrados}°`, textoEn: `Maintains heading ±${TOL.rumboGrados}°` },
     { codigo: "3", texto: `Mantiene la velocidad ±${TOL.velocidadKt} kt`, textoEn: `Maintains airspeed ±${TOL.velocidadKt} kt` },
     { codigo: "4", texto: "Vuelo coordinado: bola centrada", textoEn: "Coordinated flight: ball centered" },
-  ],
+    ];
+  },
   celdas: [celda("altitud", "Altitud", "Altitude"), celda("rumbo", "Rumbo", "Heading"), celda("velocidad", "Velocidad", "Airspeed"), celda("bola", "Bola", "Ball")],
   temas: ["recto-nivelado", "c172"],
   armar: armarRecto,
@@ -129,7 +135,9 @@ const defLento: DefManiobra<EvaluacionLento, ResultadoLento> = {
   avion: "C172",
   titulo: { es: "Vuelo lento C172", en: "C172 slow flight" },
   tarea: { es: "Área VII · Tarea A: Vuelo lento", en: "Area VII · Task A: Slow flight" },
-  elementosReporte: [
+  elementosReporte: (n) => {
+    const TL = tolLento(n);
+    return [
     {
       codigo: "PA.VII.A.S2",
       texto: `Entrada que permite terminar a ${ALTURA_SEGURA_AGL.toLocaleString("en-US")} ft AGL o más`,
@@ -146,7 +154,8 @@ const defLento: DefManiobra<EvaluacionLento, ResultadoLento> = {
       texto: `Alt ±${TL.altitudFt} · Rumbo ±${TL.rumboGrados} · Incl ±${TL.inclinacionGrados}`,
       textoEn: `Alt ±${TL.altitudFt} · Hdg ±${TL.rumboGrados} · Bank ±${TL.inclinacionGrados}`,
     },
-  ],
+    ];
+  },
   celdas: [
     celda("altitud", "Altitud", "Altitude"),
     celda("rumbo", "Rumbo", "Heading"),

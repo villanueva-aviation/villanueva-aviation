@@ -1,6 +1,7 @@
 import { difRumbo, type Campo, type Muestra, type Resultado, type ResultadoLado, type Tramo } from "./evaluador.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
-import { INCLINACION_OBJETIVO, TOLERANCIAS } from "./virajeEscarpado.ts";
+import { INCLINACION_OBJETIVO } from "./virajeEscarpado.ts";
+import { tolViraje } from "./nivel.ts";
 
 export interface Linea {
   tipo: "bien" | "mal";
@@ -67,7 +68,7 @@ function errores(r: Resultado, l: ResultadoLado, idioma: Idioma): string[] {
         : `${L}: el viraje no fue coordinado. Centra la bola con el pedal del lado al que se fue.`,
     );
   }
-  if (Math.abs(l.rumboSalida) > TOLERANCIAS.rumboSalidaGrados) {
+  if (Math.abs(l.rumboSalida) > tolViraje(r.nivel).rumboSalidaGrados) {
     // Izquierdo: el rumbo baja, así que quedar arriba del de entrada es nivelar antes.
     const antes = l.lado === "izquierda" ? l.rumboSalida > 0 : l.rumboSalida < 0;
     const g = Math.round(Math.abs(l.rumboSalida));
@@ -108,7 +109,7 @@ export function explicar(r: Resultado, idioma: Idioma = "es"): Linea[] {
   for (const l of r.lados) for (const texto of errores(r, l, idioma)) lineas.push({ tipo: "mal", texto });
 
   const limpios = (["altitud", "inclinacion", "velocidad", "bola", "rumbo"] as const).filter((c) =>
-    r.lados.every((l) => (c === "rumbo" ? Math.abs(l.rumboSalida) <= TOLERANCIAS.rumboSalidaGrados : l.fuera[c].length === 0)),
+    r.lados.every((l) => (c === "rumbo" ? Math.abs(l.rumboSalida) <= tolViraje(r.nivel).rumboSalidaGrados : l.fuera[c].length === 0)),
   );
   if (limpios.length && r.lados.length === 2) {
     const nombres = limpios.map((c) => ETIQUETA[idioma][c]);

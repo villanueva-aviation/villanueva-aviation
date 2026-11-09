@@ -1,7 +1,7 @@
 import type { Muestra } from "./evaluador.ts";
-import { CAMPOS_RECTO, desvioRecto, TOLERANCIA_RECTO, type CampoRecto, type EvaluacionRecto } from "./evaluadorRecto.ts";
+import { CAMPOS_RECTO, desvioRecto, toleranciaRecto, type CampoRecto, type EvaluacionRecto } from "./evaluadorRecto.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
-import { MITAD_SEG } from "./rectoNivelado.ts";
+import { tolRecto } from "./nivel.ts";
 import { ANULADO, avisoDe, CORRECCION, CORTO, luz, NOMBRE, type Aviso, type Luz } from "./voz.ts";
 
 // Qué dice el instructor en recto y nivelado. Puro, como voz.ts.
@@ -13,7 +13,7 @@ export function pasoRecto(ev: EvaluacionRecto | null, m: Muestra | null): PasoRe
   if (ev.fase === "terminado" || ev.fase === "invalido") return ev.fase;
   if (ev.fase === "armado" || !ev.objetivo) return "estabiliza";
   const t = (m ?? ev.previo ?? ev.objetivo).t;
-  return t - ev.objetivo.t >= MITAD_SEG ? "mitad" : "manten";
+  return t - ev.objetivo.t >= tolRecto(ev.nivel).duracionSeg / 2 ? "mitad" : "manten";
 }
 
 const rumbo3 = (r: number) => String(Math.round(r) % 360 || 360).padStart(3, "0");
@@ -60,7 +60,7 @@ function desviaciones(ev: EvaluacionRecto | null, m: Muestra | null): Record<Cam
 
 export function semaforoRecto(ev: EvaluacionRecto | null, m: Muestra | null): Record<CampoRecto, Luz> {
   const d = desviaciones(ev, m);
-  return Object.fromEntries(CAMPOS_RECTO.map((c) => [c, luz(d[c], TOLERANCIA_RECTO[c])])) as Record<CampoRecto, Luz>;
+  return Object.fromEntries(CAMPOS_RECTO.map((c) => [c, luz(d[c], toleranciaRecto(ev?.nivel)[c])])) as Record<CampoRecto, Luz>;
 }
 
 const RUMBO: Record<Idioma, { corto: string; nombre: string; correccion: { mas: string; menos: string } }> = {
@@ -83,5 +83,5 @@ export function avisoRecto(ev: EvaluacionRecto | null, m: Muestra | null, modo: 
     correccion: { ...CORRECCION[idioma], rumbo: r.correccion },
     nombre: { ...NOMBRE[idioma], rumbo: r.nombre },
   };
-  return avisoDe(desviaciones(ev, m), TOLERANCIA_RECTO, CAMPOS_RECTO, textos, modo, idioma);
+  return avisoDe(desviaciones(ev, m), toleranciaRecto(ev?.nivel), CAMPOS_RECTO, textos, modo, idioma);
 }

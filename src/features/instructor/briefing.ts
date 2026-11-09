@@ -6,15 +6,16 @@ import type { Idioma } from "./idiomaInstructor.ts";
 import { lineasPreguntas, type Respondida } from "./preguntas.ts";
 import type { IntentoSesion } from "./sesion.ts";
 import type { PasoVoz } from "./voz.ts";
-import { ALTURA_SEGURA_AGL, INCLINACION_ENTRADA, INCLINACION_OBJETIVO, LIMPIEZA, TOLERANCIAS } from "./virajeEscarpado.ts";
+import { ALTURA_SEGURA_AGL, INCLINACION_ENTRADA, INCLINACION_OBJETIVO, LIMPIEZA } from "./virajeEscarpado.ts";
+import { tolViraje, type Nivel } from "./nivel.ts";
 
 // Lo que el instructor explica antes, durante y después de la sesión.
 
 const ALTURA = `${ALTURA_SEGURA_AGL.toLocaleString("en-US")} ft`;
-const TOL = TOLERANCIAS;
 const I = INCLINACION_OBJETIVO;
 
-export function briefing(idioma: Idioma = "es"): string[] {
+export function briefing(idioma: Idioma = "es", nivel: Nivel = 3): string[] {
+  const TOL = tolViraje(nivel);
   if (idioma === "en") {
     return [
       "Today, in this hour, you'll practice the steep turn in the Cessna 172, just like on a checkride.",

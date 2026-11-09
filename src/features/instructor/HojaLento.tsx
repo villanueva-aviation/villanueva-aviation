@@ -1,10 +1,11 @@
 import type { ResultadoLento } from "./evaluadorLento.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
 import { ALTURA_SEGURA_AGL } from "./virajeEscarpado.ts";
-import { INCLINACION_VIRAJE, OBJETIVO_KT, TOLERANCIAS_LENTO as TOL } from "./vueloLento.ts";
+import { INCLINACION_VIRAJE, OBJETIVO_KT } from "./vueloLento.ts";
+import { tolLento, type Nivel } from "./nivel.ts";
 
 // Sirve para el resultado en vivo y para el guardado (sin muestras).
-type R = Pick<ResultadoLento, "aprobado" | "peor" | "fuera" | "objetivo" | "perdidas" | "bajo" | "salio" | "flaps">;
+type R = Pick<ResultadoLento, "aprobado" | "peor" | "fuera" | "objetivo" | "perdidas" | "bajo" | "salio" | "flaps"> & { nivel?: Nivel };
 
 const signo = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(Math.round(v))}`;
 const rumbo3 = (r: number) => String(Math.round(r) % 360 || 360).padStart(3, "0");
@@ -12,7 +13,8 @@ const ALTURA = ALTURA_SEGURA_AGL.toLocaleString("en-US");
 
 type Fila = { clave: string; nombre: Record<Idioma, string>; bien: (r: R) => boolean; valor: (r: R, idioma: Idioma) => string };
 
-const FILAS: Fila[] = [
+/** Las filas con las tolerancias del nivel con que se voló. */
+const filas = (TOL: ReturnType<typeof tolLento>): Fila[] => [
   { clave: "altitud", nombre: { es: `Altitud ±${TOL.altitudFt} ft`, en: `Altitude ±${TOL.altitudFt} ft` }, bien: (r) => !r.fuera.altitud.length, valor: (r) => `${signo(r.peor.altitud)} ft` },
   {
     clave: "rumbo",
@@ -72,6 +74,8 @@ const T = {
 export function HojaLento({ resultado, idioma = "es" }: { resultado: R; idioma?: Idioma }) {
   const t = T[idioma];
   const o = resultado.objetivo;
+  const TOL = tolLento(resultado.nivel);
+  const FILAS = filas(TOL);
   const malos = FILAS.filter((f) => !f.bien(resultado)).length;
   const resumen =
     idioma === "en"

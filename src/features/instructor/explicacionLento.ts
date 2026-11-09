@@ -2,13 +2,15 @@ import { CAMPOS_LENTO, desvioLento, type CampoLento, type ResultadoLento } from 
 import { reducir, type Linea } from "./explicacion.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
 import { ALTURA_SEGURA_AGL } from "./virajeEscarpado.ts";
-import { GIRO_GRADOS, INCLINACION_VIRAJE, OBJETIVO_KT, RECTO_SEG, TOLERANCIAS_LENTO as TOL } from "./vueloLento.ts";
+import { GIRO_GRADOS, INCLINACION_VIRAJE, OBJETIVO_KT, RECTO_SEG } from "./vueloLento.ts";
+import { tolLento, type Nivel } from "./nivel.ts";
 import type { PasoLento } from "./vozLento.ts";
 
 const ALTURA = ALTURA_SEGURA_AGL.toLocaleString("en-US");
-const MAX_KT = OBJETIVO_KT + TOL.velocidadMasKt;
 
-export function briefingLento(idioma: Idioma): string[] {
+export function briefingLento(idioma: Idioma, nivel: Nivel = 3): string[] {
+  const TOL = tolLento(nivel);
+  const MAX_KT = OBJETIVO_KT + TOL.velocidadMasKt;
   if (idioma === "en") {
     return [
       "Today you'll practice slow flight in the Cessna 172: full control just above the stall, like on short final.",
@@ -54,8 +56,8 @@ export function queHacerLento(paso: PasoLento | null, idioma: Idioma): string {
       return en ? `Climb first: the maneuver is flown at ${ALTURA} ft above the ground or higher.` : `Sube primero: la maniobra se vuela a ${ALTURA} ft sobre el terreno o más.`;
     case "reduce":
       return en
-        ? `Raise the nose little by little as you slow down; the instructor starts once you are steady between ${OBJETIVO_KT} and ${MAX_KT} kt.`
-        : `Sube la nariz poco a poco mientras bajas la velocidad; el instructor empieza cuando quedes estable entre ${OBJETIVO_KT} y ${MAX_KT} kt.`;
+        ? `Raise the nose little by little as you slow down; the instructor starts once you are steady at ${OBJETIVO_KT} kt or a little above.`
+        : `Sube la nariz poco a poco mientras bajas la velocidad; el instructor empieza cuando quedes estable en ${OBJETIVO_KT} kt o un poco más.`;
     case "recto":
       return en ? "Nose for airspeed, power for altitude, and trim." : "Nariz para la velocidad, potencia para la altitud, y compensa.";
     case "vira1":

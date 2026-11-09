@@ -20,6 +20,16 @@ const hasta = (ms: Muestra[], parar: (ev: EvaluacionLento, m: Muestra) => boolea
 };
 const enFase = (f: EvaluacionLento["fase"], ms = simularLento()) => hasta(ms, (ev) => ev.fase === f);
 
+test("Fácil: a 70 kt está en la banda 55–75 y aprueba; en Difícil ni siquiera entra", () => {
+  const ms = simularLento({ velocidadKt: 70 });
+  const correr = (nivel: 1 | 3) => ms.slice(1).reduce(avanzarLento, armarLento(ms[0], nivel));
+  const facil = correr(1);
+  assert.equal(facil.fase, "terminado");
+  assert.equal(facil.resultado!.aprobado, true);
+  assert.equal(facil.resultado!.nivel, 1);
+  assert.equal(correr(3).fase, "armado");
+});
+
 const limpio = hasta(simularLento()).ev.resultado!;
 const conPerdida = hasta(simularLento({ perdidaEn: 30 })).ev.resultado!;
 const sinSalida = hasta(simularLento({ sinSalida: true })).ev.resultado!;

@@ -1,4 +1,5 @@
 import { virajeEstablecido, type Campo, type Resultado } from "./evaluador.ts";
+import { tolViraje } from "./nivel.ts";
 import { serie } from "./explicacion.ts";
 import type { CodigoAcs } from "./virajeEscarpado.ts";
 
@@ -98,14 +99,15 @@ export function resumenProgreso(intentos: IntentoManiobra[]): {
 /** Series de cada lado, desde su entrada hasta la entrada del siguiente (o el final). */
 export function paraGuardar(r: Resultado): ResultadoGuardado {
   const { muestras, ...resto } = r;
+  const giroMin = tolViraje(r.nivel).giroMin;
   const series = r.lados.map((l, k) => {
     const fin = r.lados[k + 1]?.entrada.t ?? Infinity;
     const tramo = muestras.filter((m) => m.t >= l.entrada.t && m.t < fin);
     return {
       altitud: serie(tramo, "altitud", l.entrada.altitud),
       velocidad: serie(tramo, "velocidad", l.entrada.velocidad),
-      inclinacion: serie(virajeEstablecido(tramo), "inclinacion", 0),
-      bola: serie(virajeEstablecido(tramo), "bola", 0),
+      inclinacion: serie(virajeEstablecido(tramo, giroMin), "inclinacion", 0),
+      bola: serie(virajeEstablecido(tramo, giroMin), "bola", 0),
     };
   });
   return { ...resto, series };

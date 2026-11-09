@@ -1,8 +1,9 @@
 import type { Muestra } from "./evaluador.ts";
-import { CAMPOS_LENTO, desvioLento, TOLERANCIA_LENTO, type CampoLento, type EvaluacionLento } from "./evaluadorLento.ts";
+import { CAMPOS_LENTO, desvioLento, toleranciaLento, type CampoLento, type EvaluacionLento } from "./evaluadorLento.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import { ALTURA_SEGURA_AGL } from "./virajeEscarpado.ts";
-import { GIRO_GRADOS, INCLINACION_VIRAJE, OBJETIVO_KT, RECTO_SEG, TOLERANCIAS_LENTO } from "./vueloLento.ts";
+import { GIRO_GRADOS, INCLINACION_VIRAJE, OBJETIVO_KT, RECTO_SEG } from "./vueloLento.ts";
+import { tolLento } from "./nivel.ts";
 import { ANULADO, avisoDe, CORRECCION, CORTO, luz, NOMBRE, type Aviso, type Luz } from "./voz.ts";
 
 // Qué dice el instructor en vuelo lento. Puro, como voz.ts.
@@ -20,7 +21,6 @@ export function pasoLento(ev: EvaluacionLento | null, m: Muestra | null): PasoLe
 
 const rumbo3 = (r: number) => String(Math.round(r) % 360 || 360).padStart(3, "0");
 const ALTURA = ALTURA_SEGURA_AGL.toLocaleString("en-US");
-const MAX_KT = OBJETIVO_KT + TOLERANCIAS_LENTO.velocidadMasKt;
 
 function texto(paso: PasoLento, ev: EvaluacionLento | null, idioma: Idioma): string {
   const en = idioma === "en";
@@ -35,6 +35,7 @@ function texto(paso: PasoLento, ev: EvaluacionLento | null, idioma: Idioma): str
     case "recto": {
       if (!o) return "";
       const alt = (Math.round(o.altitud / 10) * 10).toLocaleString("en-US");
+      const MAX_KT = OBJETIVO_KT + tolLento(ev?.nivel).velocidadMasKt;
       return en
         ? `Hold ${alt} feet, heading ${rumbo3(o.rumbo)} and ${OBJETIVO_KT} to ${MAX_KT} knots, straight and level, for about ${RECTO_SEG} seconds.`
         : `Mantén ${alt} pies, rumbo ${rumbo3(o.rumbo)} y de ${OBJETIVO_KT} a ${MAX_KT} nudos, recto y nivelado, unos ${RECTO_SEG} segundos.`;
@@ -75,7 +76,7 @@ function desviaciones(ev: EvaluacionLento | null, m: Muestra | null): Record<Cam
   const nada = { altitud: null, rumbo: null, velocidad: null, inclinacion: null, bola: null };
   const o = ev?.objetivo;
   if (!ev || !m || !o) return nada;
-  const d = (c: CampoLento) => desvioLento(m, o, c);
+  const d = (c: CampoLento) => desvioLento(m, o, c, ev.nivel);
   const giro = Math.abs(ev.giro);
   switch (ev.fase) {
     case "recto":
@@ -98,7 +99,7 @@ function desviaciones(ev: EvaluacionLento | null, m: Muestra | null): Record<Cam
 
 export function semaforoLento(ev: EvaluacionLento | null, m: Muestra | null): Record<CampoLento, Luz> {
   const d = desviaciones(ev, m);
-  return Object.fromEntries(CAMPOS_LENTO.map((c) => [c, luz(d[c], TOLERANCIA_LENTO[c])])) as Record<CampoLento, Luz>;
+  return Object.fromEntries(CAMPOS_LENTO.map((c) => [c, luz(d[c], toleranciaLento(ev?.nivel)[c])])) as Record<CampoLento, Luz>;
 }
 
 const PROPIOS: Record<Idioma, { corto: { rumbo: string }; nombre: { rumbo: string }; correccion: Pick<Record<CampoLento, { mas: string; menos: string }>, "rumbo" | "velocidad" | "inclinacion"> }> = {
@@ -136,5 +137,5 @@ export function avisoLento(ev: EvaluacionLento | null, m: Muestra | null, modo: 
     correccion: { ...CORRECCION[idioma], ...p.correccion },
     nombre: { ...NOMBRE[idioma], ...p.nombre },
   };
-  return avisoDe(desviaciones(ev, m), TOLERANCIA_LENTO, ORDEN_AVISOS, textos, modo, idioma);
+  return avisoDe(desviaciones(ev, m), toleranciaLento(ev?.nivel), ORDEN_AVISOS, textos, modo, idioma);
 }

@@ -1,4 +1,4 @@
-import { difRumbo, esC172, inicioEstablecido, TOLERANCIA, type Campo, type Evaluacion, type Muestra, type Resultado } from "./evaluador.ts";
+import { difRumbo, esC172, inicioEstablecido, toleranciaViraje, type Campo, type Evaluacion, type Muestra, type Resultado } from "./evaluador.ts";
 import { explicar, repetir } from "./explicacion.ts";
 import { traducirAviso, traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import {
@@ -8,6 +8,7 @@ import {
   LIMPIEZA,
   REPETIR_AVISO_SEG,
 } from "./virajeEscarpado.ts";
+import { tolViraje } from "./nivel.ts";
 
 // Qué dice el instructor y cuándo. Puro: la vista solo lo reproduce.
 
@@ -52,7 +53,7 @@ function desviaciones(ev: Evaluacion | null, m: Muestra | null): Record<CampoAvi
   // para no avisar mientras el cadete todavía está entrando a 45°. Si se queda abajo de 40°, ESPERA_BAJO_SEG desde la entrada.
   const todas = [...giro.muestras, m];
   const { k, llego } = inicioEstablecido(todas);
-  const ventana = k >= 0 && m.t - todas[k].t >= (llego ? ASENTAR_SEG : ESPERA_BAJO_SEG) && Math.abs(giro.girado) < 330;
+  const ventana = k >= 0 && m.t - todas[k].t >= (llego ? ASENTAR_SEG : ESPERA_BAJO_SEG) && Math.abs(giro.girado) < tolViraje(ev.nivel).giroMin;
   return {
     altitud: m.altitud - giro.ref.altitud,
     velocidad: m.velocidad - giro.ref.velocidad,
@@ -70,7 +71,8 @@ export function luz(d: number | null, tol: number): Luz {
 
 export function semaforo(ev: Evaluacion | null, m: Muestra | null): Record<CampoAviso, Luz> {
   const d = desviaciones(ev, m);
-  return { altitud: luz(d.altitud, TOLERANCIA.altitud), velocidad: luz(d.velocidad, TOLERANCIA.velocidad), inclinacion: luz(d.inclinacion, TOLERANCIA.inclinacion), bola: luz(d.bola, TOLERANCIA.bola) };
+  const tol = toleranciaViraje(ev?.nivel);
+  return { altitud: luz(d.altitud, tol.altitud), velocidad: luz(d.velocidad, tol.velocidad), inclinacion: luz(d.inclinacion, tol.inclinacion), bola: luz(d.bola, tol.bola) };
 }
 
 /** El primer campo en ámbar o rojo, en el orden de `campos`, con su texto según el modo. */
@@ -99,7 +101,7 @@ export function avisoDe<C extends string>(
 /** El aviso más importante ahora: altitud, velocidad, inclinación, bola. */
 export function avisoVoz(ev: Evaluacion | null, m: Muestra | null, modo: Modo, idioma: Idioma = "es"): Aviso | null {
   const textos = { corto: CORTO[idioma], correccion: CORRECCION[idioma], nombre: NOMBRE[idioma] };
-  return avisoDe(desviaciones(ev, m), TOLERANCIA, CAMPOS, textos, modo, idioma);
+  return avisoDe(desviaciones(ev, m), toleranciaViraje(ev?.nivel), CAMPOS, textos, modo, idioma);
 }
 
 export type MemoriaAviso = { clave: string | null; desde: number; libreDesde: number | null };
@@ -134,8 +136,10 @@ export function pasoVoz(ev: Evaluacion | null, m: Muestra | null): PasoVoz | nul
   if (ev.fase === "invalido" || ev.fase === "terminado") return ev.fase;
   if (ev.fase === "entre") return "entre";
   const girado = Math.abs(ev.interno.giro?.girado ?? 0);
-  if (ev.fase === "viraje1") return girado >= 300 ? "nivelar1" : "viraje1";
-  if (ev.fase === "viraje2") return girado >= 300 ? "nivelar2" : "viraje2";
+  // Pide nivelar 30° antes del giro mínimo del nivel.
+  const nivelar = tolViraje(ev.nivel).giroMin - 30;
+  if (ev.fase === "viraje1") return girado >= nivelar ? "nivelar1" : "viraje1";
+  if (ev.fase === "viraje2") return girado >= nivelar ? "nivelar2" : "viraje2";
   if (!m) return "limpieza";
   if (m.agl < ALTURA_SEGURA_AGL) return "bajo";
   return limpiezaHecha(ev, m) ? "despejado" : "limpieza";

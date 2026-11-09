@@ -20,7 +20,7 @@ export function ReporteExamen({
   def = MANIOBRAS["viraje-escarpado"],
   calificado = "checkride",
 }: {
-  resultado: Pick<ResultadoComun, "aprobado" | "calificacion" | "elementos">;
+  resultado: Pick<ResultadoComun, "aprobado" | "calificacion" | "elementos" | "nivel">;
   intento: IntentoManiobra | null;
   nombre: string;
   numero?: number;
@@ -30,7 +30,7 @@ export function ReporteExamen({
   calificado?: "checkride" | "intento";
 }) {
   const t = textosReporte(idioma, calificado);
-  const ns = def.elementosReporte.filter((e) => resultado.elementos[e.codigo] === "NS").map((e) => e.codigo);
+  const ns = def.elementosReporte(resultado.nivel).filter((e) => resultado.elementos[e.codigo] === "NS").map((e) => e.codigo);
   const gris = "text-[#6b6457]";
   return (
     <article className="reporte-examen mx-auto max-w-xl rounded-lg bg-[#f6f3ea] p-5 font-serif text-[13px] leading-snug text-[#1d1f22] sm:p-6">
@@ -63,7 +63,7 @@ export function ReporteExamen({
       <p className="mb-1 font-bold">{def.tarea[idioma]}</p>
       <table className="w-full border-collapse text-xs">
         <tbody>
-          {def.elementosReporte.map((e) => (
+          {def.elementosReporte(resultado.nivel).map((e) => (
             <tr key={e.codigo} className="border-b border-[#c9c1ae] last:border-0">
               <td className="py-1 pr-2 whitespace-nowrap">{e.codigo}</td>
               <td className="py-1 pr-2">{idioma === "en" ? e.textoEn : e.texto}</td>

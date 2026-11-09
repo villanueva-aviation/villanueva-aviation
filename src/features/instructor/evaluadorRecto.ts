@@ -1,6 +1,7 @@
 import { analizar, difRumbo, invalidez, type Muestra, type Tramo } from "./evaluador.ts";
-import { DURACION_SEG, ESTABLE, TOLERANCIAS_RECTO } from "./rectoNivelado.ts";
-import { BOLA_TOLERANCIA, INCLINACION_NIVELADO } from "./virajeEscarpado.ts";
+import { ESTABLE } from "./rectoNivelado.ts";
+import { INCLINACION_NIVELADO } from "./virajeEscarpado.ts";
+import { tolRecto, type Nivel } from "./nivel.ts";
 
 export type CampoRecto = "altitud" | "rumbo" | "velocidad" | "bola";
 export type CodigoRecto = "1" | "2" | "3" | "4"; // altitud, rumbo, velocidad, bola
@@ -17,6 +18,7 @@ export interface ResultadoRecto {
   ns: Record<CampoRecto, boolean>;
   avisos: string[];
   muestras: Muestra[]; // desde el objetivo hasta el final
+  nivel: Nivel;
 }
 
 export interface EvaluacionRecto {
@@ -27,15 +29,17 @@ export interface EvaluacionRecto {
   ventana: Muestra[]; // últimos ESTABLE.seg mientras espera
   objetivo: Muestra | null;
   tramo: Muestra[]; // desde el objetivo
+  /** Falta = Difícil. */
+  nivel?: Nivel;
 }
 
 export const CAMPOS_RECTO: CampoRecto[] = ["altitud", "rumbo", "velocidad", "bola"];
-export const TOLERANCIA_RECTO: Record<CampoRecto, number> = {
-  altitud: TOLERANCIAS_RECTO.altitudFt,
-  rumbo: TOLERANCIAS_RECTO.rumboGrados,
-  velocidad: TOLERANCIAS_RECTO.velocidadKt,
-  bola: BOLA_TOLERANCIA,
-};
+export function toleranciaRecto(n: Nivel = 3): Record<CampoRecto, number> {
+  const t = tolRecto(n);
+  return { altitud: t.altitudFt, rumbo: t.rumboGrados, velocidad: t.velocidadKt, bola: t.bola };
+}
+/** Las de Difícil. */
+export const TOLERANCIA_RECTO = toleranciaRecto(3);
 const CODIGO: Record<CampoRecto, CodigoRecto> = { altitud: "1", rumbo: "2", velocidad: "3", bola: "4" };
 
 /** Desviación de una muestra contra el objetivo; el rumbo en el círculo (358 → 004 es +6). */
@@ -58,8 +62,8 @@ function estable(v: Muestra[]): boolean {
   );
 }
 
-export function armarRecto(m: Muestra): EvaluacionRecto {
-  const vacia = { previo: m, ventana: [m], objetivo: null, tramo: [] };
+export function armarRecto(m: Muestra, nivel: Nivel = 3): EvaluacionRecto {
+  const vacia = { previo: m, ventana: [m], objetivo: null, tramo: [], nivel };
   if (m.enTierra) return { fase: "invalido", motivo: "Despega primero: la maniobra se arma en el aire.", ...vacia };
   return { fase: "armado", ...vacia };
 }
@@ -70,20 +74,21 @@ export function armarSoloRecto(ev: EvaluacionRecto | null, m: Muestra): boolean 
   return !m.enTierra && Math.abs(m.inclinacion) < INCLINACION_NIVELADO && invalidez(m, null) === null;
 }
 
-function resultado(objetivo: Muestra, tramo: Muestra[]): ResultadoRecto {
+function resultado(objetivo: Muestra, tramo: Muestra[], n: Nivel): ResultadoRecto {
+  const tol = toleranciaRecto(n);
   const peor = {} as Record<CampoRecto, number>;
   const fuera = {} as Record<CampoRecto, Tramo[]>;
   const ns = {} as Record<CampoRecto, boolean>;
   const elementos = {} as Record<CodigoRecto, "S" | "NS">;
   let puntos = 100;
   for (const c of CAMPOS_RECTO) {
-    const a = analizar(tramo.map((m) => ({ t: m.t, v: desvioRecto(m, objetivo, c) })), TOLERANCIA_RECTO[c]);
+    const a = analizar(tramo.map((m) => ({ t: m.t, v: desvioRecto(m, objetivo, c) })), tol[c], tolRecto(n).nsSeg);
     peor[c] = a.peor;
     fuera[c] = a.tramos;
     ns[c] = a.ns;
     elementos[CODIGO[c]] = a.ns ? "NS" : "S";
     const segundos = a.tramos.reduce((s, tr) => s + tr.fin - tr.inicio, 0);
-    puntos -= Math.min(25, 2 * segundos + 10 * Math.max(0, Math.abs(a.peor) / TOLERANCIA_RECTO[c] - 1));
+    puntos -= Math.min(25, 2 * segundos + 10 * Math.max(0, Math.abs(a.peor) / tol[c] - 1));
   }
   return {
     maniobra: "recto-nivelado",
@@ -96,6 +101,7 @@ function resultado(objetivo: Muestra, tramo: Muestra[]): ResultadoRecto {
     ns,
     avisos: [],
     muestras: tramo,
+    nivel: n,
   };
 }
 
@@ -114,6 +120,7 @@ export function avanzarRecto(ev: EvaluacionRecto, m: Muestra): EvaluacionRecto {
 
   const tramo = [...ev.tramo, m];
   const objetivo = ev.objetivo!;
-  if (m.t - objetivo.t < DURACION_SEG) return { ...ev, tramo, previo: m };
-  return { ...ev, fase: "terminado", tramo, previo: m, resultado: resultado(objetivo, tramo) };
+  const n = ev.nivel ?? 3;
+  if (m.t - objetivo.t < tolRecto(n).duracionSeg) return { ...ev, tramo, previo: m };
+  return { ...ev, fase: "terminado", tramo, previo: m, resultado: resultado(objetivo, tramo, n) };
 }

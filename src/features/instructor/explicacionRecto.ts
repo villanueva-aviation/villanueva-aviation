@@ -1,16 +1,18 @@
 import { CAMPOS_RECTO, desvioRecto, type CampoRecto, type ResultadoRecto } from "./evaluadorRecto.ts";
 import { reducir, type Linea } from "./explicacion.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
-import { DURACION_SEG, TOLERANCIAS_RECTO as TOL } from "./rectoNivelado.ts";
+import { tolRecto, type Nivel } from "./nivel.ts";
 import type { PasoRecto } from "./vozRecto.ts";
 
-export function briefingRecto(idioma: Idioma): string[] {
-  const min = DURACION_SEG / 60;
+export function briefingRecto(idioma: Idioma, nivel: Nivel = 3): string[] {
+  const TOL = tolRecto(nivel);
+  const seg = TOL.duracionSeg;
+  const dura = seg % 60 ? `${seg} ${idioma === "en" ? "seconds" : "segundos"}` : `${seg / 60} ${idioma === "en" ? (seg === 60 ? "minute" : "minutes") : seg === 60 ? "minuto" : "minutos"}`;
   if (idioma === "en") {
     return [
       "Today you'll practice straight-and-level flight in the Cessna 172: the foundation of every maneuver.",
       "Fly at any altitude and airspeed you like. Once the airplane is stable, the instructor takes your altitude, heading and airspeed.",
-      `For ${min} minutes hold altitude ±${TOL.altitudFt} ft, heading ±${TOL.rumboGrados}° and airspeed ±${TOL.velocidadKt} kt, with the ball centered.`,
+      `For ${dura} hold altitude ±${TOL.altitudFt} ft, heading ±${TOL.rumboGrados}° and airspeed ±${TOL.velocidadKt} kt, with the ball centered.`,
       "Set the attitude on the horizon, set the power and trim so you aren't holding the yoke.",
       "Look outside and scan the instruments in a cycle: attitude, altimeter, heading and airspeed.",
       "Practice first; whenever you want, move on to the graded attempt.",
@@ -20,7 +22,7 @@ export function briefingRecto(idioma: Idioma): string[] {
   return [
     "Hoy vas a practicar vuelo recto y nivelado en el Cessna 172: la base de todas las maniobras.",
     "Vuela a la altitud y velocidad que quieras. Cuando el avión esté estable, el instructor toma tu altitud, rumbo y velocidad.",
-    `Durante ${min} minutos mantén la altitud ±${TOL.altitudFt} ft, el rumbo ±${TOL.rumboGrados}° y la velocidad ±${TOL.velocidadKt} kt, con la bola centrada.`,
+    `Durante ${dura} mantén la altitud ±${TOL.altitudFt} ft, el rumbo ±${TOL.rumboGrados}° y la velocidad ±${TOL.velocidadKt} kt, con la bola centrada.`,
     "Fija la actitud con el horizonte, pon la potencia y compensa para no cargar el yugo.",
     "Mira afuera y revisa los instrumentos en ciclo: actitud, altímetro, rumbo y velocidad.",
     "Primero practicas; cuando quieras, pasas al intento calificado.",

@@ -1,6 +1,5 @@
 import {
   ALTURA_SEGURA_AGL,
-  BOLA_TOLERANCIA,
   HUECO_MAX_SEG,
   INCLINACION_ENTRADA,
   INCLINACION_ESTABLECIDA,
@@ -9,10 +8,10 @@ import {
   LIMPIEZA,
   NS_FACTOR,
   NS_SEGUNDOS,
-  TOLERANCIAS,
   vaPorPeso,
   type CodigoAcs,
 } from "./virajeEscarpado.ts";
+import { tolViraje, type Nivel } from "./nivel.ts";
 
 /** Una lectura del simulador, tal como la sirve el lector local. */
 export interface Muestra {
@@ -104,6 +103,8 @@ export interface Resultado {
   lados: ResultadoLado[];
   avisos: string[];
   muestras: Muestra[]; // desde 120 s antes de la entrada hasta el final
+  /** Con qué tolerancias se calificó. */
+  nivel: Nivel;
 }
 
 interface Giro {
@@ -131,14 +132,16 @@ export interface Evaluacion {
   motivo?: string;
   resultado?: Resultado;
   interno: Interno;
+  /** Falta = Difícil. */
+  nivel?: Nivel;
 }
 
-export const TOLERANCIA: Record<Campo, number> = {
-  altitud: TOLERANCIAS.altitudFt,
-  velocidad: TOLERANCIAS.velocidadKt,
-  inclinacion: TOLERANCIAS.inclinacionGrados,
-  bola: BOLA_TOLERANCIA,
-};
+export function toleranciaViraje(n: Nivel = 3): Record<Campo, number> {
+  const t = tolViraje(n);
+  return { altitud: t.altitudFt, velocidad: t.velocidadKt, inclinacion: t.inclinacionGrados, bola: t.bola };
+}
+/** Las de Difícil (ACS). */
+export const TOLERANCIA = toleranciaViraje(3);
 const CAMPOS: Campo[] = ["altitud", "velocidad", "inclinacion", "bola"];
 
 /** Diferencia de rumbos en el círculo, −180…180. */
@@ -166,10 +169,10 @@ export function crearEvaluacion(): Evaluacion {
   return { fase: "armado", interno: vacio() };
 }
 
-export function armar(_ev: Evaluacion, m: Muestra): Evaluacion {
-  if (m.enTierra) return { fase: "invalido", motivo: "Despega primero: la maniobra se arma en el aire.", interno: vacio() };
+export function armar(_ev: Evaluacion, m: Muestra, nivel: Nivel = 3): Evaluacion {
+  if (m.enTierra) return { fase: "invalido", motivo: "Despega primero: la maniobra se arma en el aire.", interno: vacio(), nivel };
   const nivelada = Math.abs(m.inclinacion) < INCLINACION_NIVELADO;
-  return { fase: "armado", interno: { ...vacio(), historial: [m], previo: m, ultimaNivelada: nivelada ? m : null } };
+  return { fase: "armado", interno: { ...vacio(), historial: [m], previo: m, ultimaNivelada: nivelada ? m : null }, nivel };
 }
 
 /** La página se arma sola sin intento o tras uno anulado, cuando el avión vuela nivelado y en condiciones de calificar. Nunca encima de un resultado. */
@@ -190,7 +193,7 @@ export function invalidez(m: Muestra, previo: Muestra | null): string | null {
   return null;
 }
 
-export function analizar(puntos: { t: number; v: number }[], tol: number) {
+export function analizar(puntos: { t: number; v: number }[], tol: number, nsSeg: number = NS_SEGUNDOS) {
   let peor = 0;
   const tramos: Tramo[] = [];
   let abierto: Tramo | null = null;
@@ -207,7 +210,7 @@ export function analizar(puntos: { t: number; v: number }[], tol: number) {
     }
   }
   if (abierto) abierto.fin = puntos[puntos.length - 1].t;
-  const ns = tramos.some((tr) => tr.fin - tr.inicio > NS_SEGUNDOS) || Math.abs(peor) > NS_FACTOR * tol;
+  const ns = tramos.some((tr) => tr.fin - tr.inicio > nsSeg) || Math.abs(peor) > NS_FACTOR * tol;
   return { peor, tramos, ns };
 }
 
@@ -218,16 +221,17 @@ export function inicioEstablecido(muestras: Muestra[]): { k: number; llego: bool
   return { k: muestras.findIndex((m) => Math.abs(m.inclinacion) > INCLINACION_ENTRADA), llego: false };
 }
 
-/** Inclinación y bola se califican desde que el viraje se establece hasta los 330°. `muestras` empieza en la entrada nivelada. */
-export function virajeEstablecido(muestras: Muestra[]): Muestra[] {
+/** Inclinación y bola se califican desde que el viraje se establece hasta el giro mínimo del nivel (330° en Difícil). `muestras` empieza en la entrada nivelada. */
+export function virajeEstablecido(muestras: Muestra[], giroMin = 330): Muestra[] {
   let g = 0;
   const vuelta = muestras.map((m, k) => (k === 0 ? 0 : Math.abs((g += difRumbo(m.rumbo, muestras[k - 1].rumbo)))));
   const inicio = inicioEstablecido(muestras).k;
-  return muestras.filter((_, k) => inicio >= 0 && k >= inicio && vuelta[k] < 330);
+  return muestras.filter((_, k) => inicio >= 0 && k >= inicio && vuelta[k] < giroMin);
 }
 
-function evaluarLado({ ref, muestras, girado }: Giro): ResultadoLado {
-  const establecido = virajeEstablecido(muestras);
+function evaluarLado({ ref, muestras, girado }: Giro, n: Nivel): ResultadoLado {
+  const tol = tolViraje(n);
+  const establecido = virajeEstablecido(muestras, tol.giroMin);
   const puntos: Record<Campo, { t: number; v: number }[]> = {
     altitud: muestras.map((m) => ({ t: m.t, v: m.altitud - ref.altitud })),
     velocidad: muestras.map((m) => ({ t: m.t, v: m.velocidad - ref.velocidad })),
@@ -238,13 +242,13 @@ function evaluarLado({ ref, muestras, girado }: Giro): ResultadoLado {
   const fuera = {} as Record<Campo, Tramo[]>;
   const ns = {} as Record<Campo | "rumbo", boolean>;
   for (const c of CAMPOS) {
-    const a = puntos[c].length ? analizar(puntos[c], TOLERANCIA[c]) : { peor: 0, tramos: [], ns: false };
+    const a = puntos[c].length ? analizar(puntos[c], toleranciaViraje(n)[c], tol.nsSeg) : { peor: 0, tramos: [], ns: false };
     peor[c] = a.peor;
     fuera[c] = a.tramos;
     ns[c] = a.ns;
   }
   const rumboSalida = difRumbo(muestras[muestras.length - 1].rumbo, ref.rumbo);
-  ns.rumbo = Math.abs(rumboSalida) > TOLERANCIAS.rumboSalidaGrados;
+  ns.rumbo = Math.abs(rumboSalida) > tol.rumboSalidaGrados;
   return {
     lado: girado < 0 ? "izquierda" : "derecha",
     entrada: { t: ref.t, altitud: ref.altitud, rumbo: ref.rumbo, velocidad: ref.velocidad, va: vaPorPeso(ref.peso) },
@@ -257,7 +261,8 @@ function evaluarLado({ ref, muestras, girado }: Giro): ResultadoLado {
 
 const segundosFuera = (tramos: Tramo[]) => tramos.reduce((s, tr) => s + tr.fin - tr.inicio, 0);
 
-function resultado(lados: ResultadoLado[], refs: Muestra[], historial: Muestra[]): Resultado {
+function resultado(lados: ResultadoLado[], refs: Muestra[], historial: Muestra[], n: Nivel): Resultado {
+  const tol = toleranciaViraje(n);
   const t0 = refs[0].t;
   const antes = historial.filter((m) => m.t >= t0 - LIMPIEZA.ventanaSeg && m.t <= t0);
   const limpieza = antes.reduce((s, m, k) => (k === 0 ? 0 : s + Math.abs(difRumbo(m.rumbo, antes[k - 1].rumbo))), 0);
@@ -271,9 +276,9 @@ function resultado(lados: ResultadoLado[], refs: Muestra[], historial: Muestra[]
   let puntos = 100;
   for (const l of lados) {
     for (const c of CAMPOS) {
-      puntos -= Math.min(10, 2 * segundosFuera(l.fuera[c]) + 5 * Math.max(0, Math.abs(l.peor[c]) / TOLERANCIA[c] - 1));
+      puntos -= Math.min(10, 2 * segundosFuera(l.fuera[c]) + 5 * Math.max(0, Math.abs(l.peor[c]) / tol[c] - 1));
     }
-    puntos -= Math.min(10, Math.max(0, Math.abs(l.rumboSalida) - TOLERANCIAS.rumboSalidaGrados));
+    puntos -= Math.min(10, Math.max(0, Math.abs(l.rumboSalida) - tolViraje(n).rumboSalidaGrados));
   }
   for (const c of ["PA.V.A.S1", "PA.V.A.S2", "PA.V.A.S4"] as const) if (elementos[c] === "NS") puntos -= 10;
   const avisos: string[] = [];
@@ -287,6 +292,7 @@ function resultado(lados: ResultadoLado[], refs: Muestra[], historial: Muestra[]
     lados,
     avisos,
     muestras: historial.filter((m) => m.t >= t0 - LIMPIEZA.ventanaSeg),
+    nivel: n,
   };
 }
 
@@ -295,8 +301,14 @@ export function avanzarLote(ev: Evaluacion, muestras: Muestra[]): Evaluacion {
   return muestras.reduce(avanzar, ev);
 }
 
-/** Pura: devuelve una evaluación nueva sin tocar la anterior (useReducer la puede llamar dos veces). */
+/** Pura: devuelve una evaluación nueva sin tocar la anterior (useReducer la puede llamar dos veces). Conserva el nivel. */
 export function avanzar(ev: Evaluacion, m: Muestra): Evaluacion {
+  const sig = paso(ev, m);
+  return sig === ev || sig.nivel === ev.nivel ? sig : { ...sig, nivel: ev.nivel };
+}
+
+function paso(ev: Evaluacion, m: Muestra): Evaluacion {
+  const n = ev.nivel ?? 3;
   if (ev.fase === "terminado" || ev.fase === "invalido") return ev;
   const i = ev.interno;
   // Repetida o vieja (los lotes del lector se enciman): ya se contó.
@@ -329,15 +341,15 @@ export function avanzar(ev: Evaluacion, m: Muestra): Evaluacion {
   if (banco >= INCLINACION_NIVELADO) return { ...ev, interno: { ...sig, giro } };
 
   const base: Interno = { ...sig, ...nivelado, giro: null };
-  // Niveló antes de los 330°: entrada abortada o viraje incompleto. Se repite sin calificar.
+  // Niveló antes del giro mínimo del nivel: entrada abortada o viraje incompleto. Se repite sin calificar.
   const descartado = (motivo: "corto" | "lado") => ({ ...base, descartado: { motivo, grados: Math.abs(giro.girado), rumbo: giro.ref.rumbo } });
-  if (Math.abs(giro.girado) < 330) return { fase: i.faseAntes, interno: descartado("corto") };
+  if (Math.abs(giro.girado) < tolViraje(n).giroMin) return { fase: i.faseAntes, interno: descartado("corto") };
 
-  const lado = evaluarLado(giro);
+  const lado = evaluarLado(giro, n);
   // El segundo viraje tiene que ser al lado contrario.
   if (i.lados.length === 1 && lado.lado === i.lados[0].lado) return { fase: "entre", interno: descartado("lado") };
   const lados = [...i.lados, lado];
   const refs = [...i.refs, giro.ref];
   if (lados.length < 2) return { fase: "entre", interno: { ...base, lados, refs } };
-  return { fase: "terminado", resultado: resultado(lados, refs, sig.historial), interno: { ...base, lados, refs } };
+  return { fase: "terminado", resultado: resultado(lados, refs, sig.historial, n), interno: { ...base, lados, refs } };
 }

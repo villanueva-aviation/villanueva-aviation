@@ -1,7 +1,8 @@
 import { analizar, difRumbo, invalidez, lectorViejo, type Lado, type Muestra, type Tramo } from "./evaluador.ts";
 import { ESTABLE } from "./rectoNivelado.ts";
-import { ALTURA_SEGURA_AGL, BOLA_TOLERANCIA, INCLINACION_NIVELADO } from "./virajeEscarpado.ts";
-import { ENTRADA_SEG, GIRO_GRADOS, INCLINACION_VIRAJE, OBJETIVO_KT, RECTO_SEG, SALIDA, TOLERANCIAS_LENTO, VIRAJE_MAX_SEG } from "./vueloLento.ts";
+import { ALTURA_SEGURA_AGL, INCLINACION_NIVELADO } from "./virajeEscarpado.ts";
+import { ENTRADA_SEG, GIRO_GRADOS, INCLINACION_VIRAJE, OBJETIVO_KT, RECTO_SEG, SALIDA, VIRAJE_MAX_SEG } from "./vueloLento.ts";
+import { tolLento, type Nivel } from "./nivel.ts";
 
 export type CampoLento = "altitud" | "rumbo" | "velocidad" | "inclinacion" | "bola";
 export type CodigoLento = "PA.VII.A.S2" | "PA.VII.A.S3" | "PA.VII.A.S4" | "PA.VII.A.S5";
@@ -25,6 +26,7 @@ export interface ResultadoLento {
   flaps: number; // palanca al tomar el objetivo
   avisos: string[];
   muestras: Muestra[]; // desde el objetivo hasta el final
+  nivel: Nivel;
 }
 
 /** Fase y giro de cada muestra calificada, en paralelo a `tramo`. */
@@ -42,44 +44,45 @@ export interface EvaluacionLento {
   primerLado: Lado | null;
   tramo: Muestra[];
   marcas: Marca[];
+  /** Falta = Difícil. */
+  nivel?: Nivel;
 }
 
 export const CAMPOS_LENTO: CampoLento[] = ["altitud", "rumbo", "velocidad", "inclinacion", "bola"];
-/** La velocidad se califica corrida al centro de la banda +10/−0: ±5. */
-export const TOLERANCIA_LENTO: Record<CampoLento, number> = {
-  altitud: TOLERANCIAS_LENTO.altitudFt,
-  rumbo: TOLERANCIAS_LENTO.rumboGrados,
-  velocidad: TOLERANCIAS_LENTO.velocidadMasKt / 2,
-  inclinacion: TOLERANCIAS_LENTO.inclinacionGrados,
-  bola: BOLA_TOLERANCIA,
-};
-const MITAD_BANDA = TOLERANCIAS_LENTO.velocidadMasKt / 2;
+/** La velocidad se califica corrida al centro de la banda +X/−0: ±X/2. */
+export function toleranciaLento(n: Nivel = 3): Record<CampoLento, number> {
+  const t = tolLento(n);
+  return { altitud: t.altitudFt, rumbo: t.rumboGrados, velocidad: t.velocidadMasKt / 2, inclinacion: t.inclinacionGrados, bola: t.bola };
+}
+/** Las de Difícil. */
+export const TOLERANCIA_LENTO = toleranciaLento(3);
+const mitadBanda = (n: Nivel = 3) => tolLento(n).velocidadMasKt / 2;
 const MOTIVO_VIEJO = "Tu lector es de una versión anterior: baja el nuevo de Descargas para el vuelo lento.";
 export const AVISO_SIN_SALIDA = "No saliste del vuelo lento con potencia.";
 export const AVISO_SIN_VIRAJES = "No completaste los dos virajes.";
 
-export function desvioLento(m: Muestra, o: Pick<Muestra, "altitud" | "rumbo">, c: CampoLento): number {
+export function desvioLento(m: Muestra, o: Pick<Muestra, "altitud" | "rumbo">, c: CampoLento, n: Nivel = 3): number {
   if (c === "rumbo") return difRumbo(m.rumbo, o.rumbo);
-  if (c === "velocidad") return m.velocidad - OBJETIVO_KT - MITAD_BANDA;
+  if (c === "velocidad") return m.velocidad - OBJETIVO_KT - mitadBanda(n);
   if (c === "inclinacion") return Math.abs(m.inclinacion) - INCLINACION_VIRAJE;
   if (c === "bola") return m.bola;
   return m.altitud - o.altitud;
 }
 
-const enBanda = (v: number) => v >= OBJETIVO_KT && v <= OBJETIVO_KT + TOLERANCIAS_LENTO.velocidadMasKt;
+const enBanda = (v: number, n: Nivel) => v >= OBJETIVO_KT && v <= OBJETIVO_KT + tolLento(n).velocidadMasKt;
 const rango = (v: number[]) => Math.max(...v) - Math.min(...v);
 
 /** En la banda, estable (no solo pasando por ella), alas niveladas, alto y sin aviso de pérdida. */
-function entrada(v: Muestra[]): boolean {
+function entrada(v: Muestra[], n: Nivel): boolean {
   if (v.length < 2 || v[v.length - 1].t - v[0].t < 0.9 * ENTRADA_SEG) return false;
   return (
-    v.every((m) => enBanda(m.velocidad) && Math.abs(m.inclinacion) < INCLINACION_NIVELADO && m.agl >= ALTURA_SEGURA_AGL && !m.perdida) &&
+    v.every((m) => enBanda(m.velocidad, n) && Math.abs(m.inclinacion) < INCLINACION_NIVELADO && m.agl >= ALTURA_SEGURA_AGL && !m.perdida) &&
     rango(v.map((m) => m.velocidad)) <= ESTABLE.velocidadKt
   );
 }
 
-export function armarLento(m: Muestra): EvaluacionLento {
-  const vacia = { previo: m, ventana: [m], objetivo: null, inicioFase: null, giro: 0, primerLado: null, tramo: [], marcas: [] };
+export function armarLento(m: Muestra, nivel: Nivel = 3): EvaluacionLento {
+  const vacia = { previo: m, ventana: [m], objetivo: null, inicioFase: null, giro: 0, primerLado: null, tramo: [], marcas: [], nivel };
   if (lectorViejo(m)) return { fase: "invalido", motivo: MOTIVO_VIEJO, ...vacia };
   if (m.enTierra) return { fase: "invalido", motivo: "Despega primero: la maniobra se arma en el aire.", ...vacia };
   const motivo = invalidez(m, null);
@@ -106,6 +109,8 @@ const cerro = (giro: number, m: Muestra) => Math.abs(giro) >= GIRO_GRADOS - 10 &
 function resultado(ev: EvaluacionLento, salio: boolean, virajes = true): ResultadoLento {
   const o = ev.objetivo!;
   const { tramo, marcas } = ev;
+  const n = ev.nivel ?? 3;
+  const tol = toleranciaLento(n);
   const cuenta: Record<CampoLento, (k: Marca) => boolean> = {
     altitud: () => true,
     rumbo: (k) => k.fase === "recto" || k.fase === "salida",
@@ -118,13 +123,13 @@ function resultado(ev: EvaluacionLento, salio: boolean, virajes = true): Resulta
   const ns = {} as Record<CampoLento, boolean>;
   let puntos = 100;
   for (const c of CAMPOS_LENTO) {
-    const pts = tramo.filter((_, i) => cuenta[c](marcas[i])).map((m) => ({ t: m.t, v: desvioLento(m, o, c) }));
-    const a = analizar(pts, TOLERANCIA_LENTO[c]);
-    peor[c] = c === "velocidad" ? a.peor + MITAD_BANDA : a.peor;
+    const pts = tramo.filter((_, i) => cuenta[c](marcas[i])).map((m) => ({ t: m.t, v: desvioLento(m, o, c, n) }));
+    const a = analizar(pts, tol[c], tolLento(n).nsSeg);
+    peor[c] = c === "velocidad" ? a.peor + mitadBanda(n) : a.peor;
     fuera[c] = a.tramos;
     ns[c] = a.ns;
     const segundos = a.tramos.reduce((s, tr) => s + tr.fin - tr.inicio, 0);
-    puntos -= Math.min(25, 2 * segundos + 10 * Math.max(0, Math.abs(a.peor) / TOLERANCIA_LENTO[c] - 1));
+    puntos -= Math.min(25, 2 * segundos + 10 * Math.max(0, Math.abs(a.peor) / tol[c] - 1));
   }
   const perdidas = tramo.filter((m, i) => m.perdida && !(i > 0 ? tramo[i - 1].perdida : false)).map((m) => m.t);
   const bajo = tramo.some((m) => m.agl < ALTURA_SEGURA_AGL);
@@ -152,6 +157,7 @@ function resultado(ev: EvaluacionLento, salio: boolean, virajes = true): Resulta
     flaps: o.flaps ?? 0,
     avisos: !virajes ? [AVISO_SIN_VIRAJES] : salio ? [] : [AVISO_SIN_SALIDA],
     muestras: tramo,
+    nivel: n,
   };
 }
 
@@ -165,7 +171,7 @@ export function avanzarLento(ev: EvaluacionLento, m: Muestra): EvaluacionLento {
 
   if (ev.fase === "armado") {
     const ventana = [...ev.ventana, m].filter((x) => x.t >= m.t - ENTRADA_SEG);
-    if (!entrada(ventana)) return { ...ev, ventana, previo: m };
+    if (!entrada(ventana, ev.nivel ?? 3)) return { ...ev, ventana, previo: m };
     return { ...ev, fase: "recto", ventana, objetivo: m, inicioFase: m, giro: 0, tramo: [m], marcas: [{ fase: "recto", giro: 0 }], previo: m };
   }
 

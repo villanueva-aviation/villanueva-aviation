@@ -4,6 +4,8 @@
  * Basado en el ACS de piloto privado FAA-S-ACS-6C, Área V, Tarea A.
  */
 
+import { tolViraje, type Nivel } from "./nivel.ts";
+
 export const TOLERANCIAS = { altitudFt: 100, velocidadKt: 10, inclinacionGrados: 5, rumboSalidaGrados: 10 } as const;
 export const INCLINACION_OBJETIVO = 45;
 /** Un viraje empieza cuando la inclinación pasa de aquí. */
@@ -51,13 +53,21 @@ export function vaPorPeso(pesoLb: number): number {
 
 export type CodigoAcs = "PA.V.A.S1" | "PA.V.A.S2" | "PA.V.A.S3" | "PA.V.A.S4" | "PA.V.A.S5";
 
-export const ELEMENTOS_ACS: { codigo: CodigoAcs; texto: string; textoEn: string }[] = [
+export const elementosAcs = (n: Nivel = 3): { codigo: CodigoAcs; texto: string; textoEn: string }[] => {
+  const t = tolViraje(n);
+  return [
   { codigo: "PA.V.A.S1", texto: "Despejar el área", textoEn: "Clear the area" },
   { codigo: "PA.V.A.S2", texto: "Velocidad de entrada ≤ Va", textoEn: "Entry airspeed ≤ Va" },
   { codigo: "PA.V.A.S3", texto: "360° coordinado a ~45°", textoEn: "Coordinated 360° at ~45°" },
   { codigo: "PA.V.A.S4", texto: "Repetir al lado contrario", textoEn: "Repeat in the opposite direction" },
-  { codigo: "PA.V.A.S5", texto: "Alt ±100 · Vel ±10 · Incl ±5 · Rumbo ±10", textoEn: "Alt ±100 · Spd ±10 · Bank ±5 · Hdg ±10" },
-];
+  {
+    codigo: "PA.V.A.S5",
+    texto: `Alt ±${t.altitudFt} · Vel ±${t.velocidadKt} · Incl ±${t.inclinacionGrados} · Rumbo ±${t.rumboSalidaGrados}`,
+    textoEn: `Alt ±${t.altitudFt} · Spd ±${t.velocidadKt} · Bank ±${t.inclinacionGrados} · Hdg ±${t.rumboSalidaGrados}`,
+  },
+  ];
+};
+export const ELEMENTOS_ACS = elementosAcs(3);
 
 export const MANIOBRAS: { id: "viraje-escarpado"; avion: "C172"; nombre: string; acceso: "gratis" | "exclusivo" }[] = [
   { id: "viraje-escarpado", avion: "C172", nombre: "Viraje escarpado", acceso: "gratis" },

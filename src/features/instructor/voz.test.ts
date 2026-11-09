@@ -160,6 +160,20 @@ test("a 32° sin llegar a 40°, avisa que falta inclinación a los 5 s, no antes
   assert.equal(semaforo(correr(muestras.slice(0, k + 1)), muestras[k]).inclinacion, "gris");
 });
 
+test("el semáforo usa la tolerancia del nivel: 150 ft abajo es rojo en Difícil y ámbar en Fácil", () => {
+  const { ev, m } = enViraje();
+  const bajo = { ...m, altitud: ev.interno.giro!.ref.altitud - 150 };
+  assert.equal(semaforo(ev, bajo).altitud, "rojo");
+  assert.equal(semaforo({ ...ev, nivel: 1 }, bajo).altitud, "ambar");
+});
+
+test("Fácil: pide nivelar desde los 270° (giro mínimo 300°)", () => {
+  const { ev, m } = enViraje();
+  const a = { ...ev, interno: { ...ev.interno, giro: { ...ev.interno.giro!, girado: -280 } } };
+  assert.equal(pasoVoz(a, m), "viraje1");
+  assert.equal(pasoVoz({ ...a, nivel: 1 }, m), "nivelar1");
+});
+
 test("paraVoz", () => {
   assert.equal(paraVoz("✗ Perdiste 130 ft, vas a 95 kt y 45°"), "Perdiste 130 pies, vas a 95 nudos y 45 grados");
 });

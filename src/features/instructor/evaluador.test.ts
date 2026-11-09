@@ -181,6 +181,23 @@ test("segundo viraje al mismo lado: se descarta con motivo lado", () => {
   assert.equal(ev.interno.descartado?.motivo, "lado");
 });
 
+const correrNivel = (muestras: Muestra[], nivel: 1 | 2 | 3): Evaluacion => muestras.reduce(avanzar, armar(crearEvaluacion(), muestras[0], nivel));
+
+test("Fácil: un 360° de 318° sí cuenta y el resultado dice su nivel", () => {
+  const ev = correrNivel(simularManiobra({ angulo: 318 }), 1);
+  assert.equal(ev.fase, "terminado");
+  assert.equal(ev.nivel, 1);
+  assert.equal(ev.resultado!.nivel, 1);
+  assert.equal(correrNivel(simularManiobra({ angulo: 318 }), 3).fase, "armado");
+});
+
+test("Fácil: perder 150 ft por 6 s no reprueba; en Difícil sí", () => {
+  const caida = { caidaAltitud: { lado: 0 as const, ft: 150, segundos: 6, enGrados: 90 } };
+  assert.equal(correrNivel(simularManiobra(caida), 1).resultado!.elementos["PA.V.A.S5"], "S");
+  assert.equal(correrNivel(simularManiobra(caida), 3).resultado!.elementos["PA.V.A.S5"], "NS");
+  assert.equal(correr(simularManiobra(caida)).resultado!.nivel, 3);
+});
+
 test("lectorViejoChecklist distingue v1.4 de v1.5", () => {
   const base = simularManiobra()[0];
   assert.equal(lectorViejoChecklist({ ...base, lat: 1 }), true);

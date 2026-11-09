@@ -74,7 +74,7 @@ export function HojasInstructor() {
               <span className="font-semibold">Pasos:</span> {d.pasos(null, "es").map((p) => p.nombre).join(" → ")}
             </p>
             <ul className="mt-2 grid gap-0.5 text-xs text-slate-600">
-              {d.elementosReporte.map((e) => (
+              {d.elementosReporte().map((e) => (
                 <li key={e.codigo}>☐ {e.texto}</li>
               ))}
             </ul>

@@ -49,7 +49,7 @@ test("recto completo por la definición", () => {
 
 test("las celdas en inglés no tienen español", () => {
   for (const d of Object.values(MANIOBRAS)) {
-    const textos = [...d.celdas.map((c) => c.nombre.en), d.titulo.en, d.tarea.en, ...d.elementosReporte.map((x) => x.textoEn)];
+    const textos = [...d.celdas.map((c) => c.nombre.en), d.titulo.en, d.tarea.en, ...d.elementosReporte().map((x) => x.textoEn)];
     for (const t of textos) assert.doesNotMatch(t, /[áéíóúñ¿¡]/, `${d.id}: ${t}`);
   }
 });
@@ -58,11 +58,11 @@ test("vuelo lento tiene su def con los códigos del ACS Área VII Tarea A", () =
   const d = defDe("vuelo-lento");
   assert.equal(d.id, "vuelo-lento");
   assert.equal(d.insignia, "maniobra-vuelo-lento-c172");
-  assert.deepEqual(d.elementosReporte.map((e) => e.codigo), ["PA.VII.A.S2", "PA.VII.A.S3", "PA.VII.A.S4", "PA.VII.A.S5"]);
+  assert.deepEqual(d.elementosReporte().map((e) => e.codigo), ["PA.VII.A.S2", "PA.VII.A.S3", "PA.VII.A.S4", "PA.VII.A.S5"]);
   assert.equal(d.tarea.es, "Área VII · Tarea A: Vuelo lento");
   assert.equal(d.tarea.en, "Area VII · Task A: Slow flight");
   assert.deepEqual(d.temas, ["vuelo-lento", "c172"]);
-  for (const e of d.elementosReporte) assert.doesNotMatch(e.textoEn, /[áéíóúñ¿¡]/, e.codigo);
+  for (const e of d.elementosReporte()) assert.doesNotMatch(e.textoEn, /[áéíóúñ¿¡]/, e.codigo);
 });
 
 test("la def de vuelo lento corre un intento simulado de punta a punta", () => {

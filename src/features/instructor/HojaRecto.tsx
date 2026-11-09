@@ -1,13 +1,14 @@
 import type { ResultadoRecto } from "./evaluadorRecto.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
-import { TOLERANCIAS_RECTO as TOL } from "./rectoNivelado.ts";
+import { tolRecto, type Nivel } from "./nivel.ts";
 
-type R = Pick<ResultadoRecto, "aprobado" | "peor" | "fuera" | "objetivo">;
+type R = Pick<ResultadoRecto, "aprobado" | "peor" | "fuera" | "objetivo"> & { nivel?: Nivel };
 
 const signo = (v: number) => `${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(Math.round(v))}`;
 const rumbo3 = (r: number) => String(Math.round(r) % 360 || 360).padStart(3, "0");
 
-const FILAS: { campo: keyof R["fuera"]; nombre: Record<Idioma, string>; valor: (r: R, idioma: Idioma) => string }[] = [
+/** Las filas con las tolerancias del nivel con que se voló. */
+const filas = (TOL: ReturnType<typeof tolRecto>): { campo: keyof R["fuera"]; nombre: Record<Idioma, string>; valor: (r: R, idioma: Idioma) => string }[] => [
   { campo: "altitud", nombre: { es: `Altitud ±${TOL.altitudFt} ft`, en: `Altitude ±${TOL.altitudFt} ft` }, valor: (r) => `${signo(r.peor.altitud)} ft` },
   { campo: "rumbo", nombre: { es: `Rumbo ±${TOL.rumboGrados}°`, en: `Heading ±${TOL.rumboGrados}°` }, valor: (r) => `${signo(r.peor.rumbo)}°` },
   {
@@ -31,6 +32,7 @@ const T = {
 export function HojaRecto({ resultado, idioma = "es" }: { resultado: R; idioma?: Idioma }) {
   const t = T[idioma];
   const o = resultado.objetivo;
+  const FILAS = filas(tolRecto(resultado.nivel));
   const malos = FILAS.filter((f) => resultado.fuera[f.campo].length > 0).length;
   const resumen =
     idioma === "en"

@@ -1,6 +1,6 @@
 // Vuelo lento (ACS Área VII Tarea A). Valores de partida: se afinan tras un vuelo real.
 
-export const TOLERANCIAS_LENTO = { altitudFt: 100, rumboGrados: 10, inclinacionGrados: 10, velocidadMasKt: 10 } as const;
+// Tolerancias por nivel: nivel.ts (tolLento).
 /** Velocidad objetivo con flaps completos; la banda es +10/−0. Sin flaps el aviso del C172 suena cerca de aquí. */
 export const OBJETIVO_KT = 55;
 /** La inclinación indicada en los virajes suaves. */

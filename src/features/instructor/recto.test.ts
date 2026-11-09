@@ -18,6 +18,30 @@ const hasta = (ms: Muestra[], t = Infinity): { ev: EvaluacionRecto; m: Muestra }
   return { ev, m };
 };
 
+test("Fácil: termina a los 60 s, pide la mitad a los 30 s y aprueba 150 ft arriba", () => {
+  const ms = simularRecto({ deriva: { campo: "altitud", valor: 150, desde: 10, segundos: 6 } });
+  const correr = (nivel: 1 | 3, t = Infinity) => {
+    let ev = armarRecto(ms[0], nivel);
+    let m = ms[0];
+    for (const x of ms.slice(1)) {
+      if (x.t > t) break;
+      ev = avanzarRecto(ev, x);
+      m = x;
+    }
+    return { ev, m };
+  };
+  const inicio = 5; // ESTABLE.seg
+  const facil = correr(1, inicio + 61);
+  assert.equal(facil.ev.fase, "terminado");
+  assert.equal(facil.ev.resultado!.aprobado, true);
+  assert.equal(facil.ev.resultado!.nivel, 1);
+  const mitad = correr(1, inicio + 31);
+  assert.equal(pasoRecto(mitad.ev, mitad.m), "mitad");
+  assert.equal(correr(3).ev.resultado!.aprobado, false);
+  const manteniendo = correr(1, inicio + 20);
+  assert.equal(semaforoRecto(manteniendo.ev, { ...manteniendo.m, altitud: manteniendo.ev.objetivo!.altitud + 150 }).altitud, "ambar");
+});
+
 test("los pasos siguen el tramo", () => {
   const ms = simularRecto();
   const p = (t: number) => {
