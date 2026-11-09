@@ -45,7 +45,9 @@ const DIFERENCIA_MAX = 50;
 
 const VENTANAS: Partial<Record<Revision, { antes: number; despues: number }>> = {
   "arranque-motor": { antes: 0, despues: 30 },
-  magnetos: { antes: 15, despues: 30 },
+  // La prueba de motor se suele hacer completa y leer después (Erik, prueba en vivo 2026-11-08).
+  magnetos: { antes: 60, despues: 30 },
+  "rpm-prueba": { antes: 30, despues: 10 },
   // Volando, la velocidad tarda en quedar en el rango (Erik, prueba en vivo 2026-11-06).
   "vel-ascenso": { antes: 0, despues: 45 },
   "vel-aproximacion": { antes: 0, despues: 45 },

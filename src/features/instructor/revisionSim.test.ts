@@ -72,7 +72,8 @@ test("ES_V15 tiene 10 revisiones", () => {
 
 test("ventana del arranque es 30 s", () => {
   assert.deepEqual(ventana("arranque-motor"), { antes: 0, despues: 30 });
-  assert.deepEqual(ventana("magnetos"), { antes: 15, despues: 30 });
+  assert.deepEqual(ventana("magnetos"), { antes: 60, despues: 30 });
+  assert.deepEqual(ventana("rpm-prueba"), { antes: 30, despues: 10 });
   assert.deepEqual(ventana("freno"), { antes: 0, despues: 10 });
 });
 

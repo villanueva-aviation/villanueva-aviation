@@ -100,6 +100,20 @@ test("freno dicho y no puesto a los 10 s queda no hecho", () => {
   assert.equal(cl.puntos["antes-arrancar"][3].estado, "no-hecho");
 });
 
+test("prueba de motor hecha antes de leer acelerador y magnetos: cuentan como hechos", () => {
+  // Erik, 2026-11-08: hizo la prueba completa y después leyó los puntos, ya en ralentí.
+  const prueba = ["checklist prueba de motor", "freno", "puertas", "controles", "instrumentos", "respaldo", "altimetro", "cantidad", "selector", "mezcla"];
+  let cl = decir(nuevo(), prueba, 0);
+  const run = (t: number): Partial<Muestra> =>
+    t < 10 ? { rpm: 800 } : t < 20 ? { rpm: 1800 } : t < 25 ? { rpm: 1730, magDer: false } : t < 30 ? { rpm: 1800 } : t < 35 ? { rpm: 1720, magIzq: false } : t < 40 ? { rpm: 1800 } : { rpm: 800 };
+  for (let t = 1; t <= 69; t++) cl = avanzarChecklist(cl, con({ t, magIzq: true, magDer: true, ...run(t) }), ctx);
+  cl = decir(cl, ["acelerador 1800"], 60);
+  cl = decir(cl, ["magnetos"], 70);
+  for (let t = 70; t <= 101; t++) cl = avanzarChecklist(cl, con({ t, rpm: 800, magIzq: true, magDer: true }), ctx);
+  assert.equal(cl.puntos["prueba-motor"][9].estado, "hecho", "acelerador");
+  assert.equal(cl.puntos["prueba-motor"][10].estado, "hecho", "magnetos");
+});
+
 test("sin datos v1.5 el punto queda dicho", () => {
   const { avionica: _, ...viejo } = con({ t: 1 });
   let cl = decir(abrirAA(), ["asientos", "freno", "breakers", "equipo electrico", "avionica master apagado"]);

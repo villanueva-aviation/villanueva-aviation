@@ -20,7 +20,7 @@ export interface Checklist {
 /** El tipo de pieza del aviso de sección: un «aviso» de la cola sin clave vigente se descarta y no sonaría. */
 export const PIEZA_AVISO: TipoPieza = "orden";
 export const ADELANTE = 3; // puntos que se buscan desde el siguiente
-export const BUFFER_SEG = 60;
+export const BUFFER_SEG = 90; // ≥ la ventana más larga hacia atrás (magnetos, 60 s) más un margen
 
 const COMANDO = ["checklist", "check list"];
 const COMPLETO = ["completo", "completa", "terminado"];
