@@ -112,7 +112,7 @@ export function InstructorVirajeEscarpado() {
       <PageHero
         eyebrow="Gratis · Con tu cuenta · C172"
         title="Instructor virtual: viraje escarpado"
-        description="Vuela dos virajes de 360° a 45° en tu simulador y el instructor te califica con las tolerancias de un checkride: altitud ±100 ft, velocidad ±10 kt, inclinación ±5° y rumbo de salida ±10°."
+        description="Vuela dos virajes de 360° a 45° en tu simulador y el instructor te califica. En Difícil, con las tolerancias de un checkride: altitud ±100 ft, velocidad ±10 kt, inclinación ±5° y rumbo de salida ±10°. En Fácil y Medio, más amplias para que practiques."
       />
       <Container className="space-y-8 py-12">
         <section className="grid gap-4 md:grid-cols-3">
