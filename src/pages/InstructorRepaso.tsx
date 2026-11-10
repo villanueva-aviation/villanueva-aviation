@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { AVIONES_VOZ } from "../data/checklistVozAviones";
 import type { SeccionId } from "../data/checklistVozC172";
@@ -9,10 +9,10 @@ import { debriefingRepaso, esperaApagado, paraGuardarRepaso } from "../features/
 import type { Muestra } from "../features/instructor/evaluador";
 import { textosReporte, type Idioma } from "../features/instructor/idiomaInstructor";
 import { guardarIntento } from "../features/instructor/intentos";
-import { estadoLeccion, LECCIONES, REPASO } from "../features/instructor/lecciones";
+import { claveLeccion, estadoLeccion, leccionDe } from "../features/instructor/lecciones";
 import { lecturaFinalDe, MANIOBRAS } from "../features/instructor/maniobras";
 import {
-  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, maniobraActual, nombreManiobra, siguienteManiobra, sortear,
+  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, maniobraActual, maniobrasDe, nombreManiobra, siguienteManiobra,
   type EstadoRepaso, type EtapaRepaso,
 } from "../features/instructor/repaso";
 import type { IntentoSesion, Modo } from "../features/instructor/sesion";
@@ -33,12 +33,14 @@ const SECCIONES = AVIONES_VOZ.c172.secciones;
 
 const T = {
   es: {
-    titulo: "Repaso general · C172",
-    briefing: [
+    titulo: (l: string) => `${l} · C172`,
+    briefing: (m: string | null) => [
       "Vuelo completo en el C172, de la plataforma a la plataforma.",
       "Lee el checklist en voz alta, en español: el instructor revisa lo que se puede leer del simulador.",
       "Despega y ve a la zona de trabajo a 1,500 pies sobre el terreno o más.",
-      "En la zona vuelas 4 maniobras sorteadas. Entre una y otra, recto y nivelado.",
+      m
+        ? `En la zona vuelas ${m.toLowerCase()} 5 veces: la primera para practicar y 4 más. Entre una y otra, recto y nivelado en otro rumbo.`
+        : "En la zona vuelas 4 maniobras sorteadas. Entre una y otra, recto y nivelado.",
       "Regresa, aterriza y apaga en la plataforma. Al final escuchas el debriefing por fases.",
     ],
     modo: { practica: "Práctica", checkride: "Checkride" },
@@ -68,15 +70,17 @@ const T = {
     salir: "Salir de la lección (no se guarda)",
     esperaApagado: "Termina el checklist de apagado. El debriefing empieza al cerrar la sección o en un minuto.",
     terminar: "Terminar y ver el debriefing",
-    candado: "El repaso general todavía no está abierto. Muy pronto.",
+    candado: "Esta lección todavía no está abierta. Muy pronto.",
   },
   en: {
-    titulo: "General review · C172",
-    briefing: [
+    titulo: (l: string) => `${l} · C172`,
+    briefing: (m: string | null) => [
       "A full flight in the C172, from ramp to ramp.",
       "Read the checklist aloud, in Spanish: the instructor checks what the simulator can report.",
       "Take off and head to the practice area at 1,500 feet above the ground or higher.",
-      "In the area you fly 4 drawn maneuvers. Between them, straight and level.",
+      m
+        ? `In the area you fly ${m.toLowerCase()} 5 times: the first one to practice and 4 more. Between them, straight and level on a new heading.`
+        : "In the area you fly 4 drawn maneuvers. Between them, straight and level.",
       "Come back, land and shut down on the ramp. At the end you hear the debriefing by phase.",
     ],
     modo: { practica: "Practice", checkride: "Checkride" },
@@ -106,7 +110,7 @@ const T = {
     salir: "Leave the lesson (not saved)",
     esperaApagado: "Finish the shutdown checklist. The debriefing starts when you close the section or in one minute.",
     terminar: "Finish and see the debriefing",
-    candado: "The general review is not open yet. Coming soon.",
+    candado: "This lesson is not open yet. Coming soon.",
   },
 };
 
@@ -123,8 +127,9 @@ function leerIdioma(): Idioma {
   }
 }
 
-/** Lección 13: vuelo completo con checklist por voz, 4 maniobras sorteadas y debriefing por fases. */
+/** Una lección del programa: vuelo completo con checklist por voz, sus maniobras (o el sorteo del repaso) y debriefing por fases. */
 export function InstructorRepaso() {
+  const leccion = leccionDe(useParams().numero);
   const { user } = useAuth();
   const { hasAccess } = usePremiumAccess();
   const [idioma] = useState<Idioma>(leerIdioma);
@@ -252,16 +257,16 @@ export function InstructorRepaso() {
   const deb = repaso && terminado && listo ? debriefingRepaso(repaso, cl, idioma) : null;
   const guardarLeccion = useCallback(async () => {
     const e = repasoRef.current;
-    if (!e) return;
+    if (!e || !leccion) return;
     setGuardado({ estado: "guardando" });
     const g = paraGuardarRepaso(e, clRef.current);
     const res = await guardarIntento({
-      maniobra: "repaso-general", avion: "C172", modo: e.modo,
+      maniobra: claveLeccion(leccion), avion: "C172", modo: e.modo,
       resultado: { aprobado: g.aprobado, calificacion: g.calificacion, elementos: g.elementos, avisos: [], muestras: [] },
       detalle: g.detalle, sesionId,
     });
     setGuardado(res.error ? { estado: "error", error: res.error } : { estado: "listo" });
-  }, [sesionId]);
+  }, [sesionId, leccion]);
   const leido = useRef(false);
   useEffect(() => {
     if (!terminado || !deb || leido.current) return;
@@ -281,7 +286,7 @@ export function InstructorRepaso() {
     setGuardado({ estado: "no" });
     setFinEn(null);
     setListo(false);
-    poner(crearRepaso(modo, sortear(Object.keys(MANIOBRAS) as (keyof typeof MANIOBRAS)[]), nivel));
+    if (leccion) poner(crearRepaso(modo, maniobrasDe(leccion), nivel));
   };
   const nueva = () => {
     reiniciar();
@@ -298,8 +303,8 @@ export function InstructorRepaso() {
     reiniciar();
   };
 
-  const acceso = estadoLeccion(LECCIONES[REPASO - 1], { fundador: user?.email === FOUNDER_EMAIL, exclusivo: hasAccess });
-  if (acceso !== "abierta") {
+  const acceso = leccion ? estadoLeccion(leccion, { fundador: user?.email === FOUNDER_EMAIL, exclusivo: hasAccess }) : "proximamente";
+  if (!leccion || acceso !== "abierta") {
     return (
       <div className="mx-auto max-w-xl space-y-4 px-4 py-8 text-white">
         <p>{t.candado}</p>
@@ -310,7 +315,7 @@ export function InstructorRepaso() {
 
   const cabecera = (
     <header className="flex items-baseline justify-between gap-3">
-      <h1 className="font-display text-base font-bold text-white">{t.titulo}</h1>
+      <h1 className="font-display text-base font-bold text-white">{t.titulo(leccion.nombre[idioma])}</h1>
       <span className={`text-xs ${COLOR_ESTADO[estado]}`}>{t.estado[estado]}</span>
     </header>
   );
@@ -330,7 +335,7 @@ export function InstructorRepaso() {
         </div>
         <SelectorNivel nivel={nivel} cambiar={cambiarNivel} checkride={modo === "checkride"} idioma={idioma} />
         <ol className="list-decimal space-y-2 rounded-xl border border-white/10 bg-navy-950/60 p-5 pl-9 text-sm leading-relaxed text-white/85">
-          {t.briefing.map((l) => <li key={l}>{l}</li>)}
+          {t.briefing(leccion.maniobra ? nombreManiobra(leccion.maniobra, idioma) : null).map((l) => <li key={l}>{l}</li>)}
         </ol>
         {!escucha.supported && <p className="text-sm text-gold-300">{t.sinMicrofono}</p>}
         <Button className="w-full" onClick={empezar}>{t.empezar}</Button>

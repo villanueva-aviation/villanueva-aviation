@@ -9,6 +9,7 @@ import { crearTomas, medirTomas, type Tomas } from "./tomas.ts";
 import { ALTURA_SEGURA_AGL } from "./virajeEscarpado.ts";
 import { aNm } from "../home/navGeo.ts";
 import type { Nivel } from "./nivel.ts";
+import type { Leccion } from "./lecciones.ts";
 
 const RAD = Math.PI / 180;
 
@@ -26,6 +27,10 @@ export function sortear(disponibles: ManiobraId[], n = 4, azar = Math.random): M
   }
   return s.slice(0, n);
 }
+
+/** Lección de maniobra: la primera de práctica y 4 más (Erik). Repaso: 4 sorteadas. */
+export const maniobrasDe = (l: Leccion, azar = Math.random): ManiobraId[] =>
+  l.maniobra ? Array(5).fill(l.maniobra) : sortear(Object.keys(MANIOBRAS) as ManiobraId[], 4, azar);
 
 export interface Zona {
   nombre: Record<Idioma, string>;

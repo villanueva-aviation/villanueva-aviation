@@ -7,9 +7,18 @@ import type { Idioma } from "./idiomaInstructor.ts";
 import type { ResultadoComun } from "./maniobras.ts";
 import { simularVuelo } from "./simularVuelo.ts";
 import {
-  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, enZona, fueraDeZona, maniobraActual, nombreManiobra, siguienteManiobra, sortear, zonaRepaso,
+  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, enZona, fueraDeZona, maniobraActual, maniobrasDe, nombreManiobra, siguienteManiobra, sortear, zonaRepaso,
   type EstadoRepaso, type Zona,
 } from "./repaso.ts";
+import { LECCIONES, REPASO } from "./lecciones.ts";
+
+test("una lección de maniobra la vuela 5 veces; el repaso sortea 4", () => {
+  assert.deepEqual(maniobrasDe(LECCIONES[6]), Array(5).fill("vuelo-lento"));
+  assert.deepEqual(maniobrasDe(LECCIONES[1]), Array(5).fill("recto-nivelado"));
+  const s = maniobrasDe(LECCIONES[REPASO - 1]);
+  assert.equal(s.length, 4);
+  assert.equal(new Set(s).size, 3);
+});
 
 const BASE = simularVuelo()[0];
 const dist = (lat: number, lon: number) => Math.hypot(aNm(lat, lon, A.lat, A.lon).x, aNm(lat, lon, A.lat, A.lon).y);

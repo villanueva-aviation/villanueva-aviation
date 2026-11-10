@@ -71,6 +71,8 @@ export const ROUTES = {
   instructorVirajeEscarpado: "/instructor/viraje-escarpado",
   instructorPrograma: "/instructor/programa",
   instructorRepaso: "/instructor/repaso",
+  /** Las demás lecciones del programa; el repaso se queda en su ruta. */
+  instructorLeccion: (numero: number | string) => `/instructor/leccion/${numero}`,
   hojasInstructor: "/instructor/hojas",
   adminAventura: "/admin/aventura",
 } as const;

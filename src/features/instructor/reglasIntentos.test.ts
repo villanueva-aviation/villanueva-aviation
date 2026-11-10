@@ -47,6 +47,15 @@ test("el repaso general: su renglón es la lección, no un intento ni el checkri
   assert.equal(agruparSesiones([conCorreo(intento(r, "2026-11-05T10:00:00Z", "practica", "A"))])[0].leccion, null);
 });
 
+test("una lección de maniobra también es la lección de la sesión, con su número", () => {
+  const r = calificar(simularManiobra());
+  const leccion = { ...intento(r, "2026-11-09T11:00:00Z", "practica", "L"), maniobra: "leccion-7", detalle: { nivel: 2 } };
+  const s = agruparSesiones([intento(r, "2026-11-09T10:00:00Z", "practica", "L"), leccion].map(conCorreo))[0];
+  assert.equal(s.intentos, 1);
+  assert.equal(s.leccion?.nombre, "Lección 7 · Vuelo lento");
+  assert.equal(s.leccion?.nivel, 2);
+});
+
 test("la sesión dice en qué niveles practicó y en cuál fue la lección", () => {
   const r = calificar(simularManiobra());
   const en = (nivel: 1 | 2, at: string) => ({ ...intento({ ...r, nivel }, at, "practica", "N"), detalle: { ...paraGuardar({ ...r, nivel }) } });

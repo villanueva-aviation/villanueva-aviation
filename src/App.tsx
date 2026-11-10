@@ -341,6 +341,14 @@ function RoutedContent() {
             }
           />
           <Route
+            path={ROUTES.instructorLeccion(":numero")}
+            element={
+              <ProtectedRoute>
+                <InstructorRepaso />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path={ROUTES.instructorVirajeEscarpado}
             element={
               <ProtectedRoute>
@@ -486,6 +494,7 @@ function App() {
     pathname === ROUTES.empieza ||
     pathname === ROUTES.instructorPrograma ||
     pathname === ROUTES.instructorRepaso ||
+    pathname.startsWith(ROUTES.instructorLeccion("")) ||
     (pathname === ROUTES.ingresar && new URLSearchParams(search).get("from") === ROUTES.instructorPrograma);
   const ingles = esIngles(pathname);
   return (

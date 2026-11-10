@@ -366,7 +366,7 @@ export function InstructorPrograma() {
             return (
               <li key={l.numero}>
                 {e === "abierta" ? (
-                  <Link to={ROUTES.instructorRepaso} className="block rounded-xl border border-gold-500/60 bg-gold-500/10 px-4 py-2.5 font-semibold text-white hover:bg-gold-500/20">{fila}</Link>
+                  <Link to={l.maniobra ? ROUTES.instructorLeccion(l.numero) : ROUTES.instructorRepaso} className="block rounded-xl border border-gold-500/60 bg-gold-500/10 px-4 py-2.5 font-semibold text-white hover:bg-gold-500/20">{fila}</Link>
                 ) : (
                   <div aria-disabled="true" className="rounded-xl border border-white/10 px-4 py-2.5 text-white opacity-60">{fila}</div>
                 )}
