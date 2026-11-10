@@ -18,6 +18,8 @@ test("una lección de maniobra la vuela 5 veces; el repaso sortea 4", () => {
   const s = maniobrasDe(LECCIONES[REPASO - 1]);
   assert.equal(s.length, 4);
   assert.equal(new Set(s).size, 4, "4 distintas de las disponibles");
+  assert.deepEqual(maniobrasDe(LECCIONES[13]), Array(5).fill("toques-despegues"));
+  for (let k = 0; k < 50; k++) assert.ok(!maniobrasDe(LECCIONES[REPASO - 1]).includes("toques-despegues"), "los circuitos no se sortean en la zona");
 });
 
 const BASE = simularVuelo()[0];
@@ -273,4 +275,50 @@ test("textos en inglés sin acentos", () => {
   for (const d of decir) assert.doesNotMatch(d, /[áéíóúñ¿¡]/, d);
   const espera = correr(crearRepaso("practica", [...SORTEO]), simularVuelo().slice(0, 5), { aero: () => null, idioma: "en" });
   assert.equal(espera.e.motivo, "Waiting for the simulator's airport.");
+});
+
+test("toques y despegues: arma en la carrera, cada toque es un circuito y no va a regreso hasta el último", () => {
+  const CIRC = Array(5).fill("toques-despegues");
+  let cuenta = 0;
+  const { e, decir, etapas } = correr(crearRepaso("practica", CIRC), simularVuelo({ tocarYDespegar: true }), {
+    alEntrar: (e, d) => {
+      assert.equal(e.vuelo?.fase, "carrera-despegue");
+      assert.equal(armaManiobra(e), true);
+      cuenta++;
+      // Uno reprobado también avanza: cada circuito es su intento.
+      const r = alResultado(e, res(false), "a", "es");
+      assert.equal(r.estado.actual, 1);
+      assert.deepEqual(r.decir, ["Circuito 2 de 5: potencia completa y despega."]);
+      let x = r.estado;
+      for (let i = 0; i < 3; i++) x = conDecir(d)(alResultado(x, res(true), null, "es"));
+      return x;
+    },
+  });
+  assert.equal(cuenta, 1);
+  assert.deepEqual(etapas, ["rampa", "maniobra", "regreso", "terminado"]);
+  assert.ok(decir.includes("Circuito 1 de 5."), decir.join(" | "));
+  assert.ok(decir.includes("Circuito 5 de 5: potencia completa y despega; este termina con aterrizaje completo."), decir.join(" | "));
+  assert.ok(!decir.some((x) => x.startsWith("Ve a la zona")), decir.join(" | "));
+  assert.ok(!decir.includes("Regresa a la zona de trabajo."), "bajo 1,500 ft no hay zona");
+  assert.equal(e.hechas[4].resultado, null);
+});
+
+test("toques y despegues: después del último circuito, a la plataforma", () => {
+  const e = { ...crearRepaso("checkride", Array(5).fill("toques-despegues")), etapa: "maniobra" as const, actual: 4 };
+  const r = alResultado(e, res(true), "z", "es");
+  assert.equal(r.estado.etapa, "regreso");
+  assert.deepEqual(r.decir, ["Terminamos los circuitos. Sal de la pista y rueda a la plataforma."]);
+  assert.deepEqual(alResultado(e, res(true), "z", "en").decir, ["We're done with the patterns. Exit the runway and taxi to the ramp."]);
+});
+
+test("toques y despegues: el toque a mitad de la lección no la manda a regreso; detenerse en la pista sí", () => {
+  let e = crearRepaso("practica", Array(5).fill("toques-despegues"));
+  let enToque: string | null = null;
+  for (const m of simularVuelo({ tocarYDespegar: true })) {
+    const antes = e.vuelo?.eventos.length ?? 0;
+    e = alMuestrearRepaso(e, m, A, "es", () => 0).estado;
+    if (e.vuelo?.eventos.slice(antes).some((x) => x.tipo === "toque-y-despegue")) enToque = e.etapa;
+  }
+  assert.equal(enToque, "maniobra");
+  assert.equal(e.etapa, "terminado");
 });

@@ -322,3 +322,67 @@ export function simularCombinado(
   }
   return out;
 }
+
+/**
+ * Un circuito de tránsito por la izquierda desde la carrera de despegue (30 kt, pista 200, campo a 5,000 ft) hasta
+ * 5 s después del toque. Virajes de 90° a `incl` (20°) con régimen constante; nivela en 1,000 ft AGL + `pasarseFt`;
+ * en viento en cola baja a los 50 s. `toqueFpm`: régimen al tocar.
+ */
+export function simularCircuito(
+  op: { vr?: number; ascenso?: number; cola?: number; final?: number; incl?: number; pasarseFt?: number; toqueFpm?: number; derecha?: boolean } = {},
+): Muestra[] {
+  const ELEV = 5000;
+  const DT = 0.1;
+  const vr = op.vr ?? 55;
+  const incl = op.incl ?? 20;
+  const lado = op.derecha ? 1 : -1;
+  const patron = ELEV + 1000 + (op.pasarseFt ?? 0);
+  const out: Muestra[] = [];
+  let [v, alt, rumbo, cabeceo, vs] = [30, ELEV, 200, 0, 0];
+  let tierra = true;
+  let pierna = 0; // 0 despegue, 1 cruzado, 2 viento en cola, 3 base, 4 final
+  let girando = 0;
+  let desde = 0;
+  let bajar = false;
+  let toque: number | null = null;
+  for (let n = 0; ; n++) {
+    const t = n * DT;
+    out.push({
+      t, inclinacion: girando > 0 ? lado * incl : 0, altitud: alt, velocidad: v, rumbo: norm(rumbo), vs: tierra ? 0 : vs, cabeceo, gs: v,
+      bola: 0, agl: alt - ELEV, peso: 2400, enTierra: tierra, slew: false, tasa: 1, pausa: false, titulo: "Cessna Skyhawk 172SP",
+    });
+    if (toque !== null) {
+      if (t - toque > 5) break;
+      v -= 0.1;
+      continue;
+    }
+    if (tierra) {
+      v += 0.3;
+      if (v >= vr) cabeceo = 5;
+      if (v >= vr + 8) [tierra, vs] = [false, 700];
+      continue;
+    }
+    // Vertical: sube a 700 ft/min hasta el circuito; baja a 500 desde la mitad del viento en cola; enderezada a 20 ft.
+    if (!bajar && vs > 0 && alt + (vs * DT) / 60 >= patron) [alt, vs] = [patron, 0];
+    if (!bajar && pierna === 2 && girando === 0 && t - desde >= 50) [bajar, vs] = [true, -500];
+    if (bajar && alt - ELEV <= 20) vs = -(op.toqueFpm ?? 300);
+    alt += (vs * DT) / 60;
+    if (alt <= ELEV) {
+      [alt, tierra, toque, cabeceo] = [ELEV, true, t, 3];
+      continue;
+    }
+    const meta = vs > 0 ? (op.ascenso ?? 72) : bajar ? (pierna >= 4 ? (op.final ?? 67) : 75) : (op.cola ?? 90);
+    v += Math.sign(meta - v) * Math.min(Math.abs(meta - v), 0.2);
+    // Horizontal: cada pierna recta dura lo suyo y luego vira 90°.
+    if (girando > 0) {
+      const d = ((1091 * Math.tan((incl * Math.PI) / 180)) / v) * DT;
+      rumbo += lado * Math.min(d, girando);
+      girando = Math.max(0, girando - d);
+      if (girando === 0) [pierna, desde] = [pierna + 1, t];
+    } else if (pierna < 4) {
+      const listo = pierna === 0 ? alt - ELEV >= 500 : t - desde >= [0, 20, 60, 15][pierna];
+      if (listo) girando = 90;
+    }
+  }
+  return out;
+}

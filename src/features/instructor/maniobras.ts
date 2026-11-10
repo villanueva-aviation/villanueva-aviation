@@ -31,10 +31,17 @@ import {
   avisoCombinado, briefingCombinado, explicarCombinado, listaPasosCombinado, masFalladoCombinado, ordenCombinado, paraGuardarCombinado, pasoCombinado,
   queHacerCombinado, repetirCombinado, semaforoCombinado, textoPasoCombinado, type PasoCombinado,
 } from "./textosCombinado.ts";
+import { tolCircuito } from "./nivel.ts";
+import { armarCircuito, armarSoloCircuito, avanzarCircuito, INCLINACION_MAX, PATRON_AGL, VEL_CIRCUITO, type EvaluacionCircuito, type ResultadoCircuito } from "./evaluadorCircuito.ts";
+import {
+  avisoCircuito, briefingCircuito, explicarCircuito, listaPasosCircuito, masFalladoCircuito, ordenCircuito, paraGuardarCircuito, pasoCircuito,
+  queHacerCircuito, repetirCircuito, semaforoCircuito, textoPasoCircuito, type PasoCircuito,
+} from "./textosCircuito.ts";
 
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
-export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo";
+export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo"
+  | "toques-despegues";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -325,9 +332,60 @@ const defCombinado: DefManiobra<EvaluacionCombinado, ResultadoCombinado> = {
   paraGuardar: paraGuardarCombinado,
 };
 
+const defCircuito: DefManiobra<EvaluacionCircuito, ResultadoCircuito> = {
+  id: "toques-despegues",
+  insignia: "maniobra-toques-despegues-c172",
+  avion: "C172",
+  titulo: { es: "Toques y despegues C172", en: "C172 touch and goes" },
+  tarea: { es: "Práctica · Toques y despegues", en: "Practice · Touch and goes" },
+  elementosReporte: (n) => {
+    const T = tolCircuito(n);
+    const [al, ah] = VEL_CIRCUITO.ascenso;
+    const [fl, fh] = VEL_CIRCUITO.final;
+    const mil = PATRON_AGL.toLocaleString("en-US");
+    return [
+      { codigo: "1", texto: `Rota a ${VEL_CIRCUITO.vr} kt −5/+10`, textoEn: `Rotates at ${VEL_CIRCUITO.vr} kt -5/+10` },
+      { codigo: "2", texto: `Asciende entre ${al} y ${ah} kt, ±${T.velocidadKt} kt`, textoEn: `Climbs between ${al} and ${ah} kt, ±${T.velocidadKt} kt` },
+      { codigo: "3", texto: `Circuito a ${mil} ft AGL ±${T.altitudFt} ft`, textoEn: `Pattern at ${mil} ft AGL ±${T.altitudFt} ft` },
+      { codigo: "4", texto: `Viento en cola a ${VEL_CIRCUITO.cola} kt ±${T.velocidadKt} kt`, textoEn: `Downwind at ${VEL_CIRCUITO.cola} kt ±${T.velocidadKt} kt` },
+      { codigo: "5", texto: `Inclinación máxima ${INCLINACION_MAX}° +${T.inclinacionGrados}°`, textoEn: `Maximum bank ${INCLINACION_MAX}° +${T.inclinacionGrados}°` },
+      { codigo: "6", texto: `Final entre ${fl} y ${fh} kt, ±${T.velocidadKt} kt`, textoEn: `Final between ${fl} and ${fh} kt, ±${T.velocidadKt} kt` },
+      { codigo: "7", texto: `Toque a ${T.toqueFpm} ft/min o menos`, textoEn: `Touchdown at ${T.toqueFpm} ft/min or less` },
+    ];
+  },
+  celdas: [
+    celda("rotacion", "Rotación", "Rotation"),
+    celda("ascenso", "Ascenso", "Climb"),
+    celda("altitud", "Altitud", "Altitude"),
+    celda("velocidad", "Viento en cola", "Downwind"),
+    celda("inclinacion", "Inclinación", "Bank"),
+    celda("final", "Final", "Final"),
+    celda("toque", "Toque", "Touchdown"),
+  ],
+  temas: ["c172"],
+  armar: armarCircuito,
+  avanzar: avanzarCircuito,
+  armarSolo: armarSoloCircuito,
+  fase: (e) => (e.fase === "volando" ? "en-curso" : e.fase),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoCircuito,
+  orden: (antes, ahora, e, idioma) => ordenCircuito(antes as PasoCircuito | null, ahora as PasoCircuito | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoCircuito(paso as PasoCircuito | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosCircuito(paso as PasoCircuito | null, idioma),
+  queHacer: (paso, idioma) => queHacerCircuito(paso as PasoCircuito | null, idioma),
+  semaforo: semaforoCircuito,
+  aviso: avisoCircuito,
+  briefing: briefingCircuito,
+  explicar: explicarCircuito,
+  repetir: repetirCircuito,
+  masFallado: masFalladoCircuito,
+  paraGuardar: paraGuardarCircuito,
+};
+
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos, "ascensos-descensos": defAltitud,
-  "virajes-ascendiendo": defCombinado,
+  "virajes-ascendiendo": defCombinado, "toques-despegues": defCircuito,
 };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */

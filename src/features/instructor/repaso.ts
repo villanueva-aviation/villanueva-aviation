@@ -28,9 +28,15 @@ export function sortear(disponibles: ManiobraId[], n = 4, azar = Math.random): M
   return s.slice(0, n);
 }
 
+/** Se vuelan en el circuito del aeropuerto, no en la zona: no entran al sorteo. */
+const CIRCUITO: ManiobraId = "toques-despegues";
+
 /** Lección de maniobra: la primera de práctica y 4 más (Erik). Repaso: 4 sorteadas. */
 export const maniobrasDe = (l: Leccion, azar = Math.random): ManiobraId[] =>
-  l.maniobra ? Array(5).fill(l.maniobra) : sortear(Object.keys(MANIOBRAS) as ManiobraId[], 4, azar);
+  l.maniobra ? Array(5).fill(l.maniobra) : sortear((Object.keys(MANIOBRAS) as ManiobraId[]).filter((id) => id !== CIRCUITO), 4, azar);
+
+/** Lección 14: cada maniobra es un circuito desde la carrera de despegue. */
+const deCircuitos = (e: EstadoRepaso) => e.sorteo[0] === CIRCUITO;
 
 export interface Zona {
   nombre: Record<Idioma, string>;
@@ -167,6 +173,9 @@ const T = {
     siguiente: (m: string, otra: boolean) => `Recto y nivelado. Siguiente maniobra: ${m}${otra ? ", con otro rumbo" : ""}.`,
     repetir: "Puedes repetirla o pasar a la siguiente.",
     regreso: "Terminamos las maniobras. Regresa al aeropuerto y aterriza.",
+    circuito: (k: number, n: number, inicio: boolean) =>
+      inicio ? `Circuito ${k} de ${n}.` : `Circuito ${k} de ${n}: potencia completa y despega${k === n ? "; este termina con aterrizaje completo" : ""}.`,
+    finCircuitos: "Terminamos los circuitos. Sal de la pista y rueda a la plataforma.",
   },
   en: {
     espera: "Waiting for the simulator's airport.",
@@ -179,6 +188,9 @@ const T = {
     siguiente: (m: string, otra: boolean) => `Straight and level. Next maneuver: ${m}${otra ? ", on a different heading" : ""}.`,
     repetir: "You can repeat it or move on to the next one.",
     regreso: "We're done with the maneuvers. Head back to the airport and land.",
+    circuito: (k: number, n: number, inicio: boolean) =>
+      inicio ? `Pattern ${k} of ${n}.` : `Pattern ${k} of ${n}: full power and take off${k === n ? "; this one ends with a full-stop landing" : ""}.`,
+    finCircuitos: "We're done with the patterns. Exit the runway and taxi to the ramp.",
   },
 };
 
@@ -230,7 +242,15 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
   let etapa: EtapaRepaso = e.etapa;
   let { zona, motivo } = e;
   const decir: string[] = [];
-  if (etapa === "rampa") {
+  const circuitos = deCircuitos(e);
+  if (etapa === "rampa" && circuitos) {
+    // Se arma en la carrera para medir la rotación.
+    if (vuelo.fase === "carrera-despegue") {
+      etapa = "maniobra";
+      motivo = undefined;
+      decir.push(t.circuito(1, e.sorteo.length, true));
+    }
+  } else if (etapa === "rampa") {
     zona = zona ?? zonaRepaso(vuelo.aeropuerto, azar);
     motivo = zona ? undefined : t.espera;
     if (nuevos.some((x) => x.tipo === "despegue")) {
@@ -245,7 +265,7 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
       decir.push(t.enZona(nombreManiobra(e.sorteo[e.actual], idioma)));
     }
   } else if (etapa === "maniobra") {
-    if (zona && !enCurso && fueraDeZona(m, zona)) {
+    if (zona && !circuitos && !enCurso && fueraDeZona(m, zona)) {
       etapa = "fuera-de-zona";
       decir.push(t.fuera);
     }
@@ -255,14 +275,17 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
       decir.push(t.devuelta(nombreManiobra(e.sorteo[e.actual], idioma)));
     }
   }
-  if (aterrizo && etapa !== "regreso") etapa = "regreso";
+  // En los circuitos cada toque es parte de la maniobra; detenerse en la pista sí termina.
+  if (etapa !== "regreso" && (circuitos ? vuelo.fase === "rodaje-regreso" : aterrizo)) etapa = "regreso";
   if (vuelo.fase === "terminado") etapa = "terminado";
   return { estado: { ...e, etapa, zona, motivo, vuelo, tomas }, decir };
 }
 
 function avanzarManiobra(e: EstadoRepaso, idioma: Idioma): Paso {
   const actual = e.actual + 1;
-  if (actual >= e.sorteo.length) return { estado: { ...e, actual, etapa: "regreso" }, decir: [T[idioma].regreso] };
+  const t = T[idioma];
+  if (actual >= e.sorteo.length) return { estado: { ...e, actual, etapa: "regreso" }, decir: [deCircuitos(e) ? t.finCircuitos : t.regreso] };
+  if (deCircuitos(e)) return { estado: { ...e, actual }, decir: [t.circuito(actual + 1, e.sorteo.length, false)] };
   const id = e.sorteo[actual];
   return { estado: { ...e, actual }, decir: [T[idioma].siguiente(nombreManiobra(id, idioma), e.sorteo.slice(0, actual).includes(id))] };
 }
@@ -274,7 +297,8 @@ export function alResultado(e: EstadoRepaso, r: ResultadoComun, intentoId: strin
   if (!enManiobras(e)) return { estado: e, decir: [] };
   const hechas = e.hechas.map((h, i) => (i === e.actual ? { ...h, resultado: r, intentoId } : h));
   const estado = { ...e, hechas };
-  if (e.modo === "checkride" || r.aprobado) return avanzarManiobra(estado, idioma);
+  // Un circuito no se repite en el aire: el siguiente ya va en camino.
+  if (e.modo === "checkride" || r.aprobado || deCircuitos(e)) return avanzarManiobra(estado, idioma);
   return { estado, decir: [T[idioma].repetir] };
 }
 

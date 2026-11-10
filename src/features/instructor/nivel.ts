@@ -70,6 +70,18 @@ export const tolCombinado = (n: Nivel = 3) => ({
   ...comunes(n),
 });
 
+export const tolCircuito = (n: Nivel = 3) => ({
+  /** Altitud del circuito en viento en cola. */
+  altitudFt: por(n, 200, 150, 100),
+  /** Kt fuera de la banda (ascenso y final) o de 90 en viento en cola. */
+  velocidadKt: por(n, 10, 7, 5),
+  /** Grados sobre 30°. */
+  inclinacionGrados: por(n, 10, 7, 5),
+  /** Régimen de descenso máximo al tocar. ponytail: números míos, Erik los ajusta. */
+  toqueFpm: por(n, 600, 500, 400),
+  ...comunes(n),
+});
+
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */
 export const tolFinal = (n: Nivel = 3) => ({ menos: por(n, 10, 7, 5), mas: por(n, 15, 12, 10) });
 

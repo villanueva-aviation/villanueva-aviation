@@ -32,7 +32,7 @@ export const LECCIONES: Leccion[] = [
   l(11, "Práctica de emergencia", "Emergency practice"),
   l(12, "Práctica de emergencia", "Emergency practice"),
   l(13, "Repaso general", "General review"),
-  l(14, "Toques y despegues", "Touch and goes"),
+  l(14, "Toques y despegues", "Touch and goes", "toques-despegues"),
 ];
 
 export function estadoLeccion(leccion: Leccion, acceso: { fundador: boolean; exclusivo: boolean }): "abierta" | "candado" | "proximamente" {
