@@ -7,6 +7,7 @@ import { armarVuelo, avanzarVuelo, type EvaluacionVuelo } from "./fasesVuelo.ts"
 import type { Modo } from "./sesion.ts";
 import { crearTomas, medirTomas, type Tomas } from "./tomas.ts";
 import { ALTURA_SEGURA_AGL } from "./virajeEscarpado.ts";
+import { AGL_MIN } from "./evaluadorS.ts";
 import { aNm } from "../home/navGeo.ts";
 import type { Nivel } from "./nivel.ts";
 import type { Leccion } from "./lecciones.ts";
@@ -34,6 +35,9 @@ const CIRCUITO: ManiobraId = "toques-despegues";
 /** Lección de maniobra: la primera de práctica y 4 más (Erik). Repaso: 4 sorteadas. */
 export const maniobrasDe = (l: Leccion, azar = Math.random): ManiobraId[] =>
   l.maniobra ? Array(5).fill(l.maniobra) : sortear((Object.keys(MANIOBRAS) as ManiobraId[]).filter((id) => id !== CIRCUITO), 4, azar);
+
+/** Ft AGL desde los que la zona cuenta para esta maniobra: la «S» va de 600 a 1,000. */
+export const pisoZona = (id: ManiobraId | undefined) => (id === "s-camino" ? AGL_MIN : ALTURA_SEGURA_AGL);
 
 /** Lección 14: cada maniobra es un circuito desde la carrera de despegue. */
 const deCircuitos = (e: EstadoRepaso) => e.sorteo[0] === CIRCUITO;
@@ -112,8 +116,9 @@ export function zonaRepaso(a: Aeropuerto | null, azar = Math.random): Zona | nul
   };
 }
 
-export function enZona(m: Muestra, z: Zona): boolean {
-  if (m.lat === undefined || m.lon === undefined || m.agl < ALTURA_SEGURA_AGL) return false;
+/** `piso`: ft AGL desde los que cuenta; la «S» se vuela más abajo que las demás. */
+export function enZona(m: Muestra, z: Zona, piso = ALTURA_SEGURA_AGL): boolean {
+  if (m.lat === undefined || m.lon === undefined || m.agl < piso) return false;
   if (z.poligono) return dentro(relativos(m.lat, m.lon, z.poligono));
   const d = aNm(m.lat, m.lon, z.lat, z.lon);
   return Math.hypot(d.x, d.y) <= z.radioNm;
@@ -122,9 +127,9 @@ export function enZona(m: Muestra, z: Zona): boolean {
 /** Para salir hace falta pasarse del margen: así el aviso no se repite al volar justo en el borde. */
 const MARGEN_NM = 0.5;
 const MARGEN_FT = 100;
-export function fueraDeZona(m: Muestra, z: Zona): boolean {
+export function fueraDeZona(m: Muestra, z: Zona, piso = ALTURA_SEGURA_AGL): boolean {
   if (m.lat === undefined || m.lon === undefined) return true;
-  if (m.agl < ALTURA_SEGURA_AGL - MARGEN_FT) return true;
+  if (m.agl < piso - MARGEN_FT) return true;
   if (z.poligono) {
     const v = relativos(m.lat, m.lon, z.poligono);
     return !dentro(v) && aLaOrilla(v) > MARGEN_NM;
@@ -166,7 +171,7 @@ const T = {
     espera: "Esperando el aeropuerto del simulador.",
     salto: "El avión se movió de golpe: la lección no se califica.",
     hueco: "Se perdió la conexión con el simulador en vuelo: la lección no se califica.",
-    salida: (z: string) => `Ve a la zona de trabajo: ${z}, a 1,500 pies sobre el terreno o más.`,
+    salida: (z: string, bajo: boolean) => `Ve a la zona de trabajo: ${z}, ${bajo ? "entre 600 y 1,000 pies sobre el terreno" : "a 1,500 pies sobre el terreno o más"}.`,
     enZona: (m: string) => `Estás en la zona. Primera maniobra: ${m}.`,
     fuera: "Regresa a la zona de trabajo.",
     devuelta: (m: string) => `De vuelta en la zona. Maniobra: ${m}.`,
@@ -181,7 +186,7 @@ const T = {
     espera: "Waiting for the simulator's airport.",
     salto: "The aircraft jumped to another position: this lesson won't be graded.",
     hueco: "The connection to the simulator dropped in flight: this lesson won't be graded.",
-    salida: (z: string) => `Head to the practice area: ${z}, at 1,500 feet above the ground or higher.`,
+    salida: (z: string, bajo: boolean) => `Head to the practice area: ${z}, ${bajo ? "between 600 and 1,000 feet above the ground" : "at 1,500 feet above the ground or higher"}.`,
     enZona: (m: string) => `You're in the area. First maneuver: ${m}.`,
     fuera: "Head back to the practice area.",
     devuelta: (m: string) => `Back in the area. Maneuver: ${m}.`,
@@ -243,6 +248,7 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
   let { zona, motivo } = e;
   const decir: string[] = [];
   const circuitos = deCircuitos(e);
+  const piso = pisoZona(e.sorteo[e.actual]);
   if (etapa === "rampa" && circuitos) {
     // Se arma en la carrera para medir la rotación.
     if (vuelo.fase === "carrera-despegue") {
@@ -257,20 +263,20 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
       zona = zona ?? zonaSinAeropuerto(m);
       motivo = undefined;
       etapa = "salida";
-      if (zona) decir.push(t.salida(zona.nombre[idioma]));
+      if (zona) decir.push(t.salida(zona.nombre[idioma], piso < ALTURA_SEGURA_AGL));
     }
   } else if (etapa === "salida") {
-    if (zona && enZona(m, zona)) {
+    if (zona && enZona(m, zona, piso)) {
       etapa = "maniobra";
       decir.push(t.enZona(nombreManiobra(e.sorteo[e.actual], idioma)));
     }
   } else if (etapa === "maniobra") {
-    if (zona && !circuitos && !enCurso && fueraDeZona(m, zona)) {
+    if (zona && !circuitos && !enCurso && fueraDeZona(m, zona, piso)) {
       etapa = "fuera-de-zona";
       decir.push(t.fuera);
     }
   } else if (etapa === "fuera-de-zona") {
-    if (zona && enZona(m, zona)) {
+    if (zona && enZona(m, zona, piso)) {
       etapa = "maniobra";
       decir.push(t.devuelta(nombreManiobra(e.sorteo[e.actual], idioma)));
     }

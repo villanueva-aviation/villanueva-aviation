@@ -322,3 +322,23 @@ test("toques y despegues: el toque a mitad de la lección no la manda a regreso;
   assert.equal(enToque, "maniobra");
   assert.equal(e.etapa, "terminado");
 });
+
+test("«S»: la zona va de 600 ft AGL hacia arriba y la salida lo dice", () => {
+  const z = zonaRepaso(A, () => 0)!;
+  assert.equal(enZona(enAire(z, 1, 800), z), false);
+  assert.equal(enZona(enAire(z, 1, 800), z, 600), true);
+  assert.equal(fueraDeZona(enAire(z, 1, 550), z, 600), false, "margen de 100 ft");
+  assert.equal(fueraDeZona(enAire(z, 1, 450), z, 600), true);
+  const { e, m } = enLaZona();
+  const s = { ...e, sorteo: Array(5).fill("s-camino") };
+  assert.equal(alMuestrearRepaso(s, { ...m, t: m.t + 0.1, agl: 800 }, A, "es").estado.etapa, "maniobra");
+  let x = crearRepaso("practica", Array(5).fill("s-camino"));
+  const decir: string[] = [];
+  for (const mm of simularVuelo()) {
+    const p = alMuestrearRepaso(x, mm, A, "es", () => 0);
+    x = p.estado;
+    decir.push(...p.decir);
+    if (x.etapa === "salida") break;
+  }
+  assert.ok(decir.includes("Ve a la zona de trabajo: Cajititlán, entre 600 y 1,000 pies sobre el terreno."), decir.join(" | "));
+});

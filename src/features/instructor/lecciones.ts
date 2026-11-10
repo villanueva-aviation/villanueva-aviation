@@ -26,7 +26,7 @@ export const LECCIONES: Leccion[] = [
   l(5, "Ascensos y descensos", "Climbs and descents", "ascensos-descensos"),
   l(6, "Virajes ascendiendo y descendiendo", "Climbing and descending turns", "virajes-ascendiendo"),
   l(7, "Vuelo lento", "Slow flight", "vuelo-lento"),
-  l(8, "«S» sobre un camino", "S-turns along a road"),
+  l(8, "«S» sobre un camino", "S-turns along a road", "s-camino"),
   l(9, "«8» primera fase", "Figure 8, first phase"),
   l(10, "«8» segunda fase", "Figure 8, second phase"),
   // ponytail: la 12 se abre cuando Erik diga qué cambia respecto a la 11.

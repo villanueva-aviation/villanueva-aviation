@@ -12,7 +12,7 @@ import { guardarIntento } from "../features/instructor/intentos";
 import { claveLeccion, estadoLeccion, leccionDe } from "../features/instructor/lecciones";
 import { lecturaFinalDe, MANIOBRAS } from "../features/instructor/maniobras";
 import {
-  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, maniobraActual, maniobrasDe, nombreManiobra, siguienteManiobra,
+  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, maniobraActual, maniobrasDe, nombreManiobra, pisoZona, siguienteManiobra,
   type EstadoRepaso, type EtapaRepaso,
 } from "../features/instructor/repaso";
 import type { IntentoSesion, Modo } from "../features/instructor/sesion";
@@ -34,10 +34,10 @@ const SECCIONES = AVIONES_VOZ.c172.secciones;
 const T = {
   es: {
     titulo: (l: string) => `${l} · C172`,
-    briefing: (m: string | null, circuitos: string[] | null) => [
+    briefing: (m: string | null, circuitos: string[] | null, bajo = false) => [
       "Vuelo completo en el C172, de la plataforma a la plataforma.",
       "Lee el checklist en voz alta, en español: el instructor revisa lo que se puede leer del simulador.",
-      ...(circuitos ?? ["Despega y ve a la zona de trabajo a 1,500 pies sobre el terreno o más.",
+      ...(circuitos ?? [`Despega y ve a la zona de trabajo ${bajo ? "entre 600 y 1,000 pies" : "a 1,500 pies"} sobre el terreno${bajo ? "" : " o más"}.`,
       m
         ? `En la zona vuelas ${m.toLowerCase()} 5 veces: la primera para practicar y 4 más. Entre una y otra, recto y nivelado en otro rumbo.`
         : "En la zona vuelas 4 maniobras sorteadas. Entre una y otra, recto y nivelado.",
@@ -75,10 +75,10 @@ const T = {
   },
   en: {
     titulo: (l: string) => `${l} · C172`,
-    briefing: (m: string | null, circuitos: string[] | null) => [
+    briefing: (m: string | null, circuitos: string[] | null, bajo = false) => [
       "A full flight in the C172, from ramp to ramp.",
       "Read the checklist aloud, in Spanish: the instructor checks what the simulator can report.",
-      ...(circuitos ?? ["Take off and head to the practice area at 1,500 feet above the ground or higher.",
+      ...(circuitos ?? [`Take off and head to the practice area ${bajo ? "between 600 and 1,000 feet" : "at 1,500 feet"} above the ground${bajo ? "" : " or higher"}.`,
       m
         ? `In the area you fly ${m.toLowerCase()} 5 times: the first one to practice and 4 more. Between them, straight and level on a new heading.`
         : "In the area you fly 4 drawn maneuvers. Between them, straight and level.",
@@ -341,6 +341,7 @@ export function InstructorRepaso() {
             leccion.maniobra ? nombreManiobra(leccion.maniobra, idioma) : null,
             // Los circuitos se vuelan en el aeropuerto: su briefing sin la primera línea («Hoy vas a practicar…»).
             leccion.maniobra === "toques-despegues" ? [...MANIOBRAS[leccion.maniobra].briefing(idioma, nivel).slice(1), idioma === "en" ? "Then shut down on the ramp." : "Luego apaga en la plataforma."] : null,
+            pisoZona(leccion.maniobra) < 1500,
           ).map((l) => <li key={l}>{l}</li>)}
         </ol>
         {!escucha.supported && <p className="text-sm text-gold-300">{t.sinMicrofono}</p>}

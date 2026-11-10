@@ -90,6 +90,21 @@ export const tolFalla = (n: Nivel = 3) => ({
   ...comunes(n),
 });
 
+/** Maniobras con referencia en tierra («S», «8»): Difícil = ACS (±100 ft, ±10 kt). */
+export const tolS = (n: Nivel = 3) => ({
+  altitudFt: por(n, 200, 150, 100),
+  velocidadKt: por(n, 20, 15, 10),
+  /** Inclinación al cruzar el camino. */
+  alasGrados: por(n, 20, 15, 10),
+  /** Rumbo al cruzar: perpendicular al camino. */
+  rumboGrados: por(n, 20, 15, 10),
+  /** Diferencia entre lo que se aleja cada curva, en % de la mayor. ponytail: números míos. */
+  simetriaPct: por(n, 40, 30, 20),
+  /** Grados sobre 45°. */
+  inclinacionGrados: por(n, 10, 7, 5),
+  ...comunes(n),
+});
+
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */
 export const tolFinal = (n: Nivel = 3) => ({ menos: por(n, 10, 7, 5), mas: por(n, 15, 12, 10) });
 

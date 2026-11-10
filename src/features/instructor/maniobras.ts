@@ -43,11 +43,16 @@ import {
   avisoFalla, briefingFalla, explicarFalla, listaPasosFalla, masFalladoFalla, ordenFalla, paraGuardarFalla, pasoFalla, queHacerFalla, repetirFalla,
   semaforoFalla, textoPasoFalla, type PasoFalla,
 } from "./textosFalla.ts";
+import { tolS } from "./nivel.ts";
+import { AGL_MAX, AGL_MIN, armarS, armarSoloS, avanzarS, INCLINACION_MAX_S, type EvaluacionS, type ResultadoS } from "./evaluadorS.ts";
+import {
+  avisoS, briefingS, explicarS, listaPasosS, masFalladoS, ordenS, paraGuardarS, pasoS, queHacerS, repetirS, semaforoS, textoPasoS, type PasoS,
+} from "./textosS.ts";
 
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
 export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo"
-  | "toques-despegues" | "falla-motor";
+  | "toques-despegues" | "falla-motor" | "s-camino";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -437,9 +442,57 @@ const defFalla: DefManiobra<EvaluacionFalla, ResultadoFalla> = {
   paraGuardar: paraGuardarFalla,
 };
 
+const defS: DefManiobra<EvaluacionS, ResultadoS> = {
+  id: "s-camino",
+  insignia: "maniobra-s-camino-c172",
+  avion: "C172",
+  titulo: { es: "«S» sobre un camino C172", en: "C172 S-turns" },
+  tarea: { es: "Práctica · «S» sobre un camino", en: "Practice · S-turns along a road" },
+  elementosReporte: (n) => {
+    const T = tolS(n);
+    const banda = `${AGL_MIN.toLocaleString("en-US")}–${AGL_MAX.toLocaleString("en-US")}`;
+    return [
+      { codigo: "1", texto: `Mantiene la altitud de entrada (${banda} ft AGL) ±${T.altitudFt} ft`, textoEn: `Holds entry altitude (${banda} ft AGL) ±${T.altitudFt} ft` },
+      { codigo: "2", texto: `Mantiene la velocidad de entrada ±${T.velocidadKt} kt`, textoEn: `Holds entry airspeed ±${T.velocidadKt} kt` },
+      { codigo: "3", texto: `Alas niveladas al cruzar el camino (menos de ${T.alasGrados}°)`, textoEn: `Wings level crossing the road (less than ${T.alasGrados}°)` },
+      { codigo: "4", texto: `Cruza perpendicular al camino ±${T.rumboGrados}°`, textoEn: `Crosses perpendicular to the road ±${T.rumboGrados}°` },
+      { codigo: "5", texto: `Curvas iguales a los dos lados (±${T.simetriaPct}%)`, textoEn: `Equal halves on both sides (±${T.simetriaPct}%)` },
+      { codigo: "6", texto: `Inclinación máxima ${INCLINACION_MAX_S}° +${T.inclinacionGrados}°`, textoEn: `Maximum bank ${INCLINACION_MAX_S}° +${T.inclinacionGrados}°` },
+    ];
+  },
+  celdas: [
+    celda("altitud", "Altitud", "Altitude"),
+    celda("velocidad", "Velocidad", "Airspeed"),
+    celda("alas", "Alas al cruzar", "Wings at crossing"),
+    celda("rumbo", "Rumbo al cruzar", "Heading at crossing"),
+    celda("simetria", "Curvas iguales", "Equal halves"),
+    celda("inclinacion", "Inclinación", "Bank"),
+  ],
+  temas: ["c172"],
+  armar: armarS,
+  avanzar: avanzarS,
+  armarSolo: armarSoloS,
+  fase: (e) => (e.fase === "curva1" || e.fase === "curva2" ? "en-curso" : e.fase === "listo" ? "armado" : e.fase),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoS,
+  orden: (antes, ahora, e, idioma) => ordenS(antes as PasoS | null, ahora as PasoS | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoS(paso as PasoS | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosS(paso as PasoS | null, idioma),
+  queHacer: (paso, idioma) => queHacerS(paso as PasoS | null, idioma),
+  semaforo: semaforoS,
+  aviso: avisoS,
+  briefing: briefingS,
+  explicar: explicarS,
+  repetir: repetirS,
+  masFallado: masFalladoS,
+  paraGuardar: paraGuardarS,
+};
+
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos, "ascensos-descensos": defAltitud,
   "virajes-ascendiendo": defCombinado, "toques-despegues": defCircuito, "falla-motor": defFalla,
+  "s-camino": defS,
 };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */
