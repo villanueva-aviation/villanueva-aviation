@@ -1,5 +1,6 @@
 import { CAMPOS_LENTO, desvioLento, type CampoLento, type ResultadoLento } from "./evaluadorLento.ts";
 import { reducir, type Linea } from "./explicacion.ts";
+import type { Tramo } from "./evaluador.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
 import { ALTURA_SEGURA_AGL } from "./virajeEscarpado.ts";
 import { GIRO_GRADOS, INCLINACION_VIRAJE, OBJETIVO_KT, RECTO_SEG } from "./vueloLento.ts";
@@ -17,7 +18,7 @@ export function briefingLento(idioma: Idioma, nivel: Nivel = 3): string[] {
       `Fly at ${ALTURA} ft above the ground or higher, and clear the area before you start.`,
       `Full flaps and reduce power: slow to ${OBJETIVO_KT} kt holding your altitude. Without flaps the stall warning sounds near that speed.`,
       `Hold ${OBJETIVO_KT} to ${MAX_KT} kt straight and level for about ${RECTO_SEG} s, then a gentle ${GIRO_GRADOS}° turn each way at ${INCLINACION_VIRAJE}° of bank, and recover with full power.`,
-      `Tolerances: altitude ±${TOL.altitudFt} ft, heading ±${TOL.rumboGrados}° on the straight leg, bank ±${TOL.inclinacionGrados}° in the turns and airspeed +${TOL.velocidadMasKt}/−0 kt.`,
+      `Tolerances: altitude ±${TOL.altitudFt} ft, heading ±${TOL.rumboGrados}° on the straight leg and on the recovery (back to your entry heading), bank ±${TOL.inclinacionGrados}° in the turns and airspeed +${TOL.velocidadMasKt}/−0 kt.`,
       "Pitch controls the airspeed and power controls the altitude. If the stall warning sounds, the attempt does not pass.",
       "Practice first; whenever you want, move on to the checkride.",
       "When you're ready, press «Ready, let's start».",
@@ -28,7 +29,7 @@ export function briefingLento(idioma: Idioma, nivel: Nivel = 3): string[] {
     `Vuela a ${ALTURA} ft sobre el terreno o más, y despeja el área antes de empezar.`,
     `Flaps completos y reduce la potencia: baja a ${OBJETIVO_KT} kt manteniendo la altitud. Sin flaps el aviso de pérdida suena cerca de esa velocidad.`,
     `Mantén de ${OBJETIVO_KT} a ${MAX_KT} kt en recto y nivelado unos ${RECTO_SEG} s, luego un viraje suave de ${GIRO_GRADOS}° a cada lado con ${INCLINACION_VIRAJE}° de inclinación, y sal con potencia completa.`,
-    `Tolerancias: altitud ±${TOL.altitudFt} ft, rumbo ±${TOL.rumboGrados}° en el tramo recto, inclinación ±${TOL.inclinacionGrados}° en los virajes y velocidad +${TOL.velocidadMasKt}/−0 kt.`,
+    `Tolerancias: altitud ±${TOL.altitudFt} ft, rumbo ±${TOL.rumboGrados}° en el tramo recto y al salir (de vuelta en tu rumbo de entrada), inclinación ±${TOL.inclinacionGrados}° en los virajes y velocidad +${TOL.velocidadMasKt}/−0 kt.`,
     "La nariz controla la velocidad y la potencia controla la altitud. Si suena el aviso de pérdida, el intento no pasa.",
     "Primero practicas; cuando quieras, pasas al checkride.",
     "Cuando estés listo, presiona «Listo, empiezo».",
@@ -92,6 +93,50 @@ const ETIQUETA: Record<Idioma, Record<CampoLento, string>> = {
   en: { altitud: "altitude", rumbo: "heading", velocidad: "airspeed", inclinacion: "bank", bola: "coordination" },
 };
 const mayus = (s: string) => `${s[0].toUpperCase()}${s.slice(1)}`;
+const rumbo3 = (r: number) => String(((Math.round(r) % 360) + 360) % 360 || 360).padStart(3, "0");
+const lado = (d: number, en: boolean) => (d < 0 ? (en ? "left" : "izquierda") : en ? "right" : "derecha");
+
+/** El rumbo en el tramo recto: cuánto, a qué lado, contra qué rumbo, y cómo corregir según el lado. */
+function rumboRecto(objetivo: number, d: number, en: boolean): string {
+  const g = Math.round(Math.abs(d));
+  const de = `${rumbo3(objetivo)}`;
+  const a = rumbo3(objetivo + d);
+  const como =
+    d < 0
+      ? en
+        ? "At low airspeed with power the airplane wants to go left: add right rudder and keep the wings level with gentle aileron."
+        : "A baja velocidad y con potencia el avión tiende a irse a la izquierda: mete pie derecho y mantén las alas niveladas con alerón suave."
+      : en
+        ? "Check you're not carrying a low wing or too much right rudder: wings level and the ball centered."
+        : "Revisa que no lleves un ala abajo ni demasiado pie derecho: alas niveladas y la bola al centro.";
+  const ref = en ? "Pick a reference on the horizon in front of the nose." : "Escoge una referencia en el horizonte frente a la nariz.";
+  return en
+    ? `On the straight leg you drifted ${g}° to the ${lado(d, en)}: you had to hold heading ${de} and reached ${a}. ${como} ${ref}`
+    : `En el tramo recto te fuiste ${g}° a la ${lado(d, en)}: debías mantener rumbo ${de} y llegaste a ${a}. ${como} ${ref}`;
+}
+
+/** El rumbo al salir: si ya lo traía mal del segundo viraje, eso; si no, lo que hizo al meter potencia. */
+function rumboSalida(r: ResultadoLento, d: number, en: boolean): string {
+  const g = Math.round(Math.abs(d));
+  const o = r.objetivo.rumbo;
+  const dejo = r.rumboAlSalir ?? 0;
+  const que = en
+    ? `On the recovery you had to end up on your entry heading, ${rumbo3(o)}, and reached ${rumbo3(o + d)} (${g}° to the ${lado(d, en)}).`
+    : `Al salir debías quedar en tu rumbo de entrada, ${rumbo3(o)}, y llegaste a ${rumbo3(o + d)} (${g}° a la ${lado(d, en)}).`;
+  const como =
+    Math.abs(dejo) > tolLento(r.nivel).rumboGrados
+      ? en
+        ? `The second turn left you on ${rumbo3(o + dejo)}, not ${rumbo3(o)}: start rolling out about 5° before your heading.`
+        : `El segundo viraje te dejó en ${rumbo3(o + dejo)}, no en ${rumbo3(o)}: empieza a nivelar unos 5° antes de llegar a tu rumbo.`
+      : d < 0
+        ? en
+          ? "With full power the airplane went left: add right rudder as the power comes up and while you raise the flaps."
+          : "Al meter potencia completa el avión se fue a la izquierda: mete pie derecho conforme sube la potencia y mientras subes los flaps."
+        : en
+          ? "Keep the wings level while the power comes up and the flaps go up: no more right rudder than you need."
+          : "Mantén las alas niveladas mientras sube la potencia y subes los flaps: no metas más pie derecho del necesario.";
+  return `${que} ${como}`;
+}
 
 export function explicarLento(r: ResultadoLento, idioma: Idioma): Linea[] {
   const en = idioma === "en";
@@ -120,9 +165,17 @@ export function explicarLento(r: ResultadoLento, idioma: Idioma): Linea[] {
     const ft = Math.round(Math.max(...alto.map((tr) => tr.peor)));
     mal(en ? `You gained ${ft} ft. Reduce power a little.` : `Subiste ${ft} ft. Reduce un poco la potencia.`);
   }
-  if (r.fuera.rumbo.length) {
+  if (r.fuera.rumbo.length && r.inicioSalida === undefined) {
+    // Intentos guardados antes de separar el recto de la salida.
     const g = Math.round(Math.abs(r.peor.rumbo));
     mal(en ? `You drifted ${g}° off heading on a straight leg. ${mayus(c.rumbo[1])}` : `Te desviaste ${g}° del rumbo en un tramo recto. ${mayus(c.rumbo[1])}`);
+  } else if (r.fuera.rumbo.length) {
+    const sal = r.inicioSalida ?? Infinity;
+    const peor = (trs: Tramo[]) => trs.reduce((a, b) => (Math.abs(b.peor) > Math.abs(a.peor) ? b : a)).peor;
+    const enRecto = r.fuera.rumbo.filter((tr) => tr.inicio < sal);
+    const enSalida = r.fuera.rumbo.filter((tr) => tr.inicio >= sal);
+    if (enRecto.length) mal(rumboRecto(r.objetivo.rumbo, peor(enRecto), en));
+    if (enSalida.length) mal(rumboSalida(r, peor(enSalida), en));
   }
   if (r.fuera.velocidad.length) {
     const kt = Math.round(OBJETIVO_KT + r.peor.velocidad);

@@ -18,7 +18,7 @@ const filas = (TOL: ReturnType<typeof tolLento>): Fila[] => [
   { clave: "altitud", nombre: { es: `Altitud ±${TOL.altitudFt} ft`, en: `Altitude ±${TOL.altitudFt} ft` }, bien: (r) => !r.fuera.altitud.length, valor: (r) => `${signo(r.peor.altitud)} ft` },
   {
     clave: "rumbo",
-    nombre: { es: `Rumbo ±${TOL.rumboGrados}° (tramos rectos)`, en: `Heading ±${TOL.rumboGrados}° (straight legs)` },
+    nombre: { es: `Rumbo ±${TOL.rumboGrados}° (recto y salida)`, en: `Heading ±${TOL.rumboGrados}° (straight leg and recovery)` },
     bien: (r) => !r.fuera.rumbo.length,
     valor: (r) => `${signo(r.peor.rumbo)}°`,
   },

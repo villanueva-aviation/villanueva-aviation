@@ -52,6 +52,10 @@ export function simularLento(
     rpmSalida?: number;
     giro1?: number;
     colaSeg?: number;
+    /** Grados (+ derecha) que se va y regresa a la mitad del tramo recto. */
+    derivaRecto?: number;
+    /** Grados (+ derecha) que se va mientras mete potencia en la salida. */
+    derivaSalida?: number;
   } = {},
 ): Muestra[] {
   const lenta = op.velocidadKt ?? 58;
@@ -95,7 +99,10 @@ export function simularLento(
     emitir(0);
     v = Math.max(lenta, v - 0.2);
   }
-  quieto(35);
+  for (let i = 0, n = 350, d = op.derivaRecto ?? 0; i < n; i++) {
+    emitir(0);
+    rumbo += (i < n / 2 ? 1 : -1) * ((2 * d) / n);
+  }
   virar(-1, op.giro1 ?? 90);
   quieto(2);
   if (op.sinSegundo) quieto(70);
@@ -107,6 +114,7 @@ export function simularLento(
     while (v < 80) {
       emitir(0);
       v = Math.min(80, v + 0.2);
+      rumbo += (op.derivaSalida ?? 0) / 110;
     }
   }
   quieto(op.colaSeg ?? 10);

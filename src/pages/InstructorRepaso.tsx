@@ -19,6 +19,7 @@ import type { IntentoSesion, Modo } from "../features/instructor/sesion";
 import { useChecklistVoz } from "../features/instructor/useChecklistVoz";
 import { useIntento } from "../features/instructor/useIntento";
 import { SelectorNivel } from "../features/instructor/SelectorNivel";
+import { Explicacion } from "../features/instructor/ExplicacionInstructor";
 import { NOMBRE_NIVEL } from "../features/instructor/nivel";
 import { useVoz } from "../features/instructor/useVoz";
 import { HOJA } from "../features/instructor/vistasManiobra";
@@ -174,7 +175,9 @@ export function InstructorRepaso() {
       if (!id) return;
       const r = alResultado(e, i.resultado, i.id, idioma);
       poner(r.estado);
-      decirRef.current([...lecturaFinalDe(MANIOBRAS[id], i.resultado, idioma).slice(0, 1), ...r.decir]);
+      // La calificación y, si algo salió, el primer error con cómo corregirlo; el resto queda en pantalla.
+      const error = MANIOBRAS[id].explicar(i.resultado, idioma).find((l) => l.tipo === "mal");
+      decirRef.current([...lecturaFinalDe(MANIOBRAS[id], i.resultado, idioma).slice(0, 1), ...(error ? [error.texto] : []), ...r.decir]);
       // Avanzó (o terminó las maniobras): el intento calificado se borra para que la siguiente se arme sola.
       if (r.estado.actual !== e.actual) reiniciarRef.current();
     },
@@ -361,7 +364,12 @@ export function InstructorRepaso() {
           </ul>
         </section>
       )}
-      {actualId && resultado && <Hoja resultado={resultado} idioma={idioma} />}
+      {actualId && resultado && (
+        <>
+          <Hoja resultado={resultado} idioma={idioma} />
+          <Explicacion resultado={resultado} idioma={idioma} def={def} />
+        </>
+      )}
       {noAprobada && (
         <div className="flex gap-2">
           <Button className="flex-1" onClick={reiniciar}>{t.repetir}</Button>
@@ -404,7 +412,10 @@ export function InstructorRepaso() {
                   return (
                     <details key={i} className="mt-2 rounded-lg border border-white/10 px-3 py-2">
                       <summary className="cursor-pointer text-white/80">{nombreManiobra(h.id, idioma)} · {h.resultado.calificacion}/100</summary>
-                      <div className="mt-2"><HojaDe resultado={h.resultado} idioma={idioma} /></div>
+                      <div className="mt-2 space-y-3">
+                        <HojaDe resultado={h.resultado} idioma={idioma} />
+                        <Explicacion resultado={h.resultado} idioma={idioma} def={MANIOBRAS[h.id]} />
+                      </div>
                     </details>
                   );
                 })}

@@ -27,6 +27,10 @@ export interface ResultadoLento {
   avisos: string[];
   muestras: Muestra[]; // desde el objetivo hasta el final
   nivel: Nivel;
+  /** t en que empezó la salida (null si no llegó). Falta en los intentos de antes del 2026-11-09. */
+  inicioSalida?: number | null;
+  /** Desvío de rumbo con signo al empezar la salida: lo que dejó el segundo viraje. */
+  rumboAlSalir?: number | null;
 }
 
 /** Fase y giro de cada muestra calificada, en paralelo a `tramo`. */
@@ -140,6 +144,7 @@ function resultado(ev: EvaluacionLento, salio: boolean, virajes = true): Resulta
     "PA.VII.A.S5": ns.altitud || ns.rumbo || ns.inclinacion ? "NS" : "S",
   };
   puntos -= (perdidas.length ? 30 : 0) + (bajo ? 20 : 0) + (salio ? 0 : 20);
+  const iSalida = marcas.findIndex((k) => k.fase === "salida");
   return {
     maniobra: "vuelo-lento",
     aprobado: salio && virajes && Object.values(elementos).every((e) => e === "S"),
@@ -158,6 +163,8 @@ function resultado(ev: EvaluacionLento, salio: boolean, virajes = true): Resulta
     avisos: !virajes ? [AVISO_SIN_VIRAJES] : salio ? [] : [AVISO_SIN_SALIDA],
     muestras: tramo,
     nivel: n,
+    inicioSalida: iSalida < 0 ? null : tramo[iSalida].t,
+    rumboAlSalir: iSalida < 0 ? null : difRumbo(tramo[iSalida].rumbo, o.rumbo),
   };
 }
 

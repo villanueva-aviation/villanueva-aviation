@@ -52,8 +52,8 @@ function texto(paso: PasoLento, ev: EvaluacionLento | null, idioma: Idioma): str
     }
     case "sal":
       return en
-        ? "Recover from slow flight: full power, pitch to hold altitude, and flaps up in stages."
-        : "Sal del vuelo lento: potencia completa, nariz para mantener la altitud y flaps arriba por etapas.";
+        ? `Recover from slow flight on heading ${rumbo3(o?.rumbo ?? 0)}: full power with right rudder, pitch to hold altitude, and flaps up in stages.`
+        : `Sal del vuelo lento en rumbo ${rumbo3(o?.rumbo ?? 0)}: potencia completa con pie derecho, nariz para mantener la altitud y flaps arriba por etapas.`;
     case "terminado":
       return en ? "Maneuver complete." : "Maniobra terminada.";
     case "invalido":
