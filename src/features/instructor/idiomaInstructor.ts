@@ -17,6 +17,12 @@ const MOTIVOS_EN: Record<string, string> = {
   "Empieza en tierra, detenido en la plataforma.": "Start on the ground, stopped on the ramp.",
   "Usaste el modo slew: la lección no se califica.": "You used slew mode: this lesson won't be graded.",
   "La velocidad de simulación no estaba en 1×: la lección no se califica.": "Simulation rate wasn't 1×: this lesson won't be graded.",
+  // Toques y despegues y falla de motor.
+  "Tocaste tierra antes de completar el circuito.": "You touched down before completing the pattern.",
+  "El circuito pasó de 12 minutos: el intento no se califica.": "The pattern went past 12 minutes: this attempt won't be graded.",
+  "No pusiste el acelerador en ralentí: el intento no se califica.": "You didn't bring the throttle to idle: this attempt won't be graded.",
+  "Tu lector es de una versión anterior: baja el nuevo de Descargas para la falla de motor.":
+    "Your reader is an older version: download the new one from Downloads for the engine failure.",
 };
 
 const AVISOS_EN: Record<string, string> = {

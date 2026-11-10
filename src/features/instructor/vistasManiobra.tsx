@@ -6,6 +6,7 @@ import { HojaRumbos } from "./HojaRumbos";
 import { HojaAltitud } from "./HojaAltitud";
 import { HojaCombinado } from "./HojaCombinado";
 import { HojaCircuito } from "./HojaCircuito";
+import { HojaFalla } from "./HojaFalla";
 import type { Idioma } from "./idiomaInstructor";
 import type { ManiobraId } from "./maniobras";
 
@@ -18,4 +19,5 @@ export const HOJA: Record<ManiobraId, (p: { resultado: any; idioma: Idioma }) =>
   "ascensos-descensos": HojaAltitud,
   "virajes-ascendiendo": HojaCombinado,
   "toques-despegues": HojaCircuito,
+  "falla-motor": HojaFalla,
 };

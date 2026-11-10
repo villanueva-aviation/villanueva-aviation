@@ -37,11 +37,17 @@ import {
   avisoCircuito, briefingCircuito, explicarCircuito, listaPasosCircuito, masFalladoCircuito, ordenCircuito, paraGuardarCircuito, pasoCircuito,
   queHacerCircuito, repetirCircuito, semaforoCircuito, textoPasoCircuito, type PasoCircuito,
 } from "./textosCircuito.ts";
+import { tolFalla } from "./nivel.ts";
+import { armarFalla, armarSoloFalla, avanzarFalla, MIN_AGL, PLANEO_KT, RECUPERA_AGL, type EvaluacionFalla, type ResultadoFalla } from "./evaluadorFalla.ts";
+import {
+  avisoFalla, briefingFalla, explicarFalla, listaPasosFalla, masFalladoFalla, ordenFalla, paraGuardarFalla, pasoFalla, queHacerFalla, repetirFalla,
+  semaforoFalla, textoPasoFalla, type PasoFalla,
+} from "./textosFalla.ts";
 
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
 export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo"
-  | "toques-despegues";
+  | "toques-despegues" | "falla-motor";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -383,9 +389,57 @@ const defCircuito: DefManiobra<EvaluacionCircuito, ResultadoCircuito> = {
   paraGuardar: paraGuardarCircuito,
 };
 
+const defFalla: DefManiobra<EvaluacionFalla, ResultadoFalla> = {
+  id: "falla-motor",
+  insignia: "maniobra-falla-motor-c172",
+  avion: "C172",
+  titulo: { es: "Falla de motor C172", en: "C172 engine failure" },
+  tarea: { es: "Práctica · Falla de motor simulada", en: "Practice · Simulated engine failure" },
+  elementosReporte: (n) => {
+    const T = tolFalla(n);
+    return [
+      { codigo: "1", texto: `Ralentí en ${T.reaccionSeg} s o menos`, textoEn: `Idle within ${T.reaccionSeg} s` },
+      { codigo: "2", texto: `Planeo a ${PLANEO_KT} kt ±${T.velocidadKt} kt`, textoEn: `Glide at ${PLANEO_KT} kt ±${T.velocidadKt} kt` },
+      { codigo: "3", texto: "Checklist: mezcla, selector, bomba y magnetos", textoEn: "Checklist: mixture, fuel selector, fuel pump and magnetos" },
+      {
+        codigo: "4",
+        texto: `Recupera a la orden (${RECUPERA_AGL.toLocaleString("en-US")} ft AGL) en ${T.reaccionSeg} s, nunca abajo de ${MIN_AGL} ft`,
+        textoEn: `Recovers on the call (${RECUPERA_AGL.toLocaleString("en-US")} ft AGL) within ${T.reaccionSeg} s, never below ${MIN_AGL} ft`,
+      },
+      { codigo: "5", texto: `Asciende entre ${BANDA.sube.join(" y ")} kt, ±${T.velocidadKt} kt`, textoEn: `Climbs between ${BANDA.sube.join(" and ")} kt, ±${T.velocidadKt} kt` },
+    ];
+  },
+  celdas: [
+    celda("reaccion", "Reacción", "Reaction"),
+    celda("planeo", "Planeo", "Glide"),
+    celda("checklist", "Checklist", "Checklist"),
+    celda("recuperacion", "Recuperación", "Recovery"),
+    celda("ascenso", "Ascenso", "Climb"),
+  ],
+  temas: ["c172"],
+  armar: armarFalla,
+  avanzar: avanzarFalla,
+  armarSolo: armarSoloFalla,
+  fase: (e) => (e.fase === "armado" || e.fase === "terminado" || e.fase === "invalido" ? e.fase : "en-curso"),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoFalla,
+  orden: (antes, ahora, e, idioma) => ordenFalla(antes as PasoFalla | null, ahora as PasoFalla | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoFalla(paso as PasoFalla | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosFalla(paso as PasoFalla | null, idioma),
+  queHacer: (paso, idioma) => queHacerFalla(paso as PasoFalla | null, idioma),
+  semaforo: semaforoFalla,
+  aviso: avisoFalla,
+  briefing: briefingFalla,
+  explicar: explicarFalla,
+  repetir: repetirFalla,
+  masFallado: masFalladoFalla,
+  paraGuardar: paraGuardarFalla,
+};
+
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos, "ascensos-descensos": defAltitud,
-  "virajes-ascendiendo": defCombinado, "toques-despegues": defCircuito,
+  "virajes-ascendiendo": defCombinado, "toques-despegues": defCircuito, "falla-motor": defFalla,
 };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */

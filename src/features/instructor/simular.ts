@@ -386,3 +386,39 @@ export function simularCircuito(
   }
   return out;
 }
+
+/**
+ * Falla de motor simulada en el C172: 6,600 ft (2,100 AGL), 95 kt, recto y nivelado. Hacia los 5 s el instructor dice
+ * «falla»; ralentí `reaccion` s después de los 6 s, planeo a `kt` (68) y el checklist a los 18 s, salvo `sinChecklist`
+ * (los magnetos «sin hacer» dejan el derecho apagado). Recupera `retraso` s después de llegar a 1,000 AGL + `recuperaAgl`
+ * y asciende a `ascenso` (72) 25 s.
+ */
+export function simularFalla(
+  op: { reaccion?: number; kt?: number; sinChecklist?: ("mezcla" | "selector" | "bomba" | "magnetos")[]; recuperaAgl?: number; retraso?: number; ascenso?: number; sinRalenti?: boolean } = {},
+): Muestra[] {
+  const SUELO = 4500;
+  const sin = new Set(op.sinChecklist ?? []);
+  const out: Muestra[] = [];
+  let [v, alt, vs, acel] = [95, SUELO + 2100, 0, 65];
+  let recupera: number | null = null;
+  for (let n = 0; ; n++) {
+    const t = n / 10;
+    if (op.sinRalenti && t > 40) break;
+    if (recupera !== null && t > recupera + 25) break;
+    if (!op.sinRalenti && recupera === null && t >= 6 + (op.reaccion ?? 1)) acel = 0;
+    if (recupera !== null && t >= recupera - 1e-9) acel = 100;
+    const ck = t >= 18;
+    const hecho = (x: "mezcla" | "selector" | "bomba" | "magnetos") => ck && !sin.has(x);
+    out.push({
+      t, inclinacion: 0, altitud: alt, velocidad: v, rumbo: 90, vs, bola: 0, agl: alt - SUELO, peso: 2400, enTierra: false, slew: false, tasa: 1, pausa: false,
+      titulo: "Cessna Skyhawk 172SP", acelerador: acel, mezcla: hecho("mezcla") ? 100 : 70, selector: hecho("selector") ? 1 : 2, bomba: hecho("bomba"),
+      magIzq: true, magDer: !(ck && sin.has("magnetos")), lat: 20.5, lon: -103.3,
+    });
+    if (recupera === null && acel === 0 && alt - SUELO <= 1000 + (op.recuperaAgl ?? 0)) recupera = t + (op.retraso ?? 1);
+    const meta = acel === 100 ? (op.ascenso ?? 72) : acel === 0 ? (op.kt ?? 68) : 95;
+    v += Math.sign(meta - v) * Math.min(Math.abs(meta - v), 0.3);
+    vs = acel === 100 ? 700 : acel === 0 ? -700 : 0;
+    alt += vs / 600;
+  }
+  return out;
+}

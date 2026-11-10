@@ -29,7 +29,8 @@ export const LECCIONES: Leccion[] = [
   l(8, "«S» sobre un camino", "S-turns along a road"),
   l(9, "«8» primera fase", "Figure 8, first phase"),
   l(10, "«8» segunda fase", "Figure 8, second phase"),
-  l(11, "Práctica de emergencia", "Emergency practice"),
+  // ponytail: la 12 se abre cuando Erik diga qué cambia respecto a la 11.
+  l(11, "Práctica de emergencia", "Emergency practice", "falla-motor"),
   l(12, "Práctica de emergencia", "Emergency practice"),
   l(13, "Repaso general", "General review"),
   l(14, "Toques y despegues", "Touch and goes", "toques-despegues"),

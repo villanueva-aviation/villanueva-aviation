@@ -82,6 +82,14 @@ export const tolCircuito = (n: Nivel = 3) => ({
   ...comunes(n),
 });
 
+export const tolFalla = (n: Nivel = 3) => ({
+  /** Segundos para ralentí tras «falla de motor» y para potencia completa tras «recupera». */
+  reaccionSeg: por(n, 5, 4, 3),
+  /** Kt de la velocidad de planeo (68) o fuera de la banda de ascenso. */
+  velocidadKt: por(n, 10, 7, 5),
+  ...comunes(n),
+});
+
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */
 export const tolFinal = (n: Nivel = 3) => ({ menos: por(n, 10, 7, 5), mas: por(n, 15, 12, 10) });
 
