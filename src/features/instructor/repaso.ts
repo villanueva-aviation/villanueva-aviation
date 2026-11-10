@@ -32,6 +32,45 @@ export interface Zona {
   lat: number;
   lon: number;
   radioNm: number;
+  /** Si está, la zona es este contorno [lat, lon] en lugar del círculo. */
+  poligono?: [number, number][];
+}
+
+/**
+ * Orilla del lago de Chapala (OpenStreetMap vía Nominatim, simplificada a ~1 km, 2026-11-09). Las islas cuentan como lago.
+ * ponytail: la simplificación corta la orilla hasta ~1 km; si Erik nota que avisa sobre tierra, bajar el umbral.
+ */
+const LAGO_CHAPALA: [number, number][] = [
+  [20.2452, -103.4217], [20.2254, -103.4062], [20.2271, -103.3652], [20.1818, -103.2194], [20.1494, -103.1714], [20.1669, -103.1352],
+  [20.1595, -103.0832], [20.1821, -103.0404], [20.1624, -103.021], [20.1736, -102.9721], [20.1626, -102.8665], [20.1185, -102.8244],
+  [20.1419, -102.8208], [20.1664, -102.6904], [20.1835, -102.6842], [20.206, -102.6873], [20.207, -102.7675], [20.2338, -102.7072],
+  [20.2642, -102.6941], [20.2835, -102.703], [20.2947, -102.7643], [20.3203, -102.7861], [20.3017, -102.8527], [20.3137, -102.9511],
+  [20.3367, -102.9927], [20.3335, -103.0788], [20.3254, -103.127], [20.2844, -103.1889], [20.2903, -103.1961], [20.2921, -103.2079],
+  [20.2867, -103.2338], [20.2976, -103.2693], [20.2827, -103.3351], [20.2887, -103.4111],
+];
+
+/** Los vértices en NM respecto al avión: el avión queda en el origen. */
+const relativos = (lat: number, lon: number, p: [number, number][]) => p.map(([a, b]) => aNm(a, b, lat, lon));
+
+/** Par-impar: ¿el origen está dentro? */
+function dentro(v: { x: number; y: number }[]): boolean {
+  let si = false;
+  for (let i = 0, j = v.length - 1; i < v.length; j = i++) {
+    if (v[i].y > 0 !== v[j].y > 0 && 0 < ((v[j].x - v[i].x) * -v[i].y) / (v[j].y - v[i].y) + v[i].x) si = !si;
+  }
+  return si;
+}
+
+/** NM del origen a la orilla más cercana. */
+function aLaOrilla(v: { x: number; y: number }[]): number {
+  let min = Infinity;
+  for (let i = 0, j = v.length - 1; i < v.length; j = i++) {
+    const dx = v[i].x - v[j].x;
+    const dy = v[i].y - v[j].y;
+    const k = Math.max(0, Math.min(1, -(v[j].x * dx + v[j].y * dy) / (dx * dx + dy * dy || 1)));
+    min = Math.min(min, Math.hypot(v[j].x + k * dx, v[j].y + k * dy));
+  }
+  return min;
 }
 
 const punto = (a: Aeropuerto, rumbo: number, nm: number) => ({
@@ -48,8 +87,8 @@ export function zonaRepaso(a: Aeropuerto | null, azar = Math.random): Zona | nul
   if (a.icao === "MMGL") {
     return azar() < 0.5
       ? { nombre: { es: "Cajititlán", en: "Cajititlan" }, ...punto(a, 180, 5), radioNm: 3 }
-      : // Sobre el agua, no sobre el cerro de la orilla: 4.5 NM al sur del aeródromo.
-        { nombre: { es: "el lago de Chapala, al sur del aeródromo", en: "Lake Chapala, south of the airfield" }, lat: AERODROMO_CHAPALA.lat - 4.5 / 60, lon: AERODROMO_CHAPALA.lon, radioNm: 3 };
+      : // Todo el lago (Erik, 2026-11-09); el centro sigue siendo el punto sobre el agua al sur del aeródromo.
+        { nombre: { es: "el lago de Chapala", en: "Lake Chapala" }, lat: AERODROMO_CHAPALA.lat - 4.5 / 60, lon: AERODROMO_CHAPALA.lon, radioNm: 3, poligono: LAGO_CHAPALA };
   }
   const larga = [...a.pistas].sort((x, y) => y.largoFt - x.largoFt)[0];
   // ponytail: rumbo verdadero redondeado a 10°; la declinación local no la manda el lector.
@@ -63,9 +102,10 @@ export function zonaRepaso(a: Aeropuerto | null, azar = Math.random): Zona | nul
 }
 
 export function enZona(m: Muestra, z: Zona): boolean {
-  if (m.lat === undefined || m.lon === undefined) return false;
+  if (m.lat === undefined || m.lon === undefined || m.agl < ALTURA_SEGURA_AGL) return false;
+  if (z.poligono) return dentro(relativos(m.lat, m.lon, z.poligono));
   const d = aNm(m.lat, m.lon, z.lat, z.lon);
-  return Math.hypot(d.x, d.y) <= z.radioNm && m.agl >= ALTURA_SEGURA_AGL;
+  return Math.hypot(d.x, d.y) <= z.radioNm;
 }
 
 /** Para salir hace falta pasarse del margen: así el aviso no se repite al volar justo en el borde. */
@@ -73,8 +113,13 @@ const MARGEN_NM = 0.5;
 const MARGEN_FT = 100;
 export function fueraDeZona(m: Muestra, z: Zona): boolean {
   if (m.lat === undefined || m.lon === undefined) return true;
+  if (m.agl < ALTURA_SEGURA_AGL - MARGEN_FT) return true;
+  if (z.poligono) {
+    const v = relativos(m.lat, m.lon, z.poligono);
+    return !dentro(v) && aLaOrilla(v) > MARGEN_NM;
+  }
   const d = aNm(m.lat, m.lon, z.lat, z.lon);
-  return Math.hypot(d.x, d.y) > z.radioNm + MARGEN_NM || m.agl < ALTURA_SEGURA_AGL - MARGEN_FT;
+  return Math.hypot(d.x, d.y) > z.radioNm + MARGEN_NM;
 }
 
 // ── La lección de rampa a rampa ──

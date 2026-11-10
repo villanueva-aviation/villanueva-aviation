@@ -7,7 +7,7 @@ import type { Idioma } from "./idiomaInstructor.ts";
 import type { ResultadoComun } from "./maniobras.ts";
 import { simularVuelo } from "./simularVuelo.ts";
 import {
-  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, enZona, maniobraActual, nombreManiobra, siguienteManiobra, sortear, zonaRepaso,
+  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, enZona, fueraDeZona, maniobraActual, nombreManiobra, siguienteManiobra, sortear, zonaRepaso,
   type EstadoRepaso, type Zona,
 } from "./repaso.ts";
 
@@ -31,12 +31,21 @@ test("zona en MMGL: Cajititlán o Chapala", () => {
   assert.equal(caji.nombre.es, "Cajititlán");
   assert.ok(Math.abs(dist(caji.lat, caji.lon) - 5) < 0.1);
   assert.ok(caji.lat < A.lat, "al sur");
-  const chapala = zonaRepaso(A, () => 0.99)!;
-  // Sobre el agua: 4.5 NM al sur del aeródromo de Chapala (MSFS: Paco Airport, 20.308 N 103.160 W), radio 3.
-  assert.equal(chapala.nombre.es, "el lago de Chapala, al sur del aeródromo");
-  assert.equal(chapala.radioNm, 3);
-  assert.ok(Math.abs(chapala.lat - (20.308378 - 4.5 / 60)) < 0.001);
-  assert.ok(Math.abs(chapala.lon - -103.159506) < 0.001);
+  assert.equal(zonaRepaso(A, () => 0.99)!.nombre.es, "el lago de Chapala");
+});
+
+test("Chapala: todo el lago es la zona (Erik, 2026-11-09)", () => {
+  const z = zonaRepaso(A, () => 0.99)!;
+  const sobre = (lat: number, lon: number): Muestra => ({ ...BASE, lat, lon, agl: 1800, enTierra: false });
+  assert.equal(enZona(sobre(20.2334, -103.1595), z), true, "la zona de antes, al sur del aeródromo");
+  assert.equal(enZona(sobre(20.2, -102.8), z), true, "el extremo este del lago");
+  assert.equal(enZona(sobre(20.25, -103.38), z), true, "el extremo oeste, frente a Jocotepec");
+  assert.equal(enZona(sobre(20.31, -103.26), z), false, "Ajijic, en tierra");
+  assert.equal(enZona(sobre(20.44, -103.31), z), false, "Cajititlán");
+  // Orilla norte en 20.3335 N 103.0788 W: medio NM de margen para salir.
+  assert.equal(fueraDeZona(sobre(20.3335 + 0.3 / 60, -103.0788), z), false);
+  assert.equal(fueraDeZona(sobre(20.3335 + 1 / 60, -103.0788), z), true);
+  assert.equal(fueraDeZona(sobre(20.2, -102.8), z), false);
 });
 
 test("otro aeropuerto: 10 NM al través de la pista más larga; sin aeropuerto, null", () => {

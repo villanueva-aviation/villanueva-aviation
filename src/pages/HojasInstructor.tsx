@@ -55,7 +55,7 @@ export function HojasInstructor() {
         <h2 className={h2}>1. Repaso general (C172)</h2>
         <ul className="mt-3 grid list-disc gap-1.5 pl-5 text-sm text-slate-700">
           <li>De rampa a rampa: checklist y rodaje, despegue, 4 maniobras al azar en la zona de trabajo, regreso, aterrizaje y apagado.</li>
-          <li>Desde MMGL la zona es Cajititlán (5 NM al sur) o el lago de Chapala (4.5 NM al sur del aeródromo de Chapala, sobre el agua). Entra a 1,500 ft sobre el terreno o más: vuela a 7,000 ft.</li>
+          <li>Desde MMGL la zona es Cajititlán (5 NM al sur) o el lago de Chapala (cualquier parte sobre el agua). Entra a 1,500 ft sobre el terreno o más: vuela a 7,000 ft.</li>
           <li>Despegue: rota a {VEL_C172.vr} kt y asciende a Vy, {VEL_C172.vy} kt. Final: {VEL_C172.aprox} kt, −5/+10.</li>
           <li>Si usas slew o el avión salta de lugar, la lección no se califica. Regresa volando.</li>
         </ul>
