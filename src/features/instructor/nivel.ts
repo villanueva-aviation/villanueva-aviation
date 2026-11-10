@@ -41,6 +41,15 @@ export const tolLento = (n: Nivel = 3) => ({
   ...comunes(n),
 });
 
+export const tolRumbos = (n: Nivel = 3) => ({
+  altitudFt: por(n, 200, 150, 100),
+  inclinacionGrados: por(n, 10, 7, 5),
+  /** Rumbo al nivelar y mientras se mantiene. */
+  rumboGrados: por(n, 20, 15, 10),
+  velocidadKt: por(n, 20, 15, 10),
+  ...comunes(n),
+});
+
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */
 export const tolFinal = (n: Nivel = 3) => ({ menos: por(n, 10, 7, 5), mas: por(n, 15, 12, 10) });
 

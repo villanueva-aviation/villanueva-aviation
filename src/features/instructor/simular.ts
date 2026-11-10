@@ -207,3 +207,39 @@ export function simularManiobra(
   recto(5);
   return out;
 }
+
+/**
+ * Virajes a rumbos a 10 Hz: 5 s recto en 090 a 3,500 ft y 95 kt, entrada en 3 s a `incl` (30°), viraje por la derecha
+ * hasta el rumbo asignado (240) + `pasarse`, salida en 3 s que empieza justo a tiempo, y 15 s recto.
+ * El ritmo de viraje crece con la inclinación (lineal, basta para probar). `perdidaFt`: altitud perdida mientras está inclinado.
+ */
+export function simularRumbos(op: { incl?: number; pasarse?: number; perdidaFt?: number; ladoContrario?: boolean } = {}): Muestra[] {
+  const incl = op.incl ?? 30;
+  const w = (1091 * Math.tan((incl * Math.PI) / 180)) / 95; // °/s con la inclinación completa
+  const s = op.ladoContrario ? -1 : 1;
+  const meta = 150 + (op.pasarse ?? 0); // giro total
+  const out: Muestra[] = [];
+  let t = 0;
+  let rumbo = 90;
+  let girado = 0;
+  let banco = 0;
+  let saliendo = false;
+  let fin: number | null = null;
+  while (fin === null || t < fin + 15) {
+    out.push({
+      t: Math.round(t * 10) / 10, inclinacion: s * banco, altitud: 3500 - (banco > 5 ? (op.perdidaFt ?? 0) : 0), velocidad: 95, rumbo: norm(rumbo),
+      bola: 0, agl: 2500, peso: 2550, enTierra: false, slew: false, tasa: 1, pausa: false, titulo: "Cessna Skyhawk 172SP",
+    });
+    t += 0.1;
+    if (t < 5) continue;
+    // La salida dura 3 s y gira w·1.5°: empieza a esa distancia de la meta.
+    if (!saliendo && meta - girado <= w * 1.5) saliendo = true;
+    banco = saliendo ? Math.max(0, banco - (incl / 3) * 0.1) : Math.min(incl, banco + (incl / 3) * 0.1);
+    if (saliendo && banco === 0 && fin === null) fin = t;
+    const d = w * (banco / incl) * 0.1;
+    girado += d;
+    rumbo += s * d;
+    if (op.ladoContrario && girado > 60 && fin === null) fin = t;
+  }
+  return out;
+}

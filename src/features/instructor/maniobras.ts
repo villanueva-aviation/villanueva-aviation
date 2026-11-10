@@ -9,16 +9,21 @@ import { textosReporte, traducirAviso, type Idioma } from "./idiomaInstructor.ts
 import type { Tema } from "./preguntas.ts";
 import { paraGuardar } from "./reglasIntentos.ts";
 import { elementosAcs } from "./virajeEscarpado.ts";
-import { tolLento, tolRecto, type Nivel } from "./nivel.ts";
+import { tolLento, tolRecto, tolRumbos, type Nivel } from "./nivel.ts";
 import { avisoVoz, ordenVoz, paraVoz, pasoVoz, semaforo, textoPaso, type Aviso, type Luz, type PasoVoz } from "./voz.ts";
 import { avisoLento, ordenLento, pasoLento, semaforoLento, textoPasoLento, type PasoLento } from "./vozLento.ts";
 import { avisoRecto, ordenRecto, pasoRecto, semaforoRecto, textoPasoRecto, type PasoRecto } from "./vozRecto.ts";
 import { INCLINACION_VIRAJE, OBJETIVO_KT } from "./vueloLento.ts";
+import { armarRumbos, armarSoloRumbos, avanzarRumbos, INCLINACION_RUMBOS, type EvaluacionRumbos, type ResultadoRumbos } from "./evaluadorRumbos.ts";
+import {
+  avisoRumbos, briefingRumbos, explicarRumbos, listaPasosRumbos, masFalladoRumbos, ordenRumbos, paraGuardarRumbos, pasoRumbos, queHacerRumbos,
+  repetirRumbos, semaforoRumbos, textoPasoRumbos, type PasoRumbos,
+} from "./textosRumbos.ts";
 import { ALTURA_SEGURA_AGL } from "./virajeEscarpado.ts";
 
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
-export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento";
+export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -184,7 +189,51 @@ const defLento: DefManiobra<EvaluacionLento, ResultadoLento> = {
   paraGuardar: paraGuardarLento,
 };
 
-export const MANIOBRAS: Record<ManiobraId, DefManiobra> = { "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento };
+const defRumbos: DefManiobra<EvaluacionRumbos, ResultadoRumbos> = {
+  id: "virajes-rumbos",
+  insignia: "maniobra-virajes-rumbos-c172",
+  avion: "C172",
+  titulo: { es: "Virajes a rumbos C172", en: "C172 turns to headings" },
+  tarea: { es: "Práctica · Virajes a rumbos", en: "Practice · Turns to headings" },
+  elementosReporte: (n) => {
+    const T = tolRumbos(n);
+    return [
+      { codigo: "1", texto: `Mantiene la altitud ±${T.altitudFt} ft`, textoEn: `Maintains altitude ±${T.altitudFt} ft` },
+      { codigo: "2", texto: `Inclinación ${INCLINACION_RUMBOS}° ±${T.inclinacionGrados}°`, textoEn: `Bank ${INCLINACION_RUMBOS}° ±${T.inclinacionGrados}°` },
+      { codigo: "3", texto: `Nivela en el rumbo asignado ±${T.rumboGrados}°`, textoEn: `Rolls out on the assigned heading ±${T.rumboGrados}°` },
+      { codigo: "4", texto: `Mantiene la velocidad ±${T.velocidadKt} kt`, textoEn: `Maintains airspeed ±${T.velocidadKt} kt` },
+      { codigo: "5", texto: "Vuelo coordinado: bola centrada", textoEn: "Coordinated flight: ball centered" },
+    ];
+  },
+  celdas: [
+    celda("altitud", "Altitud", "Altitude"),
+    celda("inclinacion", `Inclinación ${INCLINACION_RUMBOS}°`, `Bank ${INCLINACION_RUMBOS}°`),
+    celda("rumbo", "Rumbo", "Heading"),
+    celda("velocidad", "Velocidad", "Airspeed"),
+    celda("bola", "Bola", "Ball"),
+  ],
+  temas: ["c172"],
+  armar: armarRumbos,
+  avanzar: avanzarRumbos,
+  armarSolo: armarSoloRumbos,
+  fase: (e) => (e.fase === "virando" || e.fase === "manteniendo" ? "en-curso" : e.fase),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoRumbos,
+  orden: (antes, ahora, e, idioma) => ordenRumbos(antes as PasoRumbos | null, ahora as PasoRumbos | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoRumbos(paso as PasoRumbos | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosRumbos(paso as PasoRumbos | null, idioma),
+  queHacer: (paso, idioma) => queHacerRumbos(paso as PasoRumbos | null, idioma),
+  semaforo: semaforoRumbos,
+  aviso: avisoRumbos,
+  briefing: briefingRumbos,
+  explicar: explicarRumbos,
+  repetir: repetirRumbos,
+  masFallado: masFalladoRumbos,
+  paraGuardar: paraGuardarRumbos,
+};
+
+export const MANIOBRAS: Record<ManiobraId, DefManiobra> = { "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */
 export function defDe(id: string | null | undefined): DefManiobra {

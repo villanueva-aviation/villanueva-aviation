@@ -3,6 +3,7 @@ export type Idioma = "es" | "en";
 // ponytail: tabla español→inglés de los textos que arma el evaluador; si gana más, pasar el evaluador a códigos.
 const MOTIVOS_EN: Record<string, string> = {
   "Despega primero: la maniobra se arma en el aire.": "Take off first: the maneuver starts in the air.",
+  "Viraste al lado contrario del que pidió el instructor.": "You turned the opposite way from what the instructor asked.",
   "Tu lector es de una versión anterior: baja el nuevo de Descargas para el vuelo lento.":
     "Your reader is an older version: download the new one from Downloads for slow flight.",
   "Se perdió la conexión con el simulador por más de 2 segundos.": "The connection to the simulator dropped for more than 2 seconds.",

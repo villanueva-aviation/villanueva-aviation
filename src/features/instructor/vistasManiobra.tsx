@@ -2,6 +2,7 @@ import type { JSX } from "react";
 import { HojaCheckride } from "./HojaCheckride";
 import { HojaLento } from "./HojaLento";
 import { HojaRecto } from "./HojaRecto";
+import { HojaRumbos } from "./HojaRumbos";
 import type { Idioma } from "./idiomaInstructor";
 import type { ManiobraId } from "./maniobras";
 
@@ -10,4 +11,5 @@ export const HOJA: Record<ManiobraId, (p: { resultado: any; idioma: Idioma }) =>
   "viraje-escarpado": HojaCheckride,
   "recto-nivelado": HojaRecto,
   "vuelo-lento": HojaLento,
+  "virajes-rumbos": HojaRumbos,
 };

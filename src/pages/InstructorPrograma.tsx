@@ -137,7 +137,7 @@ const COLOR: Record<Luz, string> = {
 };
 const COLOR_ESTADO = { conectado: "text-emerald-300", "sin-simulador": "text-gold-300", "sin-lector": "text-red-300" } as const;
 const EN_VUELO: Bloque[] = ["preparacion", "practica", "checkride"];
-const MATERIAL: Record<ManiobraId, typeof MATERIAL_VIRAJE> = { "viraje-escarpado": MATERIAL_VIRAJE, "recto-nivelado": MATERIAL_RECTO, "vuelo-lento": MATERIAL_LENTO };
+const MATERIAL: Record<ManiobraId, typeof MATERIAL_VIRAJE> = { "viraje-escarpado": MATERIAL_VIRAJE, "recto-nivelado": MATERIAL_RECTO, "vuelo-lento": MATERIAL_LENTO, "virajes-rumbos": MATERIAL_RECTO };
 const mayus = (s: string) => `${s[0].toUpperCase()}${s.slice(1)}`;
 
 function leerIdioma(): Idioma {

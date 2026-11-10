@@ -22,7 +22,7 @@ export const LECCIONES: Leccion[] = [
   // ponytail: 2 y 3 son iguales hasta que Erik diga qué cambia entre ellas en la escuela.
   l(2, "Vuelo recto y nivelado", "Straight and level flight", "recto-nivelado"),
   l(3, "Vuelo recto y nivelado", "Straight and level flight", "recto-nivelado"),
-  l(4, "Virajes a rumbos", "Turns to headings"),
+  l(4, "Virajes a rumbos", "Turns to headings", "virajes-rumbos"),
   l(5, "Ascensos y descensos", "Climbs and descents"),
   l(6, "Virajes ascendiendo y descendiendo", "Climbing and descending turns"),
   l(7, "Vuelo lento", "Slow flight", "vuelo-lento"),
