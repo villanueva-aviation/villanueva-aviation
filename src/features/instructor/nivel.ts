@@ -50,6 +50,15 @@ export const tolRumbos = (n: Nivel = 3) => ({
   ...comunes(n),
 });
 
+export const tolAltitud = (n: Nivel = 3) => ({
+  /** Al nivelar y mientras se mantiene. */
+  altitudFt: por(n, 200, 150, 100),
+  /** Kt fuera de la banda de velocidad (70–74 al subir, 90–95 al bajar; Erik). */
+  velocidadKt: por(n, 10, 7, 5),
+  rumboGrados: por(n, 20, 15, 10),
+  ...comunes(n),
+});
+
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */
 export const tolFinal = (n: Nivel = 3) => ({ menos: por(n, 10, 7, 5), mas: por(n, 15, 12, 10) });
 

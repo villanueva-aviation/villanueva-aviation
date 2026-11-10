@@ -209,6 +209,36 @@ export function simularManiobra(
 }
 
 /**
+ * Ascensos y descensos a 10 Hz: 5 s recto en 090 a 7,000 ft (o 7,500 si `baja`) y 95 kt, terreno a 4,500 ft.
+ * Cambia a 700 ft/min (500 al bajar) a `kt` (72 o 92), nivela de golpe en la asignada + `pasarse` y sigue 15 s a 95 kt.
+ */
+export function simularAltitud(op: { baja?: boolean; kt?: number; pasarse?: number; contrario?: boolean } = {}): Muestra[] {
+  const s = op.baja ? -1 : 1;
+  const inicio = op.baja ? 7500 : 7000;
+  const meta = inicio + s * 500 + s * (op.pasarse ?? 0);
+  const kt = op.kt ?? (op.baja ? 92 : 72);
+  const fpm = (op.baja ? 500 : 700) * (op.contrario ? -1 : 1);
+  const out: Muestra[] = [];
+  let alt = inicio;
+  let v = 95;
+  let fin: number | null = null;
+  for (let n = 0; fin === null || n / 10 < fin + 15; n++) {
+    const t = n / 10;
+    const cambiando = t >= 5 && fin === null;
+    out.push({
+      t, inclinacion: 0, altitud: alt, velocidad: v, rumbo: 90, vs: cambiando ? s * fpm : 0,
+      bola: 0, agl: alt - 4500, peso: 2550, enTierra: false, slew: false, tasa: 1, pausa: false, titulo: "Cessna Skyhawk 172SP",
+    });
+    if (cambiando) {
+      alt += (s * fpm) / 600;
+      v += Math.sign(kt - v) * Math.min(Math.abs(kt - v), 0.5);
+      if (s * (alt - meta) >= 0 || (op.contrario && Math.abs(alt - inicio) > 300)) [alt, fin] = [op.contrario ? alt : meta, t];
+    } else if (fin !== null) v += Math.sign(95 - v) * Math.min(Math.abs(95 - v), 0.5);
+  }
+  return out;
+}
+
+/**
  * Virajes a rumbos a 10 Hz: 5 s recto en 090 a 3,500 ft y 95 kt, entrada en 3 s a `incl` (30°), viraje por la derecha
  * hasta el rumbo asignado (240) + `pasarse`, salida en 3 s que empieza justo a tiempo, y 15 s recto.
  * El ritmo de viraje crece con la inclinación (lineal, basta para probar). `perdidaFt`: altitud perdida mientras está inclinado.
