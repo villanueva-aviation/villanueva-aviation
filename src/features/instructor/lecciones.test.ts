@@ -23,9 +23,10 @@ test("acceso al repaso: por ahora solo el fundador", () => {
 });
 
 test("2 y 3 (recto y nivelado) y 7 (vuelo lento) se abren con su maniobra, con la misma regla de acceso", () => {
-  assert.deepEqual(LECCIONES.filter((l) => l.disponible).map((l) => l.numero), [2, 3, 4, 5, 7, REPASO]);
+  assert.deepEqual(LECCIONES.filter((l) => l.disponible).map((l) => l.numero), [2, 3, 4, 5, 6, 7, REPASO]);
   assert.equal(LECCIONES[3].maniobra, "virajes-rumbos");
   assert.equal(LECCIONES[4].maniobra, "ascensos-descensos");
+  assert.equal(LECCIONES[5].maniobra, "virajes-ascendiendo");
   assert.equal(LECCIONES[1].maniobra, "recto-nivelado");
   assert.equal(LECCIONES[2].maniobra, "recto-nivelado");
   assert.equal(LECCIONES[6].maniobra, "vuelo-lento");
@@ -39,6 +40,6 @@ test("cada lección se guarda con su clave; el repaso conserva la de antes", () 
   assert.equal(claveLeccion(LECCIONES[6]), "leccion-7");
   assert.equal(leccionDe(undefined), LECCIONES[REPASO - 1]);
   assert.equal(leccionDe("7"), LECCIONES[6]);
-  assert.equal(leccionDe("6"), null, "no disponible");
+  assert.equal(leccionDe("8"), null, "no disponible");
   assert.equal(leccionDe("x"), null);
 });

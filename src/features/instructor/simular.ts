@@ -273,3 +273,52 @@ export function simularRumbos(op: { incl?: number; pasarse?: number; perdidaFt?:
   }
   return out;
 }
+
+/**
+ * Virajes ascendiendo y descendiendo a 10 Hz: 5 s recto en 090 a 7,000 ft (7,500 si `baja`) y 95 kt, terreno a 4,500 ft.
+ * Viraje por la derecha a `incl` (15°) hasta 240 + `pasarse`, y a la vez cambio de altitud a `fpm` (700 o 500) hasta la
+ * asignada + `pasarseFt`, a `kt` (72 o 92). Cada uno termina por su lado; luego 15 s recto y nivelado.
+ */
+export function simularCombinado(
+  op: { baja?: boolean; kt?: number; incl?: number; pasarse?: number; pasarseFt?: number; fpm?: number; ladoContrario?: boolean; contrario?: boolean } = {},
+): Muestra[] {
+  const incl = op.incl ?? 15;
+  const lado = op.ladoContrario ? -1 : 1;
+  const metaGiro = 150 + (op.pasarse ?? 0);
+  const s = op.baja ? -1 : 1;
+  const inicio = op.baja ? 7500 : 7000;
+  const metaAlt = inicio + s * (500 + (op.pasarseFt ?? 0));
+  const kt = op.kt ?? (op.baja ? 92 : 72);
+  const fpm = (op.fpm ?? (op.baja ? 500 : 700)) * (op.contrario ? -1 : 1);
+  const out: Muestra[] = [];
+  let [rumbo, girado, banco, alt, v] = [90, 0, 0, inicio, 95];
+  let saliendo = false;
+  let giroFin: number | null = null;
+  let altFin: number | null = null;
+  for (let n = 0; ; n++) {
+    const t = n / 10;
+    if (giroFin !== null && altFin !== null && t > Math.max(giroFin, altFin) + 15) break;
+    const cambiando = t >= 5 && altFin === null;
+    out.push({
+      t, inclinacion: lado * banco, altitud: alt, velocidad: v, rumbo: norm(rumbo), vs: cambiando ? s * fpm : 0,
+      bola: 0, agl: alt - 4500, peso: 2550, enTierra: false, slew: false, tasa: 1, pausa: false, titulo: "Cessna Skyhawk 172SP",
+    });
+    if (t < 5) continue;
+    if (giroFin === null) {
+      const w = (1091 * Math.tan((incl * Math.PI) / 180)) / v; // °/s con la inclinación completa
+      // La salida dura 2 s y gira w·1°: empieza a esa distancia de la meta.
+      if (!saliendo && metaGiro - girado <= w) saliendo = true;
+      banco = saliendo ? Math.max(0, banco - (incl / 2) * 0.1) : Math.min(incl, banco + (incl / 2) * 0.1);
+      const d = w * (banco / incl) * 0.1;
+      girado += d;
+      rumbo += lado * d;
+      if ((saliendo && banco === 0) || (op.ladoContrario && girado > 60)) giroFin = t;
+    }
+    if (cambiando) {
+      alt += (s * fpm) / 600;
+      v += Math.sign(kt - v) * Math.min(Math.abs(kt - v), 0.5);
+      if (s * (alt - metaAlt) >= 0 || (op.contrario && Math.abs(alt - inicio) > 300)) [alt, altFin] = [op.contrario ? alt : metaAlt, t];
+    } else if (altFin !== null) v += Math.sign(95 - v) * Math.min(Math.abs(95 - v), 0.5);
+  }
+  return out;
+}

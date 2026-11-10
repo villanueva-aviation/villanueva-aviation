@@ -25,10 +25,16 @@ import {
   repetirRumbos, semaforoRumbos, textoPasoRumbos, type PasoRumbos,
 } from "./textosRumbos.ts";
 import { ALTURA_SEGURA_AGL } from "./virajeEscarpado.ts";
+import { tolCombinado } from "./nivel.ts";
+import { armarCombinado, armarSoloCombinado, avanzarCombinado, INCLINACION_COMBINADO, type EvaluacionCombinado, type ResultadoCombinado } from "./evaluadorCombinado.ts";
+import {
+  avisoCombinado, briefingCombinado, explicarCombinado, listaPasosCombinado, masFalladoCombinado, ordenCombinado, paraGuardarCombinado, pasoCombinado,
+  queHacerCombinado, repetirCombinado, semaforoCombinado, textoPasoCombinado, type PasoCombinado,
+} from "./textosCombinado.ts";
 
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
-export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos";
+export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -275,8 +281,53 @@ const defAltitud: DefManiobra<EvaluacionAltitud, ResultadoAltitud> = {
   paraGuardar: paraGuardarAltitud,
 };
 
+const defCombinado: DefManiobra<EvaluacionCombinado, ResultadoCombinado> = {
+  id: "virajes-ascendiendo",
+  insignia: "maniobra-virajes-ascendiendo-c172",
+  avion: "C172",
+  titulo: { es: "Virajes ascendiendo y descendiendo C172", en: "C172 climbing and descending turns" },
+  tarea: { es: "Práctica · Virajes ascendiendo y descendiendo", en: "Practice · Climbing and descending turns" },
+  elementosReporte: (n) => {
+    const T = tolCombinado(n);
+    return [
+      { codigo: "1", texto: `Velocidad ${BANDA.sube.join("–")} kt al subir y ${BANDA.baja.join("–")} kt al bajar, ±${T.velocidadKt} kt`, textoEn: `Airspeed ${BANDA.sube.join("-")} kt climbing and ${BANDA.baja.join("-")} kt descending, ±${T.velocidadKt} kt` },
+      { codigo: "2", texto: `Inclinación ${INCLINACION_COMBINADO}° ±${T.inclinacionGrados}°`, textoEn: `Bank ${INCLINACION_COMBINADO}° ±${T.inclinacionGrados}°` },
+      { codigo: "3", texto: `Nivela en el rumbo asignado ±${T.rumboGrados}°`, textoEn: `Rolls out on the assigned heading ±${T.rumboGrados}°` },
+      { codigo: "4", texto: `Nivela en la altitud asignada ±${T.altitudFt} ft`, textoEn: `Levels off at the assigned altitude ±${T.altitudFt} ft` },
+      { codigo: "5", texto: "Vuelo coordinado: bola centrada", textoEn: "Coordinated flight: ball centered" },
+    ];
+  },
+  celdas: [
+    celda("velocidad", "Velocidad", "Airspeed"),
+    celda("inclinacion", `Inclinación ${INCLINACION_COMBINADO}°`, `Bank ${INCLINACION_COMBINADO}°`),
+    celda("rumbo", "Rumbo", "Heading"),
+    celda("altitud", "Altitud", "Altitude"),
+    celda("bola", "Bola", "Ball"),
+  ],
+  temas: ["c172"],
+  armar: armarCombinado,
+  avanzar: avanzarCombinado,
+  armarSolo: armarSoloCombinado,
+  fase: (e) => (e.fase === "virando" || e.fase === "manteniendo" ? "en-curso" : e.fase),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoCombinado,
+  orden: (antes, ahora, e, idioma) => ordenCombinado(antes as PasoCombinado | null, ahora as PasoCombinado | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoCombinado(paso as PasoCombinado | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosCombinado(paso as PasoCombinado | null, idioma),
+  queHacer: (paso, idioma) => queHacerCombinado(paso as PasoCombinado | null, idioma),
+  semaforo: semaforoCombinado,
+  aviso: avisoCombinado,
+  briefing: briefingCombinado,
+  explicar: explicarCombinado,
+  repetir: repetirCombinado,
+  masFallado: masFalladoCombinado,
+  paraGuardar: paraGuardarCombinado,
+};
+
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos, "ascensos-descensos": defAltitud,
+  "virajes-ascendiendo": defCombinado,
 };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */

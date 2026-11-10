@@ -11,10 +11,10 @@ export const ADELANTO_FT = 50;
 export const MANTENER_SEG = 10;
 export const BANDA = { sube: [70, 74], baja: [90, 95] } as const;
 /** Menos de esto de régimen vertical durante QUIETO_SEG: niveló. */
-const QUIETO_FPM = 150;
-const QUIETO_SEG = 3;
+export const QUIETO_FPM = 150;
+export const QUIETO_SEG = 3;
 /** Irse más que esto al otro lado anula. */
-const CONTRARIO_FT = 150;
+export const CONTRARIO_FT = 150;
 
 export type CampoAltitud = "altitud" | "velocidad" | "rumbo" | "bola";
 export const CAMPOS_ALTITUD: CampoAltitud[] = ["altitud", "velocidad", "rumbo", "bola"];
@@ -80,7 +80,7 @@ export function fueraDeBanda(kt: number, sube: boolean): number {
 }
 
 /** ¿Se califica la velocidad? Ya cambió 150 ft y le faltan más de 100: ya no está acelerando ni nivelando. */
-const midiendoVelocidad = (cambiado: number, total: number) => cambiado >= 150 && total - cambiado > 100;
+export const midiendoVelocidad = (cambiado: number, total: number) => cambiado >= 150 && total - cambiado > 100;
 
 export function desvioAltitud(m: Muestra, o: Muestra, a: AltitudAsignada, c: CampoAltitud, nivelo: boolean): number | null {
   const total = Math.abs(a.altitud - o.altitud);
@@ -114,7 +114,7 @@ function estable(v: Muestra[]): boolean {
 }
 
 /** Régimen vertical: el del lector, o el de las dos últimas muestras con un lector viejo. */
-const fpm = (m: Muestra, p: Muestra) => m.vs ?? ((m.altitud - p.altitud) / Math.max(0.05, m.t - p.t)) * 60;
+export const fpm = (m: Muestra, p: Muestra) => m.vs ?? ((m.altitud - p.altitud) / Math.max(0.05, m.t - p.t)) * 60;
 
 function resultado(ev: EvaluacionAltitud, tramo: Muestra[], n: Nivel): ResultadoAltitud {
   const o = ev.objetivo!;

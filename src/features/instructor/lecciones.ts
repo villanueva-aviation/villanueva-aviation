@@ -24,7 +24,7 @@ export const LECCIONES: Leccion[] = [
   l(3, "Vuelo recto y nivelado", "Straight and level flight", "recto-nivelado"),
   l(4, "Virajes a rumbos", "Turns to headings", "virajes-rumbos"),
   l(5, "Ascensos y descensos", "Climbs and descents", "ascensos-descensos"),
-  l(6, "Virajes ascendiendo y descendiendo", "Climbing and descending turns"),
+  l(6, "Virajes ascendiendo y descendiendo", "Climbing and descending turns", "virajes-ascendiendo"),
   l(7, "Vuelo lento", "Slow flight", "vuelo-lento"),
   l(8, "«S» sobre un camino", "S-turns along a road"),
   l(9, "«8» primera fase", "Figure 8, first phase"),

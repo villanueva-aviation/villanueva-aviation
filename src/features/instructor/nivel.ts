@@ -59,6 +59,17 @@ export const tolAltitud = (n: Nivel = 3) => ({
   ...comunes(n),
 });
 
+export const tolCombinado = (n: Nivel = 3) => ({
+  /** Al nivelar y mientras se mantiene. */
+  altitudFt: por(n, 200, 150, 100),
+  /** Kt fuera de la banda (la misma de ascensos y descensos). */
+  velocidadKt: por(n, 10, 7, 5),
+  inclinacionGrados: por(n, 10, 7, 5),
+  /** Al nivelar alas y mientras se mantiene. */
+  rumboGrados: por(n, 20, 15, 10),
+  ...comunes(n),
+});
+
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */
 export const tolFinal = (n: Nivel = 3) => ({ menos: por(n, 10, 7, 5), mas: por(n, 15, 12, 10) });
 

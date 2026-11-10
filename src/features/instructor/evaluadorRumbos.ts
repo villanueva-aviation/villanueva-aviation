@@ -104,7 +104,7 @@ export function armarSoloRumbos(ev: EvaluacionRumbos | null, m: Muestra): boolea
 }
 
 const rango = (v: number[]) => Math.max(...v) - Math.min(...v);
-function estable(v: Muestra[]): boolean {
+export function estable(v: Muestra[]): boolean {
   if (v.length < 2 || v[v.length - 1].t - v[0].t < 0.9 * ESTABLE.seg) return false;
   return (
     v.every((m) => Math.abs(m.inclinacion) < ESTABLE.inclinacion) &&
