@@ -10,7 +10,7 @@ import { FOUNDER_EMAIL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 
 /** La teoría con dibujos de cada lección que ya la tiene. */
-const TEORIA: Partial<Record<number, TemaIfr>> = { 1: "interceptacion" };
+const TEORIA: Partial<Record<number, TemaIfr>> = { 1: "interceptacion", 2: "rutas", 3: "arcos", 4: "esperas" };
 
 const T = {
   es: {

@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Download } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { HSI } from "../features/landing/HSI";
+import { DiagramaEspera } from "../features/entrenador/EntrenadorEsperas";
 import type { Idioma } from "../features/instructor/idiomaInstructor";
 import { TEORIA_IFR, type TemaIfr } from "../data/teoriaIfr";
 import { ROUTES } from "../lib/routes";
@@ -54,6 +55,11 @@ export function TeoriaIfr() {
               {s.hsi && (
                 <div className="mx-auto mt-3 w-40 shrink-0 sm:mt-0">
                   <HSI rumbo={s.hsi.rumbo} curso={s.hsi.curso} desviacion={s.hsi.desviacion} marcador={s.hsi.rumbo} />
+                </div>
+              )}
+              {s.espera && (
+                <div className="mx-auto mt-3 w-56 shrink-0 rounded-xl bg-[#0b1d34] p-2 sm:mt-0">
+                  <DiagramaEspera s={s.espera} revelar />
                 </div>
               )}
             </section>

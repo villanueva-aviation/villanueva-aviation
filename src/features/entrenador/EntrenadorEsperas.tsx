@@ -135,6 +135,9 @@ function Diagrama({ s, revelar }: { s: Situacion; revelar: boolean }) {
   );
 }
 
+/** El mismo dibujo, para la teoría IFR. */
+export { Diagrama as DiagramaEspera };
+
 export function EntrenadorEsperas() {
   const idTitulo = useId();
   const [s, setS] = useState<Situacion>(() => generarSituacion());
