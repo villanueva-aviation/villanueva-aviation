@@ -30,6 +30,14 @@ const rampa = (de: number, a: number, rumbo: number, dme?: number): [number, num
 };
 const quieto = (desv: number, rumbo: number, seg: number, dme?: number) => Array.from({ length: seg }, (): [number, number, number?] => [desv, rumbo, dme]);
 
+test("NAV1 en otro VOR a mitad del ejercicio: no se califica contra esa estación y se anula a los 10 s", () => {
+  let e = iniciarInterceptacion(base(0, 20, 60), 2, EJ, { intento: 0, examen: false });
+  // Otra estación: su radial cae justo en el curso, pero no es el VOR del ejercicio.
+  for (let t = 1; t <= 12; t++) e = avanzarInterceptacion(e, { ...base(t, 0, 90), navMhz: 115.3 });
+  assert.equal(e.cruce, null);
+  assert.equal(e.fase, "invalido");
+});
+
 test("perfecta: entra a 30°, cruza y se queda centrada 30 s → 100 sin tramos", () => {
   const e = volar([...rampa(20, 0, 60), ...quieto(0, 90, 35)]);
   assert.equal(e.fase, "terminado");

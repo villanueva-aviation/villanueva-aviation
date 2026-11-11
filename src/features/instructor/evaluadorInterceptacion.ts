@@ -104,7 +104,9 @@ export function avanzarInterceptacion(e: EvaluacionInterceptacion, m: Muestra): 
   const motivo = invalidez(m, e.previo) ?? (lectorViejoNav(m) ? MOTIVO_LECTOR : m.gpsNav ? MOTIVO_GPS : null);
   if (motivo) return anular(e, m, motivo);
   const muestras = [...e.muestras, m];
-  if (!m.navSenal) {
+  // Otra frecuencia en NAV1 es otra estación: cuenta como sin señal del VOR del ejercicio.
+  const otraEstacion = e.inicio.navMhz !== undefined && m.navMhz !== undefined && Math.abs(m.navMhz - e.inicio.navMhz) >= 0.03;
+  if (!m.navSenal || otraEstacion) {
     const desde = e.sinSenalDesde ?? m.t;
     if (m.t - desde > SIN_SENAL_SEG) return anular(e, m, MOTIVO_SENAL);
     return { ...e, sinSenalDesde: desde, muestras, previo: m };
