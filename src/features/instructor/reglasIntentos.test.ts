@@ -43,7 +43,8 @@ test("el repaso general: su renglón es la lección, no un intento ni el checkri
   const s = agruparSesiones(lista)[0];
   assert.equal(s.intentos, 2);
   assert.deepEqual(s.checkride, { calificacion: 60, aprobado: false });
-  assert.deepEqual(s.leccion, { nombre: "Repaso general", modo: "checkride", calificacion: 75, aprobado: false, nivel: 3 });
+  assert.ok(leccion.id, "el renglón de la lección tiene id");
+  assert.deepEqual(s.leccion, { id: leccion.id, nombre: "Repaso general", modo: "checkride", calificacion: 75, aprobado: false, nivel: 3 });
   assert.equal(agruparSesiones([conCorreo(intento(r, "2026-11-05T10:00:00Z", "practica", "A"))])[0].leccion, null);
 });
 

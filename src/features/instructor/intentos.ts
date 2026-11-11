@@ -1,6 +1,7 @@
 import { supabase } from "../../lib/supabaseClient";
 import type { ResultadoComun } from "./maniobras.ts";
-import type { IntentoManiobra } from "./reglasIntentos.ts";
+import { LECCIONES_GUARDADAS, type IntentoManiobra } from "./reglasIntentos.ts";
+import type { Grabacion } from "./recorrido.ts";
 
 const COLUMNAS =
   "id, user_id, maniobra, avion, modo, calificacion, aprobado, elementos, detalle, revision, revisado_at, created_at, sesion_id";
@@ -55,6 +56,42 @@ export async function fetchMisIntentosManiobra(maniobra: string): Promise<Intent
     .order("created_at", { ascending: true });
   if (error) throw error;
   return (data as IntentoManiobra[]) ?? [];
+}
+
+/** Un renglón por id: el dueño lee el suyo, el fundador cualquiera (RLS). */
+export async function fetchIntento(id: string): Promise<IntentoManiobra | null> {
+  const { data, error } = await supabase.from("intentos_maniobra").select(COLUMNAS).eq("id", id).maybeSingle();
+  if (error) throw error;
+  return (data as IntentoManiobra | null) ?? null;
+}
+
+/** Los renglones de lección propios, el más nuevo primero. */
+export async function fetchMisLecciones(): Promise<{ id: string; maniobra: string; created_at: string }[]> {
+  const userId = await miUserId();
+  if (!userId) return [];
+  const { data, error } = await supabase
+    .from("intentos_maniobra")
+    .select("id, maniobra, created_at")
+    .eq("user_id", userId)
+    .in("maniobra", Object.keys(LECCIONES_GUARDADAS))
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as { id: string; maniobra: string; created_at: string }[]) ?? [];
+}
+
+// El recorrido del mapa va en su propia tabla: el panel trae `detalle` de cientos de renglones y no debe cargar los puntos.
+export async function guardarRecorrido(intentoId: string, grabacion: Grabacion): Promise<Escritura> {
+  const userId = await miUserId();
+  if (!userId) return { error: "Inicia sesión para guardar el recorrido." };
+  const { error } = await supabase.from("recorridos_leccion").insert({ intento_id: intentoId, user_id: userId, grabacion });
+  return { error: error?.message ?? null };
+}
+
+/** null si ese vuelo no tiene recorrido guardado; lanza si falla la consulta. */
+export async function fetchRecorrido(intentoId: string): Promise<Grabacion | null> {
+  const { data, error } = await supabase.from("recorridos_leccion").select("grabacion").eq("intento_id", intentoId).maybeSingle();
+  if (error) throw error;
+  return (data?.grabacion as Grabacion | undefined) ?? null;
 }
 
 /** La base rechaza todo lo que no sea un checkride aprobado sin mandar (policy + trigger). */

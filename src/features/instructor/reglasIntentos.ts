@@ -36,7 +36,7 @@ export type ResumenSesion = {
   /** Los niveles de las prácticas de la sesión, de Fácil a Difícil. */
   niveles: Nivel[];
   /** La lección del vuelo completo (repaso general) que agrupa los intentos de la sesión. */
-  leccion: { nombre: string; modo: "practica" | "checkride"; calificacion: number; aprobado: boolean; nivel: Nivel } | null;
+  leccion: { id: string; nombre: string; modo: "practica" | "checkride"; calificacion: number; aprobado: boolean; nivel: Nivel } | null;
 };
 
 /** Renglones de intentos_maniobra que son una lección entera, no una maniobra. */
@@ -51,7 +51,7 @@ export function agruparSesiones(intentos: (IntentoManiobra & { email: string | n
     if (!i.sesion_id) continue;
     const s = porSesion.get(i.sesion_id) ?? { sesionId: i.sesion_id, email: i.email, inicio: i.created_at, intentos: 0, checkride: null, niveles: [], leccion: null };
     const leccion = LECCIONES_GUARDADAS[i.maniobra];
-    if (leccion) s.leccion = { nombre: leccion, modo: i.modo, calificacion: i.calificacion, aprobado: i.aprobado, nivel: nivelDe(i.detalle) };
+    if (leccion) s.leccion = { id: i.id, nombre: leccion, modo: i.modo, calificacion: i.calificacion, aprobado: i.aprobado, nivel: nivelDe(i.detalle) };
     else {
       s.intentos++;
       if (i.modo === "checkride") s.checkride = { calificacion: i.calificacion, aprobado: i.aprobado };
