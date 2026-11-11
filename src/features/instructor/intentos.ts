@@ -54,14 +54,14 @@ export async function fetchMisIntentosManiobra(maniobra: string): Promise<Intent
     .eq("user_id", userId)
     .eq("maniobra", maniobra)
     .order("created_at", { ascending: true });
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return (data as IntentoManiobra[]) ?? [];
 }
 
 /** Un renglón por id: el dueño lee el suyo, el fundador cualquiera (RLS). */
 export async function fetchIntento(id: string): Promise<IntentoManiobra | null> {
   const { data, error } = await supabase.from("intentos_maniobra").select(COLUMNAS).eq("id", id).maybeSingle();
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return (data as IntentoManiobra | null) ?? null;
 }
 
@@ -75,7 +75,7 @@ export async function fetchMisLecciones(): Promise<{ id: string; maniobra: strin
     .eq("user_id", userId)
     .in("maniobra", Object.keys(LECCIONES_GUARDADAS))
     .order("created_at", { ascending: false });
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return (data as { id: string; maniobra: string; created_at: string }[]) ?? [];
 }
 
@@ -90,7 +90,7 @@ export async function guardarRecorrido(intentoId: string, grabacion: Grabacion):
 /** null si ese vuelo no tiene recorrido guardado; lanza si falla la consulta. */
 export async function fetchRecorrido(intentoId: string): Promise<Grabacion | null> {
   const { data, error } = await supabase.from("recorridos_leccion").select("grabacion").eq("intento_id", intentoId).maybeSingle();
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return (data?.grabacion as Grabacion | undefined) ?? null;
 }
 
@@ -108,7 +108,7 @@ export async function fetchPorRevisar(): Promise<(IntentoManiobra & { email: str
     .select(`${COLUMNAS}, email`)
     .eq("revision", "mandado")
     .order("created_at", { ascending: true });
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return (data as (IntentoManiobra & { email: string | null })[]) ?? [];
 }
 
@@ -120,7 +120,7 @@ export async function fetchSesionesRecientes(limite = 200): Promise<(IntentoMani
     .not("sesion_id", "is", null)
     .order("created_at", { ascending: false })
     .limit(limite);
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return (data as (IntentoManiobra & { email: string | null })[]) ?? [];
 }
 
@@ -129,7 +129,7 @@ export async function contarPorRevisar(): Promise<number> {
     .from("intentos_maniobra")
     .select("id", { count: "exact", head: true })
     .eq("revision", "mandado");
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return count ?? 0;
 }
 

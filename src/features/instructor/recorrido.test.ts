@@ -4,7 +4,7 @@ import type { Muestra } from "./evaluador.ts";
 import type { EvaluacionVuelo, FaseVuelo } from "./fasesVuelo.ts";
 import { crearRepaso, type EstadoRepaso, type EtapaRepaso } from "./repaso.ts";
 import { MANIOBRAS, type ManiobraId, type ResultadoComun } from "./maniobras.ts";
-import { CAMPO_PUNTO, cerrarGrabacion, crearGrabador, faseMapa, grabarMuestra, grabarVoz, puntoEn, TOLERANCIAS, tramosFuera, unidadDe, type Punto } from "./recorrido.ts";
+import { CAMPO_PUNTO, cerrarGrabacion, crearGrabador, faseMapa, grabarMuestra, grabarVoz, marcasErrores, puntoEn, TOLERANCIAS, tramosFuera, unidadDe, type Punto } from "./recorrido.ts";
 import { grabacionDemo } from "./recorridoDemo.ts";
 import type { Nivel } from "./nivel.ts";
 import { simularRumbos } from "./simular.ts";
@@ -225,4 +225,11 @@ test("el vuelo de demostración trae recorrido, 2 intentos y un error de rumbo e
   assert.equal(rumbo.fase, "zona");
   assert.ok(gr.fases.some((f) => f.fase === "zona"));
   assert.ok(gr.voz.length > 0);
+});
+
+test("errores en el mismo punto del mapa comparten un marcador; los que no tienen momento no llevan", () => {
+  const g = grabacionDemo();
+  const marcas = marcasErrores(g);
+  assert.deepEqual(marcas.map((m) => m.ns), [[1, 2], [3]]);
+  assert.equal(marcas[0].punto, puntoEn(g.puntos, g.errores[0].inicio!));
 });

@@ -54,6 +54,8 @@ export function InstructorVuelo() {
 
   const cargar = useCallback(async () => {
     if (demo) return;
+    // Un id que no es uuid no existe; preguntarle a la base solo daría un error de sintaxis de Postgres.
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return setCarga({ estado: "listo", intento: null, grabacion: null });
     setCarga({ estado: "cargando" });
     try {
       const [intento, grabacion] = await Promise.all([fetchIntento(id), fetchRecorrido(id)]);

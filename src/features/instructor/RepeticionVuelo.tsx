@@ -117,6 +117,7 @@ export function RepeticionVuelo({ grabacion, cursorT, alMover, idioma }: { graba
           <button
             key={v}
             type="button"
+            aria-pressed={ultimaVel === v}
             onClick={() => {
               setUltimaVel(v);
               if (vel) setVel(v);

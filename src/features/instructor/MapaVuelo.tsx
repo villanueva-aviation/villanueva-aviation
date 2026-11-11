@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { CAMPO_PUNTO as C, puntoEn, type FaseMapa, type Grabacion, type Punto } from "./recorrido";
+import { CAMPO_PUNTO as C, marcasErrores, puntoEn, type FaseMapa, type Grabacion, type Punto } from "./recorrido";
 
 // Esri World Imagery. Sin llave mientras solo entra el fundador; antes de abrir a cadetes va VITE_ARCGIS_KEY (spec 2026-11-10).
 const LLAVE = import.meta.env.VITE_ARCGIS_KEY as string | undefined;
@@ -22,13 +22,15 @@ const ORO = "#d4af37";
 const latLng = (p: Punto): L.LatLngTuple => [p[C.lat], p[C.lon]];
 const entre = (ps: Punto[], a: number, b: number) => ps.filter((p) => p[C.t] >= a && p[C.t] <= b);
 
-const numero = (n: number | string, color = ROJO) =>
-  L.divIcon({
+const numero = (n: number | string, color = ROJO) => {
+  const ancho = 24 + Math.max(0, String(n).length - 1) * 7;
+  return L.divIcon({
     className: "",
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    html: `<div style="width:24px;height:24px;border-radius:50%;background:${color};border:2px solid #fff;color:#fff;font:700 12px system-ui;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.6)">${n}</div>`,
+    iconSize: [ancho, 24],
+    iconAnchor: [ancho / 2, 12],
+    html: `<div style="width:${ancho}px;height:24px;border-radius:12px;background:${color};border:2px solid #fff;color:#fff;font:700 12px system-ui;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.6)">${n}</div>`,
   });
+};
 const avion = (rumbo: number) =>
   L.divIcon({
     className: "",
@@ -52,6 +54,7 @@ export function MapaVuelo({
   const contenedor = useRef<HTMLDivElement>(null);
   const mapa = useRef<L.Map | null>(null);
   const marcaAvion = useRef<L.Marker | null>(null);
+  const todo = useRef<L.LatLngBounds | null>(null);
   const tocar = useRef(alTocarError);
   tocar.current = alTocarError;
 
@@ -59,12 +62,13 @@ export function MapaVuelo({
     const ps = grabacion.puntos;
     if (!contenedor.current || ps.length < 2) return;
     // En teléfono, arrastrar el mapa con un dedo impediría bajar por la página.
-    const m = L.map(contenedor.current, { scrollWheelZoom: false, dragging: !L.Browser.mobile, maxZoom: 18 });
+    const m = L.map(contenedor.current, { scrollWheelZoom: false, dragging: !L.Browser.mobile, maxZoom: 18, zoomSnap: 0.25 });
     L.tileLayer(MOSAICO, { attribution: ATRIBUCION, maxZoom: 18 }).addTo(m);
 
     const z = grabacion.zona;
-    if (z?.poligono) L.polygon(z.poligono, { color: ORO, weight: 1.5, fill: false, dashArray: "6 6" }).addTo(m);
-    else if (z) L.circle([z.lat, z.lon], { radius: z.radioNm * 1852, color: ORO, weight: 1.5, fill: false, dashArray: "6 6" }).addTo(m);
+    const estiloZona = { color: ORO, weight: 2, fill: false, dashArray: "6 6" };
+    if (z?.poligono) L.polygon(z.poligono, estiloZona).addTo(m);
+    else if (z) L.circle([z.lat, z.lon], { radius: z.radioNm * 1852, ...estiloZona }).addTo(m);
 
     for (const f of grabacion.fases) {
       const tramo = entre(ps, f.inicio, f.fin);
@@ -74,15 +78,19 @@ export function MapaVuelo({
       if (e.inicio === null) continue;
       const tramo = entre(ps, e.inicio, e.fin ?? e.inicio);
       if (tramo.length > 1) L.polyline(tramo.map(latLng), { color: ROJO, weight: 6, opacity: 0.9 }).addTo(m);
-      const p = puntoEn(ps, e.inicio);
-      if (p) L.marker(latLng(p), { icon: numero(e.n), zIndexOffset: 500 }).on("click", () => tocar.current(e.n)).addTo(m);
     }
+    for (const { punto, ns } of marcasErrores(grabacion))
+      L.marker(latLng(punto), { icon: numero(ns.join("·")), zIndexOffset: 500 }).on("click", () => tocar.current(ns[0])).addTo(m);
     const a = grabacion.anulada;
     if (a) {
       const p = puntoEn(ps, a.t);
       if (p) L.marker(latLng(p), { icon: numero("✕"), zIndexOffset: 600 }).bindTooltip(a.motivo).addTo(m);
     }
-    m.fitBounds(L.latLngBounds(ps.map(latLng)), { padding: [20, 20] });
+    // Todo el vuelo incluye la zona completa, para ver dónde quedaron las maniobras dentro de ella.
+    todo.current = L.latLngBounds(ps.map(latLng));
+    // El círculo aún no tiene mapa con vista, así que sus límites salen del centro y el radio.
+    if (z) todo.current.extend(z.poligono ? L.latLngBounds(z.poligono) : L.latLng(z.lat, z.lon).toBounds(z.radioNm * 1852 * 2));
+    m.fitBounds(todo.current, { padding: [20, 20] });
     mapa.current = m;
     return () => {
       m.remove();
@@ -105,8 +113,9 @@ export function MapaVuelo({
   useEffect(() => {
     const m = mapa.current;
     if (!m) return;
-    const ps = foco ? entre(grabacion.puntos, foco.inicio, foco.fin) : grabacion.puntos;
+    const ps = foco ? entre(grabacion.puntos, foco.inicio, foco.fin) : [];
     if (ps.length) m.fitBounds(L.latLngBounds(ps.map(latLng)), { padding: [30, 30], maxZoom: 15 });
+    else if (!foco && todo.current) m.fitBounds(todo.current, { padding: [20, 20] });
   }, [foco, grabacion]);
 
   return <div ref={contenedor} className="h-80 w-full overflow-hidden rounded-xl border border-white/10 bg-navy-950 sm:h-[28rem]" />;

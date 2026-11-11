@@ -223,3 +223,13 @@ export function cerrarGrabacion(
     anulada: e.etapa === "invalido" ? { t: g.puntos[g.puntos.length - 1]?.[0] ?? 0, motivo: e.motivo ?? "" } : null,
   };
 }
+
+/** Un marcador por punto del mapa: errores que caen en el mismo segundo (rotar y ascender) van juntos para no taparse. */
+export function marcasErrores(g: Grabacion): { punto: Punto; ns: number[] }[] {
+  const marcas = new Map<Punto, number[]>();
+  for (const e of g.errores) {
+    const p = e.inicio === null ? null : puntoEn(g.puntos, e.inicio);
+    if (p) marcas.set(p, [...(marcas.get(p) ?? []), e.n]);
+  }
+  return [...marcas].map(([punto, ns]) => ({ punto, ns }));
+}
