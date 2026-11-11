@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Muestra } from "./evaluador.ts";
 import { LECTOR_INICIAL, recibir } from "./lector.ts";
 import { leerAeropuerto, type Aeropuerto } from "./aeropuertoSim.ts";
+import { leerVors, type VorSim } from "./vorSim.ts";
 
 const URL_LECTOR = "http://127.0.0.1:8766/muestra";
 const CADA_MS = 100;
@@ -17,10 +18,12 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): {
   estado: EstadoLector;
   muestra: Muestra | null;
   aeropuerto: Aeropuerto | null;
+  vors: VorSim[];
 } {
   const [estado, setEstado] = useState<EstadoLector>("sin-lector");
   const [muestra, setMuestra] = useState<Muestra | null>(null);
   const [aeropuerto, setAeropuerto] = useState<Aeropuerto | null>(null);
+  const [vors, setVors] = useState<VorSim[]>([]);
   const callback = useRef(alRecibir);
   callback.current = alRecibir;
 
@@ -29,17 +32,23 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): {
     let timer: number | undefined;
     let lectura = LECTOR_INICIAL;
     let aeropuertoCrudo = "null"; // para no volver a renderizar si no cambio
+    let vorsCrudo = "[]";
 
     const leer = async () => {
       try {
         const url = lectura.desde === null ? URL_LECTOR : `${URL_LECTOR}?desde=${lectura.desde}`;
         const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(2000) });
-        const json = (await res.json()) as { conectado: boolean; muestra: Muestra | null; muestras?: Muestra[]; aeropuerto?: unknown };
+        const json = (await res.json()) as { conectado: boolean; muestra: Muestra | null; muestras?: Muestra[]; aeropuerto?: unknown; vors?: unknown };
         if (!vivo) return;
         const crudo = JSON.stringify(json.aeropuerto ?? null);
         if (crudo !== aeropuertoCrudo) {
           aeropuertoCrudo = crudo;
           setAeropuerto(leerAeropuerto(json.aeropuerto));
+        }
+        const crudoVors = JSON.stringify(json.vors ?? []);
+        if (crudoVors !== vorsCrudo) {
+          vorsCrudo = crudoVors;
+          setVors(leerVors(json.vors));
         }
         setEstado(json.conectado && json.muestra ? "conectado" : "sin-simulador");
         if (json.muestra) {
@@ -63,5 +72,5 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): {
     };
   }, []);
 
-  return { estado, muestra, aeropuerto };
+  return { estado, muestra, aeropuerto, vors };
 }

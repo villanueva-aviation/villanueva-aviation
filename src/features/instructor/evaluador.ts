@@ -66,7 +66,20 @@ export interface Muestra {
   bomba?: boolean;
   autopiloto?: boolean;
   trim?: number;
+  // Desde el lector v1.6, para el programa IFR (solo NAV1). navDesv: grados de la barra. navDesde: 0 apagado, 1 TO, 2 FROM.
+  navMhz?: number;
+  navObs?: number;
+  navRadial?: number;
+  navDesv?: number;
+  navDesde?: 0 | 1 | 2;
+  navDme?: number;
+  navTieneDme?: boolean;
+  navSenal?: boolean;
+  gpsNav?: boolean;
 }
+
+/** Un lector anterior a v1.6 no manda el radio NAV1: el programa IFR no se puede calificar. */
+export const lectorViejoNav = (m: Muestra) => m.navRadial === undefined;
 
 /** Un lector anterior a v1.3 no manda el aviso de pérdida: el vuelo lento no se puede calificar. */
 export const lectorViejo = (m: Muestra) => m.perdida === undefined;
