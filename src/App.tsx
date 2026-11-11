@@ -64,6 +64,7 @@ const GimnasioAutorizaciones = lazy(() =>
 const ResumenHsi = lazy(() => import("./pages/ResumenHsi").then((m) => ({ default: m.ResumenHsi })));
 const InstructorPrograma = lazy(() => import("./pages/InstructorPrograma").then((m) => ({ default: m.InstructorPrograma })));
 const InstructorRepaso = lazy(() => import("./pages/InstructorRepaso").then((m) => ({ default: m.InstructorRepaso })));
+const InstructorVuelo = lazy(() => import("./pages/InstructorVuelo").then((m) => ({ default: m.InstructorVuelo })));
 const InstructorVirajeEscarpado = lazy(() =>
   import("./pages/InstructorVirajeEscarpado").then((m) => ({ default: m.InstructorVirajeEscarpado })),
 );
@@ -337,6 +338,14 @@ function RoutedContent() {
             element={
               <ProtectedRoute>
                 <InstructorRepaso />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.instructorVuelo(":id")}
+            element={
+              <ProtectedRoute>
+                <InstructorVuelo />
               </ProtectedRoute>
             }
           />

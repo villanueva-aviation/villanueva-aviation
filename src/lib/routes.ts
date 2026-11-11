@@ -74,6 +74,8 @@ export const ROUTES = {
   /** Las demás lecciones del programa; el repaso se queda en su ruta. */
   instructorLeccion: (numero: number | string) => `/instructor/leccion/${numero}`,
   hojasInstructor: "/instructor/hojas",
+  /** Un vuelo de lección guardado con su mapa; «demo» es un vuelo simulado. */
+  instructorVuelo: (id: string) => `/instructor/vuelo/${id}`,
   adminAventura: "/admin/aventura",
 } as const;
 
