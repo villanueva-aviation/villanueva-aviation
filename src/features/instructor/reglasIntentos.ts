@@ -1,7 +1,7 @@
 import { virajeEstablecido, type Campo, type Resultado } from "./evaluador.ts";
 import { nivelDe, tolViraje, type Nivel } from "./nivel.ts";
 import { serie } from "./explicacion.ts";
-import { claveLeccion, LECCIONES, REPASO } from "./lecciones.ts";
+import { claveLeccion, LECCIONES, LECCIONES_IFR, REPASO } from "./lecciones.ts";
 import type { CodigoAcs } from "./virajeEscarpado.ts";
 
 export type Revision = "sin_mandar" | "mandado" | "aprobado" | "no_aprobado";
@@ -41,7 +41,10 @@ export type ResumenSesion = {
 
 /** Renglones de intentos_maniobra que son una lección entera, no una maniobra. */
 export const LECCIONES_GUARDADAS: Record<string, string> = Object.fromEntries(
-  LECCIONES.filter((l) => l.disponible).map((l) => [claveLeccion(l), l.numero === REPASO ? l.nombre.es : `Lección ${l.numero} · ${l.nombre.es}`]),
+  [
+    ...LECCIONES.filter((l) => l.disponible).map((l) => [claveLeccion(l), l.numero === REPASO ? l.nombre.es : `Lección ${l.numero} · ${l.nombre.es}`]),
+    ...LECCIONES_IFR.filter((l) => l.disponible).map((l) => [claveLeccion(l), `IFR ${l.numero} · ${l.nombre.es}`]),
+  ],
 );
 
 /** Una fila por sesión del programa, la más nueva primero. Los intentos sin sesión no cuentan. */

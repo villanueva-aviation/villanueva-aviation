@@ -11,6 +11,7 @@ import { AGL_MIN } from "./evaluadorS.ts";
 import { aNm } from "../home/navGeo.ts";
 import type { Nivel } from "./nivel.ts";
 import type { Leccion } from "./lecciones.ts";
+import type { VorElegido } from "./vorSim.ts";
 
 const RAD = Math.PI / 180;
 
@@ -33,11 +34,14 @@ export function sortear(disponibles: ManiobraId[], n = 4, azar = Math.random): M
 const CIRCUITO: ManiobraId = "toques-despegues";
 
 /** La familiarización es el primer vuelo, no una maniobra que se repasa. */
-const FUERA_DEL_SORTEO: ManiobraId[] = [CIRCUITO, "familiarizacion"];
+/** La interceptación es del programa IFR. */
+const FUERA_DEL_SORTEO: ManiobraId[] = [CIRCUITO, "familiarizacion", "interceptar-radial"];
 
-/** Lección de maniobra: la primera de práctica y 4 más (Erik). Repaso: 4 sorteadas. */
-export const maniobrasDe = (l: Leccion, azar = Math.random): ManiobraId[] =>
-  l.maniobra ? Array(5).fill(l.maniobra) : sortear((Object.keys(MANIOBRAS) as ManiobraId[]).filter((id) => !FUERA_DEL_SORTEO.includes(id)), 4, azar);
+/** Lección de maniobra: la primera de práctica y 4 más (Erik). Repaso: 4 sorteadas. IFR: 5 prácticas, o 2 en el examen (spec). */
+export const maniobrasDe = (l: Leccion, azar = Math.random, modo?: Modo): ManiobraId[] =>
+  l.maniobra
+    ? Array(l.programa === "ifr" && modo === "checkride" ? 2 : 5).fill(l.maniobra)
+    : sortear((Object.keys(MANIOBRAS) as ManiobraId[]).filter((id) => !FUERA_DEL_SORTEO.includes(id)), 4, azar);
 
 /** Ft AGL desde los que la zona cuenta para esta maniobra: la «S» va de 600 a 1,000 y la «8» a la altura pivote. */
 export const pisoZona = (id: ManiobraId | undefined) => (id === "s-camino" || id === "ocho-pilones" || id === "ocho-alrededor" ? AGL_MIN : ALTURA_SEGURA_AGL);
@@ -159,8 +163,13 @@ export interface EstadoRepaso {
   vuelo: EvaluacionVuelo | null;
   tomas: Tomas;
   motivo?: string;
-  /** Tolerancias de las maniobras y del final; el checkride siempre en Difícil. */
+  /** Tolerancias de las maniobras y del final; el checkride en Difícil (IFR: medio como mínimo). */
   nivel: Nivel;
+  programa: "vfr" | "ifr";
+  /** IFR: el VOR de la lección (en VFR, null). */
+  vor: VorElegido | null;
+  /** IFR: desde cuándo no hay señal del VOR en maniobra. */
+  sinSenalDesde: number | null;
 }
 type Paso = { estado: EstadoRepaso; decir: string[] };
 
@@ -168,6 +177,10 @@ type Paso = { estado: EstadoRepaso; decir: string[] };
 const SALTO_NM = 2;
 const SALTO_KT = 200;
 const HUECO_AIRE_SEG = 10;
+/** IFR: segundos sin señal del VOR antes de avisar. */
+const SIN_SENAL_SEG = 5;
+/** IFR: desde aquí empiezan los ejercicios. */
+const PISO_IFR_AGL = 1000;
 
 const T = {
   es: {
@@ -184,6 +197,12 @@ const T = {
     circuito: (k: number, n: number, inicio: boolean) =>
       inicio ? `Circuito ${k} de ${n}.` : `Circuito ${k} de ${n}: potencia completa y despega${k === n ? "; este termina con aterrizaje completo" : ""}.`,
     finCircuitos: "Terminamos los circuitos. Sal de la pista y rueda a la plataforma.",
+    eligeVor: "Elige un VOR.",
+    sintoniza: (mhz: string, id: string) => `Sintoniza ${mhz} en NAV1, ${id}. Arriba de 1,000 pies sobre el terreno empezamos.`,
+    conSenal: (id: string) => `Tenemos señal de ${id}. Primer ejercicio.`,
+    sinSenal: (id: string) => `Perdí la señal de ${id}: revisa NAV1 o acércate al VOR.`,
+    devueltaSenal: (id: string) => `Señal de ${id} de vuelta. Seguimos.`,
+    siguienteIfr: "Siguiente ejercicio.",
   },
   en: {
     espera: "Waiting for the simulator's airport.",
@@ -199,6 +218,12 @@ const T = {
     circuito: (k: number, n: number, inicio: boolean) =>
       inicio ? `Pattern ${k} of ${n}.` : `Pattern ${k} of ${n}: full power and take off${k === n ? "; this one ends with a full-stop landing" : ""}.`,
     finCircuitos: "We're done with the patterns. Exit the runway and taxi to the ramp.",
+    eligeVor: "Pick a VOR.",
+    sintoniza: (mhz: string, id: string) => `Tune ${mhz} on NAV1, ${id}. We start above 1,000 feet above the ground.`,
+    conSenal: (id: string) => `We have ${id}. First exercise.`,
+    sinSenal: (id: string) => `I lost ${id}: check NAV1 or get closer to the VOR.`,
+    devueltaSenal: (id: string) => `${id} is back. Let's continue.`,
+    siguienteIfr: "Next exercise.",
   },
 };
 
@@ -208,9 +233,20 @@ export function nombreManiobra(id: ManiobraId, idioma: Idioma): string {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
-export const crearRepaso = (modo: Modo, sorteo: ManiobraId[], nivel: Nivel = 3): EstadoRepaso => ({
-  etapa: "rampa", modo, sorteo, nivel: modo === "checkride" ? 3 : nivel, actual: 0, hechas: sorteo.map((id) => ({ id, resultado: null, intentoId: null })), zona: null, vuelo: null, tomas: crearTomas(),
+export const crearRepaso = (modo: Modo, sorteo: ManiobraId[], nivel: Nivel = 3, programa: "vfr" | "ifr" = "vfr"): EstadoRepaso => ({
+  etapa: "rampa", modo, sorteo, actual: 0, hechas: sorteo.map((id) => ({ id, resultado: null, intentoId: null })), zona: null, vuelo: null, tomas: crearTomas(),
+  nivel: modo !== "checkride" ? nivel : programa === "ifr" ? (Math.max(2, nivel) as Nivel) : 3,
+  programa, vor: null, sinSenalDesde: null,
 });
+
+/** IFR: hay señal del VOR de la lección en NAV1 y la barra es del VOR, no del GPS. */
+export const conSenal = (m: Muestra, vor: VorElegido) => !!m.navSenal && !m.gpsNav && m.navMhz !== undefined && Math.abs(m.navMhz - vor.mhz) < 0.03;
+
+/** IFR: el VOR se elige en la rampa o, a más tardar, en la salida. */
+export function ponerVor(e: EstadoRepaso, v: VorElegido): EstadoRepaso {
+  if (e.etapa !== "rampa" && e.etapa !== "salida") return e;
+  return { ...e, vor: v, motivo: e.motivo === T.es.eligeVor || e.motivo === T.en.eligeVor ? undefined : e.motivo };
+}
 
 const anular = (e: EstadoRepaso, motivo: string, idioma: Idioma): Paso => ({ estado: { ...e, etapa: "invalido", motivo: traducirMotivo(motivo, idioma) }, decir: [] });
 
@@ -228,6 +264,7 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
   if (!e.vuelo) {
     const vuelo = armarVuelo(m, a);
     if (vuelo.fase === "invalido") return anular({ ...e, vuelo }, vuelo.motivo ?? "", idioma);
+    if (e.programa === "ifr") return { estado: { ...e, vuelo }, decir: [] };
     const zona = zonaRepaso(vuelo.aeropuerto, azar);
     return { estado: { ...e, vuelo, zona, motivo: zona ? undefined : t.espera }, decir: [] };
   }
@@ -248,11 +285,41 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
   if (aterrizo) tomas = { ...tomas, tocoEnPista: vuelo.aeropuerto ? aterrizo.pista != null : null };
 
   let etapa: EtapaRepaso = e.etapa;
-  let { zona, motivo } = e;
+  let { zona, motivo, sinSenalDesde } = e;
   const decir: string[] = [];
   const circuitos = deCircuitos(e);
   const piso = pisoZona(e.sorteo[e.actual]);
-  if (etapa === "rampa" && circuitos) {
+  const vor = e.vor;
+  if (e.programa === "ifr") {
+    // Sin zona: los ejercicios se hacen donde haya señal del VOR, arriba de 1,000 ft AGL.
+    const senal = !!vor && conSenal(m, vor);
+    if (etapa === "rampa" && nuevos.some((x) => x.tipo === "despegue")) {
+      etapa = "salida";
+      if (vor) decir.push(t.sintoniza(vor.mhz.toFixed(2), vor.ident));
+      else motivo = t.eligeVor;
+    } else if (etapa === "salida") {
+      if (!vor) motivo = t.eligeVor;
+      else if (m.agl >= PISO_IFR_AGL && !m.enTierra && senal) {
+        etapa = "maniobra";
+        motivo = undefined;
+        sinSenalDesde = null;
+        decir.push(t.conSenal(vor.ident));
+      }
+    } else if (etapa === "maniobra" && vor) {
+      if (senal) sinSenalDesde = null;
+      else {
+        sinSenalDesde = sinSenalDesde ?? m.t;
+        if (m.t - sinSenalDesde > SIN_SENAL_SEG) {
+          etapa = "fuera-de-zona";
+          decir.push(t.sinSenal(vor.ident));
+        }
+      }
+    } else if (etapa === "fuera-de-zona" && vor && senal) {
+      etapa = "maniobra";
+      sinSenalDesde = null;
+      decir.push(t.devueltaSenal(vor.ident));
+    }
+  } else if (etapa === "rampa" && circuitos) {
     // Se arma en la carrera para medir la rotación.
     if (vuelo.fase === "carrera-despegue") {
       etapa = "maniobra";
@@ -287,7 +354,7 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
   // En los circuitos cada toque es parte de la maniobra; detenerse en la pista sí termina.
   if (etapa !== "regreso" && (circuitos ? vuelo.fase === "rodaje-regreso" : aterrizo)) etapa = "regreso";
   if (vuelo.fase === "terminado") etapa = "terminado";
-  return { estado: { ...e, etapa, zona, motivo, vuelo, tomas }, decir };
+  return { estado: { ...e, etapa, zona, motivo, vuelo, tomas, sinSenalDesde }, decir };
 }
 
 function avanzarManiobra(e: EstadoRepaso, idioma: Idioma): Paso {
@@ -296,6 +363,7 @@ function avanzarManiobra(e: EstadoRepaso, idioma: Idioma): Paso {
   if (actual >= e.sorteo.length) return { estado: { ...e, actual, etapa: "regreso" }, decir: [deCircuitos(e) ? t.finCircuitos : t.regreso] };
   if (deCircuitos(e)) return { estado: { ...e, actual }, decir: [t.circuito(actual + 1, e.sorteo.length, false)] };
   const id = e.sorteo[actual];
+  if (e.programa === "ifr") return { estado: { ...e, actual }, decir: [t.siguienteIfr] };
   return { estado: { ...e, actual }, decir: [T[idioma].siguiente(nombreManiobra(id, idioma), e.sorteo.slice(0, actual).includes(id))] };
 }
 

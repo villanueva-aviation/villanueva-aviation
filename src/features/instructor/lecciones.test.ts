@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ACCESO_REPASO, LECCIONES, REPASO, claveLeccion, estadoLeccion, leccionDe } from "./lecciones.ts";
+import { ACCESO_REPASO, LECCIONES, LECCIONES_IFR, REPASO, claveLeccion, estadoLeccion, leccionDe, leccionIfrDe } from "./lecciones.ts";
+import { LECCIONES_GUARDADAS } from "./reglasIntentos.ts";
 
 test("14 lecciones en el orden de la escuela", () => {
   assert.equal(LECCIONES.length, 14);
@@ -51,4 +52,17 @@ test("cada lección se guarda con su clave; el repaso conserva la de antes", () 
   assert.equal(leccionDe("1"), LECCIONES[0]);
   assert.equal(leccionDe("15"), null, "no existe");
   assert.equal(leccionDe("x"), null);
+});
+
+test("programa IFR: 6 lecciones, solo la 1 abierta, con su propia clave", () => {
+  assert.equal(LECCIONES_IFR.length, 6);
+  assert.deepEqual(LECCIONES_IFR.map((l) => l.disponible), [true, false, false, false, false, false]);
+  assert.equal(LECCIONES_IFR[0].maniobra, "interceptar-radial");
+  assert.equal(LECCIONES_IFR[5].nombre.en, "IFR checkride");
+  for (const l of LECCIONES_IFR) assert.doesNotMatch(l.nombre.en, /[áéíóúñ¿¡«»]/);
+  assert.equal(claveLeccion(leccionIfrDe("1")!), "ifr-1");
+  assert.equal(leccionIfrDe("2"), null, "todavía no existe");
+  assert.equal(leccionIfrDe(undefined), null);
+  assert.ok(LECCIONES_GUARDADAS["ifr-1"]);
+  assert.equal(leccionDe("1"), LECCIONES[0], "la 1 del VFR no cambia");
 });

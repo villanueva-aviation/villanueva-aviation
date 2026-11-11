@@ -73,6 +73,10 @@ export const ROUTES = {
   instructorRepaso: "/instructor/repaso",
   /** Las demás lecciones del programa; el repaso se queda en su ruta. */
   instructorLeccion: (numero: number | string) => `/instructor/leccion/${numero}`,
+  /** El programa IFR: menú, lecciones y teoría con dibujos. */
+  instructorIfr: "/instructor/ifr",
+  instructorIfrLeccion: (numero: number | string) => `/instructor/ifr/leccion/${numero}`,
+  instructorIfrTeoria: (tema: string) => `/instructor/ifr/teoria/${tema}`,
   hojasInstructor: "/instructor/hojas",
   /** Un vuelo de lección guardado con su mapa; «demo» es un vuelo simulado. */
   instructorVuelo: (id: string) => `/instructor/vuelo/${id}`,

@@ -17,6 +17,13 @@ function checklist(cambiar?: (cl: Checklist) => void): Checklist {
   cambiar?.(cl);
   return cl;
 }
+test("IFR: la parte de maniobras se titula Navegación", () => {
+  const e = { ...crearRepaso("practica", ["interceptar-radial"], 2, "ifr"), etapa: "terminado" as const };
+  assert.equal(debriefingRepaso(e, checklist(), "es").partes[2].titulo, "Navegación");
+  assert.equal(debriefingRepaso(e, checklist(), "en").partes[2].titulo, "Navigation");
+  assert.equal(debriefingRepaso(crearRepaso("practica", ["recto-nivelado"]), checklist(), "es").partes[2].titulo, "Maniobras");
+});
+
 const saltado = (cl: Checklist) => (cl.puntos["arranque"][0] = { estado: "saltado" });
 const noHecho = (cl: Checklist) => (cl.puntos["arranque"][1] = { estado: "no-hecho" });
 

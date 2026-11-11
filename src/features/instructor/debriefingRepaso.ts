@@ -18,6 +18,7 @@ const kt = (x: number) => Math.round(x);
 const T = {
   es: {
     titulos: { checklist: "Checklist", despegue: "Despegue", maniobras: "Maniobras", aterrizaje: "Aterrizaje" },
+    navegacion: "Navegación",
     enOrden: (n: number) => `${n} puntos en orden`,
     saltados: (l: string[]) => l.map((s) => `Saltaste: ${s}`),
     noHechos: (l: string[]) => l.map((s) => `Dijiste pero no hiciste: ${s}`),
@@ -30,6 +31,7 @@ const T = {
   },
   en: {
     titulos: { checklist: "Checklist", despegue: "Takeoff", maniobras: "Maneuvers", aterrizaje: "Landing" },
+    navegacion: "Navigation",
     enOrden: (n: number) => `${n} items in order`,
     saltados: (l: string[]) => (l.length ? [`${l.length} items skipped`] : []),
     noHechos: (l: string[]) => (l.length ? [`${l.length} items called but not done`] : []),
@@ -62,7 +64,7 @@ export function debriefingRepaso(e: EstadoRepaso, cl: Checklist, idioma: Idioma)
   poner(despegue, c.despegue.rotacion, t.rotacion(!!c.despegue.rotacion, kt(e.tomas.rotacionKt ?? 0)));
   poner(despegue, c.despegue.vy, t.vy(!!c.despegue.vy, kt(e.tomas.vy.suma / Math.max(1, e.tomas.vy.n))));
 
-  const maniobras = nueva("maniobras");
+  const maniobras = { ...nueva("maniobras"), ...(e.programa === "ifr" ? { titulo: t.navegacion } : {}) };
   for (const h of e.hechas) {
     const nombre = nombreManiobra(h.id, idioma);
     if (!h.resultado) maniobras.repetir.push(`${nombre}: ${t.noVolada}`);

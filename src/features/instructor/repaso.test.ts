@@ -10,7 +10,9 @@ import {
   alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, enZona, fueraDeZona, maniobraActual, maniobrasDe, nombreManiobra, pisoZona, siguienteManiobra, sortear, zonaRepaso,
   type EstadoRepaso, type Zona,
 } from "./repaso.ts";
-import { LECCIONES, REPASO } from "./lecciones.ts";
+import { LECCIONES, REPASO, leccionIfrDe } from "./lecciones.ts";
+import { conSenal, ponerVor } from "./repaso.ts";
+import { elegirVor } from "./vorSim.ts";
 
 test("una lección de maniobra la vuela 5 veces; el repaso sortea 4", () => {
   assert.deepEqual(maniobrasDe(LECCIONES[6]), Array(5).fill("vuelo-lento"));
@@ -22,6 +24,7 @@ test("una lección de maniobra la vuela 5 veces; el repaso sortea 4", () => {
   for (let k = 0; k < 50; k++) assert.ok(!maniobrasDe(LECCIONES[REPASO - 1]).includes("toques-despegues"), "los circuitos no se sortean en la zona");
   for (let k = 0; k < 50; k++) assert.ok(!maniobrasDe(LECCIONES[REPASO - 1]).includes("familiarizacion"), "el primer vuelo no se repasa");
   assert.deepEqual(maniobrasDe(LECCIONES[0]), Array(5).fill("familiarizacion"));
+  for (let k = 0; k < 50; k++) assert.ok(!maniobrasDe(LECCIONES[REPASO - 1]).includes("interceptar-radial"), "el repaso VFR no sortea maniobras IFR");
 });
 
 const BASE = simularVuelo()[0];
@@ -346,4 +349,43 @@ test("«S»: la zona va de 600 ft AGL hacia arriba y la salida lo dice", () => {
   assert.equal(pisoZona("ocho-pilones"), 600, "la «8» sobre pilones va a la altura pivote, unos 700–900 ft");
   assert.equal(pisoZona("ocho-alrededor"), 600);
   assert.equal(pisoZona("recto-nivelado"), 1500);
+});
+
+// ── IFR: la misma lección de rampa a rampa, con el VOR en lugar de la zona ──
+
+const VOR = elegirVor({ ident: "GDL", region: "MM", lat: A.lat, lon: A.lon, mhz: 117.5, dme: true }, BASE);
+const IFR = Array(5).fill("interceptar-radial");
+/** El vuelo simulado con NAV1 en `mhz`; `sinSenal(i, m)` apaga la señal en esas muestras. */
+const vueloIfr = (mhz = 117.5, sinSenal: (i: number, m: Muestra) => boolean = () => false) =>
+  simularVuelo().map((m, i) => ({ ...m, navMhz: mhz, navObs: 0, navRadial: 0, navDesv: 0, navDesde: 2 as const, navDme: 3, navTieneDme: true, navSenal: !sinSenal(i, m), gpsNav: false }));
+
+test("IFR: despega → salida, arriba de 1,000 ft con señal → maniobra; 6 s sin señal → fuera; vuelve la señal → maniobra", () => {
+  const ms = vueloIfr();
+  const i0 = ms.findIndex((m) => !m.enTierra && m.agl >= 1200);
+  const { e, decir, etapas } = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr"), VOR), vueloIfr(117.5, (i) => i >= i0 + 100 && i < i0 + 160));
+  assert.deepEqual(etapas.slice(0, 5), ["rampa", "salida", "maniobra", "fuera-de-zona", "maniobra"]);
+  assert.equal(e.zona, null, "en IFR no hay zona");
+  assert.ok(decir.includes("Sintoniza 117.50 en NAV1, GDL. Arriba de 1,000 pies sobre el terreno empezamos."), decir.join(" | "));
+  assert.ok(decir.includes("Tenemos señal de GDL. Primer ejercicio."), decir.join(" | "));
+  assert.ok(decir.includes("Perdí la señal de GDL: revisa NAV1 o acércate al VOR."), decir.join(" | "));
+});
+
+test("IFR: con otra frecuencia en NAV1 no empieza (Review Focus 1)", () => {
+  const { etapas } = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr"), VOR), vueloIfr(113.1));
+  assert.ok(!etapas.includes("maniobra"), etapas.join(" → "));
+  assert.equal(conSenal({ ...vueloIfr()[0], gpsNav: true }, VOR), false, "el GPS manejando la barra no cuenta");
+});
+
+test("IFR: sin VOR elegido al despegar, pide elegir uno", () => {
+  const { e } = correr(crearRepaso("practica", IFR, 2, "ifr"), vueloIfr());
+  assert.equal(e.motivo, "Elige un VOR.");
+  assert.ok(!["maniobra", "fuera-de-zona"].includes(e.etapa));
+});
+
+test("IFR: el checkride va en medio como mínimo y son 2 interceptaciones; el VFR sigue en Difícil", () => {
+  assert.equal(crearRepaso("checkride", IFR, 1, "ifr").nivel, 2);
+  assert.equal(crearRepaso("checkride", IFR, 3, "ifr").nivel, 3);
+  assert.equal(crearRepaso("checkride", [...SORTEO], 1).nivel, 3);
+  assert.equal(maniobrasDe(leccionIfrDe("1")!, Math.random, "checkride").length, 2);
+  assert.deepEqual(maniobrasDe(leccionIfrDe("1")!), IFR);
 });

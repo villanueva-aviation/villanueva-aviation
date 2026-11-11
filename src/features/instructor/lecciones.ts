@@ -9,6 +9,8 @@ export interface Leccion {
   disponible: boolean;
   /** La maniobra que se vuela en la zona; sin ella es el repaso (sorteo). */
   maniobra?: ManiobraId;
+  /** Falta = el programa VFR. */
+  programa?: "ifr";
 }
 
 export const REPASO = 13;
@@ -35,6 +37,17 @@ export const LECCIONES: Leccion[] = [
   l(14, "Toques y despegues", "Touch and goes", "toques-despegues"),
 ];
 
+/** El programa IFR (spec 2026-11-11): por ahora solo la 1. */
+const ifr = (numero: number, es: string, en: string, maniobra?: ManiobraId): Leccion => ({ numero, nombre: { es, en }, disponible: !!maniobra, maniobra, programa: "ifr" });
+export const LECCIONES_IFR: Leccion[] = [
+  ifr(1, "Interceptación de radiales", "Radial interception", "interceptar-radial"),
+  ifr(2, "Rutas de acercamiento y alejamiento", "Inbound and outbound courses"),
+  ifr(3, "Arcos DME", "DME arcs"),
+  ifr(4, "Patrones de espera", "Holding patterns"),
+  ifr(5, "Vuelo mezclado", "Mixed flight"),
+  ifr(6, "Checkride IFR", "IFR checkride"),
+];
+
 export function estadoLeccion(leccion: Leccion, acceso: { fundador: boolean; exclusivo: boolean }): "abierta" | "candado" | "proximamente" {
   if (!leccion.disponible) return "proximamente";
   const ok = acceso.fundador || ACCESO_REPASO === "todos" || (ACCESO_REPASO === "exclusivo" && acceso.exclusivo);
@@ -42,10 +55,16 @@ export function estadoLeccion(leccion: Leccion, acceso: { fundador: boolean; exc
 }
 
 /** El valor de `maniobra` en intentos_maniobra para la lección entera. */
-export const claveLeccion = (x: Leccion) => (x.numero === REPASO ? "repaso-general" : `leccion-${x.numero}`);
+export const claveLeccion = (x: Leccion) => (x.programa === "ifr" ? `ifr-${x.numero}` : x.numero === REPASO ? "repaso-general" : `leccion-${x.numero}`);
 
 /** El número de la URL (sin número: el repaso, la ruta de antes); null si no existe o no está disponible. */
 export function leccionDe(numero: string | undefined): Leccion | null {
   const x = numero === undefined ? LECCIONES[REPASO - 1] : LECCIONES.find((y) => String(y.numero) === numero);
+  return x?.disponible ? x : null;
+}
+
+/** La lección IFR de la URL; null si no existe o no está disponible. */
+export function leccionIfrDe(numero: string | undefined): Leccion | null {
+  const x = LECCIONES_IFR.find((y) => String(y.numero) === numero);
   return x?.disponible ? x : null;
 }
