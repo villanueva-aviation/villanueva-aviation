@@ -9,6 +9,7 @@ import { grabacionDemo } from "./recorridoDemo.ts";
 import type { Nivel } from "./nivel.ts";
 import { simularRumbos } from "./simular.ts";
 import { toleranciaRumbos } from "./evaluadorRumbos.ts";
+import { avanzarInterceptacion, iniciarInterceptacion } from "./evaluadorInterceptacion.ts";
 import { crearChecklist, type Checklist } from "./checklistVoz.ts";
 import { CHECKLIST_VOZ_C172 } from "../../data/checklistVozC172.ts";
 
@@ -232,4 +233,51 @@ test("errores en el mismo punto del mapa comparten un marcador; los que no tiene
   const marcas = marcasErrores(g);
   assert.deepEqual(marcas.map((m) => m.ns), [[1, 2], [3]]);
   assert.equal(marcas[0].punto, puntoEn(g.puntos, g.errores[0].inicio!));
+});
+
+// ── IFR: el radial en el mapa ──
+
+const conNav = (x: Partial<Muestra> = {}) => muestra({ navMhz: 117.5, navObs: 90, navRadial: 92.4, navDesv: -2.46, navDesde: 2, navDme: 8.26, navTieneDme: true, navSenal: true, gpsNav: false, ...x });
+
+test("IFR: el grabador con nav guarda radial, barra en puntos y DME; sin nav, los 9 de siempre", () => {
+  const g = crearGrabador(true);
+  grabarMuestra(g, conNav(), estado("maniobra"));
+  assert.equal(g.puntos[0].length, 12);
+  assert.deepEqual(g.puntos[0].slice(9), [92, -1.2, 8.3]);
+  assert.equal(CAMPO_PUNTO.radial, 9);
+  const v = crearGrabador();
+  grabarMuestra(v, conNav(), estado("maniobra"));
+  assert.equal(v.puntos[0].length, 9);
+});
+
+/** Interceptación alejándose por el radial 090 que se pasa 1.4 puntos (medio: error). */
+function interceptacionPasada(): ResultadoComun {
+  const ej = { caso: "alejandose" as const, radial: 90, desde: true, curso: 90 };
+  const en = (t: number, desv: number, rumbo: number) => conNav({ t: 300 + t, navRadial: (90 + desv + 360) % 360, rumbo, navDme: 6 + t / 60 });
+  let e = iniciarInterceptacion(en(0, 20, 60), 2, ej, { intento: 0, examen: false, vor: "GDL" });
+  const vuelo: [number, number][] = [];
+  for (let d = 19; d >= 0; d--) vuelo.push([d, 60]);
+  vuelo.push([-1, 100], [-2, 100], [-2.8, 100], [-2, 80], [-1, 80]);
+  for (let k = 0; k < 35; k++) vuelo.push([0, 90]);
+  vuelo.forEach(([d, r], i) => (e = avanzarInterceptacion(e, en(i + 1, d, r))));
+  return e.resultado!;
+}
+
+test("IFR: el cierre trae el VOR, el radial de cada intento y el sobrepaso como error en puntos", () => {
+  const r = interceptacionPasada();
+  const vor = { ident: "GDL", region: "MM", lat: 20.52, lon: -103.31, mhz: 117.5, dme: true, decl: 5 };
+  const e = { ...leccion(), programa: "ifr" as const, vor, zona: null, sorteo: ["interceptar-radial" as const] };
+  const x = cerrarGrabacion(grabadorConFases(), { leccion: 1, e, cl: checklistLeido(), resultados: [{ maniobra: "interceptar-radial", resultado: r }] });
+  assert.deepEqual(x.vor, { ident: "GDL", lat: 20.52, lon: -103.31, decl: 5 });
+  assert.deepEqual(x.radiales, [{ intento: 1, radial: 90, desde: true }]);
+  const err = x.errores.find((v) => v.campo === "sobrepaso");
+  assert.ok(err, JSON.stringify(x.errores));
+  assert.equal(unidadDe("interceptar-radial", "sobrepaso"), " puntos");
+  assert.equal(x.zona, null);
+});
+
+test("VFR: la grabación no gana vor ni radiales", () => {
+  const x = cerrarGrabacion(grabadorConFases(), { leccion: 4, e: leccion(), cl: checklistLeido(), resultados: [] });
+  assert.equal("vor" in x, false);
+  assert.equal("radiales" in x, false);
 });

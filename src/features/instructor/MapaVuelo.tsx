@@ -20,6 +20,26 @@ const ROJO = "#ff4d4d";
 const ORO = "#d4af37";
 
 const latLng = (p: Punto): L.LatLngTuple => [p[C.lat], p[C.lon]];
+const RAD = Math.PI / 180;
+/** `nm` millas desde (lat, lon) al rumbo verdadero `rumbo`; plano local, suficiente para 60 NM. */
+const destino = (lat: number, lon: number, rumbo: number, nm: number): L.LatLngTuple => [
+  lat + (nm * Math.cos(rumbo * RAD)) / 60,
+  lon + (nm * Math.sin(rumbo * RAD)) / 60 / Math.cos(lat * RAD),
+];
+const etiqueta = (texto: string, color: string) =>
+  L.divIcon({
+    className: "",
+    iconSize: [60, 18],
+    iconAnchor: [30, 9],
+    html: `<div style="text-align:center;font:700 11px system-ui;color:${color};text-shadow:0 0 3px #000,0 0 3px #000">${texto}</div>`,
+  });
+const hexagono = (ident: string) =>
+  L.divIcon({
+    className: "",
+    iconSize: [44, 40],
+    iconAnchor: [22, 12],
+    html: `<svg width="24" height="24" viewBox="-12 -12 24 24" style="display:block;margin:0 auto;filter:drop-shadow(0 1px 2px #000)"><polygon points="10,0 5,8.7 -5,8.7 -10,0 -5,-8.7 5,-8.7" fill="none" stroke="${ORO}" stroke-width="2.5"/><circle r="2" fill="${ORO}"/></svg><div style="text-align:center;font:700 11px system-ui;color:${ORO};text-shadow:0 0 3px #000">${ident}</div>`,
+  });
 const entre = (ps: Punto[], a: number, b: number) => ps.filter((p) => p[C.t] >= a && p[C.t] <= b);
 
 const numero = (n: number | string, color = ROJO) => {
@@ -70,6 +90,20 @@ export function MapaVuelo({
     if (z?.poligono) L.polygon(z.poligono, estiloZona).addTo(m);
     else if (z) L.circle([z.lat, z.lon], { radius: z.radioNm * 1852, ...estiloZona }).addTo(m);
 
+    // IFR: el VOR y el radial de cada intento, de la estación hacia afuera hasta 5 NM más allá de donde voló el avión.
+    const v = grabacion.vor;
+    if (v) {
+      for (const rad of grabacion.radiales ?? []) {
+        const i = grabacion.intentos.find((x) => x.n === rad.intento);
+        const dmes = (i ? entre(ps, i.inicio, i.fin) : []).map((p) => p[C.dme]).filter((d): d is number => d !== undefined);
+        const largo = (dmes.length ? Math.max(...dmes) : 10) + 5;
+        const fin = destino(v.lat, v.lon, rad.radial + v.decl, largo);
+        L.polyline([[v.lat, v.lon], fin], { color: "#ffffff", weight: 1.5, dashArray: "2 6", opacity: 0.85 }).addTo(m);
+        L.marker(fin, { icon: etiqueta(`R-${String(rad.radial % 360 || 360).padStart(3, "0")}`, "#ffffff"), interactive: false }).addTo(m);
+      }
+      L.marker([v.lat, v.lon], { icon: hexagono(v.ident), interactive: false, zIndexOffset: 400 }).addTo(m);
+    }
+
     for (const f of grabacion.fases) {
       const tramo = entre(ps, f.inicio, f.fin);
       if (tramo.length > 1) L.polyline(tramo.map(latLng), ESTILO[f.fase]).addTo(m);
@@ -90,6 +124,7 @@ export function MapaVuelo({
     todo.current = L.latLngBounds(ps.map(latLng));
     // El círculo aún no tiene mapa con vista, así que sus límites salen del centro y el radio.
     if (z) todo.current.extend(z.poligono ? L.latLngBounds(z.poligono) : L.latLng(z.lat, z.lon).toBounds(z.radioNm * 1852 * 2));
+    if (v) todo.current.extend([v.lat, v.lon]);
     m.fitBounds(todo.current, { padding: [20, 20] });
     mapa.current = m;
     return () => {

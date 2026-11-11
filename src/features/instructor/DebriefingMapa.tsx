@@ -15,6 +15,7 @@ const T = {
     intento: (k: number, m: string, c: number) => `Intento ${k} · ${m} · ${c}/100`,
     tolerancia: "tolerancia",
     ver: "Ver",
+    navegacion: "Navegación",
     sinErrores: "Sin errores en este vuelo.",
     sinErroresFase: "Sin errores en esta parte del vuelo.",
     errores: "Errores",
@@ -27,6 +28,7 @@ const T = {
     intento: (k: number, m: string, c: number) => `Attempt ${k} · ${m} · ${c}/100`,
     tolerancia: "tolerance",
     ver: "Show",
+    navegacion: "Navigation",
     sinErrores: "No errors on this flight.",
     sinErroresFase: "No errors in this part of the flight.",
     errores: "Errors",
@@ -89,6 +91,8 @@ export function DebriefingMapa({ grabacion: g, idioma }: { grabacion: Grabacion;
   };
 
   // La lista agrupada: por intento, o por fase los errores de la lección.
+  // IFR: los ejercicios no se hacen en una zona sino con el VOR.
+  const nombrePestana = (p: Pestana) => (p === "zona" && g.vor ? t.navegacion : t.pestana[p]);
   const lista = dePestana(pestana);
   const grupos: { clave: string; titulo: string; errores: ErrorVuelo[]; explicacion: string[] }[] = [];
   for (const e of lista) {
@@ -98,7 +102,7 @@ export function DebriefingMapa({ grabacion: g, idioma }: { grabacion: Grabacion;
       const i = g.intentos.find((x) => x.n === e.intento);
       gr = {
         clave,
-        titulo: i ? t.intento(i.n, nombreManiobra(i.maniobra, idioma), i.calificacion) : t.pestana[e.fase],
+        titulo: i ? t.intento(i.n, nombreManiobra(i.maniobra, idioma), i.calificacion) : nombrePestana(e.fase),
         errores: [],
         explicacion: g.explicaciones.find((x) => x.intento === e.intento)?.lineas[idioma] ?? [],
       };
@@ -125,7 +129,7 @@ export function DebriefingMapa({ grabacion: g, idioma }: { grabacion: Grabacion;
               onClick={() => elegir(p)}
               className={`rounded-full px-3 py-1.5 text-sm ${pestana === p ? "bg-gold-400 font-semibold text-navy-950" : "bg-navy-800 text-white/70 hover:text-white"}`}
             >
-              {t.pestana[p]}
+              {nombrePestana(p)}
               {p !== "todo" && (n ? <span className={pestana === p ? "" : "text-red-300"}> · {n}</span> : " ✓")}
             </button>
           );

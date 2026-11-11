@@ -197,7 +197,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const aeroRef = useRef<Parameters<typeof alMuestrearRepaso>[2]>(null);
   const decirRef = useRef<(textos: string[]) => void>(() => {});
   // Lo que se graba para el mapa: el vuelo y cada intento calificado (e.hechas solo guarda el último de cada maniobra).
-  const grabador = useRef(crearGrabador());
+  const grabador = useRef(crearGrabador(ifr));
   const resultadosVuelo = useRef<{ maniobra: ManiobraId; resultado: ResultadoComun }[]>([]);
   const [mapa, setMapa] = useState<{ estado: "no" | "guardando" | "listo" | "error"; error?: string; id?: string }>({ estado: "no" });
   // IFR: los VOR del lector y, en el examen, los dos casos sorteados al empezar.
@@ -390,7 +390,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     dichos.current.clear();
     leido.current = false;
     setGuardado({ estado: "no" });
-    grabador.current = crearGrabador();
+    grabador.current = crearGrabador(ifr);
     resultadosVuelo.current = [];
     setMapa({ estado: "no" });
     setFinEn(null);
@@ -400,7 +400,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   };
   const nueva = () => {
     reiniciar();
-    grabador.current = crearGrabador();
+    grabador.current = crearGrabador(ifr);
     resultadosVuelo.current = [];
     setMapa({ estado: "no" });
     setFinEn(null);

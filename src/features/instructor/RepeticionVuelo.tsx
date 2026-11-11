@@ -14,8 +14,8 @@ const VELOCIDADES = [1, 4, 16] as const;
 const VOZ_SEG = 20;
 
 const T = {
-  es: { altitud: "Altitud", velocidad: "Velocidad", rumbo: "Rumbo", inclinacion: "Inclinación", bola: "Bola", instructor: "Instructor", play: "Reproducir", pausa: "Pausa", perfil: "Perfil del vuelo: altitud en blanco, velocidad en azul. Arrastra para moverte." },
-  en: { altitud: "Altitude", velocidad: "Airspeed", rumbo: "Heading", inclinacion: "Bank", bola: "Ball", instructor: "Instructor", play: "Play", pausa: "Pause", perfil: "Flight profile: altitude in white, airspeed in blue. Drag to move." },
+  es: { altitud: "Altitud", velocidad: "Velocidad", rumbo: "Rumbo", inclinacion: "Inclinación", bola: "Bola", radial: "Radial", barra: "Barra", instructor: "Instructor", play: "Reproducir", pausa: "Pausa", perfil: "Perfil del vuelo: altitud en blanco, velocidad en azul. Arrastra para moverte." },
+  en: { altitud: "Altitude", velocidad: "Airspeed", rumbo: "Heading", inclinacion: "Bank", bola: "Ball", radial: "Radial", barra: "Needle", instructor: "Instructor", play: "Play", pausa: "Pause", perfil: "Flight profile: altitude in white, airspeed in blue. Drag to move." },
 };
 
 export const mmss = (seg: number) => `${Math.floor(Math.max(0, seg) / 60)}:${String(Math.floor(Math.max(0, seg) % 60)).padStart(2, "0")}`;
@@ -52,7 +52,7 @@ export function RepeticionVuelo({ grabacion, cursorT, alMover, idioma }: { graba
   }, [vel, t1]);
 
   const x = (tt: number) => ((tt - t0) / dur) * W;
-  const escala = (k: number) => {
+  const escala = (k: typeof C.altitud | typeof C.velocidad) => {
     const vs = ps.map((p) => p[k]);
     const lo = Math.min(...vs);
     const hi = Math.max(...vs);
@@ -60,7 +60,7 @@ export function RepeticionVuelo({ grabacion, cursorT, alMover, idioma }: { graba
   };
   const yAlt = escala(C.altitud);
   const yVel = escala(C.velocidad);
-  const linea = (k: number, y: (v: number) => number) => ps.map((p) => `${x(p[C.t]).toFixed(1)},${y(p[k]).toFixed(1)}`).join(" ");
+  const linea = (k: typeof C.altitud | typeof C.velocidad, y: (v: number) => number) => ps.map((p) => `${x(p[C.t]).toFixed(1)},${y(p[k]).toFixed(1)}`).join(" ");
 
   const desdePuntero = (ev: PointerEvent<SVGSVGElement>) => {
     const r = ev.currentTarget.getBoundingClientRect();
@@ -139,6 +139,13 @@ export function RepeticionVuelo({ grabacion, cursorT, alMover, idioma }: { graba
           {lectura(t.rumbo, `${String(Math.round(p[C.rumbo]) % 360).padStart(3, "0")}°`)}
           {lectura(t.inclinacion, `${Math.round(Math.abs(p[C.inclinacion]))}°`)}
           {lectura(t.bola, p[C.bola].toFixed(2))}
+          {p[C.radial] !== undefined && (
+            <>
+              {lectura(t.radial, String(Math.round(p[C.radial]!) % 360 || 360).padStart(3, "0"))}
+              {lectura(t.barra, `${p[C.desv]!.toFixed(1)}`)}
+              {lectura("DME", `${p[C.dme]!.toFixed(1)} NM`)}
+            </>
+          )}
         </div>
       )}
       <p className="mt-2 min-h-[2.5rem] rounded-lg border-l-2 border-gold-400 bg-navy-800/50 px-3 py-2 text-sm text-white/80">

@@ -18,9 +18,15 @@ import { toleranciaS } from "./evaluadorS.ts";
 import { toleranciaOcho } from "./evaluadorOcho.ts";
 import { toleranciaAlrededor } from "./evaluadorAlrededor.ts";
 
-/** [t, lat, lon, altitud, velocidad, rumbo, inclinación, bola, agl]: arreglo y no objeto para que una hora pese poco. */
-export type Punto = [t: number, lat: number, lon: number, altitud: number, velocidad: number, rumbo: number, inclinacion: number, bola: number, agl: number];
-export const CAMPO_PUNTO = { t: 0, lat: 1, lon: 2, altitud: 3, velocidad: 4, rumbo: 5, inclinacion: 6, bola: 7, agl: 8 } as const;
+/**
+ * [t, lat, lon, altitud, velocidad, rumbo, inclinación, bola, agl]: arreglo y no objeto para que una hora pese poco.
+ * IFR agrega [radial, barra en puntos, DME] al final.
+ */
+export type Punto = [
+  t: number, lat: number, lon: number, altitud: number, velocidad: number, rumbo: number, inclinacion: number, bola: number, agl: number,
+  radial?: number, desv?: number, dme?: number,
+];
+export const CAMPO_PUNTO = { t: 0, lat: 1, lon: 2, altitud: 3, velocidad: 4, rumbo: 5, inclinacion: 6, bola: 7, agl: 8, radial: 9, desv: 10, dme: 11 } as const;
 
 export type FaseMapa = "rodaje" | "despegue" | "zona" | "circuitos" | "aterrizaje" | "rodaje-regreso";
 export type TramoFase = { fase: FaseMapa; inicio: number; fin: number };
@@ -29,9 +35,11 @@ export interface Grabador {
   puntos: Punto[];
   fases: TramoFase[];
   voz: { t: number; texto: string }[];
+  /** IFR: también el radio NAV1 en cada punto. */
+  nav?: boolean;
 }
 
-export const crearGrabador = (): Grabador => ({ puntos: [], fases: [], voz: [] });
+export const crearGrabador = (nav = false): Grabador => ({ puntos: [], fases: [], voz: [], ...(nav ? { nav } : {}) });
 
 const CADA_SEG = 1;
 const r = (x: number, d = 0) => Math.round(x * 10 ** d) / 10 ** d;
@@ -72,7 +80,10 @@ export function grabarMuestra(g: Grabador, m: Muestra, e: EstadoRepaso): void {
   const previo = g.puntos[g.puntos.length - 1];
   // El t guardado va redondeado a 0.1 s: sin el margen, un reloj en x.37 grabaría cada 2 s.
   if (previo && m.t - previo[0] < CADA_SEG - 0.05) return;
-  g.puntos.push([r(m.t, 1), r(m.lat, 5), r(m.lon, 5), r(m.altitud), r(m.velocidad), r(m.rumbo), r(m.inclinacion), r(m.bola, 2), r(m.agl)]);
+  const p: Punto = [r(m.t, 1), r(m.lat, 5), r(m.lon, 5), r(m.altitud), r(m.velocidad), r(m.rumbo), r(m.inclinacion), r(m.bola, 2), r(m.agl)];
+  // La barra en puntos (uno = 2°), como la califica la interceptación.
+  if (g.nav && m.navRadial !== undefined) p.push(r(m.navRadial), r((m.navDesv ?? 0) / 2, 1), r(m.navDme ?? 0, 1));
+  g.puntos.push(p);
 }
 
 export function grabarVoz(g: Grabador, t: number, textos: string[]): void {
@@ -165,6 +176,10 @@ export interface Grabacion {
   bien: Record<Idioma, string[]>;
   zona: { lat: number; lon: number; radioNm: number; poligono?: [number, number][] } | null;
   anulada: { t: number; motivo: string } | null;
+  /** IFR: el VOR de la lección; `decl` para dibujar los radiales (magnéticos) en el mapa (verdadero). */
+  vor?: { ident: string; lat: number; lon: number; decl: number };
+  /** IFR: el radial pedido en cada intento. */
+  radiales?: { intento: number; radial: number; desde: boolean }[];
 }
 
 const IDIOMAS: Idioma[] = ["es", "en"];
@@ -212,6 +227,11 @@ export function cerrarGrabacion(
     .map((err, k) => ({ n: k + 1, ...err }));
   const bien = Object.fromEntries(IDIOMAS.map((idioma) => [idioma, deb[idioma].partes.flatMap((p) => p.bien)])) as Record<Idioma, string[]>;
   const z = e.zona;
+  const v = e.vor;
+  const radiales = x.resultados.flatMap(({ resultado }, i) => {
+    const ej = (resultado as { ejercicio?: { radial: number; desde: boolean } }).ejercicio;
+    return ej ? [{ intento: i + 1, radial: ej.radial, desde: ej.desde }] : [];
+  });
   return {
     version: 1,
     leccion: x.leccion,
@@ -224,6 +244,8 @@ export function cerrarGrabacion(
     bien,
     zona: z ? { lat: z.lat, lon: z.lon, radioNm: z.radioNm, ...(z.poligono ? { poligono: z.poligono } : {}) } : null,
     anulada: e.etapa === "invalido" ? { t: g.puntos[g.puntos.length - 1]?.[0] ?? 0, motivo: e.motivo ?? "" } : null,
+    // Solo en IFR: una grabación VFR queda igual.
+    ...(v ? { vor: { ident: v.ident, lat: v.lat, lon: v.lon, decl: v.decl }, radiales } : {}),
   };
 }
 
