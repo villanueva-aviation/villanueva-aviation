@@ -83,3 +83,9 @@ test("generarArco: radio 4 NM más allá (o más acá, lejos) y salida a 60°", 
 test("el briefing del arco en inglés no tiene caracteres del español", () => {
   for (const l of briefingArco("en")) assert.doesNotMatch(l, /[áéíóúñ¿¡]/i);
 });
+
+test("el briefing del arco dice «1 milla», no «1 millas», en fácil", () => {
+  assert.ok(briefingArco("es", 1).some((l) => l.includes("dentro de 1 milla.")));
+  assert.ok(briefingArco("en", 1).some((l) => l.includes("within 1 mile.")));
+  assert.ok(briefingArco("es", 2).some((l) => l.includes("dentro de 0.5 millas.")));
+});

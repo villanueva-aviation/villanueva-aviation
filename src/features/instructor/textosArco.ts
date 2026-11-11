@@ -19,6 +19,7 @@ export function pasoArco(e: EvaluacionArco | null, _m: Muestra | null): PasoArco
 
 const tres = (r: number) => String(Math.round(norm360(r)) || 360).padStart(3, "0");
 const uno = (x: number) => String(Math.round(x * 10) / 10);
+const millas = (x: number, en: boolean) => (x === 1 ? (en ? "1 mile" : "1 milla") : `${uno(x)} ${en ? "miles" : "millas"}`);
 
 /** Hacia dónde vira al llegar al arco: depende del sentido y de si llega alejándose o acercándose. */
 export const viraALaDerecha = (ej: EjercicioArco) => (ej.sentido > 0) === ej.alejandose;
@@ -113,7 +114,7 @@ export function briefingArco(idioma: Idioma, nivel: Nivel = 2): string[] {
     return [
       "Today you'll fly DME arcs: a circle around the VOR at a fixed distance.",
       "Fly the radial toward the arc and start your turn about half a mile before reaching it.",
-      `On the arc, keep the distance within ${uno(T.distanciaNm)} miles. If it grows, turn about 10 degrees toward the station; if it shrinks, open up 10 degrees.`,
+      `On the arc, keep the distance within ${millas(T.distanciaNm, true)}. If it grows, turn about 10 degrees toward the station; if it shrinks, open up 10 degrees.`,
       "Near the final radial, set the inbound course on the OBS and turn onto it without overshooting.",
       "When you're ready, press «Ready, let's start».",
     ];
@@ -121,7 +122,7 @@ export function briefingArco(idioma: Idioma, nivel: Nivel = 2): string[] {
   return [
     "Hoy vas a volar arcos DME: un círculo alrededor del VOR a una distancia fija.",
     "Vuela el radial hacia el arco y empieza a virar como medio millas antes de llegar.",
-    `En el arco, mantén la distancia dentro de ${uno(T.distanciaNm)} millas. Si crece, vira unos 10° hacia la estación; si baja, abre unos 10°.`,
+    `En el arco, mantén la distancia dentro de ${millas(T.distanciaNm, false)}. Si crece, vira unos 10° hacia la estación; si baja, abre unos 10°.`,
     "Cerca del radial final, pon el curso de acercamiento en el OBS y vira a él sin pasarte.",
     "Cuando estés listo, presiona «Listo, empiezo».",
   ];

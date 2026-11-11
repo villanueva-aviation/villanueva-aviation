@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ACCESO_REPASO, LECCIONES, LECCIONES_IFR, REPASO, claveLeccion, estadoLeccion, leccionDe, leccionIfrDe } from "./lecciones.ts";
+import { ACCESO_REPASO, LECCIONES, LECCIONES_IFR, REPASO, claveLeccion, estadoLeccion, leccionDe, leccionIfrDe, lineaEjercicios } from "./lecciones.ts";
 import { LECCIONES_GUARDADAS } from "./reglasIntentos.ts";
 
 test("14 lecciones en el orden de la escuela", () => {
@@ -84,4 +84,13 @@ test("IFR 2 a 4: su maniobra, sus ejercicios y su clave; los arcos piden DME", (
 
 test("IFR 1: 5 prácticas y un examen de 2", () => {
   assert.deepEqual(LECCIONES_IFR[0].ejercicios, { practica: 5, examen: 2 });
+});
+
+test("el briefing IFR cuenta los ejercicios de cada lección", () => {
+  const [l1, l2, , l4] = LECCIONES_IFR;
+  assert.equal(lineaEjercicios(l1, false, "es"), "Son 5 interceptaciones, cada una con otro radial.");
+  assert.equal(lineaEjercicios(l2, false, "es"), "Son 3 ejercicios de práctica, con consejos.");
+  assert.equal(lineaEjercicios(l4, false, "en"), "2 practice exercises, with tips.");
+  assert.equal(lineaEjercicios(l4, true, "es"), "Es 1 ejercicio calificado, sin consejos.");
+  assert.equal(lineaEjercicios(l2, true, "en"), "One graded exercise, no tips.");
 });

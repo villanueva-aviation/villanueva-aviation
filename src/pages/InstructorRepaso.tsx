@@ -12,7 +12,7 @@ import { guardarIntento, guardarRecorrido } from "../features/instructor/intento
 import { cerrarGrabacion, crearGrabador, grabarMuestra, grabarVoz } from "../features/instructor/recorrido";
 import { DebriefingMapa } from "../features/instructor/DebriefingMapa";
 import type { ManiobraId, ResultadoComun } from "../features/instructor/maniobras";
-import { claveLeccion, estadoLeccion, leccionDe, leccionIfrDe } from "../features/instructor/lecciones";
+import { claveLeccion, estadoLeccion, leccionDe, leccionIfrDe, lineaEjercicios } from "../features/instructor/lecciones";
 import { casosExamen, entradaDicha, type CasoInterceptacion, type DatosEspera } from "../features/instructor/navIfr";
 import { elegirVor, vorsCercanos, vorsParaLeccion, type VorSim } from "../features/instructor/vorSim";
 import type { Entrada } from "../features/entrenador/esperas";
@@ -85,12 +85,12 @@ const T = {
     mapaGuardando: "Guardando el mapa del vuelo…",
     mapaNoGuardado: (e: string) => `No se pudo guardar el mapa del vuelo: ${e}`,
     verDespues: "Ver este vuelo después",
-    briefingIfr: (checkride: boolean) => [
+    briefingIfr: (ejercicios: string) => [
       "Vuelo completo en el C172, de la plataforma a la plataforma.",
       "Lee el checklist en voz alta, en español: el instructor revisa lo que se puede leer del simulador.",
       "En la plataforma elige el VOR y sintonízalo en NAV1, con la barra en NAV, no en GPS.",
       "Despega; arriba de 1,000 pies sobre el terreno y con señal del VOR empiezan los ejercicios.",
-      checkride ? "Son 2 interceptaciones calificadas, una alejándote y otra acercándote, sin consejos." : "Son 5 interceptaciones, cada una con otro radial.",
+      ejercicios,
       "Regresa, aterriza y apaga en la plataforma.",
       "Al final escuchas el debriefing por fases.",
     ],
@@ -150,12 +150,12 @@ const T = {
     mapaGuardando: "Saving the flight map…",
     mapaNoGuardado: (e: string) => `Couldn't save the flight map: ${e}`,
     verDespues: "See this flight later",
-    briefingIfr: (checkride: boolean) => [
+    briefingIfr: (ejercicios: string) => [
       "A full flight in the C172, from ramp to ramp.",
       "Read the checklist aloud, in Spanish: the instructor checks what the simulator can report.",
       "On the ramp pick the VOR and tune it on NAV1, with the needle on NAV, not GPS.",
       "Take off; the exercises start above 1,000 feet above the ground with the VOR signal.",
-      checkride ? "Two graded intercepts, one outbound and one inbound, no tips." : "Five intercepts, each on a different radial.",
+      ejercicios,
       "Come back, land and shut down on the ramp.",
       "At the end you hear the debriefing by phase.",
     ],
@@ -508,10 +508,10 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
         <SelectorNivel nivel={nivel} cambiar={cambiarNivel} checkride={modo === "checkride"} idioma={idioma} />
         <ol className="list-decimal space-y-2 rounded-xl border border-white/10 bg-navy-950/60 p-5 pl-9 text-sm leading-relaxed text-white/85">
           {(ifr ? [
-            ...t.briefingIfr(modo === "checkride").slice(0, 2),
+            ...t.briefingIfr(lineaEjercicios(leccion, modo === "checkride", idioma)).slice(0, 2),
             // La teoría corta de la maniobra, sin el saludo ni el «Listo, empiezo».
             ...(leccion.maniobra ? MANIOBRAS[leccion.maniobra].briefing(idioma, nivel).slice(1, -1) : []),
-            ...t.briefingIfr(modo === "checkride").slice(2),
+            ...t.briefingIfr(lineaEjercicios(leccion, modo === "checkride", idioma)).slice(2),
           ] : t.briefing(
             leccion.maniobra ? nombreManiobra(leccion.maniobra, idioma) : null,
             // Los circuitos se vuelan en el aeropuerto: su briefing sin la primera línea («Hoy vas a practicar…»).

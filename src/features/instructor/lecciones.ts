@@ -74,3 +74,16 @@ export function leccionIfrDe(numero: string | undefined): Leccion | null {
   const x = LECCIONES_IFR.find((y) => String(y.numero) === numero);
   return x?.disponible ? x : null;
 }
+
+/** La línea del briefing IFR con cuántos ejercicios tiene la lección (la 1 los describe). */
+export function lineaEjercicios(l: Leccion, checkride: boolean, idioma: Idioma): string {
+  const en = idioma === "en";
+  if (l.numero === 1)
+    return checkride
+      ? en ? "Two graded intercepts, one outbound and one inbound, no tips." : "Son 2 interceptaciones calificadas, una alejándote y otra acercándote, sin consejos."
+      : en ? "Five intercepts, each on a different radial." : "Son 5 interceptaciones, cada una con otro radial.";
+  const n = (checkride ? l.ejercicios?.examen : l.ejercicios?.practica) ?? 1;
+  if (checkride)
+    return n === 1 ? (en ? "One graded exercise, no tips." : "Es 1 ejercicio calificado, sin consejos.") : en ? `${n} graded exercises, no tips.` : `Son ${n} ejercicios calificados, sin consejos.`;
+  return n === 1 ? (en ? "One practice exercise, with tips." : "Es 1 ejercicio de práctica, con consejos.") : en ? `${n} practice exercises, with tips.` : `Son ${n} ejercicios de práctica, con consejos.`;
+}
