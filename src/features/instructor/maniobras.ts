@@ -54,11 +54,17 @@ import {
   avisoOcho, briefingOcho, explicarOcho, listaPasosOcho, masFalladoOcho, ordenOcho, paraGuardarOcho, pasoOcho, queHacerOcho, repetirOcho, semaforoOcho,
   textoPasoOcho, type PasoOcho,
 } from "./textosOcho.ts";
+import { tolAlrededor } from "./nivel.ts";
+import { armarAlrededor, armarSoloAlrededor, avanzarAlrededor, type EvaluacionAlrededor, type ResultadoAlrededor } from "./evaluadorAlrededor.ts";
+import {
+  avisoAlrededor, briefingAlrededor, explicarAlrededor, listaPasosAlrededor, masFalladoAlrededor, ordenAlrededor, paraGuardarAlrededor, pasoAlrededor,
+  queHacerAlrededor, repetirAlrededor, semaforoAlrededor, textoPasoAlrededor, type PasoAlrededor,
+} from "./textosAlrededor.ts";
 
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
 export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo"
-  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones";
+  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -537,10 +543,55 @@ const defOcho: DefManiobra<EvaluacionOcho, ResultadoOcho> = {
   paraGuardar: paraGuardarOcho,
 };
 
+const defAlrededor: DefManiobra<EvaluacionAlrededor, ResultadoAlrededor> = {
+  id: "ocho-alrededor",
+  insignia: "maniobra-ocho-alrededor-c172",
+  avion: "C172",
+  titulo: { es: "«8» alrededor de pilones C172", en: "C172 eights around pylons" },
+  tarea: { es: "Práctica · «8» alrededor de pilones", en: "Practice · Eights around pylons" },
+  elementosReporte: (n) => {
+    const T = tolAlrededor(n);
+    const banda = `${AGL_MIN.toLocaleString("en-US")}–${AGL_MAX.toLocaleString("en-US")}`;
+    return [
+      { codigo: "1", texto: `Mantiene la altitud de entrada (${banda} ft AGL) ±${T.altitudFt} ft`, textoEn: `Holds entry altitude (${banda} ft AGL) ±${T.altitudFt} ft` },
+      { codigo: "2", texto: `Mantiene la velocidad de entrada ±${T.velocidadKt} kt`, textoEn: `Holds entry airspeed ±${T.velocidadKt} kt` },
+      { codigo: "3", texto: `La misma distancia a cada pilón (±${T.radioPct}%)`, textoEn: `Same distance from each pylon (±${T.radioPct}%)` },
+      { codigo: "4", texto: `Alas niveladas entre los pilones al menos ${CRUCE_SEG} s`, textoEn: `Wings level between the pylons for at least ${CRUCE_SEG} s` },
+      { codigo: "5", texto: `Inclinación máxima ${INCLINACION_MAX_OCHO}° +${T.inclinacionGrados}°`, textoEn: `Maximum bank ${INCLINACION_MAX_OCHO}° +${T.inclinacionGrados}°` },
+    ];
+  },
+  celdas: [
+    celda("altitud", "Altitud", "Altitude"),
+    celda("velocidad", "Velocidad", "Airspeed"),
+    celda("radio", "Distancia al pilón", "Distance to pylon"),
+    celda("cruce", "Cruce", "Crossing"),
+    celda("inclinacion", "Inclinación", "Bank"),
+  ],
+  temas: ["c172"],
+  armar: armarAlrededor,
+  avanzar: avanzarAlrededor,
+  armarSolo: armarSoloAlrededor,
+  fase: (e) => (e.fase === "vuelta1" || e.fase === "cruce" || e.fase === "vuelta2" ? "en-curso" : e.fase === "listo" ? "armado" : e.fase),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoAlrededor,
+  orden: (antes, ahora, e, idioma) => ordenAlrededor(antes as PasoAlrededor | null, ahora as PasoAlrededor | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoAlrededor(paso as PasoAlrededor | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosAlrededor(paso as PasoAlrededor | null, idioma),
+  queHacer: (paso, idioma) => queHacerAlrededor(paso as PasoAlrededor | null, idioma),
+  semaforo: semaforoAlrededor,
+  aviso: avisoAlrededor,
+  briefing: briefingAlrededor,
+  explicar: explicarAlrededor,
+  repetir: repetirAlrededor,
+  masFallado: masFalladoAlrededor,
+  paraGuardar: paraGuardarAlrededor,
+};
+
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos, "ascensos-descensos": defAltitud,
   "virajes-ascendiendo": defCombinado, "toques-despegues": defCircuito, "falla-motor": defFalla,
-  "s-camino": defS, "ocho-pilones": defOcho,
+  "s-camino": defS, "ocho-pilones": defOcho, "ocho-alrededor": defAlrededor,
 };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */

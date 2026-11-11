@@ -342,5 +342,6 @@ test("«S»: la zona va de 600 ft AGL hacia arriba y la salida lo dice", () => {
   }
   assert.ok(decir.includes("Ve a la zona de trabajo: Cajititlán, entre 600 y 1,000 pies sobre el terreno."), decir.join(" | "));
   assert.equal(pisoZona("ocho-pilones"), 600, "la «8» sobre pilones va a la altura pivote, unos 700–900 ft");
+  assert.equal(pisoZona("ocho-alrededor"), 600);
   assert.equal(pisoZona("recto-nivelado"), 1500);
 });

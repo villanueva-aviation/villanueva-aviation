@@ -115,6 +115,18 @@ export const tolOcho = (n: Nivel = 3) => ({
   ...comunes(n),
 });
 
+/** «8» alrededor de pilones: altitud de entrada y la misma distancia a cada pilón. */
+export const tolAlrededor = (n: Nivel = 3) => ({
+  altitudFt: por(n, 200, 150, 100),
+  velocidadKt: por(n, 20, 15, 10),
+  /** Cuánto varía la distancia al pilón en una vuelta, en % del radio. Sin corregir, a 30° y 90 kt: 5 kt de viento ≈ 11%,
+   * 10 kt ≈ 19%, 15 kt ≈ 24%. ponytail: números míos. */
+  radioPct: por(n, 30, 20, 10),
+  /** Grados sobre 45°. */
+  inclinacionGrados: por(n, 10, 7, 5),
+  ...comunes(n),
+});
+
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */
 export const tolFinal = (n: Nivel = 3) => ({ menos: por(n, 10, 7, 5), mas: por(n, 15, 12, 10) });
 

@@ -28,7 +28,7 @@ export const LECCIONES: Leccion[] = [
   l(7, "Vuelo lento", "Slow flight", "vuelo-lento"),
   l(8, "«S» sobre un camino", "S-turns along a road", "s-camino"),
   l(9, "«8» sobre pilones", "Eights on pylons", "ocho-pilones"),
-  l(10, "«8» alrededor de pilones", "Eights around pylons"),
+  l(10, "«8» alrededor de pilones", "Eights around pylons", "ocho-alrededor"),
   l(11, "Práctica de emergencia", "Emergency practice", "falla-motor"),
   l(12, "Práctica de emergencia", "Emergency practice", "falla-motor"),
   l(13, "Repaso general", "General review"),

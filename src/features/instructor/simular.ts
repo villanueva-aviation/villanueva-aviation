@@ -466,6 +466,46 @@ export function simularOcho(op: { incl1?: number; incl2?: number; cruce?: number
 }
 
 /**
+ * «8» alrededor de pilones: 6,000 ft (800 AGL), 90 kt, rumbo 000. A los 8 s vira por la derecha a `incl1` (30°) 270°,
+ * `cruce` s (4) alas niveladas y 270° por la izquierda a `incl2` (30°); luego 5 s recto. `vientoKt` sopla del norte con la
+ * inclinación fija (el círculo se deforma); `subeFt` sube en la segunda vuelta; `kt2` es su velocidad.
+ */
+export function simularAlrededor(
+  op: { incl1?: number; incl2?: number; cruce?: number; vientoKt?: number; subeFt?: number; kt2?: number; mismoLado?: boolean } = {},
+): Muestra[] {
+  const [LAT, LON, SUELO, DT] = [20.5, -103.3, 5200, 0.1];
+  const out: Muestra[] = [];
+  let [x, y, h, alt, v] = [0, 0, 0, 6000, 90];
+  const w = op.vientoKt ?? 0;
+  const vuelta2: [number, number, number] = [op.mismoLado ? 1 : -1, op.incl2 ?? 30, 270];
+  const tramos = ([[0, 0, 8], [1, op.incl1 ?? 30, 270], [0, 0, op.cruce ?? 4], vuelta2, [0, 0, 5]] as [number, number, number][]).filter((t) => t[2] > 0);
+  let k = 0;
+  let hecho = 0;
+  for (let n = 0; k < tramos.length; n++) {
+    const t = n * DT;
+    const [lado, incl, cuanto] = tramos[k];
+    const segunda = tramos[k] === vuelta2;
+    const [vx, vy] = [v * Math.sin((h * Math.PI) / 180), v * Math.cos((h * Math.PI) / 180) - w];
+    out.push({
+      t, inclinacion: lado * incl, altitud: alt, velocidad: v, rumbo: norm(h), rumboV: norm(h), vs: 0, bola: 0, agl: alt - SUELO, peso: 2400, enTierra: false,
+      slew: false, tasa: 1, pausa: false, titulo: "Cessna Skyhawk 172SP", lat: LAT + y / 60, lon: LON + x / (60 * Math.cos((LAT * Math.PI) / 180)), gs: Math.hypot(vx, vy),
+    });
+    if (lado === 0) hecho += DT;
+    else {
+      const d = Math.min(((1091 * Math.tan((incl * Math.PI) / 180)) / v) * DT, cuanto - hecho);
+      h += lado * d;
+      hecho += d;
+    }
+    x += (vx * DT) / 3600;
+    y += (vy * DT) / 3600;
+    if (segunda && op.subeFt) alt = 6000 + (op.subeFt * hecho) / 270;
+    if (segunda && op.kt2) v += Math.sign(op.kt2 - v) * Math.min(Math.abs(op.kt2 - v), 0.5);
+    if (hecho >= cuanto - 1e-9) [k, hecho] = [k + 1, 0];
+  }
+  return out;
+}
+
+/**
  * Falla de motor simulada en el C172: 6,600 ft (2,100 AGL), 95 kt, recto y nivelado. Hacia los 5 s el instructor dice
  * «falla»; ralentí `reaccion` s después de los 6 s, planeo a `kt` (68) y el checklist a los 18 s, salvo `sinChecklist`
  * (los magnetos «sin hacer» dejan el derecho apagado). Recupera `retraso` s después de llegar a 1,000 AGL + `recuperaAgl`

@@ -37,7 +37,7 @@ export const maniobrasDe = (l: Leccion, azar = Math.random): ManiobraId[] =>
   l.maniobra ? Array(5).fill(l.maniobra) : sortear((Object.keys(MANIOBRAS) as ManiobraId[]).filter((id) => id !== CIRCUITO), 4, azar);
 
 /** Ft AGL desde los que la zona cuenta para esta maniobra: la «S» va de 600 a 1,000 y la «8» a la altura pivote. */
-export const pisoZona = (id: ManiobraId | undefined) => (id === "s-camino" || id === "ocho-pilones" ? AGL_MIN : ALTURA_SEGURA_AGL);
+export const pisoZona = (id: ManiobraId | undefined) => (id === "s-camino" || id === "ocho-pilones" || id === "ocho-alrededor" ? AGL_MIN : ALTURA_SEGURA_AGL);
 
 /** Lección 14: cada maniobra es un circuito desde la carrera de despegue. */
 const deCircuitos = (e: EstadoRepaso) => e.sorteo[0] === CIRCUITO;
