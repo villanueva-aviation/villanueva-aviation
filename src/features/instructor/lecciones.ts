@@ -41,15 +41,15 @@ export const LECCIONES: Leccion[] = [
   l(14, "Toques y despegues", "Touch and goes", "toques-despegues"),
 ];
 
-/** El programa IFR (spec 2026-11-11): por ahora solo la 1. */
+/** El programa IFR (spec 2026-11-11): de la 1 a la 4. */
 const ifr = (numero: number, es: string, en: string, maniobra?: ManiobraId, extra: Partial<Leccion> = {}): Leccion => ({
   numero, nombre: { es, en }, disponible: !!maniobra, maniobra, programa: "ifr", ...extra,
 });
 export const LECCIONES_IFR: Leccion[] = [
   ifr(1, "Interceptación de radiales", "Radial interception", "interceptar-radial", { ejercicios: { practica: 5, examen: 2 } }),
-  ifr(2, "Rutas de acercamiento y alejamiento", "Inbound and outbound courses"),
-  ifr(3, "Arcos DME", "DME arcs"),
-  ifr(4, "Patrones de espera", "Holding patterns"),
+  ifr(2, "Rutas de acercamiento y alejamiento", "Inbound and outbound courses", "ruta-vor", { ejercicios: { practica: 3, examen: 1 } }),
+  ifr(3, "Arcos DME", "DME arcs", "arco-dme", { ejercicios: { practica: 3, examen: 1 }, requiereDme: true }),
+  ifr(4, "Patrones de espera", "Holding patterns", "espera", { ejercicios: { practica: 2, examen: 1 } }),
   ifr(5, "Vuelo mezclado", "Mixed flight"),
   ifr(6, "Checkride IFR", "IFR checkride"),
 ];

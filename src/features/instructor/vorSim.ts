@@ -39,4 +39,8 @@ export function distanciaVor(m: Muestra, v: { lat: number; lon: number }): numbe
   return Math.hypot(d.x, d.y);
 }
 
+/** Los arcos piden DME: los VOR sin él se ven pero no se pueden elegir. */
+export const vorsParaLeccion = <T extends VorSim>(cercanos: T[], requiereDme: boolean): (T & { apto: boolean })[] =>
+  cercanos.map((v) => ({ ...v, apto: !requiereDme || v.dme }));
+
 export const elegirVor = (v: VorSim, m: Muestra): VorElegido => ({ ...v, decl: declinacion(m) });

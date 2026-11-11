@@ -81,8 +81,9 @@ function texto(paso: PasoEspera, e: EvaluacionEspera | null, idioma: Idioma): st
   }
 }
 
+/** La pregunta no va aquí: la página la hace y escucha la respuesta. */
 export function ordenEspera(antes: PasoEspera | null, ahora: PasoEspera | null, e: EvaluacionEspera | null, idioma: Idioma): string | null {
-  if (!ahora || ahora === antes || ahora === "terminado") return null;
+  if (!ahora || ahora === antes || ahora === "terminado" || ahora === "pregunta") return null;
   return texto(ahora, e, idioma) || null;
 }
 

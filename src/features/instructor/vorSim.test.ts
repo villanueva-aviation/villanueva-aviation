@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Muestra } from "./evaluador.ts";
-import { declinacion, distanciaVor, elegirVor, leerVors, vorsCercanos, type VorSim } from "./vorSim.ts";
+import { declinacion, distanciaVor, elegirVor, leerVors, vorsCercanos, vorsParaLeccion, type VorSim } from "./vorSim.ts";
 
 const muestra = (x: Partial<Muestra> = {}): Muestra => ({
   t: 0, inclinacion: 0, altitud: 6500, velocidad: 100, rumbo: 90, bola: 0, agl: 1500, peso: 2300, enTierra: false, slew: false, tasa: 1, pausa: false,
@@ -45,4 +45,11 @@ test("distanciaVor: millas por lat/lon; sin posición, null", () => {
   const d = distanciaVor(m, { lat: 20, lon: -103 });
   assert.ok(d !== null && Math.abs(d - 6) < 0.05, `d ${d}`);
   assert.equal(distanciaVor({} as Muestra, { lat: 20, lon: -103 }), null);
+});
+
+test("vorsParaLeccion: sin DME no es apto solo cuando la lección pide DME", () => {
+  const vs = [vor("CON", 20, -103), vor("SIN", 20.1, -103, false)];
+  assert.deepEqual(vorsParaLeccion(vs, true).map((v) => v.apto), [true, false]);
+  assert.deepEqual(vorsParaLeccion(vs, false).map((v) => v.apto), [true, true]);
+  assert.equal(vorsParaLeccion(vs, true)[1].ident, "SIN");
 });

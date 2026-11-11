@@ -13,8 +13,13 @@ import { cerrarGrabacion, crearGrabador, grabarMuestra, grabarVoz } from "../fea
 import { DebriefingMapa } from "../features/instructor/DebriefingMapa";
 import type { ManiobraId, ResultadoComun } from "../features/instructor/maniobras";
 import { claveLeccion, estadoLeccion, leccionDe, leccionIfrDe } from "../features/instructor/lecciones";
-import { casosExamen, type CasoInterceptacion } from "../features/instructor/navIfr";
-import { elegirVor, vorsCercanos, type VorSim } from "../features/instructor/vorSim";
+import { casosExamen, entradaDicha, type CasoInterceptacion, type DatosEspera } from "../features/instructor/navIfr";
+import { elegirVor, vorsCercanos, vorsParaLeccion, type VorSim } from "../features/instructor/vorSim";
+import type { Entrada } from "../features/entrenador/esperas";
+import { DatosEsperaForm } from "../features/instructor/DatosEsperaForm";
+import { responderEntrada } from "../features/instructor/evaluadorEspera";
+import { PREGUNTA_ENTRADA } from "../features/instructor/textosEspera";
+import { useEscucha } from "../features/instructor/useEscucha";
 import { lecturaFinalDe, MANIOBRAS } from "../features/instructor/maniobras";
 import {
   alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, maniobraActual, maniobrasDe, nombreManiobra, pisoZona, ponerVor, siguienteManiobra,
@@ -95,8 +100,12 @@ const T = {
     vors: "VOR cercanos",
     sinVors: "No hay VOR a menos de 60 millas: el lector manda la lista al conectarse con MSFS.",
     conDme: "con DME",
+    sinDme: "sin DME",
+    sinVorDme: "No hay VOR con DME a 60 millas: elige otro aeropuerto.",
     largo: "vuelo largo",
     menuIfr: "Volver al menú IFR",
+    tuEntrada: "Tu entrada:",
+    entradas: { directa: "Directa", paralela: "Paralela", gota: "Gota" } as Record<Entrada, string>,
   },
   en: {
     titulo: (l: string) => `${l} · C172`,
@@ -156,8 +165,12 @@ const T = {
     vors: "Nearby VORs",
     sinVors: "No VOR within 60 miles: the reader sends the list once it connects to MSFS.",
     conDme: "with DME",
+    sinDme: "no DME",
+    sinVorDme: "No VOR with DME within 60 miles: pick another airport.",
     largo: "long flight",
     menuIfr: "Back to the IFR menu",
+    tuEntrada: "Your entry:",
+    entradas: { directa: "Direct", paralela: "Parallel", gota: "Teardrop" } as Record<Entrada, string>,
   },
 };
 
@@ -203,6 +216,14 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   // IFR: los VOR del lector y, en el examen, los dos casos sorteados al empezar.
   const vorsRef = useRef<VorSim[]>([]);
   const casosRef = useRef<CasoInterceptacion[] | undefined>(undefined);
+  // Lección 4: la espera (de la carta o inventada) y el radial de llegada. Una inventada vale para un solo intento.
+  const [datosEspera, setDatosEspera] = useState<DatosEspera | null>(null);
+  const [llegada, setLlegada] = useState<number | null>(null);
+  const esperaRef = useRef(datosEspera);
+  esperaRef.current = datosEspera;
+  const llegadaRef = useRef(llegada);
+  llegadaRef.current = llegada;
+  const esperaUsada = useRef(false);
 
   const actualId = repaso ? maniobraActual(repaso) : null;
   const def = MANIOBRAS[actualId ?? "recto-nivelado"];
@@ -219,7 +240,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     for (const m of lote) {
       // IFR: despega sin elegir VOR → el más cercano.
       if (e.programa === "ifr" && !e.vor && e.etapa === "rampa" && !m.enTierra && m.lat !== undefined && m.lon !== undefined) {
-        const cerca = vorsCercanos(vorsRef.current, m.lat, m.lon)[0];
+        const cerca = vorsParaLeccion(vorsCercanos(vorsRef.current, m.lat, m.lon), !!leccion?.requiereDme).find((v) => v.apto);
         if (cerca) e = ponerVor(e, elegirVor(cerca, m));
       }
       const antes = e.etapa;
@@ -244,6 +265,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       const id = maniobraActual(e);
       if (!id) return;
       resultadosVuelo.current.push({ maniobra: id, resultado: i.resultado });
+      esperaUsada.current = true;
       const r = alResultado(e, i.resultado, i.id, idioma);
       poner(r.estado);
       // La calificación y, si algo salió, el primer error con cómo corregirlo; el resto queda en pantalla.
@@ -256,11 +278,22 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   );
 
   const contexto = useCallback(
-    () => ({ intento: repasoRef.current?.actual ?? 0, examen: modo === "checkride", casos: casosRef.current, vor: repasoRef.current?.vor?.ident, estacion: repasoRef.current?.vor ?? undefined }),
+    () => {
+      const espera = esperaRef.current;
+      return {
+        intento: repasoRef.current?.actual ?? 0, examen: modo === "checkride", casos: casosRef.current, vor: repasoRef.current?.vor?.ident,
+        estacion: repasoRef.current?.vor ?? undefined,
+        // Con carta, la misma en cada intento; inventada, solo en el primero (después cada intento inventa la suya).
+        espera: espera && (espera.carta || !esperaUsada.current) ? espera : undefined,
+        llegada: llegadaRef.current ?? undefined,
+      };
+    },
     [modo],
   );
   const intento = useIntento(def, { sesionId, modoFijo: modo, arma: !!repaso && armaManiobra(repaso), alTerminar, alLote, contexto });
-  const { estado, muestra, aeropuerto, vors, ev, resultado, enCurso, reiniciar, nivel, cambiarNivel } = intento;
+  const { estado, muestra, aeropuerto, vors, ev, resultado, enCurso, reiniciar, nivel, cambiarNivel, ajustar } = intento;
+  const muestraRef = useRef(muestra);
+  muestraRef.current = muestra;
   aeroRef.current = aeropuerto;
   vorsRef.current = vors;
   // Solo una maniobra ya empezada sigue fuera de la zona; una armada sin empezar se desarma (abajo).
@@ -319,9 +352,34 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     return () => window.clearTimeout(id);
   }, [terminado, finEn, listo, cl]);
 
+  // Lección 4: «¿Qué entrada vas a hacer?» con el micrófono; también hay botones. El checklist calla mientras.
+  const escuchaEntrada = useEscucha(idioma, voz);
+  const responder = useCallback((d: Entrada) => ajustar((e) => responderEntrada(e, d, muestraRef.current?.rumbo ?? 0)), [ajustar]);
+  const preguntar = def.id === "espera" && !!ev?.preguntar;
+  const preguntaHecha = useRef(false);
+  const { escuchar, supported: micEntrada } = escuchaEntrada;
+  useEffect(() => {
+    if (!preguntar) {
+      preguntaHecha.current = false;
+      return;
+    }
+    if (preguntaHecha.current) return;
+    preguntaHecha.current = true;
+    const pregunta = paraVoz(PREGUNTA_ENTRADA[idioma], idioma);
+    if (!micEntrada) {
+      decir(pregunta, "orden", "pregunta");
+      return;
+    }
+    // Si no se entiende, la respuesta queda pendiente para los botones.
+    escuchar(pregunta, "orden", "pregunta", (texto) => {
+      const d = entradaDicha(texto, idioma);
+      if (d) responder(d);
+    });
+  }, [preguntar, micEntrada, escuchar, decir, idioma, responder]);
+
   // Checklist por voz, en español, mientras dura la lección. Al cerrar una sección el instructor dice qué faltó.
   const enVuelo = !!repaso && repaso.etapa !== "terminado" && repaso.etapa !== "invalido";
-  const escucha = useChecklistVoz(enVuelo || (terminado && !listo), voz, (texto) => {
+  const escucha = useChecklistVoz((enVuelo || (terminado && !listo)) && escuchaEntrada.fase === "inactivo", voz, (texto) => {
     clRef.current = oir(clRef.current, texto, ultimaT.current);
     setCl(clRef.current);
   });
@@ -396,6 +454,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     setFinEn(null);
     setListo(false);
     casosRef.current = ifr && modo === "checkride" ? casosExamen() : undefined;
+    esperaUsada.current = false;
     if (leccion) poner(crearRepaso(modo, maniobrasDe(leccion, Math.random, modo), nivel, programa));
   };
   const nueva = () => {
@@ -468,7 +527,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   }
 
   // IFR: el VOR se elige en la plataforma (o mientras sube); a más de 40 NM es un vuelo largo.
-  const cercanos = ifr && muestra?.lat !== undefined && muestra.lon !== undefined ? vorsCercanos(vors, muestra.lat, muestra.lon) : [];
+  const cercanos = ifr && muestra?.lat !== undefined && muestra.lon !== undefined ? vorsParaLeccion(vorsCercanos(vors, muestra.lat, muestra.lon), !!leccion.requiereDme) : [];
   const eligeVor = ifr && (repaso.etapa === "rampa" || repaso.etapa === "salida");
 
   const Hoja = HOJA[def.id];
@@ -497,18 +556,20 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
         <section className="space-y-2 rounded-xl border border-white/10 p-4 text-sm">
           <p className="font-semibold text-white">{t.vors}</p>
           {cercanos.length === 0 && <p className="text-white/60">{t.sinVors}</p>}
+          {cercanos.length > 0 && !cercanos.some((v) => v.apto) && <p className="text-gold-300">{t.sinVorDme}</p>}
           <div className="grid gap-2 sm:grid-cols-2">
             {cercanos.slice(0, 8).map((v) => (
               <button
                 key={`${v.ident}-${v.mhz}`}
                 type="button"
+                disabled={!v.apto}
                 aria-pressed={repaso.vor?.ident === v.ident && repaso.vor.mhz === v.mhz}
                 onClick={() => muestra && poner(ponerVor(repaso, elegirVor(v, muestra)))}
-                className={`rounded-lg border px-3 py-2 text-left ${repaso.vor?.ident === v.ident && repaso.vor.mhz === v.mhz ? "border-gold-500 bg-gold-500/15 text-gold-100" : "border-white/15 text-white"}`}
+                className={`rounded-lg border px-3 py-2 text-left disabled:opacity-40 ${repaso.vor?.ident === v.ident && repaso.vor.mhz === v.mhz ? "border-gold-500 bg-gold-500/15 text-gold-100" : "border-white/15 text-white"}`}
               >
                 <span className="block font-display font-bold">{v.ident} · {v.mhz.toFixed(2)}</span>
                 <span className="block text-xs text-white/70">
-                  {Math.round(v.nm)} NM{v.dme ? ` · ${t.conDme}` : ""}{v.largo ? ` · ${t.largo}` : ""}
+                  {Math.round(v.nm)} NM{v.dme ? ` · ${t.conDme}` : v.apto ? "" : ` · ${t.sinDme}`}{v.largo ? ` · ${t.largo}` : ""}
                 </span>
               </button>
             ))}
@@ -516,9 +577,23 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
         </section>
       )}
 
+      {eligeVor && leccion.maniobra === "espera" && (
+        <DatosEsperaForm datos={datosEspera} llegada={llegada} cambiar={setDatosEspera} cambiarLlegada={setLlegada} idioma={idioma} />
+      )}
+
       {actualId && !resultado && (
         <section className="space-y-2 rounded-xl border border-white/10 p-4 text-sm text-white/85">
           <p className="font-semibold text-white">{def.textoPaso(paso, ev, idioma)}</p>
+          {def.id === "espera" && ev?.fase === "llegando" && ev.dicha === undefined && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-white/70">{t.tuEntrada}</span>
+              {(["directa", "paralela", "gota"] as const).map((d) => (
+                <button key={d} type="button" onClick={() => responder(d)} className="rounded-full border border-gold-500 px-3 py-1 text-gold-100">
+                  {t.entradas[d]}
+                </button>
+              ))}
+            </div>
+          )}
           <ul className="space-y-1">
             {def.pasos(paso, idioma).map((p) => (
               <li key={p.nombre} className={p.estado === "actual" ? "text-gold-200" : p.estado === "hecho" ? "text-white/50 line-through" : "text-white/70"}>{p.nombre}</li>

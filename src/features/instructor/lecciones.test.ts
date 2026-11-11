@@ -54,17 +54,32 @@ test("cada lección se guarda con su clave; el repaso conserva la de antes", () 
   assert.equal(leccionDe("x"), null);
 });
 
-test("programa IFR: 6 lecciones, solo la 1 abierta, con su propia clave", () => {
+test("programa IFR: 6 lecciones, de la 1 a la 4 abiertas, con su propia clave", () => {
   assert.equal(LECCIONES_IFR.length, 6);
-  assert.deepEqual(LECCIONES_IFR.map((l) => l.disponible), [true, false, false, false, false, false]);
+  assert.deepEqual(LECCIONES_IFR.map((l) => l.disponible), [true, true, true, true, false, false]);
   assert.equal(LECCIONES_IFR[0].maniobra, "interceptar-radial");
   assert.equal(LECCIONES_IFR[5].nombre.en, "IFR checkride");
   for (const l of LECCIONES_IFR) assert.doesNotMatch(l.nombre.en, /[áéíóúñ¿¡«»]/);
   assert.equal(claveLeccion(leccionIfrDe("1")!), "ifr-1");
-  assert.equal(leccionIfrDe("2"), null, "todavía no existe");
+  assert.equal(leccionIfrDe("5"), null, "todavía no existe");
+  assert.equal(estadoLeccion(LECCIONES_IFR[5], { fundador: true, exclusivo: true }), "proximamente");
   assert.equal(leccionIfrDe(undefined), null);
   assert.ok(LECCIONES_GUARDADAS["ifr-1"]);
   assert.equal(leccionDe("1"), LECCIONES[0], "la 1 del VFR no cambia");
+});
+
+test("IFR 2 a 4: su maniobra, sus ejercicios y su clave; los arcos piden DME", () => {
+  const [, ruta, arco, espera] = LECCIONES_IFR;
+  assert.equal(ruta.maniobra, "ruta-vor");
+  assert.deepEqual(ruta.ejercicios, { practica: 3, examen: 1 });
+  assert.equal(arco.maniobra, "arco-dme");
+  assert.deepEqual(arco.ejercicios, { practica: 3, examen: 1 });
+  assert.equal(arco.requiereDme, true);
+  assert.equal(espera.maniobra, "espera");
+  assert.deepEqual(espera.ejercicios, { practica: 2, examen: 1 });
+  assert.equal(ruta.requiereDme, undefined);
+  assert.deepEqual(["2", "3", "4"].map((n) => claveLeccion(leccionIfrDe(n)!)), ["ifr-2", "ifr-3", "ifr-4"]);
+  assert.ok(LECCIONES_GUARDADAS["ifr-4"]);
 });
 
 test("IFR 1: 5 prácticas y un examen de 2", () => {
