@@ -10,6 +10,7 @@ import { HojaFalla } from "./HojaFalla";
 import { HojaS } from "./HojaS";
 import { HojaOcho } from "./HojaOcho";
 import { HojaAlrededor } from "./HojaAlrededor";
+import { HojaFamiliarizacion } from "./HojaFamiliarizacion";
 import type { Idioma } from "./idiomaInstructor";
 import type { ManiobraId } from "./maniobras";
 
@@ -26,4 +27,5 @@ export const HOJA: Record<ManiobraId, (p: { resultado: any; idioma: Idioma }) =>
   "s-camino": HojaS,
   "ocho-pilones": HojaOcho,
   "ocho-alrededor": HojaAlrededor,
+  familiarizacion: HojaFamiliarizacion,
 };

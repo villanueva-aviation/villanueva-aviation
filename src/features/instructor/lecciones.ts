@@ -18,7 +18,7 @@ export const ACCESO_REPASO: "fundador" | "exclusivo" | "todos" = "fundador";
 const l = (numero: number, es: string, en: string, maniobra?: ManiobraId): Leccion => ({ numero, nombre: { es, en }, disponible: numero === REPASO || !!maniobra, maniobra });
 
 export const LECCIONES: Leccion[] = [
-  l(1, "Familiarización", "Familiarization"),
+  l(1, "Familiarización", "Familiarization", "familiarizacion"),
   // 2 y 3, y 11 y 12, son la misma lección dos veces: en la escuela son dos horas de lo mismo (Erik, 2026-11-10).
   l(2, "Vuelo recto y nivelado", "Straight and level flight", "recto-nivelado"),
   l(3, "Vuelo recto y nivelado", "Straight and level flight", "recto-nivelado"),

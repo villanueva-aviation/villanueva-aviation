@@ -16,14 +16,15 @@ test("14 lecciones en el orden de la escuela", () => {
 test("acceso al repaso: por ahora solo el fundador", () => {
   const r = LECCIONES[REPASO - 1];
   assert.equal(ACCESO_REPASO, "fundador");
-  assert.equal(estadoLeccion(LECCIONES[0], { fundador: true, exclusivo: true }), "proximamente");
+  assert.equal(estadoLeccion({ ...LECCIONES[0], disponible: false }, { fundador: true, exclusivo: true }), "proximamente");
   assert.equal(estadoLeccion(r, { fundador: true, exclusivo: false }), "abierta");
   assert.equal(estadoLeccion(r, { fundador: false, exclusivo: true }), "candado");
   assert.equal(estadoLeccion(r, { fundador: false, exclusivo: false }), "candado");
 });
 
 test("2 y 3 (recto y nivelado) y 7 (vuelo lento) se abren con su maniobra, con la misma regla de acceso", () => {
-  assert.deepEqual(LECCIONES.filter((l) => l.disponible).map((l) => l.numero), [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, REPASO, 14]);
+  assert.ok(LECCIONES.every((l) => l.disponible), "las 14 ya existen");
+  assert.equal(LECCIONES[0].maniobra, "familiarizacion");
   assert.equal(LECCIONES[7].maniobra, "s-camino");
   assert.equal(LECCIONES[8].maniobra, "ocho-pilones");
   assert.equal(LECCIONES[9].nombre.es, "«8» alrededor de pilones");
@@ -47,6 +48,7 @@ test("cada lección se guarda con su clave; el repaso conserva la de antes", () 
   assert.equal(claveLeccion(LECCIONES[6]), "leccion-7");
   assert.equal(leccionDe(undefined), LECCIONES[REPASO - 1]);
   assert.equal(leccionDe("7"), LECCIONES[6]);
-  assert.equal(leccionDe("1"), null, "no disponible");
+  assert.equal(leccionDe("1"), LECCIONES[0]);
+  assert.equal(leccionDe("15"), null, "no existe");
   assert.equal(leccionDe("x"), null);
 });

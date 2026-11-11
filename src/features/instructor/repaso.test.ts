@@ -20,6 +20,8 @@ test("una lección de maniobra la vuela 5 veces; el repaso sortea 4", () => {
   assert.equal(new Set(s).size, 4, "4 distintas de las disponibles");
   assert.deepEqual(maniobrasDe(LECCIONES[13]), Array(5).fill("toques-despegues"));
   for (let k = 0; k < 50; k++) assert.ok(!maniobrasDe(LECCIONES[REPASO - 1]).includes("toques-despegues"), "los circuitos no se sortean en la zona");
+  for (let k = 0; k < 50; k++) assert.ok(!maniobrasDe(LECCIONES[REPASO - 1]).includes("familiarizacion"), "el primer vuelo no se repasa");
+  assert.deepEqual(maniobrasDe(LECCIONES[0]), Array(5).fill("familiarizacion"));
 });
 
 const BASE = simularVuelo()[0];

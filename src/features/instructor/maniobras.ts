@@ -60,11 +60,19 @@ import {
   avisoAlrededor, briefingAlrededor, explicarAlrededor, listaPasosAlrededor, masFalladoAlrededor, ordenAlrededor, paraGuardarAlrededor, pasoAlrededor,
   queHacerAlrededor, repetirAlrededor, semaforoAlrededor, textoPasoAlrededor, type PasoAlrededor,
 } from "./textosAlrededor.ts";
+import {
+  armarFamiliarizacion, armarSoloFamiliarizacion, avanzarFamiliarizacion, type EvaluacionFamiliarizacion, type ResultadoFamiliarizacion,
+} from "./evaluadorFamiliarizacion.ts";
+import {
+  avisoFamiliarizacion, briefingFamiliarizacion, explicarFamiliarizacion, listaPasosFamiliarizacion, masFalladoFamiliarizacion, ordenFamiliarizacion,
+  paraGuardarFamiliarizacion, pasoFamiliarizacion, queHacerFamiliarizacion, repetirFamiliarizacion, semaforoFamiliarizacion, textoPasoFamiliarizacion,
+  type PasoFamiliarizacion,
+} from "./textosFamiliarizacion.ts";
 
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
 export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo"
-  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor";
+  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor" | "familiarizacion";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -588,10 +596,49 @@ const defAlrededor: DefManiobra<EvaluacionAlrededor, ResultadoAlrededor> = {
   paraGuardar: paraGuardarAlrededor,
 };
 
+const defFamiliarizacion: DefManiobra<EvaluacionFamiliarizacion, ResultadoFamiliarizacion> = {
+  id: "familiarizacion",
+  insignia: "maniobra-familiarizacion-c172",
+  avion: "C172",
+  titulo: { es: "Familiarización C172", en: "C172 familiarization" },
+  tarea: { es: "Práctica · Familiarización con los controles", en: "Practice · Getting to know the controls" },
+  elementosReporte: () => [
+    { codigo: "1", texto: "Inclina 20° a la izquierda y nivela", textoEn: "Banks 20 degrees left and levels the wings" },
+    { codigo: "2", texto: "Inclina 20° a la derecha y nivela", textoEn: "Banks 20 degrees right and levels the wings" },
+    { codigo: "3", texto: "Sube la nariz 5° y la regresa", textoEn: "Raises the nose 5 degrees and brings it back" },
+    { codigo: "4", texto: "Baja la nariz 5° y la regresa", textoEn: "Lowers the nose 5 degrees and brings it back" },
+    { codigo: "5", texto: "Pisa el pedal izquierdo y lo suelta", textoEn: "Presses the left pedal and releases it" },
+    { codigo: "6", texto: "Pisa el pedal derecho y lo suelta", textoEn: "Presses the right pedal and releases it" },
+    { codigo: "7", texto: "Mete potencia y ve subir la velocidad", textoEn: "Adds power and sees the airspeed go up" },
+    { codigo: "8", texto: "Reduce la potencia y ve bajar la velocidad", textoEn: "Reduces power and sees the airspeed go down" },
+  ],
+  celdas: [celda("alabeo", "Alabeo", "Roll"), celda("cabeceo", "Cabeceo", "Pitch"), celda("guinada", "Guiñada", "Yaw"), celda("potencia", "Potencia", "Power")],
+  temas: ["c172"],
+  armar: armarFamiliarizacion,
+  avanzar: avanzarFamiliarizacion,
+  armarSolo: armarSoloFamiliarizacion,
+  fase: (e) => (e.fase === "tareas" ? "en-curso" : e.fase),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoFamiliarizacion,
+  orden: (antes, ahora, e, idioma) => ordenFamiliarizacion(antes as PasoFamiliarizacion | null, ahora as PasoFamiliarizacion | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoFamiliarizacion(paso as PasoFamiliarizacion | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosFamiliarizacion(paso as PasoFamiliarizacion | null, idioma),
+  queHacer: (paso, idioma) => queHacerFamiliarizacion(paso as PasoFamiliarizacion | null, idioma),
+  semaforo: semaforoFamiliarizacion,
+  aviso: avisoFamiliarizacion,
+  briefing: (idioma) => briefingFamiliarizacion(idioma),
+  explicar: explicarFamiliarizacion,
+  repetir: repetirFamiliarizacion,
+  masFallado: masFalladoFamiliarizacion,
+  paraGuardar: paraGuardarFamiliarizacion,
+};
+
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos, "ascensos-descensos": defAltitud,
   "virajes-ascendiendo": defCombinado, "toques-despegues": defCircuito, "falla-motor": defFalla,
   "s-camino": defS, "ocho-pilones": defOcho, "ocho-alrededor": defAlrededor,
+  familiarizacion: defFamiliarizacion,
 };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */

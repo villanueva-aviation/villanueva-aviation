@@ -32,9 +32,12 @@ export function sortear(disponibles: ManiobraId[], n = 4, azar = Math.random): M
 /** Se vuelan en el circuito del aeropuerto, no en la zona: no entran al sorteo. */
 const CIRCUITO: ManiobraId = "toques-despegues";
 
+/** La familiarización es el primer vuelo, no una maniobra que se repasa. */
+const FUERA_DEL_SORTEO: ManiobraId[] = [CIRCUITO, "familiarizacion"];
+
 /** Lección de maniobra: la primera de práctica y 4 más (Erik). Repaso: 4 sorteadas. */
 export const maniobrasDe = (l: Leccion, azar = Math.random): ManiobraId[] =>
-  l.maniobra ? Array(5).fill(l.maniobra) : sortear((Object.keys(MANIOBRAS) as ManiobraId[]).filter((id) => id !== CIRCUITO), 4, azar);
+  l.maniobra ? Array(5).fill(l.maniobra) : sortear((Object.keys(MANIOBRAS) as ManiobraId[]).filter((id) => !FUERA_DEL_SORTEO.includes(id)), 4, azar);
 
 /** Ft AGL desde los que la zona cuenta para esta maniobra: la «S» va de 600 a 1,000 y la «8» a la altura pivote. */
 export const pisoZona = (id: ManiobraId | undefined) => (id === "s-camino" || id === "ocho-pilones" || id === "ocho-alrededor" ? AGL_MIN : ALTURA_SEGURA_AGL);

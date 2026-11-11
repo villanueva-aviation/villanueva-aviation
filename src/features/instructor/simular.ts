@@ -506,6 +506,43 @@ export function simularAlrededor(
 }
 
 /**
+ * Familiarización: 6,000 ft (2,000 AGL), 95 kt, cabeceo 2°, 6 s recto; luego cada movimiento en 3 s, 1 s ahí, 3 s de
+ * regreso y 2 s quieto: alabeo 20° izquierda y derecha, nariz ±6°, pedal izquierdo y derecho (bola 0.5 y 2°/s) y potencia
+ * +8 kt y −10 kt. `omitir` se salta un movimiento; `alReves` hace el alabeo primero a la derecha.
+ */
+export function simularFamiliarizacion(op: { omitir?: string; alReves?: boolean } = {}): Muestra[] {
+  const [LAT, LON, SUELO, DT] = [20.5, -103.3, 4000, 0.1];
+  type Paso = { id: string; incl?: number; cab?: number; bola?: number; kt?: number };
+  const izq = op.alReves ? 20 : -20;
+  const pasos: Paso[] = [
+    { id: "alabeo-izq", incl: izq }, { id: "alabeo-der", incl: -izq }, { id: "cabeceo-arriba", cab: 6 }, { id: "cabeceo-abajo", cab: -6 },
+    { id: "guinada-izq", bola: -0.5 }, { id: "guinada-der", bola: 0.5 }, { id: "acelera", kt: 8 }, { id: "reduce", kt: -10 },
+  ].filter((x) => x.id !== op.omitir);
+  const out: Muestra[] = [];
+  let [h, v, t] = [0, 95, 0];
+  const push = (incl: number, cab: number, bola: number) => {
+    out.push({
+      t: Math.round(t * 10) / 10, inclinacion: incl, altitud: 6000, velocidad: v, rumbo: norm(h), rumboV: norm(h), cabeceo: 2 + cab, vs: 0, bola, agl: 6000 - SUELO,
+      peso: 2400, enTierra: false, slew: false, tasa: 1, pausa: false, titulo: "Cessna Skyhawk 172SP", lat: LAT, lon: LON, gs: v,
+    });
+    h += ((1091 * Math.tan((incl * Math.PI) / 180)) / v) * DT + Math.sign(bola) * 2 * DT;
+    t += DT;
+  };
+  for (let n = 0; n < 60; n++) push(0, 0, 0);
+  for (const p of pasos) {
+    // 0→1 en 3 s, 1 s ahí, 1→0 en 3 s, 2 s quieto. La potencia no regresa: sube o baja y se queda.
+    const f = (n: number) => (n < 30 ? n / 30 : n < 40 ? 1 : n < 70 ? (p.kt ? 1 : 1 - (n - 40) / 30) : p.kt ? 1 : 0);
+    const v0 = v;
+    for (let n = 0; n < 90; n++) {
+      const x = f(n);
+      if (p.kt) v = v0 + p.kt * Math.min(1, n / 30);
+      push((p.incl ?? 0) * x, (p.cab ?? 0) * x, (p.bola ?? 0) * x);
+    }
+  }
+  return out;
+}
+
+/**
  * Falla de motor simulada en el C172: 6,600 ft (2,100 AGL), 95 kt, recto y nivelado. Hacia los 5 s el instructor dice
  * «falla»; ralentí `reaccion` s después de los 6 s, planeo a `kt` (68) y el checklist a los 18 s, salvo `sinChecklist`
  * (los magnetos «sin hacer» dejan el derecho apagado). Recupera `retraso` s después de llegar a 1,000 AGL + `recuperaAgl`
