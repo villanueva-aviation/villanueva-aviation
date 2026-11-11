@@ -1,4 +1,7 @@
-import type { Giros } from "../entrenador/esperas.ts";
+import { entradaEspera, generarSituacion, norm, type Entrada, type Giros } from "../entrenador/esperas.ts";
+import type { Muestra } from "./evaluador.ts";
+import type { Idioma } from "./idiomaInstructor.ts";
+import { normalizar } from "./preguntas.ts";
 
 // Geometría del VOR y los ejercicios del programa IFR. Puro.
 // Radiales y cursos en grados magnéticos, como los da el radio NAV1.
@@ -78,6 +81,70 @@ export function generarArco(radialAvion: number, dme: number, azar: () => number
   const radioNm = dme <= 14 ? Math.min(18, Math.max(6, Math.round(dme) + 4)) : Math.round(dme) - 4;
   const sentido: 1 | -1 = azar() < 0.5 ? 1 : -1;
   return { radioNm, desde, hasta: norm360(desde + sentido * 60), sentido, alejandose: dme < radioNm };
+}
+
+/** Lección 4 sin carta: la espera de las preguntas de esperas, con tramos de un minuto. */
+export function inventarEspera(azar: () => number = Math.random): DatosEspera {
+  const s = generarSituacion(azar);
+  return { acercamiento: norm(s.alejamiento + 180), giros: s.giros, tramoSeg: 60, carta: false };
+}
+
+/** Las entradas que valen con cualquiera de estos rumbos de llegada (cerca de una frontera valen las dos). */
+export function entradasValidas(rumbos: number[], alejamiento: number, giros: Giros): Entrada[] {
+  return [...new Set(rumbos.map((r) => entradaEspera(norm(r), alejamiento, giros)))];
+}
+
+const PALABRAS_ENTRADA: [Entrada, string[]][] = [
+  ["directa", ["directa", "direct"]],
+  ["paralela", ["paralela", "parallel"]],
+  ["gota", ["gota", "lagrima", "teardrop", "tear drop"]],
+];
+
+/** La entrada que dijo el cadete; si dijo dos distintas o ninguna, null. */
+export function entradaDicha(texto: string, idioma: Idioma): Entrada | null {
+  const t = ` ${normalizar(texto, idioma)} `;
+  const dichas = PALABRAS_ENTRADA.filter(([, ps]) => ps.some((p) => t.includes(` ${p} `))).map(([e]) => e);
+  return dichas.length === 1 ? dichas[0] : null;
+}
+
+/** Recto: alas niveladas. Un tramo de la entrada cuenta desde 30 s y a 60° o menos del alejamiento. */
+const RECTO_GRADOS = 5;
+const TRAMO_MIN_SEG = 30;
+const TRAMO_INICIO_SEG = 180;
+const TRAMO_RUMBO_GRADOS = 60;
+
+/**
+ * La entrada que voló, de las muestras entre el cruce del fijo y el regreso al fijo: el primer tramo recto y el sentido del
+ * viraje que le sigue. Viraje contrario a los de la espera → paralela; si no, gota si el tramo iba 30° hacia el lado de la espera.
+ */
+export function entradaVolada(ms: Muestra[], alejamiento: number, giros: Giros): Entrada | null {
+  if (!ms.length) return null;
+  const t0 = ms[0].t;
+  let fin = -1;
+  let h1 = 0;
+  for (let i = 0; i < ms.length && fin < 0; ) {
+    const recto = (m: Muestra) => Math.abs(m.inclinacion) < RECTO_GRADOS && Math.abs(norm180(m.rumbo - alejamiento)) <= TRAMO_RUMBO_GRADOS;
+    if (!recto(ms[i]) || ms[i].t - t0 > TRAMO_INICIO_SEG) {
+      i++;
+      continue;
+    }
+    let j = i;
+    while (j + 1 < ms.length && recto(ms[j + 1])) j++;
+    if (ms[j].t - ms[i].t >= TRAMO_MIN_SEG) {
+      fin = j;
+      // Rumbo medio, alrededor del primero para no promediar mal cerca de 360.
+      const r0 = ms[i].rumbo;
+      h1 = r0 + ms.slice(i, j + 1).reduce((a, m) => a + norm180(m.rumbo - r0), 0) / (j - i + 1);
+    }
+    i = j + 1;
+  }
+  if (fin < 0) return null;
+  let giro = 0;
+  for (let k = fin + 1; k < ms.length && Math.abs(giro) < 90; k++) giro += norm180(ms[k].rumbo - ms[k - 1].rumbo);
+  if (Math.abs(giro) < 90) return null;
+  if ((giro > 0) !== (giros === "derecha")) return "paralela";
+  const lado = giros === "derecha" ? -1 : 1;
+  return Math.abs(norm180(h1 - (alejamiento + lado * 30))) < Math.abs(norm180(h1 - alejamiento)) ? "gota" : "directa";
 }
 
 /** El examen: una interceptación alejándose y una acercándose, sin consejos. */

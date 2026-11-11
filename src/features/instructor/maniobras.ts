@@ -94,10 +94,17 @@ import {
   textoPasoArco, type PasoArco,
 } from "./textosArco.ts";
 
+import { tolEspera } from "./nivel.ts";
+import { armarEspera, armarSoloEspera, avanzarEspera, type EvaluacionEspera, type ResultadoEspera } from "./evaluadorEspera.ts";
+import {
+  avisoEspera, briefingEspera, explicarEspera, listaPasosEspera, masFalladoEspera, ordenEspera, paraGuardarEspera, pasoEspera, queHacerEspera,
+  repetirEspera, semaforoEspera, textoPasoEspera, type PasoEspera,
+} from "./textosEspera.ts";
+
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
 export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo"
-  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor" | "familiarizacion" | "interceptar-radial" | "ruta-vor" | "arco-dme";
+  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor" | "familiarizacion" | "interceptar-radial" | "ruta-vor" | "arco-dme" | "espera";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -784,6 +791,49 @@ const defArco: DefManiobra<EvaluacionArco, ResultadoArco> = {
   paraGuardar: paraGuardarArco,
 };
 
+const defEspera: DefManiobra<EvaluacionEspera, ResultadoEspera> = {
+  id: "espera",
+  insignia: "maniobra-espera-c172",
+  avion: "C172",
+  titulo: { es: "Patrones de espera C172", en: "C172 holding patterns" },
+  tarea: { es: "Práctica IFR · Patrones de espera", en: "IFR practice · Holding patterns" },
+  elementosReporte: (n) => {
+    const T = tolEspera(n);
+    return [
+      { codigo: "1", texto: "Dice la entrada correcta antes del fijo", textoEn: "Calls the correct entry before the fix" },
+      { codigo: "2", texto: "Vuela la entrada correcta", textoEn: "Flies the correct entry" },
+      { codigo: "3", texto: `Tramo de alejamiento de un minuto ±${T.tramoSeg} s`, textoEn: `One-minute outbound leg ±${T.tramoSeg} s` },
+      { codigo: "4", texto: `Acercamiento dentro de ${T.puntos} puntos`, textoEn: `Inbound within ${T.puntos} dots` },
+      { codigo: "5", texto: `Virajes a 3 ±${T.tasaGrados} °/s`, textoEn: `Turns at 3 ±${T.tasaGrados} °/s` },
+      { codigo: "6", texto: `A ${T.maxNm} NM o menos del VOR`, textoEn: `Within ${T.maxNm} NM of the VOR` },
+    ];
+  },
+  celdas: [
+    celda("dicha", "Entrada dicha", "Entry called"), celda("volada", "Entrada volada", "Entry flown"), celda("tramo", "Tramo", "Leg"),
+    celda("acercamiento", "Acercamiento", "Inbound"), celda("virajes", "Virajes", "Turns"), celda("distancia", "Distancia", "Distance"),
+  ],
+  temas: ["c172"],
+  armar: armarEspera,
+  nivelExamen: (n) => (Math.max(2, n) as Nivel),
+  avanzar: avanzarEspera,
+  armarSolo: armarSoloEspera,
+  fase: (e) => (e.fase === "posicionando" ? "armado" : e.fase === "terminado" || e.fase === "invalido" ? e.fase : "en-curso"),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoEspera,
+  orden: (antes, ahora, e, idioma) => ordenEspera(antes as PasoEspera | null, ahora as PasoEspera | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoEspera(paso as PasoEspera | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosEspera(paso as PasoEspera | null, idioma),
+  queHacer: (paso, idioma) => queHacerEspera(paso as PasoEspera | null, idioma),
+  semaforo: semaforoEspera,
+  aviso: avisoEspera,
+  briefing: briefingEspera,
+  explicar: explicarEspera,
+  repetir: repetirEspera,
+  masFallado: masFalladoEspera,
+  paraGuardar: paraGuardarEspera,
+};
+
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos, "ascensos-descensos": defAltitud,
   "virajes-ascendiendo": defCombinado, "toques-despegues": defCircuito, "falla-motor": defFalla,
@@ -792,6 +842,7 @@ export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "interceptar-radial": defInterceptacion,
   "ruta-vor": defRuta,
   "arco-dme": defArco,
+  espera: defEspera,
 };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */

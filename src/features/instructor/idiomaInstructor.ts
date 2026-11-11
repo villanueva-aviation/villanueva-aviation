@@ -35,6 +35,7 @@ const MOTIVOS_EN: Record<string, string> = {
   "Se perdió la señal del VOR por más de 10 segundos.": "The VOR signal was lost for more than 10 seconds.",
   "No hay señal del VOR: sintoniza la frecuencia en NAV1.": "No VOR signal: tune the frequency on NAV1.",
   "Este VOR no tiene DME: elige uno con DME para los arcos.": "This VOR has no DME: pick one with DME for the arcs.",
+  "La espera no se completó en 30 minutos.": "The hold wasn't completed within 30 minutes.",
   "La segunda vuelta de la «8» tiene que ir al lado contrario de la primera.": "The second turn of the eight has to go the opposite way from the first.",
 };
 

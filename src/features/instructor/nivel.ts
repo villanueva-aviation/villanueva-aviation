@@ -147,6 +147,9 @@ export const tolRuta = (n: Nivel = 2) => ({ puntos: por(n, 2, 1, 0.5), establece
 /** Lección IFR 3: la distancia al arco (Erik). */
 export const tolArco = (n: Nivel = 2) => ({ distanciaNm: por(n, 1, 0.5, 0.2) });
 
+/** Lección IFR 4: el minuto de alejamiento, el acercamiento, la tasa de viraje y lo lejos que se va (Erik). */
+export const tolEspera = (n: Nivel = 2) => ({ tramoSeg: por(n, 15, 10, 5), puntos: por(n, 2, 1, 0.5), tasaGrados: por(n, 1.5, 1, 0.5), maxNm: por(n, 5, 4, 3) });
+
 export const tolFinal = (n: Nivel = 3) => ({ menos: por(n, 10, 7, 5), mas: por(n, 15, 12, 10) });
 
 export const INVITA_SUBIR: Record<Idioma, (n: Nivel) => string> = {

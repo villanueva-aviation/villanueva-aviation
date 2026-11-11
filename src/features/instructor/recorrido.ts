@@ -5,7 +5,7 @@ import type { Checklist } from "./checklistVoz.ts";
 import { debriefingRepaso } from "./debriefingRepaso.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
 import { MANIOBRAS, type ManiobraId, type ResultadoComun } from "./maniobras.ts";
-import { tolArco, tolInterceptacion, tolRuta, type Nivel } from "./nivel.ts";
+import { tolArco, tolEspera, tolInterceptacion, tolRuta, type Nivel } from "./nivel.ts";
 import { LIMITE_SEG } from "./evaluadorInterceptacion.ts";
 import { toleranciaRecto } from "./evaluadorRecto.ts";
 import { toleranciaLento } from "./evaluadorLento.ts";
@@ -122,6 +122,7 @@ export const TOLERANCIAS: Record<ManiobraId, (n: Nivel) => Record<string, number
   "interceptar-radial": (n) => ({ sobrepaso: tolInterceptacion(n).sobrepasoPuntos, corto: tolInterceptacion(n).cortoSeg, interceptar: LIMITE_SEG }),
   "ruta-vor": (n) => ({ acercamiento: tolRuta(n).puntos, alejamiento: tolRuta(n).puntos }),
   "arco-dme": (n) => ({ entrada: tolArco(n).distanciaNm, distancia: tolArco(n).distanciaNm, salida: tolInterceptacion(n).sobrepasoPuntos }),
+  espera: (n) => ({ dicha: 0, volada: 0, tramo: tolEspera(n).tramoSeg, acercamiento: tolEspera(n).puntos, virajes: tolEspera(n).tasaGrados, distancia: tolEspera(n).maxNm }),
 };
 
 /** Unidad de `peor` por campo; "maniobra.campo" cuando una maniobra usa el mismo nombre con otra unidad. */
@@ -131,6 +132,7 @@ export const UNIDAD: Record<string, string> = {
   "interceptar-radial.sobrepaso": " puntos", "interceptar-radial.corto": "s", "interceptar-radial.interceptar": "s",
   "ruta-vor.acercamiento": " puntos", "ruta-vor.alejamiento": " puntos",
   "arco-dme.entrada": " NM", "arco-dme.distancia": " NM", "arco-dme.salida": " puntos",
+  "espera.tramo": "s", "espera.acercamiento": " puntos", "espera.virajes": "°/s", "espera.distancia": " NM",
 };
 export const unidadDe = (_id: ManiobraId, campo: string): string => UNIDAD[`${_id}.${campo}`] ?? UNIDAD[campo] ?? "";
 
