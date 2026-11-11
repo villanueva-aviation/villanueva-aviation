@@ -13,6 +13,7 @@ import { HojaAlrededor } from "./HojaAlrededor";
 import { HojaFamiliarizacion } from "./HojaFamiliarizacion";
 import { HojaInterceptacion } from "./HojaInterceptacion";
 import { HojaRuta } from "./HojaRuta";
+import { HojaArco } from "./HojaArco";
 import type { Idioma } from "./idiomaInstructor";
 import type { ManiobraId } from "./maniobras";
 
@@ -32,4 +33,5 @@ export const HOJA: Record<ManiobraId, (p: { resultado: any; idioma: Idioma }) =>
   familiarizacion: HojaFamiliarizacion,
   "interceptar-radial": HojaInterceptacion,
   "ruta-vor": HojaRuta,
+  "arco-dme": HojaArco,
 };

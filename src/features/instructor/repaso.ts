@@ -35,7 +35,7 @@ const CIRCUITO: ManiobraId = "toques-despegues";
 
 /** La familiarización es el primer vuelo, no una maniobra que se repasa. */
 /** La interceptación es del programa IFR. */
-const FUERA_DEL_SORTEO: ManiobraId[] = [CIRCUITO, "familiarizacion", "interceptar-radial", "ruta-vor"];
+const FUERA_DEL_SORTEO: ManiobraId[] = [CIRCUITO, "familiarizacion", "interceptar-radial", "ruta-vor", "arco-dme"];
 
 /** Lección de maniobra: la primera de práctica y 4 más (Erik). Repaso: 4 sorteadas. IFR: los ejercicios de la lección. */
 export const maniobrasDe = (l: Leccion, azar = Math.random, modo?: Modo): ManiobraId[] =>

@@ -87,10 +87,17 @@ import {
   textoPasoRuta, type PasoRuta,
 } from "./textosRuta.ts";
 
+import { tolArco } from "./nivel.ts";
+import { armarArco, armarSoloArco, avanzarArco, type EvaluacionArco, type ResultadoArco } from "./evaluadorArco.ts";
+import {
+  avisoArco, briefingArco, explicarArco, listaPasosArco, masFalladoArco, ordenArco, paraGuardarArco, pasoArco, queHacerArco, repetirArco, semaforoArco,
+  textoPasoArco, type PasoArco,
+} from "./textosArco.ts";
+
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
 export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo"
-  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor" | "familiarizacion" | "interceptar-radial" | "ruta-vor";
+  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor" | "familiarizacion" | "interceptar-radial" | "ruta-vor" | "arco-dme";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -740,6 +747,43 @@ const defRuta: DefManiobra<EvaluacionRuta, ResultadoRuta> = {
   paraGuardar: paraGuardarRuta,
 };
 
+const defArco: DefManiobra<EvaluacionArco, ResultadoArco> = {
+  id: "arco-dme",
+  insignia: "maniobra-arco-dme-c172",
+  avion: "C172",
+  titulo: { es: "Arcos DME C172", en: "C172 DME arcs" },
+  tarea: { es: "Práctica IFR · Arcos DME", en: "IFR practice · DME arcs" },
+  elementosReporte: (n) => {
+    const T = tolArco(n);
+    return [
+      { codigo: "1", texto: `Entra al arco sin pasarse más de ${T.distanciaNm} NM`, textoEn: `Turns onto the arc without overshooting more than ${T.distanciaNm} NM` },
+      { codigo: "2", texto: `Mantiene la distancia del arco ±${T.distanciaNm} NM`, textoEn: `Holds the arc distance ±${T.distanciaNm} NM` },
+      { codigo: "3", texto: `Sale al radial con las reglas de interceptación`, textoEn: `Turns onto the radial within interception rules` },
+    ];
+  },
+  celdas: [celda("entrada", "Entrada", "Entry"), celda("distancia", "Distancia", "Distance"), celda("salida", "Salida al radial", "Radial exit")],
+  temas: ["c172"],
+  armar: armarArco,
+  nivelExamen: (n) => (Math.max(2, n) as Nivel),
+  avanzar: avanzarArco,
+  armarSolo: armarSoloArco,
+  fase: (e) => (e.fase === "terminado" || e.fase === "invalido" ? e.fase : "en-curso"),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoArco,
+  orden: (antes, ahora, e, idioma) => ordenArco(antes as PasoArco | null, ahora as PasoArco | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoArco(paso as PasoArco | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosArco(paso as PasoArco | null, idioma),
+  queHacer: (paso, idioma) => queHacerArco(paso as PasoArco | null, idioma),
+  semaforo: semaforoArco,
+  aviso: avisoArco,
+  briefing: briefingArco,
+  explicar: explicarArco,
+  repetir: repetirArco,
+  masFallado: masFalladoArco,
+  paraGuardar: paraGuardarArco,
+};
+
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos, "ascensos-descensos": defAltitud,
   "virajes-ascendiendo": defCombinado, "toques-despegues": defCircuito, "falla-motor": defFalla,
@@ -747,6 +791,7 @@ export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   familiarizacion: defFamiliarizacion,
   "interceptar-radial": defInterceptacion,
   "ruta-vor": defRuta,
+  "arco-dme": defArco,
 };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */

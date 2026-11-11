@@ -66,6 +66,20 @@ export function generarRuta(radialAvion: number, giro: number, azar: () => numbe
   return { entrada, salida: norm360(entrada + 180 + signo * giro), giro };
 }
 
+/**
+ * Lección 3: vuela el radial `desde` hasta el arco de `radioNm`, lo sigue 60° hasta `hasta` y se acerca por él.
+ * `sentido` +1 = radiales crecientes. `alejandose`: llega al arco desde adentro.
+ */
+export type EjercicioArco = { radioNm: number; desde: number; hasta: number; sentido: 1 | -1; alejandose: boolean };
+
+/** El arco queda 4 NM más allá del avión (o más acá si ya está lejos), entre 6 y 18 NM. */
+export function generarArco(radialAvion: number, dme: number, azar: () => number = Math.random): EjercicioArco {
+  const desde = redondear10(radialAvion);
+  const radioNm = dme <= 14 ? Math.min(18, Math.max(6, Math.round(dme) + 4)) : Math.round(dme) - 4;
+  const sentido: 1 | -1 = azar() < 0.5 ? 1 : -1;
+  return { radioNm, desde, hasta: norm360(desde + sentido * 60), sentido, alejandose: dme < radioNm };
+}
+
 /** El examen: una interceptación alejándose y una acercándose, sin consejos. */
 export function casosExamen(azar: () => number = Math.random): [CasoInterceptacion, CasoInterceptacion] {
   return [azar() < 0.5 ? "alejandose" : "alejandose-amplio", azar() < 0.5 ? "acercandose" : "acercandose-amplio"];
