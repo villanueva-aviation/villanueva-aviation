@@ -105,6 +105,16 @@ export const tolS = (n: Nivel = 3) => ({
   ...comunes(n),
 });
 
+/** «8» sobre pilones: sin altitud fija, la altura pivote cambia con la velocidad sobre el suelo. */
+export const tolOcho = (n: Nivel = 3) => ({
+  velocidadKt: por(n, 20, 15, 10),
+  /** Grados del pilón adelante o atrás de la línea del ala. ponytail: números míos. */
+  alaGrados: por(n, 20, 15, 10),
+  /** Grados sobre 45°. */
+  inclinacionGrados: por(n, 10, 7, 5),
+  ...comunes(n),
+});
+
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */
 export const tolFinal = (n: Nivel = 3) => ({ menos: por(n, 10, 7, 5), mas: por(n, 15, 12, 10) });
 

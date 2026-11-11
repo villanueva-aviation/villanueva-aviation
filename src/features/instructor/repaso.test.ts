@@ -7,7 +7,7 @@ import type { Idioma } from "./idiomaInstructor.ts";
 import type { ResultadoComun } from "./maniobras.ts";
 import { simularVuelo } from "./simularVuelo.ts";
 import {
-  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, enZona, fueraDeZona, maniobraActual, maniobrasDe, nombreManiobra, siguienteManiobra, sortear, zonaRepaso,
+  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, enZona, fueraDeZona, maniobraActual, maniobrasDe, nombreManiobra, pisoZona, siguienteManiobra, sortear, zonaRepaso,
   type EstadoRepaso, type Zona,
 } from "./repaso.ts";
 import { LECCIONES, REPASO } from "./lecciones.ts";
@@ -341,4 +341,6 @@ test("«S»: la zona va de 600 ft AGL hacia arriba y la salida lo dice", () => {
     if (x.etapa === "salida") break;
   }
   assert.ok(decir.includes("Ve a la zona de trabajo: Cajititlán, entre 600 y 1,000 pies sobre el terreno."), decir.join(" | "));
+  assert.equal(pisoZona("ocho-pilones"), 600, "la «8» sobre pilones va a la altura pivote, unos 700–900 ft");
+  assert.equal(pisoZona("recto-nivelado"), 1500);
 });

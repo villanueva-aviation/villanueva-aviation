@@ -48,11 +48,17 @@ import { AGL_MAX, AGL_MIN, armarS, armarSoloS, avanzarS, INCLINACION_MAX_S, type
 import {
   avisoS, briefingS, explicarS, listaPasosS, masFalladoS, ordenS, paraGuardarS, pasoS, queHacerS, repetirS, semaforoS, textoPasoS, type PasoS,
 } from "./textosS.ts";
+import { tolOcho } from "./nivel.ts";
+import { armarOcho, armarSoloOcho, avanzarOcho, CRUCE_SEG, INCLINACION_MAX_OCHO, type EvaluacionOcho, type ResultadoOcho } from "./evaluadorOcho.ts";
+import {
+  avisoOcho, briefingOcho, explicarOcho, listaPasosOcho, masFalladoOcho, ordenOcho, paraGuardarOcho, pasoOcho, queHacerOcho, repetirOcho, semaforoOcho,
+  textoPasoOcho, type PasoOcho,
+} from "./textosOcho.ts";
 
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
 export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo"
-  | "toques-despegues" | "falla-motor" | "s-camino";
+  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -489,10 +495,52 @@ const defS: DefManiobra<EvaluacionS, ResultadoS> = {
   paraGuardar: paraGuardarS,
 };
 
+const defOcho: DefManiobra<EvaluacionOcho, ResultadoOcho> = {
+  id: "ocho-pilones",
+  insignia: "maniobra-ocho-pilones-c172",
+  avion: "C172",
+  titulo: { es: "«8» sobre pilones C172", en: "C172 eights on pylons" },
+  tarea: { es: "Práctica · «8» sobre pilones", en: "Practice · Eights on pylons" },
+  elementosReporte: (n) => {
+    const T = tolOcho(n);
+    return [
+      { codigo: "1", texto: `Mantiene la velocidad de entrada ±${T.velocidadKt} kt`, textoEn: `Holds entry airspeed ±${T.velocidadKt} kt` },
+      { codigo: "2", texto: `Mantiene el pilón en la línea del ala ±${T.alaGrados}° (altura pivote)`, textoEn: `Keeps the pylon on the wing line ±${T.alaGrados}° (pivotal altitude)` },
+      { codigo: "3", texto: `Alas niveladas entre los pilones al menos ${CRUCE_SEG} s`, textoEn: `Wings level between the pylons for at least ${CRUCE_SEG} s` },
+      { codigo: "4", texto: `Inclinación máxima ${INCLINACION_MAX_OCHO}° +${T.inclinacionGrados}°`, textoEn: `Maximum bank ${INCLINACION_MAX_OCHO}° +${T.inclinacionGrados}°` },
+    ];
+  },
+  celdas: [
+    celda("velocidad", "Velocidad", "Airspeed"),
+    celda("ala", "Pilón en el ala", "Pylon on the wing"),
+    celda("cruce", "Cruce", "Crossing"),
+    celda("inclinacion", "Inclinación", "Bank"),
+  ],
+  temas: ["c172"],
+  armar: armarOcho,
+  avanzar: avanzarOcho,
+  armarSolo: armarSoloOcho,
+  fase: (e) => (e.fase === "vuelta1" || e.fase === "cruce" || e.fase === "vuelta2" ? "en-curso" : e.fase === "listo" ? "armado" : e.fase),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoOcho,
+  orden: (antes, ahora, e, idioma) => ordenOcho(antes as PasoOcho | null, ahora as PasoOcho | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoOcho(paso as PasoOcho | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosOcho(paso as PasoOcho | null, idioma),
+  queHacer: (paso, idioma) => queHacerOcho(paso as PasoOcho | null, idioma),
+  semaforo: semaforoOcho,
+  aviso: avisoOcho,
+  briefing: briefingOcho,
+  explicar: explicarOcho,
+  repetir: repetirOcho,
+  masFallado: masFalladoOcho,
+  paraGuardar: paraGuardarOcho,
+};
+
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos, "ascensos-descensos": defAltitud,
   "virajes-ascendiendo": defCombinado, "toques-despegues": defCircuito, "falla-motor": defFalla,
-  "s-camino": defS,
+  "s-camino": defS, "ocho-pilones": defOcho,
 };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */

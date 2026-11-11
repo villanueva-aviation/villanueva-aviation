@@ -26,6 +26,9 @@ const MOTIVOS_EN: Record<string, string> = {
   "Tu lector es de una versión anterior: baja el nuevo de Descargas para la «S».": "Your reader is an older version: download the new one from Downloads for S-turns.",
   "La «S» pasó de 4 minutos: el intento no se califica.": "The S-turn went past 4 minutes: this attempt won't be graded.",
   "La segunda curva de la «S» tiene que ir al lado contrario de la primera.": "The second half of the S-turn has to go the opposite way from the first.",
+  "Tu lector es de una versión anterior: baja el nuevo de Descargas para la «8».": "Your reader is an older version: download the new one from Downloads for eights on pylons.",
+  "La «8» pasó de 6 minutos: el intento no se califica.": "The eight went past 6 minutes: this attempt won't be graded.",
+  "La segunda vuelta de la «8» tiene que ir al lado contrario de la primera.": "The second turn of the eight has to go the opposite way from the first.",
 };
 
 const AVISOS_EN: Record<string, string> = {
