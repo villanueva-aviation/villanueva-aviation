@@ -29,6 +29,11 @@ const MOTIVOS_EN: Record<string, string> = {
   "Tu lector es de una versión anterior: baja el nuevo de Descargas para la «8».": "Your reader is an older version: download the new one from Downloads for eights on pylons.",
   "Tu lector es de una versión anterior: baja el nuevo de Descargas para la familiarización.": "Your reader is an older version: download the new one from Downloads for familiarization.",
   "La «8» pasó de 6 minutos: el intento no se califica.": "The eight went past 6 minutes: this attempt won't be graded.",
+  // Programa IFR (evaluadorInterceptacion.ts).
+  "Actualiza el lector a v1.6 para el programa IFR.": "Update the reader to v1.6 for the IFR program.",
+  "La barra la está manejando el GPS: cambia a NAV.": "The GPS is driving the needle: switch to NAV.",
+  "Se perdió la señal del VOR por más de 10 segundos.": "The VOR signal was lost for more than 10 seconds.",
+  "No hay señal del VOR: sintoniza la frecuencia en NAV1.": "No VOR signal: tune the frequency on NAV1.",
   "La segunda vuelta de la «8» tiene que ir al lado contrario de la primera.": "The second turn of the eight has to go the opposite way from the first.",
 };
 

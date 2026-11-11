@@ -68,11 +68,21 @@ import {
   paraGuardarFamiliarizacion, pasoFamiliarizacion, queHacerFamiliarizacion, repetirFamiliarizacion, semaforoFamiliarizacion, textoPasoFamiliarizacion,
   type PasoFamiliarizacion,
 } from "./textosFamiliarizacion.ts";
+import { tolInterceptacion } from "./nivel.ts";
+import type { CasoInterceptacion } from "./navIfr.ts";
+import {
+  armarInterceptacion, armarSoloInterceptacion, avanzarInterceptacion, LIMITE_SEG, type EvaluacionInterceptacion, type ResultadoInterceptacion,
+} from "./evaluadorInterceptacion.ts";
+import {
+  avisoInterceptacion, briefingInterceptacion, explicarInterceptacion, listaPasosInterceptacion, masFalladoInterceptacion, ordenInterceptacion,
+  paraGuardarInterceptacion, pasoInterceptacion, queHacerInterceptacion, repetirInterceptacion, semaforoInterceptacion, textoPasoInterceptacion,
+  type PasoInterceptacion,
+} from "./textosInterceptacion.ts";
 
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
 export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo"
-  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor" | "familiarizacion";
+  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor" | "familiarizacion" | "interceptar-radial";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -82,6 +92,14 @@ export interface ResultadoComun {
   muestras: Muestra[];
   /** Falta en los intentos de antes de los niveles = Difícil. */
   nivel?: Nivel;
+}
+
+/** Con qué armar cada intento: el número de intento en la lección y, en el examen, los casos ya sorteados. `vor`: el ident para la voz. */
+export interface ContextoArmado {
+  intento: number;
+  examen: boolean;
+  casos?: CasoInterceptacion[];
+  vor?: string;
 }
 
 /** Métodos con sintaxis de método: cada definición tipa su E y su R, y el registro las guarda como DefManiobra. */
@@ -95,7 +113,9 @@ export interface DefManiobra<E = any, R extends ResultadoComun = any> {
   elementosReporte(nivel?: Nivel): { codigo: string; texto: string; textoEn: string }[];
   celdas: { campo: string; nombre: Record<Idioma, string> }[];
   temas: Tema[];
-  armar(m: Muestra, nivel?: Nivel): E;
+  armar(m: Muestra, nivel?: Nivel, ctx?: ContextoArmado): E;
+  /** El nivel del examen según el que eligió el cadete; si falta, Difícil. */
+  nivelExamen?(elegido: Nivel): Nivel;
   avanzar(e: E, m: Muestra): E;
   armarSolo(e: E | null, m: Muestra): boolean;
   fase(e: E): FaseComun;
@@ -634,11 +654,49 @@ const defFamiliarizacion: DefManiobra<EvaluacionFamiliarizacion, ResultadoFamili
   paraGuardar: paraGuardarFamiliarizacion,
 };
 
+const defInterceptacion: DefManiobra<EvaluacionInterceptacion, ResultadoInterceptacion> = {
+  id: "interceptar-radial",
+  insignia: "maniobra-interceptar-radial-c172",
+  avion: "C172",
+  titulo: { es: "Interceptación de radiales C172", en: "C172 radial interception" },
+  tarea: { es: "Práctica IFR · Interceptación de radiales", en: "IFR practice · Radial interception" },
+  elementosReporte: (n) => {
+    const T = tolInterceptacion(n);
+    return [
+      { codigo: "1", texto: `Se establece en el radial (±${T.establecidoPuntos} puntos, ${LIMITE_SEG / 60} min máximo)`, textoEn: `Settles on the radial (±${T.establecidoPuntos} dots, ${LIMITE_SEG / 60} min max)` },
+      { codigo: "2", texto: `No se pasa más de ${T.sobrepasoPuntos} puntos`, textoEn: `Overshoots no more than ${T.sobrepasoPuntos} dots` },
+      { codigo: "3", texto: `No se queda corto más de ${T.cortoSeg} s`, textoEn: `Stops short no longer than ${T.cortoSeg} s` },
+    ];
+  },
+  celdas: [celda("sobrepaso", "Pasarse", "Overshoot"), celda("corto", "Quedarse corto", "Undershoot"), celda("interceptar", "Interceptar", "Intercept")],
+  temas: ["c172"],
+  armar: armarInterceptacion,
+  nivelExamen: (n) => (Math.max(2, n) as Nivel),
+  avanzar: avanzarInterceptacion,
+  armarSolo: armarSoloInterceptacion,
+  fase: (e) => (e.fase === "interceptando" || e.fase === "establecido" ? "en-curso" : e.fase),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoInterceptacion,
+  orden: (antes, ahora, e, idioma) => ordenInterceptacion(antes as PasoInterceptacion | null, ahora as PasoInterceptacion | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoInterceptacion(paso as PasoInterceptacion | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosInterceptacion(paso as PasoInterceptacion | null, idioma),
+  queHacer: (paso, idioma) => queHacerInterceptacion(paso as PasoInterceptacion | null, idioma),
+  semaforo: semaforoInterceptacion,
+  aviso: avisoInterceptacion,
+  briefing: briefingInterceptacion,
+  explicar: explicarInterceptacion,
+  repetir: repetirInterceptacion,
+  masFallado: masFalladoInterceptacion,
+  paraGuardar: paraGuardarInterceptacion,
+};
+
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos, "ascensos-descensos": defAltitud,
   "virajes-ascendiendo": defCombinado, "toques-despegues": defCircuito, "falla-motor": defFalla,
   "s-camino": defS, "ocho-pilones": defOcho, "ocho-alrededor": defAlrededor,
   familiarizacion: defFamiliarizacion,
+  "interceptar-radial": defInterceptacion,
 };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */

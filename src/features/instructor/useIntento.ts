@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchMisIntentosManiobra, guardarIntento, mandarARevision } from "./intentos";
 import type { Muestra } from "./evaluador.ts";
-import type { DefManiobra, ResultadoComun } from "./maniobras.ts";
+import type { ContextoArmado, DefManiobra, ResultadoComun } from "./maniobras.ts";
 import type { IntentoManiobra } from "./reglasIntentos.ts";
 import type { IntentoSesion, Modo } from "./sesion.ts";
 import { useLector } from "./useLector.ts";
@@ -28,6 +28,8 @@ export type Opciones = {
   alTerminar?: (i: IntentoSesion) => void;
   /** Cada lote del lector, después de pasarlo a la maniobra (el repaso sigue el vuelo completo con él). */
   alLote?: (lote: Muestra[]) => void;
+  /** Con qué armar cada intento (el programa IFR elige el ejercicio con él). */
+  contexto?: () => ContextoArmado;
 };
 
 /** Todo el intento de una maniobra: lector, evaluación, armado solo, guardado y revisión. */
@@ -42,8 +44,8 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
   const [modoSelector, setModo] = useState<Modo>("practica");
   const modo = opciones.modoFijo ?? modoSelector;
   const [nivelSelector, setNivelSelector] = useState<Nivel>(leerNivel);
-  // El checkride es el simulacro del examen: siempre con las tolerancias de Difícil.
-  const nivel: Nivel = modo === "checkride" ? 3 : nivelSelector;
+  // El checkride es el simulacro del examen: Difícil, salvo que la maniobra diga otra cosa (IFR: medio como mínimo).
+  const nivel: Nivel = modo === "checkride" ? (def.nivelExamen?.(nivelSelector) ?? 3) : nivelSelector;
   const cambiarNivel = (n: Nivel) => {
     setNivelSelector(n);
     try {
@@ -102,7 +104,7 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
     setGuardado({ id: null, error: null, guardando: false });
     setEnvio(null);
     setAnulado(null);
-    setEv(def.armar(muestra, nivel));
+    setEv(def.armar(muestra, nivel, op.current.contexto?.()));
   };
 
   // Se arma sola en el aire y nivelada, también tras un intento anulado (pausa, slew...), nunca encima de un resultado.
@@ -110,7 +112,7 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
     if (!arma || !muestra || !def.armarSolo(ev, muestra)) return;
     setModoIntento(modo);
     setAnulado(ev && def.fase(ev) === "invalido" ? (def.motivo(ev) ?? null) : null);
-    setEv(def.armar(muestra, nivel));
+    setEv(def.armar(muestra, nivel, op.current.contexto?.()));
   }, [ev, muestra, modo, arma, def, nivel]);
 
   const fase = ev ? def.fase(ev) : null;
