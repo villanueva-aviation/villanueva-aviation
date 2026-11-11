@@ -127,6 +127,19 @@ export const tolAlrededor = (n: Nivel = 3) => ({
   ...comunes(n),
 });
 
+/** Interceptación de radiales (programa IFR, Erik 2026-11-11). Puntos de la barra: uno = 2°. */
+export const tolInterceptacion = (n: Nivel = 2) => ({
+  /** Cruzar al otro lado después de centrar: más que esto es error; más de la mitad, nota. */
+  sobrepasoPuntos: por(n, 1.5, 1, 0.5),
+  /** Segundos con el rumbo del curso y la barra todavía a más de un punto. */
+  cortoSeg: por(n, 60, 30, 20),
+  /** Dentro de esto por 30 s: establecido en el radial. */
+  establecidoPuntos: por(n, 2, 1, 0.5),
+  /** Ángulo de interceptación: 30° ±10 (fuera es nota, no error). */
+  anguloMin: 20,
+  anguloMax: 40,
+});
+
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */
 export const tolFinal = (n: Nivel = 3) => ({ menos: por(n, 10, 7, 5), mas: por(n, 15, 12, 10) });
 
