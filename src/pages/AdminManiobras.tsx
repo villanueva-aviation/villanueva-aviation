@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { CheckCircle2, ClipboardList, XCircle } from "lucide-react";
 import { PageHero } from "../components/layout/PageHero";
 import { Button } from "../components/ui/Button";
@@ -140,6 +140,11 @@ export function AdminManiobras() {
                       {s.leccion
                         ? `${s.leccion.nombre} · ${s.leccion.calificacion}/100 · ${s.leccion.modo === "practica" ? `práctica en ${NOMBRE_NIVEL.es[s.leccion.nivel]}` : s.leccion.aprobado ? "aprobado" : "no aprobado"}`
                         : "—"}
+                      {s.leccion && (
+                        <Link to={ROUTES.instructorVuelo(s.leccion.id)} className="ml-2 text-gold-300 underline">
+                          Ver vuelo
+                        </Link>
+                      )}
                     </td>
                   </tr>
                 ))}

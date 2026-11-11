@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { AVIONES_VOZ } from "../data/checklistVozAviones";
@@ -8,7 +8,10 @@ import { avanzarChecklist, crearChecklist, oir, porDecir, type Checklist, type E
 import { debriefingRepaso, esperaApagado, paraGuardarRepaso } from "../features/instructor/debriefingRepaso";
 import type { Muestra } from "../features/instructor/evaluador";
 import { textosReporte, type Idioma } from "../features/instructor/idiomaInstructor";
-import { guardarIntento } from "../features/instructor/intentos";
+import { guardarIntento, guardarRecorrido } from "../features/instructor/intentos";
+import { cerrarGrabacion, crearGrabador, grabarMuestra, grabarVoz } from "../features/instructor/recorrido";
+import { DebriefingMapa } from "../features/instructor/DebriefingMapa";
+import type { ManiobraId, ResultadoComun } from "../features/instructor/maniobras";
 import { claveLeccion, estadoLeccion, leccionDe } from "../features/instructor/lecciones";
 import { lecturaFinalDe, MANIOBRAS } from "../features/instructor/maniobras";
 import {
@@ -72,6 +75,9 @@ const T = {
     esperaApagado: "Termina el checklist de apagado. El debriefing empieza al cerrar la sección o en un minuto.",
     terminar: "Terminar y ver el debriefing",
     candado: "Esta lección todavía no está abierta. Muy pronto.",
+    mapaGuardando: "Guardando el mapa del vuelo…",
+    mapaNoGuardado: (e: string) => `No se pudo guardar el mapa del vuelo: ${e}`,
+    verDespues: "Ver este vuelo después",
   },
   en: {
     titulo: (l: string) => `${l} · C172`,
@@ -113,6 +119,9 @@ const T = {
     esperaApagado: "Finish the shutdown checklist. The debriefing starts when you close the section or in one minute.",
     terminar: "Finish and see the debriefing",
     candado: "This lesson is not open yet. Coming soon.",
+    mapaGuardando: "Saving the flight map…",
+    mapaNoGuardado: (e: string) => `Couldn't save the flight map: ${e}`,
+    verDespues: "See this flight later",
   },
 };
 
@@ -148,6 +157,10 @@ export function InstructorRepaso() {
   const enCursoRef = useRef(false);
   const aeroRef = useRef<Parameters<typeof alMuestrearRepaso>[2]>(null);
   const decirRef = useRef<(textos: string[]) => void>(() => {});
+  // Lo que se graba para el mapa: el vuelo y cada intento calificado (e.hechas solo guarda el último de cada maniobra).
+  const grabador = useRef(crearGrabador());
+  const resultadosVuelo = useRef<{ maniobra: ManiobraId; resultado: ResultadoComun }[]>([]);
+  const [mapa, setMapa] = useState<{ estado: "no" | "guardando" | "listo" | "error"; error?: string; id?: string }>({ estado: "no" });
 
   const actualId = repaso ? maniobraActual(repaso) : null;
   const def = MANIOBRAS[actualId ?? "recto-nivelado"];
@@ -162,8 +175,11 @@ export function InstructorRepaso() {
     if (!e) return;
     const decir: string[] = [];
     for (const m of lote) {
+      const antes = e.etapa;
       const r = alMuestrearRepaso(e, m, aeroRef.current, idioma, Math.random, enCursoRef.current);
       e = r.estado;
+      // Hasta la muestra que termina o anula la lección; después el avión sigue en rampa y no se graba.
+      if (antes !== "terminado" && antes !== "invalido") grabarMuestra(grabador.current, m, e);
       decir.push(...r.decir);
       ultimaT.current = m.t;
       clRef.current = avanzarChecklist(clRef.current, m, { elevacionFt: e.vuelo?.aeropuerto?.elevacionFt ?? null, limites: AVIONES_VOZ.c172.limites });
@@ -180,6 +196,7 @@ export function InstructorRepaso() {
       if (!e || !e.vuelo) return;
       const id = maniobraActual(e);
       if (!id) return;
+      resultadosVuelo.current.push({ maniobra: id, resultado: i.resultado });
       const r = alResultado(e, i.resultado, i.id, idioma);
       poner(r.estado);
       // La calificación y, si algo salió, el primer error con cómo corregirlo; el resto queda en pantalla.
@@ -208,7 +225,17 @@ export function InstructorRepaso() {
   const avisoCrudo = enManiobra ? def.aviso(ev, muestra, modo, idioma) : null;
   const avisoActual = useRef(avisoCrudo);
   avisoActual.current = avisoCrudo;
-  const voz = useVoz(idioma, () => avisoActual.current?.clave ?? null);
+  const vozBase = useVoz(idioma, () => avisoActual.current?.clave ?? null);
+  // Todo lo que dice el instructor (órdenes, avisos, checklist, lectura final) queda grabado para la repetición.
+  const decirBase = vozBase.decir;
+  const decirGrabado = useCallback<typeof decirBase>(
+    (textos, ...resto) => {
+      grabarVoz(grabador.current, ultimaT.current, Array.isArray(textos) ? textos : [textos]);
+      return decirBase(textos, ...resto);
+    },
+    [decirBase],
+  );
+  const voz = useMemo(() => ({ ...vozBase, decir: decirGrabado }), [vozBase, decirGrabado]);
   const { decir } = voz;
   decirRef.current = (textos) => decir(textos.map((x) => paraVoz(x, idioma)), "orden");
   const pasoAntes = useRef<string | null>(null);
@@ -257,6 +284,25 @@ export function InstructorRepaso() {
 
   // Al terminar: debriefing leído y la lección guardada una vez.
   const deb = repaso && terminado && listo ? debriefingRepaso(repaso, cl, idioma) : null;
+  // El mapa: al terminar con el debriefing, o al anularse (se ve, pero no se guarda).
+  const anulada = repaso?.etapa === "invalido";
+  const conDeb = !!deb;
+  const grabacion = useMemo(
+    () => (repaso && leccion && (conDeb || anulada) ? cerrarGrabacion(grabador.current, { leccion: leccion.numero, e: repaso, cl, resultados: resultadosVuelo.current }) : null),
+    [repaso, leccion, conDeb, anulada, cl],
+  );
+  // Después del renglón de la lección: si falla, la lección ya quedó guardada y solo se reintenta el mapa.
+  const guardarMapa = useCallback(
+    async (id: string) => {
+      const e = repasoRef.current;
+      if (!e || !leccion) return;
+      setMapa({ estado: "guardando", id });
+      const g = cerrarGrabacion(grabador.current, { leccion: leccion.numero, e, cl: clRef.current, resultados: resultadosVuelo.current });
+      const r = await guardarRecorrido(id, g);
+      setMapa(r.error ? { estado: "error", error: r.error, id } : { estado: "listo", id });
+    },
+    [leccion],
+  );
   const guardarLeccion = useCallback(async () => {
     const e = repasoRef.current;
     if (!e || !leccion) return;
@@ -268,7 +314,8 @@ export function InstructorRepaso() {
       detalle: g.detalle, sesionId,
     });
     setGuardado(res.error ? { estado: "error", error: res.error } : { estado: "listo" });
-  }, [sesionId, leccion]);
+    if (!res.error && res.id) guardarMapa(res.id);
+  }, [sesionId, leccion, guardarMapa]);
   const leido = useRef(false);
   useEffect(() => {
     if (!terminado || !deb || leido.current) return;
@@ -286,12 +333,18 @@ export function InstructorRepaso() {
     dichos.current.clear();
     leido.current = false;
     setGuardado({ estado: "no" });
+    grabador.current = crearGrabador();
+    resultadosVuelo.current = [];
+    setMapa({ estado: "no" });
     setFinEn(null);
     setListo(false);
     if (leccion) poner(crearRepaso(modo, maniobrasDe(leccion), nivel));
   };
   const nueva = () => {
     reiniciar();
+    grabador.current = crearGrabador();
+    resultadosVuelo.current = [];
+    setMapa({ estado: "no" });
     setFinEn(null);
     setListo(false);
     setSesionId(crypto.randomUUID());
@@ -407,6 +460,22 @@ export function InstructorRepaso() {
             </ul>
           )}
         </section>
+      )}
+
+      {grabacion && (
+        <div className="space-y-2">
+          <DebriefingMapa grabacion={grabacion} idioma={idioma} />
+          {mapa.estado === "guardando" && <p className="text-sm text-white/70">{t.mapaGuardando}</p>}
+          {mapa.estado === "listo" && mapa.id && (
+            <Link to={ROUTES.instructorVuelo(mapa.id)} className="text-sm text-gold-300 underline">{t.verDespues}</Link>
+          )}
+          {mapa.estado === "error" && (
+            <p className="text-sm text-red-300">
+              {t.mapaNoGuardado(mapa.error ?? "")}{" "}
+              <button type="button" onClick={() => mapa.id && guardarMapa(mapa.id)} className="underline">{t.reintentar}</button>
+            </p>
+          )}
+        </div>
       )}
 
       {deb && (

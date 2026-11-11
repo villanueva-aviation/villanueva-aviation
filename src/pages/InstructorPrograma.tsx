@@ -5,7 +5,8 @@ import { Button } from "../components/ui/Button";
 import { MATERIAL_LENTO, MATERIAL_RECTO, MATERIAL_VIRAJE } from "../data/materialInstructor";
 import { useAuth } from "../features/auth/AuthContext";
 import { ACTIVIDADES, estadoActividad } from "../features/instructor/actividades";
-import { estadoLeccion, LECCIONES } from "../features/instructor/lecciones";
+import { claveLeccion, estadoLeccion, LECCIONES } from "../features/instructor/lecciones";
+import { fetchMisLecciones } from "../features/instructor/intentos";
 import { FOUNDER_EMAIL } from "../lib/constants";
 import { BANCO } from "../features/instructor/bancoPreguntas";
 import { calificarRespuesta, lineasPreguntas, siguientePregunta, type Pregunta } from "../features/instructor/preguntas";
@@ -160,6 +161,22 @@ export function InstructorPrograma() {
   const [idioma, setIdioma] = useState<Idioma>(leerIdioma);
   const t = T[idioma];
   const [sesion, setSesion] = useState<Sesion>(() => crearSesion(crypto.randomUUID()));
+  // El vuelo más nuevo de cada lección (clave → id del renglón); si la consulta falla, sin enlaces.
+  const [ultimoVuelo, setUltimoVuelo] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (!user) return;
+    let vivo = true;
+    fetchMisLecciones()
+      .then((ls) => {
+        const m: Record<string, string> = {};
+        for (const x of ls) m[x.maniobra] ??= x.id;
+        if (vivo) setUltimoVuelo(m);
+      })
+      .catch(() => {});
+    return () => {
+      vivo = false;
+    };
+  }, [user]);
   const [ahora, setAhora] = useState(() => Date.now());
   const sesionRef = useRef(sesion);
   sesionRef.current = sesion;
@@ -366,7 +383,14 @@ export function InstructorPrograma() {
             return (
               <li key={l.numero}>
                 {e === "abierta" ? (
-                  <Link to={l.maniobra ? ROUTES.instructorLeccion(l.numero) : ROUTES.instructorRepaso} className="block rounded-xl border border-gold-500/60 bg-gold-500/10 px-4 py-2.5 font-semibold text-white hover:bg-gold-500/20">{fila}</Link>
+                  <>
+                    <Link to={l.maniobra ? ROUTES.instructorLeccion(l.numero) : ROUTES.instructorRepaso} className="block rounded-xl border border-gold-500/60 bg-gold-500/10 px-4 py-2.5 font-semibold text-white hover:bg-gold-500/20">{fila}</Link>
+                    {ultimoVuelo[claveLeccion(l)] && (
+                      <Link to={ROUTES.instructorVuelo(ultimoVuelo[claveLeccion(l)])} className="ml-4 mt-0.5 inline-block text-xs text-gold-300 underline">
+                        {idioma === "en" ? "Last flight" : "Último vuelo"}
+                      </Link>
+                    )}
+                  </>
                 ) : (
                   <div aria-disabled="true" className="rounded-xl border border-white/10 px-4 py-2.5 text-white opacity-60">{fila}</div>
                 )}
