@@ -30,6 +30,9 @@ class Muestra
     // v1.5, para el checklist por voz. Selector: 0 cerrado, 1 ambos, 2 izq, 3 der. Trim: -100..100 (%).
     public double Selector, Trim;
     public bool Avionica, Valvula, Bomba, Autopiloto;
+    // v1.6, para el programa IFR (solo NAV1). NavDesv: grados de la barra. NavDesde: 0 apagado, 1 TO, 2 FROM.
+    public double NavMhz, NavObs, NavRadial, NavDesv, NavDesde, NavDme;
+    public bool NavTieneDme, NavSenal, GpsNav;
     public string Xpdr = "0000";
     public string Titulo = "";
 
@@ -70,6 +73,9 @@ class Muestra
             ",\"vientoDir\":" + N(VientoDir) + ",\"vientoKt\":" + N(VientoKt) +
             ",\"avionica\":" + B(Avionica) + ",\"selector\":" + N(Selector) + ",\"valvula\":" + B(Valvula) +
             ",\"bomba\":" + B(Bomba) + ",\"autopiloto\":" + B(Autopiloto) + ",\"trim\":" + N(Trim) +
+            ",\"navMhz\":" + N2(NavMhz) + ",\"navObs\":" + N(NavObs) + ",\"navRadial\":" + N(NavRadial) + ",\"navDesv\":" + N(NavDesv) +
+            ",\"navDesde\":" + N(NavDesde) + ",\"navDme\":" + N(NavDme) + ",\"navTieneDme\":" + B(NavTieneDme) +
+            ",\"navSenal\":" + B(NavSenal) + ",\"gpsNav\":" + B(GpsNav) +
             ",\"titulo\":" + Texto(Titulo) + "}";
     }
 
@@ -150,6 +156,7 @@ static class LectorInstructor
     static readonly List<Muestra> Historial = new List<Muestra>();
     const double GuardarSeg = 120;
     static string aeropuerto; // JSON del aeropuerto mas cercano; null mientras no llega
+    static string vors = "[]"; // v1.6: JSON de los VOR cercanos (sin localizadores)
     // --grabar: una linea JSON por muestra, a lo mas 5 por segundo, y una {"aeropuerto":...} cuando cambia.
     static StreamWriter grabacion;
     static double grabada = double.NegativeInfinity;
@@ -168,6 +175,8 @@ static class LectorInstructor
             aeropuerto = json;
         }
     }
+
+    public static void PonerVors(string json) { lock (Candado) vors = json ?? "[]"; }
 
     public static Muestra Ultima() { lock (Candado) return ultima; }
 
@@ -281,7 +290,20 @@ static class LectorInstructor
         var lista = !PedirLista("MMGL", new[] { 20.52, -103.31 }, 20.521, -103.311) && PedirLista("MMGL", new[] { 20.52, -103.31 }, 20.58, -103.31)
             && PedirLista(null, new[] { 20.52, -103.31 }, 20.52, -103.31) && PedirLista("MMGL", null, 20.52, -103.31);
         Console.WriteLine(lista ? "Lista de aeropuertos: OK" : "Lista de aeropuertos: FALLA");
-        return ok && edge && banderas && puerto && json && json14 && aeropuerto && grabado && vencido && lista ? 0 : 1;
+
+        // v1.6: el radio NAV1 para el programa IFR.
+        var n = new Muestra { NavMhz = 115.2, NavRadial = 270, NavDesv = -3.5, NavDesde = 2, NavDme = 12.4, NavTieneDme = true, NavSenal = true, GpsNav = false }.Json();
+        var json16 = n.Contains("\"navMhz\":115.2") && n.Contains("\"navRadial\":270") && n.Contains("\"navDesv\":-3.5") && n.Contains("\"navDesde\":2")
+            && n.Contains("\"navDme\":12.4") && n.Contains("\"navTieneDme\":true") && n.Contains("\"navSenal\":true") && n.Contains("\"gpsNav\":false");
+        Console.WriteLine(json16 ? "Json v1.6: OK" : "Json v1.6: FALLA");
+
+        // v1.6: los VOR cercanos van en la raiz de /muestra; [] mientras no llegan.
+        var sinVors = Estado(double.NaN).Contains("\"vors\":[]");
+        PonerVors("[{\"ident\":\"GDL\"}]");
+        var vorsOk = sinVors && Estado(double.NaN).Contains("\"vors\":[{\"ident\":\"GDL\"}]");
+        PonerVors("[]");
+        Console.WriteLine(vorsOk ? "Vors: OK" : "Vors: FALLA");
+        return ok && edge && banderas && puerto && json && json14 && aeropuerto && grabado && vencido && lista && json16 && vorsOk ? 0 : 1;
     }
 
     // Lo que pasaba: Edge heredaba el puerto del lector y, si el lector se cerraba, nadie podia volver a usarlo.
@@ -515,7 +537,7 @@ static class LectorInstructor
                     primera = false;
                 }
             }
-            return sb.Append("],\"aeropuerto\":").Append(aeropuerto ?? "null").Append('}').ToString();
+            return sb.Append("],\"aeropuerto\":").Append(aeropuerto ?? "null").Append(",\"vors\":").Append(vors).Append('}').ToString();
         }
     }
 
@@ -744,7 +766,25 @@ static class Simulado
 static class Sim
 {
     enum Def { Vuelo, Titulo, Aeropuerto }
-    enum Req { Vuelo, Titulo, Aeropuertos, DatosAeropuerto }
+    enum Req { Vuelo, Titulo, Aeropuertos, DatosAeropuerto, Vors }
+
+    // v1.6: los VOR del simulador, sin localizadores. Flags del SDK: 2 = localizador, 8 = DME. Frecuencia en Hz.
+    static string JsonVors(List<Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_FACILITY_VOR> lista)
+    {
+        var sb = new StringBuilder("[");
+        var primero = true;
+        foreach (var v in lista)
+        {
+            if ((v.Flags & 2) != 0) continue;
+            if (!primero) sb.Append(',');
+            primero = false;
+            sb.Append("{\"ident\":").Append(Muestra.Texto(v.Ident ?? "")).Append(",\"region\":").Append(Muestra.Texto(v.Region ?? ""))
+                .Append(",\"lat\":").Append(Muestra.N6(v.Latitude)).Append(",\"lon\":").Append(Muestra.N6(v.Longitude))
+                .Append(",\"mhz\":").Append(Math.Round(v.fFrequency / 1e6, 2).ToString("0.##", CultureInfo.InvariantCulture))
+                .Append(",\"dme\":").Append((v.Flags & 8) != 0 ? "true" : "false").Append('}');
+        }
+        return sb.Append(']').ToString();
+    }
 
     // Aeropuerto mas cercano, en el orden de CamposAeropuerto. Unidades del SDK: metros y Hz.
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi, Pack = 1)]
@@ -836,10 +876,21 @@ static class Sim
         new[] { "GENERAL ENG FUEL PUMP SWITCH:1", "bool" },
         new[] { "AUTOPILOT MASTER", "bool" },
         new[] { "ELEVATOR TRIM PCT", "percent" },
+        // v1.6 (x[46]..x[55])
+        new[] { "NAV ACTIVE FREQUENCY:1", "MHz" },
+        new[] { "NAV OBS:1", "degrees" },
+        new[] { "NAV RADIAL:1", "degrees" },
+        new[] { "NAV RADIAL ERROR:1", "degrees" },
+        new[] { "NAV TOFROM:1", "enum" },
+        new[] { "NAV DME:1", "nautical miles" },
+        new[] { "NAV HAS DME:1", "bool" },
+        new[] { "NAV HAS NAV:1", "bool" },
+        new[] { "NAV SIGNAL:1", "number" },
+        new[] { "GPS DRIVES NAV1", "bool" },
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    struct Vuelo { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 46)] public double[] Valores; }
+    struct Vuelo { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 56)] public double[] Valores; }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     struct Titulo { [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)] public string Valor; }
@@ -877,6 +928,8 @@ static class Sim
                     Tren = x[37] != 0, VientoDir = x[38], VientoKt = x[39],
                     Avionica = x[40] != 0, Selector = x[41], Valvula = x[42] != 0, Bomba = x[43] != 0,
                     Autopiloto = x[44] != 0, Trim = x[45],
+                    NavMhz = x[46], NavObs = x[47], NavRadial = x[48], NavDesv = x[49], NavDesde = x[50], NavDme = x[51],
+                    NavTieneDme = x[52] != 0, NavSenal = x[53] != 0 && x[54] > 0, GpsNav = x[55] != 0,
                 });
             };
             foreach (var v in Vars)
@@ -941,8 +994,18 @@ static class Sim
                 LectorInstructor.PonerAeropuerto(JsonAeropuerto(icaoActual, datoAeropuerto, pistas, frecuencias));
                 Console.WriteLine("Aeropuerto: " + icaoActual + " (" + pistas.Count + " pistas, " + frecuencias.Count + " frecuencias)");
             };
-            double ultimaLista = -100;
-            double[] posLista = null;
+            // v1.6: VOR cercanos. La lista llega en paginas; al llegar la ultima se publica.
+            var vorsCercanos = new List<Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_FACILITY_VOR>();
+            sim.OnRecvVorList += (s, d) =>
+            {
+                if (d.dwEntryNumber == 0) vorsCercanos.Clear();
+                foreach (var o in d.rgData) vorsCercanos.Add((Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_FACILITY_VOR)o);
+                if (d.dwEntryNumber + 1 < d.dwOutOf) return;
+                LectorInstructor.PonerVors(JsonVors(vorsCercanos));
+                Console.WriteLine("VOR cercanos: " + vorsCercanos.Count);
+            };
+            double ultimaLista = -100, ultimaVors = -100;
+            double[] posLista = null, posVors = null;
             while (abierto)
             {
                 if (senal.WaitOne(10000)) sim.ReceiveMessage();
@@ -953,6 +1016,14 @@ static class Sim
                     posLista = new[] { u.Lat, u.Lon };
                     try { sim.RequestFacilitiesList(Microsoft.FlightSimulator.SimConnect.SIMCONNECT_FACILITY_LIST_TYPE.AIRPORT, Req.Aeropuertos); }
                     catch (Exception e) { Console.WriteLine("Lista de aeropuertos: " + e.Message); }
+                }
+                // Mismo criterio que los aeropuertos: al arrancar y al moverse mas de 3 NM (un nombre vacio = sin lista todavia).
+                if (u != null && LectorInstructor.Ahora() - ultimaVors > 30 && LectorInstructor.PedirLista(posVors == null ? null : "", posVors, u.Lat, u.Lon))
+                {
+                    ultimaVors = LectorInstructor.Ahora();
+                    posVors = new[] { u.Lat, u.Lon };
+                    try { sim.RequestFacilitiesList(Microsoft.FlightSimulator.SimConnect.SIMCONNECT_FACILITY_LIST_TYPE.VOR, Req.Vors); }
+                    catch (Exception e) { Console.WriteLine("Lista de VOR: " + e.Message); }
                 }
             }
         }
