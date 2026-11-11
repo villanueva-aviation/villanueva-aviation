@@ -66,3 +66,7 @@ test("programa IFR: 6 lecciones, solo la 1 abierta, con su propia clave", () => 
   assert.ok(LECCIONES_GUARDADAS["ifr-1"]);
   assert.equal(leccionDe("1"), LECCIONES[0], "la 1 del VFR no cambia");
 });
+
+test("IFR 1: 5 prácticas y un examen de 2", () => {
+  assert.deepEqual(LECCIONES_IFR[0].ejercicios, { practica: 5, examen: 2 });
+});

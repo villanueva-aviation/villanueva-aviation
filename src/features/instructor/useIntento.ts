@@ -133,6 +133,9 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
     setEv(null);
   };
 
+  /** Cambia la evaluación en curso desde la página (p. ej. la entrada que el cadete dijo en la espera). */
+  const ajustar = (f: (e: any) => any) => setEv((e: any) => (e ? f(e) : e));
+
   const intento = guardado.id ? (intentos.find((i) => i.id === guardado.id) ?? null) : null;
   const numero = intento ? intentos.findIndex((i) => i.id === intento.id) + 1 : undefined;
   const enCurso = !!fase && fase !== "terminado" && fase !== "invalido";
@@ -149,5 +152,5 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
   // Dos prácticas aprobadas seguidas en el nivel de ahora: invitar a subir.
   const subir = modo === "practica" ? sugerirNivel(intentos, nivelSelector) : null;
 
-  return { estado, muestra, aeropuerto, vors, modo, cambiarModo, nivel, nivelSelector, cambiarNivel, subir, modoIntento, ev, resultado, anulado, enCurso, iniciar, reiniciar, guardado, guardar, intento, numero, intentos, mandar, envio, aprobadoPorErik };
+  return { estado, muestra, aeropuerto, vors, modo, cambiarModo, nivel, nivelSelector, cambiarNivel, subir, modoIntento, ev, resultado, anulado, enCurso, iniciar, reiniciar, ajustar, guardado, guardar, intento, numero, intentos, mandar, envio, aprobadoPorErik };
 }

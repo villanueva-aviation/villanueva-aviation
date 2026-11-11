@@ -11,6 +11,10 @@ export interface Leccion {
   maniobra?: ManiobraId;
   /** Falta = el programa VFR. */
   programa?: "ifr";
+  /** IFR: cuántos ejercicios tiene la práctica y cuántos el examen. */
+  ejercicios?: { practica: number; examen: number };
+  /** IFR: solo con un VOR con DME (los arcos). */
+  requiereDme?: true;
 }
 
 export const REPASO = 13;
@@ -38,9 +42,11 @@ export const LECCIONES: Leccion[] = [
 ];
 
 /** El programa IFR (spec 2026-11-11): por ahora solo la 1. */
-const ifr = (numero: number, es: string, en: string, maniobra?: ManiobraId): Leccion => ({ numero, nombre: { es, en }, disponible: !!maniobra, maniobra, programa: "ifr" });
+const ifr = (numero: number, es: string, en: string, maniobra?: ManiobraId, extra: Partial<Leccion> = {}): Leccion => ({
+  numero, nombre: { es, en }, disponible: !!maniobra, maniobra, programa: "ifr", ...extra,
+});
 export const LECCIONES_IFR: Leccion[] = [
-  ifr(1, "Interceptación de radiales", "Radial interception", "interceptar-radial"),
+  ifr(1, "Interceptación de radiales", "Radial interception", "interceptar-radial", { ejercicios: { practica: 5, examen: 2 } }),
   ifr(2, "Rutas de acercamiento y alejamiento", "Inbound and outbound courses"),
   ifr(3, "Arcos DME", "DME arcs"),
   ifr(4, "Patrones de espera", "Holding patterns"),

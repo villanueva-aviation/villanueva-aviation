@@ -69,7 +69,8 @@ import {
   type PasoFamiliarizacion,
 } from "./textosFamiliarizacion.ts";
 import { tolInterceptacion } from "./nivel.ts";
-import type { CasoInterceptacion } from "./navIfr.ts";
+import type { CasoInterceptacion, DatosEspera } from "./navIfr.ts";
+import type { VorElegido } from "./vorSim.ts";
 import {
   armarInterceptacion, armarSoloInterceptacion, avanzarInterceptacion, LIMITE_SEG, type EvaluacionInterceptacion, type ResultadoInterceptacion,
 } from "./evaluadorInterceptacion.ts";
@@ -100,6 +101,11 @@ export interface ContextoArmado {
   examen: boolean;
   casos?: CasoInterceptacion[];
   vor?: string;
+  /** IFR: el VOR de la lección, para medir la distancia por lat/lon. */
+  estacion?: VorElegido;
+  /** Lección 4: la espera (de la carta o inventada) y el radial por el que llega. */
+  espera?: DatosEspera;
+  llegada?: number;
 }
 
 /** Métodos con sintaxis de método: cada definición tipa su E y su R, y el registro las guarda como DefManiobra. */

@@ -1,4 +1,6 @@
-// Geometría del VOR y los ejercicios de interceptación del programa IFR. Puro.
+import type { Giros } from "../entrenador/esperas.ts";
+
+// Geometría del VOR y los ejercicios del programa IFR. Puro.
 // Radiales y cursos en grados magnéticos, como los da el radio NAV1.
 
 export type CasoInterceptacion = "alejandose" | "acercandose" | "alejandose-amplio" | "acercandose-amplio" | "contrario";
@@ -9,8 +11,20 @@ export type Ejercicio = { caso: CasoInterceptacion; radial: number; desde: boole
 export const CASOS_PRACTICA: CasoInterceptacion[] = ["alejandose", "acercandose", "alejandose-amplio", "acercandose-amplio", "contrario"];
 
 export const norm180 = (g: number) => ((((g + 180) % 360) + 360) % 360) - 180;
-const norm360 = (g: number) => ((g % 360) + 360) % 360;
-const redondear10 = (g: number) => norm360(Math.round(g / 10) * 10);
+export const norm360 = (g: number) => ((g % 360) + 360) % 360;
+export const redondear10 = (g: number) => norm360(Math.round(g / 10) * 10);
+
+/** La espera de la lección 4: de la carta del cadete o inventada. `acercamiento`: el curso hacia el VOR. */
+export type DatosEspera = { acercamiento: number; giros: Giros; tramoSeg: number; carta: boolean };
+
+/**
+ * ¿Ya está del otro lado de la estación respecto a `radialLado`? Con histéresis: pasa a partir de 100° y regresa a 80° o menos,
+ * para que el radial que oscila sobre la estación no cuente dos pasos.
+ */
+export function pasoEstacion(antes: boolean, radialAvion: number, radialLado: number): boolean {
+  const d = Math.abs(norm180(radialAvion - radialLado));
+  return antes ? d > 80 : d >= 100;
+}
 
 /** Grados de desvío: positivo si el avión está a la derecha del curso, mirando hacia donde va el curso. */
 export function desvioGrados(ej: Ejercicio, radialAvion: number): number {

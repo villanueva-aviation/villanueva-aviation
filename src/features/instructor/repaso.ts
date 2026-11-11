@@ -37,10 +37,10 @@ const CIRCUITO: ManiobraId = "toques-despegues";
 /** La interceptación es del programa IFR. */
 const FUERA_DEL_SORTEO: ManiobraId[] = [CIRCUITO, "familiarizacion", "interceptar-radial"];
 
-/** Lección de maniobra: la primera de práctica y 4 más (Erik). Repaso: 4 sorteadas. IFR: 5 prácticas, o 2 en el examen (spec). */
+/** Lección de maniobra: la primera de práctica y 4 más (Erik). Repaso: 4 sorteadas. IFR: los ejercicios de la lección. */
 export const maniobrasDe = (l: Leccion, azar = Math.random, modo?: Modo): ManiobraId[] =>
   l.maniobra
-    ? Array(l.programa === "ifr" && modo === "checkride" ? 2 : 5).fill(l.maniobra)
+    ? Array(l.ejercicios ? (modo === "checkride" ? l.ejercicios.examen : l.ejercicios.practica) : 5).fill(l.maniobra)
     : sortear((Object.keys(MANIOBRAS) as ManiobraId[]).filter((id) => !FUERA_DEL_SORTEO.includes(id)), 4, azar);
 
 /** Ft AGL desde los que la zona cuenta para esta maniobra: la «S» va de 600 a 1,000 y la «8» a la altura pivote. */

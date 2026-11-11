@@ -32,4 +32,11 @@ const norm180 = (g: number) => ((((g + 180) % 360) + 360) % 360) - 180;
 
 export const declinacion = (m: Muestra): number => (m.rumboV === undefined ? 0 : norm180(m.rumboV - m.rumbo));
 
+/** Millas del avión al VOR por lat/lon; sirve también con un VOR sin DME. Sin posición, null. */
+export function distanciaVor(m: Muestra, v: { lat: number; lon: number }): number | null {
+  if (m.lat === undefined || m.lon === undefined) return null;
+  const d = aNm(v.lat, v.lon, m.lat, m.lon);
+  return Math.hypot(d.x, d.y);
+}
+
 export const elegirVor = (v: VorSim, m: Muestra): VorElegido => ({ ...v, decl: declinacion(m) });

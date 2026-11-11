@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Muestra } from "./evaluador.ts";
-import { declinacion, elegirVor, leerVors, vorsCercanos, type VorSim } from "./vorSim.ts";
+import { declinacion, distanciaVor, elegirVor, leerVors, vorsCercanos, type VorSim } from "./vorSim.ts";
 
 const muestra = (x: Partial<Muestra> = {}): Muestra => ({
   t: 0, inclinacion: 0, altitud: 6500, velocidad: 100, rumbo: 90, bola: 0, agl: 1500, peso: 2300, enTierra: false, slew: false, tasa: 1, pausa: false,
@@ -38,4 +38,11 @@ test("elegirVor guarda la declinación del momento", () => {
   const v = elegirVor(vor("GDL", 20.52, -103.31), muestra({ rumbo: 90, rumboV: 95 }));
   assert.equal(v.decl, 5);
   assert.equal(v.ident, "GDL");
+});
+
+test("distanciaVor: millas por lat/lon; sin posición, null", () => {
+  const m = { lat: 20.1, lon: -103 } as Muestra;
+  const d = distanciaVor(m, { lat: 20, lon: -103 });
+  assert.ok(d !== null && Math.abs(d - 6) < 0.05, `d ${d}`);
+  assert.equal(distanciaVor({} as Muestra, { lat: 20, lon: -103 }), null);
 });

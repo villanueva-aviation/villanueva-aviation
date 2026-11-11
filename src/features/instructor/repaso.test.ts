@@ -389,3 +389,12 @@ test("IFR: el checkride va en medio como mínimo y son 2 interceptaciones; el VF
   assert.equal(maniobrasDe(leccionIfrDe("1")!, Math.random, "checkride").length, 2);
   assert.deepEqual(maniobrasDe(leccionIfrDe("1")!), IFR);
 });
+
+test("IFR: los ejercicios de la lección mandan cuántas maniobras hay en práctica y en examen", () => {
+  const l1 = leccionIfrDe("1")!;
+  assert.equal(maniobrasDe(l1, Math.random, "practica").length, 5);
+  assert.equal(maniobrasDe(l1, Math.random, "checkride").length, 2);
+  const otra = { ...l1, ejercicios: { practica: 3, examen: 1 } };
+  assert.equal(maniobrasDe(otra, Math.random, "practica").length, 3);
+  assert.equal(maniobrasDe(otra, Math.random, "checkride").length, 1);
+});

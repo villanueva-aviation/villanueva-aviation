@@ -256,7 +256,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   );
 
   const contexto = useCallback(
-    () => ({ intento: repasoRef.current?.actual ?? 0, examen: modo === "checkride", casos: casosRef.current, vor: repasoRef.current?.vor?.ident }),
+    () => ({ intento: repasoRef.current?.actual ?? 0, examen: modo === "checkride", casos: casosRef.current, vor: repasoRef.current?.vor?.ident, estacion: repasoRef.current?.vor ?? undefined }),
     [modo],
   );
   const intento = useIntento(def, { sesionId, modoFijo: modo, arma: !!repaso && armaManiobra(repaso), alTerminar, alLote, contexto });

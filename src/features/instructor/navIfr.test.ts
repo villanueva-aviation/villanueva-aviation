@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { CASOS_PRACTICA, casosExamen, deltaRadial, desvioGrados, distanciaConsejo, generarEjercicio, norm180, puntos, type Ejercicio } from "./navIfr.ts";
+import { CASOS_PRACTICA, casosExamen, deltaRadial, desvioGrados, distanciaConsejo, generarEjercicio, norm180, pasoEstacion, puntos, type Ejercicio } from "./navIfr.ts";
 import { tolInterceptacion } from "./nivel.ts";
 
 test("norm180 deja los grados entre -180 y 180", () => {
@@ -59,4 +59,12 @@ test("tolerancias de interceptación por nivel", () => {
   assert.equal(tolInterceptacion(1).sobrepasoPuntos, 1.5);
   assert.equal(tolInterceptacion(3).cortoSeg, 20);
   assert.equal(tolInterceptacion(2).establecidoPuntos, 1);
+});
+
+test("pasoEstacion: del otro lado a partir de 100°, de regreso a 80° o menos (histéresis)", () => {
+  assert.equal(pasoEstacion(false, 90 + 95, 90), false);
+  assert.equal(pasoEstacion(false, 90 + 100, 90), true);
+  assert.equal(pasoEstacion(true, 90 + 85, 90), true);
+  assert.equal(pasoEstacion(true, 90 + 80, 90), false);
+  assert.equal(pasoEstacion(false, 350 + 150, 350), true);
 });
