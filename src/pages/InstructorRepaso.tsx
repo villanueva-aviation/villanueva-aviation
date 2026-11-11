@@ -287,9 +287,14 @@ export function InstructorRepaso() {
   // El mapa: al terminar con el debriefing, o al anularse (se ve, pero no se guarda).
   const anulada = repaso?.etapa === "invalido";
   const conDeb = !!deb;
+  // Se congela al aparecer: el lector sigue mandando muestras en rampa y el checklist cambia en cada una,
+  // y recalcular aquí redibujaría y volvería a centrar el mapa cada 100 ms.
   const grabacion = useMemo(
-    () => (repaso && leccion && (conDeb || anulada) ? cerrarGrabacion(grabador.current, { leccion: leccion.numero, e: repaso, cl, resultados: resultadosVuelo.current }) : null),
-    [repaso, leccion, conDeb, anulada, cl],
+    () =>
+      repasoRef.current && leccion && (conDeb || anulada)
+        ? cerrarGrabacion(grabador.current, { leccion: leccion.numero, e: repasoRef.current, cl: clRef.current, resultados: resultadosVuelo.current })
+        : null,
+    [leccion, conDeb, anulada],
   );
   // Después del renglón de la lección: si falla, la lección ya quedó guardada y solo se reintenta el mapa.
   const guardarMapa = useCallback(
