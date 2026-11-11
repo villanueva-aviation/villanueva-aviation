@@ -27,7 +27,7 @@ export function pasoEstacion(antes: boolean, radialAvion: number, radialLado: nu
 }
 
 /** Grados de desvío: positivo si el avión está a la derecha del curso, mirando hacia donde va el curso. */
-export function desvioGrados(ej: Ejercicio, radialAvion: number): number {
+export function desvioGrados(ej: Pick<Ejercicio, "radial" | "desde">, radialAvion: number): number {
   const d = norm180(radialAvion - ej.radial);
   return ej.desde ? d : -d;
 }
@@ -52,6 +52,18 @@ export function generarEjercicio(caso: CasoInterceptacion, radialAvion: number, 
   const radial = redondear10(radialAvion + signo * deltaRadial(dme, caso.endsWith("amplio")));
   const desde = caso.startsWith("alejandose");
   return { caso, radial, desde, curso: desde ? radial : norm360(radial + 180) };
+}
+
+/** Lección 2: se acerca por `entrada` (curso entrada + 180, TO), pasa la estación y se aleja por `salida` (FROM). */
+export type EjercicioRuta = { entrada: number; salida: number; giro: number };
+
+/** Cuánto vira sobre la estación en cada práctica. */
+export const CASOS_RUTA = [45, 90, 135];
+
+export function generarRuta(radialAvion: number, giro: number, azar: () => number = Math.random): EjercicioRuta {
+  const entrada = redondear10(radialAvion);
+  const signo = azar() < 0.5 ? 1 : -1;
+  return { entrada, salida: norm360(entrada + 180 + signo * giro), giro };
 }
 
 /** El examen: una interceptación alejándose y una acercándose, sin consejos. */

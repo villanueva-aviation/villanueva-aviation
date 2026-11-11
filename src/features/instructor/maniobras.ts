@@ -80,10 +80,17 @@ import {
   type PasoInterceptacion,
 } from "./textosInterceptacion.ts";
 
+import { tolRuta } from "./nivel.ts";
+import { armarRuta, armarSoloRuta, avanzarRuta, type EvaluacionRuta, type ResultadoRuta } from "./evaluadorRuta.ts";
+import {
+  avisoRuta, briefingRuta, explicarRuta, listaPasosRuta, masFalladoRuta, ordenRuta, paraGuardarRuta, pasoRuta, queHacerRuta, repetirRuta, semaforoRuta,
+  textoPasoRuta, type PasoRuta,
+} from "./textosRuta.ts";
+
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
 export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo"
-  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor" | "familiarizacion" | "interceptar-radial";
+  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor" | "familiarizacion" | "interceptar-radial" | "ruta-vor";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -697,12 +704,49 @@ const defInterceptacion: DefManiobra<EvaluacionInterceptacion, ResultadoIntercep
   paraGuardar: paraGuardarInterceptacion,
 };
 
+const defRuta: DefManiobra<EvaluacionRuta, ResultadoRuta> = {
+  id: "ruta-vor",
+  insignia: "maniobra-ruta-vor-c172",
+  avion: "C172",
+  titulo: { es: "Rutas de acercamiento y alejamiento C172", en: "C172 inbound and outbound courses" },
+  tarea: { es: "Práctica IFR · Rutas de acercamiento y alejamiento", en: "IFR practice · Inbound and outbound courses" },
+  elementosReporte: (n) => {
+    const T = tolRuta(n);
+    return [
+      { codigo: "1", texto: `Se acerca por el radial dentro de ${T.puntos} puntos`, textoEn: `Tracks inbound within ${T.puntos} dots` },
+      { codigo: "2", texto: `Se aleja por el radial nuevo dentro de ${T.puntos} puntos (establecido en ${T.establecerSeg} s)`, textoEn: `Tracks outbound within ${T.puntos} dots (settled within ${T.establecerSeg} s)` },
+    ];
+  },
+  celdas: [celda("acercamiento", "Acercamiento", "Inbound"), celda("alejamiento", "Alejamiento", "Outbound")],
+  temas: ["c172"],
+  armar: armarRuta,
+  nivelExamen: (n) => (Math.max(2, n) as Nivel),
+  avanzar: avanzarRuta,
+  armarSolo: armarSoloRuta,
+  fase: (e) => (e.fase === "posicionando" ? "armado" : e.fase === "acercandose" || e.fase === "alejandose" ? "en-curso" : e.fase),
+  motivo: (e) => e.motivo,
+  resultado: (e) => e.resultado ?? null,
+  paso: pasoRuta,
+  orden: (antes, ahora, e, idioma) => ordenRuta(antes as PasoRuta | null, ahora as PasoRuta | null, e, idioma),
+  textoPaso: (paso, e, idioma) => textoPasoRuta(paso as PasoRuta | null, e, idioma),
+  pasos: (paso, idioma) => listaPasosRuta(paso as PasoRuta | null, idioma),
+  queHacer: (paso, idioma) => queHacerRuta(paso as PasoRuta | null, idioma),
+  semaforo: semaforoRuta,
+  aviso: avisoRuta,
+  briefing: briefingRuta,
+  explicar: explicarRuta,
+  repetir: repetirRuta,
+  masFallado: masFalladoRuta,
+  paraGuardar: paraGuardarRuta,
+};
+
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "viraje-escarpado": defViraje, "recto-nivelado": defRecto, "vuelo-lento": defLento, "virajes-rumbos": defRumbos, "ascensos-descensos": defAltitud,
   "virajes-ascendiendo": defCombinado, "toques-despegues": defCircuito, "falla-motor": defFalla,
   "s-camino": defS, "ocho-pilones": defOcho, "ocho-alrededor": defAlrededor,
   familiarizacion: defFamiliarizacion,
   "interceptar-radial": defInterceptacion,
+  "ruta-vor": defRuta,
 };
 
 /** Desconocida o null → viraje, que es lo que había antes de las actividades. */
