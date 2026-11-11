@@ -276,8 +276,29 @@ test("IFR: el cierre trae el VOR, el radial de cada intento y el sobrepaso como 
   assert.equal(x.zona, null);
 });
 
+test("IFR: un arco deja su figura y su radial de salida; una espera, la suya y el radial de llegada", () => {
+  const vor = { ident: "GDL", region: "MM", lat: 20.52, lon: -103.31, mhz: 117.5, dme: true, decl: 5 };
+  const e = { ...leccion(), programa: "ifr" as const, vor, zona: null, sorteo: ["arco-dme" as const, "espera" as const] };
+  const comun = { aprobado: true, calificacion: 100, elementos: {}, avisos: [], muestras: [], nivel: 2 as Nivel };
+  const arco = {
+    ...comun, maniobra: "arco-dme", ejercicio: { radioNm: 10, desde: 90, hasta: 150, sentido: 1, alejandose: true }, extremos: [], peorDistancia: 0,
+    sobrepasoEntrada: 0, salida: null, fuera: { entrada: [], distancia: [], salida: [] },
+  } as unknown as ResultadoComun;
+  const espera = {
+    ...comun, maniobra: "espera", ejercicio: { acercamiento: 270, giros: "derecha", tramoSeg: 60, carta: false, llegada: 40 }, dicha: "directa",
+    volada: "directa", correcta: "directa", validas: ["directa"], tramos: [], tasas: [], peorAcercamiento: 0, maxDistancia: 0,
+    fuera: { dicha: [], volada: [], tramo: [], acercamiento: [], virajes: [], distancia: [] },
+  } as unknown as ResultadoComun;
+  const x = cerrarGrabacion(grabadorConFases(), { leccion: 3, e, cl: checklistLeido(), resultados: [{ maniobra: "arco-dme", resultado: arco }, { maniobra: "espera", resultado: espera }] });
+  assert.deepEqual(x.arcos, [{ intento: 1, radioNm: 10, desde: 90, hasta: 150, sentido: 1 }]);
+  assert.deepEqual(x.esperas, [{ intento: 2, acercamiento: 270, giros: "derecha", tramoSeg: 60 }]);
+  assert.deepEqual(x.radiales, [{ intento: 1, radial: 150, desde: false }, { intento: 2, radial: 40, desde: false }]);
+});
+
 test("VFR: la grabación no gana vor ni radiales", () => {
   const x = cerrarGrabacion(grabadorConFases(), { leccion: 4, e: leccion(), cl: checklistLeido(), resultados: [] });
   assert.equal("vor" in x, false);
   assert.equal("radiales" in x, false);
+  assert.equal("arcos" in x, false);
+  assert.equal("esperas" in x, false);
 });

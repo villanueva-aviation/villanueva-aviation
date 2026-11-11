@@ -13,7 +13,7 @@ import {
 } from "./esperas";
 
 const ORO = "#d4af37";
-const COLOR_SECTOR: Record<Entrada, string> = {
+export const COLOR_SECTOR: Record<Entrada, string> = {
   directa: "rgba(255,255,255,0.10)",
   gota: "rgba(212,175,55,0.30)",
   paralela: "rgba(127,179,255,0.22)",

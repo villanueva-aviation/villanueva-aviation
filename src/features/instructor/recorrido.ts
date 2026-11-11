@@ -4,7 +4,7 @@ import type { EstadoRepaso } from "./repaso.ts";
 import type { Checklist } from "./checklistVoz.ts";
 import { debriefingRepaso } from "./debriefingRepaso.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
-import { MANIOBRAS, type ManiobraId, type ResultadoComun } from "./maniobras.ts";
+import { MANIOBRAS, type Figuras, type ManiobraId, type ResultadoComun } from "./maniobras.ts";
 import { tolArco, tolEspera, tolInterceptacion, tolRuta, type Nivel } from "./nivel.ts";
 import { LIMITE_SEG } from "./evaluadorInterceptacion.ts";
 import { toleranciaRecto } from "./evaluadorRecto.ts";
@@ -184,8 +184,10 @@ export interface Grabacion {
   anulada: { t: number; motivo: string } | null;
   /** IFR: el VOR de la lección; `decl` para dibujar los radiales (magnéticos) en el mapa (verdadero). */
   vor?: { ident: string; lat: number; lon: number; decl: number };
-  /** IFR: el radial pedido en cada intento. */
+  /** IFR: los radiales pedidos en cada intento, y los arcos y esperas. */
   radiales?: { intento: number; radial: number; desde: boolean }[];
+  arcos?: ({ intento: number } & NonNullable<Figuras["arco"]>)[];
+  esperas?: ({ intento: number } & NonNullable<Figuras["espera"]>)[];
 }
 
 const IDIOMAS: Idioma[] = ["es", "en"];
@@ -234,10 +236,10 @@ export function cerrarGrabacion(
   const bien = Object.fromEntries(IDIOMAS.map((idioma) => [idioma, deb[idioma].partes.flatMap((p) => p.bien)])) as Record<Idioma, string[]>;
   const z = e.zona;
   const v = e.vor;
-  const radiales = x.resultados.flatMap(({ resultado }, i) => {
-    const ej = (resultado as { ejercicio?: { radial: number; desde: boolean } }).ejercicio;
-    return ej ? [{ intento: i + 1, radial: ej.radial, desde: ej.desde }] : [];
-  });
+  const figuras = x.resultados.map(({ maniobra, resultado }, i) => ({ intento: i + 1, f: MANIOBRAS[maniobra].figuras?.(resultado) ?? {} }));
+  const radiales = figuras.flatMap(({ intento, f }) => (f.radiales ?? []).map((r) => ({ intento, ...r })));
+  const arcos = figuras.flatMap(({ intento, f }) => (f.arco ? [{ intento, ...f.arco }] : []));
+  const esperas = figuras.flatMap(({ intento, f }) => (f.espera ? [{ intento, ...f.espera }] : []));
   return {
     version: 1,
     leccion: x.leccion,
@@ -252,6 +254,8 @@ export function cerrarGrabacion(
     anulada: e.etapa === "invalido" ? { t: g.puntos[g.puntos.length - 1]?.[0] ?? 0, motivo: e.motivo ?? "" } : null,
     // Solo en IFR: una grabación VFR queda igual.
     ...(v ? { vor: { ident: v.ident, lat: v.lat, lon: v.lon, decl: v.decl }, radiales } : {}),
+    ...(v && arcos.length ? { arcos } : {}),
+    ...(v && esperas.length ? { esperas } : {}),
   };
 }
 

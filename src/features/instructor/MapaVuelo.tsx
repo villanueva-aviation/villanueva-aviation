@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { CAMPO_PUNTO as C, marcasErrores, puntoEn, type FaseMapa, type Grabacion, type Punto } from "./recorrido";
+import { destino, figuraEspera, puntosArco } from "./figurasMapa";
+import { COLOR_SECTOR } from "../entrenador/EntrenadorEsperas";
 
 // Esri World Imagery. Sin llave mientras solo entra el fundador; antes de abrir a cadetes va VITE_ARCGIS_KEY (spec 2026-11-10).
 const LLAVE = import.meta.env.VITE_ARCGIS_KEY as string | undefined;
@@ -20,12 +22,6 @@ const ROJO = "#ff4d4d";
 const ORO = "#d4af37";
 
 const latLng = (p: Punto): L.LatLngTuple => [p[C.lat], p[C.lon]];
-const RAD = Math.PI / 180;
-/** `nm` millas desde (lat, lon) al rumbo verdadero `rumbo`; plano local, suficiente para 60 NM. */
-const destino = (lat: number, lon: number, rumbo: number, nm: number): L.LatLngTuple => [
-  lat + (nm * Math.cos(rumbo * RAD)) / 60,
-  lon + (nm * Math.sin(rumbo * RAD)) / 60 / Math.cos(lat * RAD),
-];
 const etiqueta = (texto: string, color: string) =>
   L.divIcon({
     className: "",
@@ -92,6 +88,7 @@ export function MapaVuelo({
 
     // IFR: el VOR y el radial de cada intento, de la estación hacia afuera hasta 5 NM más allá de donde voló el avión.
     const v = grabacion.vor;
+    const figurasExtra: L.LatLngTuple[] = [];
     if (v) {
       for (const rad of grabacion.radiales ?? []) {
         const i = grabacion.intentos.find((x) => x.n === rad.intento);
@@ -100,6 +97,19 @@ export function MapaVuelo({
         const fin = destino(v.lat, v.lon, rad.radial + v.decl, largo);
         L.polyline([[v.lat, v.lon], fin], { color: "#ffffff", weight: 1.5, dashArray: "2 6", opacity: 0.85 }).addTo(m);
         L.marker(fin, { icon: etiqueta(`R-${String(rad.radial % 360 || 360).padStart(3, "0")}`, "#ffffff"), interactive: false }).addTo(m);
+      }
+      // Los arcos, punteados como los radiales; las esperas con sus sectores de entrada.
+      for (const a of grabacion.arcos ?? []) {
+        const ps = puntosArco(v, a.radioNm, a.desde, a.hasta, a.sentido, v.decl);
+        L.polyline(ps, { color: "#ffffff", weight: 1.5, dashArray: "2 6", opacity: 0.85 }).addTo(m);
+        L.marker(ps[Math.floor(ps.length / 2)], { icon: etiqueta(`${a.radioNm} NM`, "#ffffff"), interactive: false }).addTo(m);
+        figurasExtra.push(...ps);
+      }
+      for (const es of grabacion.esperas ?? []) {
+        const f = figuraEspera(v, es, v.decl);
+        for (const s of f.sectores) L.polygon(s.poligono, { stroke: false, fillColor: COLOR_SECTOR[s.entrada], fillOpacity: 1, interactive: false }).addTo(m);
+        L.polyline(f.pista, { color: "#ffffff", weight: 2, opacity: 0.9 }).addTo(m);
+        figurasExtra.push(...f.pista, ...f.sectores.flatMap((s) => s.poligono));
       }
       L.marker([v.lat, v.lon], { icon: hexagono(v.ident), interactive: false, zIndexOffset: 400 }).addTo(m);
     }
@@ -125,6 +135,7 @@ export function MapaVuelo({
     // El círculo aún no tiene mapa con vista, así que sus límites salen del centro y el radio.
     if (z) todo.current.extend(z.poligono ? L.latLngBounds(z.poligono) : L.latLng(z.lat, z.lon).toBounds(z.radioNm * 1852 * 2));
     if (v) todo.current.extend([v.lat, v.lon]);
+    for (const p of figurasExtra) todo.current.extend(p);
     m.fitBounds(todo.current, { padding: [20, 20] });
     mapa.current = m;
     return () => {

@@ -70,6 +70,7 @@ import {
 } from "./textosFamiliarizacion.ts";
 import { tolInterceptacion } from "./nivel.ts";
 import type { CasoInterceptacion, DatosEspera } from "./navIfr.ts";
+import type { Giros } from "../entrenador/esperas.ts";
 import type { VorElegido } from "./vorSim.ts";
 import {
   armarInterceptacion, armarSoloInterceptacion, avanzarInterceptacion, LIMITE_SEG, type EvaluacionInterceptacion, type ResultadoInterceptacion,
@@ -129,6 +130,13 @@ export interface ContextoArmado {
   llegada?: number;
 }
 
+/** IFR: lo que el mapa del debriefing dibuja de cada intento (rumbos magnéticos). */
+export type Figuras = {
+  radiales?: { radial: number; desde: boolean }[];
+  arco?: { radioNm: number; desde: number; hasta: number; sentido: 1 | -1 };
+  espera?: { acercamiento: number; giros: Giros; tramoSeg: number };
+};
+
 /** Métodos con sintaxis de método: cada definición tipa su E y su R, y el registro las guarda como DefManiobra. */
 export interface DefManiobra<E = any, R extends ResultadoComun = any> {
   id: ManiobraId;
@@ -160,6 +168,7 @@ export interface DefManiobra<E = any, R extends ResultadoComun = any> {
   repetir(r: R, idioma: Idioma): string | null;
   masFallado(rs: R[], idioma: Idioma): string | null;
   paraGuardar(r: R): object;
+  figuras?(r: R): Figuras;
 }
 
 const celda = (campo: string, es: string, en: string) => ({ campo, nombre: { es, en } });
@@ -716,6 +725,7 @@ const defInterceptacion: DefManiobra<EvaluacionInterceptacion, ResultadoIntercep
   repetir: repetirInterceptacion,
   masFallado: masFalladoInterceptacion,
   paraGuardar: paraGuardarInterceptacion,
+  figuras: (r) => ({ radiales: [{ radial: r.ejercicio.radial, desde: r.ejercicio.desde }] }),
 };
 
 const defRuta: DefManiobra<EvaluacionRuta, ResultadoRuta> = {
@@ -752,6 +762,7 @@ const defRuta: DefManiobra<EvaluacionRuta, ResultadoRuta> = {
   repetir: repetirRuta,
   masFallado: masFalladoRuta,
   paraGuardar: paraGuardarRuta,
+  figuras: (r) => ({ radiales: [{ radial: r.ejercicio.entrada, desde: false }, { radial: r.ejercicio.salida, desde: true }] }),
 };
 
 const defArco: DefManiobra<EvaluacionArco, ResultadoArco> = {
@@ -789,6 +800,7 @@ const defArco: DefManiobra<EvaluacionArco, ResultadoArco> = {
   repetir: repetirArco,
   masFallado: masFalladoArco,
   paraGuardar: paraGuardarArco,
+  figuras: ({ ejercicio: { radioNm, desde, hasta, sentido } }) => ({ arco: { radioNm, desde, hasta, sentido }, radiales: [{ radial: hasta, desde: false }] }),
 };
 
 const defEspera: DefManiobra<EvaluacionEspera, ResultadoEspera> = {
@@ -832,6 +844,7 @@ const defEspera: DefManiobra<EvaluacionEspera, ResultadoEspera> = {
   repetir: repetirEspera,
   masFallado: masFalladoEspera,
   paraGuardar: paraGuardarEspera,
+  figuras: ({ ejercicio: { acercamiento, giros, tramoSeg, llegada } }) => ({ espera: { acercamiento, giros, tramoSeg }, radiales: [{ radial: llegada, desde: false }] }),
 };
 
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
