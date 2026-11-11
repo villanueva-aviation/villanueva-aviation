@@ -95,8 +95,8 @@ export function entradasValidas(rumbos: number[], alejamiento: number, giros: Gi
 }
 
 const PALABRAS_ENTRADA: [Entrada, string[]][] = [
-  ["directa", ["directa", "direct"]],
-  ["paralela", ["paralela", "parallel"]],
+  ["directa", ["directa", "directo", "direct"]],
+  ["paralela", ["paralela", "paralelo", "parallel"]],
   ["gota", ["gota", "lagrima", "teardrop", "tear drop"]],
 ];
 

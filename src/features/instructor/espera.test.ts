@@ -69,6 +69,11 @@ test("entradaDicha: lágrima, teardrop, parallel; dos distintas o nada → null"
   assert.equal(entradaDicha("", "es"), null);
 });
 
+test("entradaDicha: «voy directo» y «en paralelo» también cuentan", () => {
+  assert.equal(entradaDicha("Voy directo", "es"), "directa");
+  assert.equal(entradaDicha("Entrada en paralelo", "es"), "paralela");
+});
+
 test("entradasValidas: a 3° de la frontera de 110° valen paralela y directa", () => {
   const v = entradasValidas([197 - 5, 197, 197 + 5], 90, "derecha");
   assert.ok(v.includes("paralela"));
