@@ -64,6 +64,8 @@ const GimnasioAutorizaciones = lazy(() =>
 const ResumenHsi = lazy(() => import("./pages/ResumenHsi").then((m) => ({ default: m.ResumenHsi })));
 const InstructorPrograma = lazy(() => import("./pages/InstructorPrograma").then((m) => ({ default: m.InstructorPrograma })));
 const InstructorRepaso = lazy(() => import("./pages/InstructorRepaso").then((m) => ({ default: m.InstructorRepaso })));
+const InstructorIfr = lazy(() => import("./pages/InstructorIfr").then((m) => ({ default: m.InstructorIfr })));
+const TeoriaIfr = lazy(() => import("./pages/TeoriaIfr").then((m) => ({ default: m.TeoriaIfr })));
 const InstructorVuelo = lazy(() => import("./pages/InstructorVuelo").then((m) => ({ default: m.InstructorVuelo })));
 const InstructorVirajeEscarpado = lazy(() =>
   import("./pages/InstructorVirajeEscarpado").then((m) => ({ default: m.InstructorVirajeEscarpado })),
@@ -113,6 +115,7 @@ const TITULOS: Record<string, string> = {
   [ROUTES.instructorVirajeEscarpado]: "Instructor virtual: viraje escarpado del C172 — Villanueva Aviation",
   [ROUTES.instructorPrograma]: "Instructor virtual — Villanueva Aviation",
   [ROUTES.instructorRepaso]: "Repaso general — Villanueva Aviation",
+  [ROUTES.instructorIfr]: "Instructor virtual IFR — Villanueva Aviation",
   [ROUTES.hojasInstructor]: "Briefings y checklists por voz (PDF gratis) — Villanueva Aviation",
   [ROUTES.overlayGratis]: "Overlay gratis para streamers de simulador (OBS) — Villanueva Aviation",
   [RUTAS_EN.home]: "Villanueva Aviation — Learn to fly for real in your simulator",
@@ -354,6 +357,22 @@ function RoutedContent() {
             element={
               <ProtectedRoute>
                 <InstructorRepaso />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.instructorIfr}
+            element={
+              <ProtectedRoute>
+                <InstructorIfr />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.instructorIfrTeoria(":tema")}
+            element={
+              <ProtectedRoute>
+                <TeoriaIfr />
               </ProtectedRoute>
             }
           />

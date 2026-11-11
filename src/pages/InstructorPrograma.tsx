@@ -5,7 +5,7 @@ import { Button } from "../components/ui/Button";
 import { MATERIAL_LENTO, MATERIAL_RECTO, MATERIAL_VIRAJE } from "../data/materialInstructor";
 import { useAuth } from "../features/auth/AuthContext";
 import { ACTIVIDADES, estadoActividad } from "../features/instructor/actividades";
-import { claveLeccion, estadoLeccion, LECCIONES } from "../features/instructor/lecciones";
+import { claveLeccion, estadoLeccion, LECCIONES, LECCIONES_IFR } from "../features/instructor/lecciones";
 import { fetchMisLecciones } from "../features/instructor/intentos";
 import { FOUNDER_EMAIL } from "../lib/constants";
 import { BANCO } from "../features/instructor/bancoPreguntas";
@@ -398,6 +398,12 @@ export function InstructorPrograma() {
             );
           })}
         </ol>
+        {/* El programa IFR, para quien ya puede abrir sus lecciones. */}
+        {estadoLeccion(LECCIONES_IFR[0], { fundador: user?.email === FOUNDER_EMAIL, exclusivo: hasAccess }) === "abierta" && (
+          <Link to={ROUTES.instructorIfr} className="block rounded-xl border border-white/15 px-4 py-2.5 font-semibold text-white hover:border-gold-500/60">
+            {idioma === "en" ? "IFR program" : "Programa IFR"} →
+          </Link>
+        )}
         <h2 className="pt-2 font-display text-sm font-bold uppercase tracking-wide text-gold-300">{t.actividades}</h2>
         <ul className="space-y-3">
           {ACTIVIDADES.map((a) => {
