@@ -23,10 +23,10 @@ test("acceso al repaso: por ahora solo el fundador", () => {
 });
 
 test("2 y 3 (recto y nivelado) y 7 (vuelo lento) se abren con su maniobra, con la misma regla de acceso", () => {
-  assert.deepEqual(LECCIONES.filter((l) => l.disponible).map((l) => l.numero), [2, 3, 4, 5, 6, 7, 8, 11, REPASO, 14]);
+  assert.deepEqual(LECCIONES.filter((l) => l.disponible).map((l) => l.numero), [2, 3, 4, 5, 6, 7, 8, 11, 12, REPASO, 14]);
   assert.equal(LECCIONES[7].maniobra, "s-camino");
   assert.equal(LECCIONES[10].maniobra, "falla-motor");
-  assert.equal(LECCIONES[11].disponible, false, "la 12 espera a que Erik diga qué cambia");
+  assert.equal(LECCIONES[11].maniobra, "falla-motor", "la 12 es la segunda hora de emergencias");
   assert.equal(LECCIONES[13].maniobra, "toques-despegues");
   assert.equal(LECCIONES[3].maniobra, "virajes-rumbos");
   assert.equal(LECCIONES[4].maniobra, "ascensos-descensos");

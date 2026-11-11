@@ -19,7 +19,7 @@ const l = (numero: number, es: string, en: string, maniobra?: ManiobraId): Lecci
 
 export const LECCIONES: Leccion[] = [
   l(1, "Familiarización", "Familiarization"),
-  // ponytail: 2 y 3 son iguales hasta que Erik diga qué cambia entre ellas en la escuela.
+  // 2 y 3, y 11 y 12, son la misma lección dos veces: en la escuela son dos horas de lo mismo (Erik, 2026-11-10).
   l(2, "Vuelo recto y nivelado", "Straight and level flight", "recto-nivelado"),
   l(3, "Vuelo recto y nivelado", "Straight and level flight", "recto-nivelado"),
   l(4, "Virajes a rumbos", "Turns to headings", "virajes-rumbos"),
@@ -29,9 +29,8 @@ export const LECCIONES: Leccion[] = [
   l(8, "«S» sobre un camino", "S-turns along a road", "s-camino"),
   l(9, "«8» primera fase", "Figure 8, first phase"),
   l(10, "«8» segunda fase", "Figure 8, second phase"),
-  // ponytail: la 12 se abre cuando Erik diga qué cambia respecto a la 11.
   l(11, "Práctica de emergencia", "Emergency practice", "falla-motor"),
-  l(12, "Práctica de emergencia", "Emergency practice"),
+  l(12, "Práctica de emergencia", "Emergency practice", "falla-motor"),
   l(13, "Repaso general", "General review"),
   l(14, "Toques y despegues", "Touch and goes", "toques-despegues"),
 ];
