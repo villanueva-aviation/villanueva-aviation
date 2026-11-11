@@ -163,6 +163,19 @@ Se reutiliza el debriefing que ya está en main (`DebriefingMapa`, `MapaVuelo`, 
 - Cómo se deduce la entrada volada a partir del recorrido.
 - Los valores exactos de fácil y difícil en la espera, en proporción a los de medio.
 
-## Pregunta abierta para Erik
+## De rampa a rampa (Erik, 2026-11-11: «igual que las VFR»)
 
-- ¿Las lecciones IFR van de rampa a rampa, como las VFR, o empiezan ya en el aire cerca del VOR?
+Cada lección IFR es un vuelo completo, como las VFR. Se reutiliza el mismo flujo (`repaso.ts`, `fasesVuelo.ts`, checklist por voz, debriefing de lección):
+- **rampa:** checklist por voz, arranque, prueba de motor;
+- **salida:** rodaje y despegue, calificados como en VFR;
+- **navegación:** los ejercicios en el VOR. Ocupa el lugar de la zona de maniobras (maniobra o fuera de zona);
+- **regreso:** aproximación, aterrizaje y rodaje, calificados como en VFR;
+- **apagado y debriefing.**
+
+Mis decisiones para encajarlo:
+- **Inicio de los ejercicios:** al pasar 1,000 ft sobre el terreno después del despegue. El primero se genera desde la posición en ese momento, así que volar hacia el VOR ya forma parte del primer ejercicio.
+- **Regreso:** cuando se terminan las prácticas o el examen, el instructor dice «Regresa al aeropuerto».
+- **Lista de VOR:** muestra los que están a 60 NM o menos del aeropuerto. A más de 40 NM avisa «vuelo largo».
+- **Sin zona:** no hay zona de práctica ni «fuera de zona». Lo que equivale es perder la señal del VOR: el instructor pide acercarse y no califica mientras no haya señal.
+- **Anular la lección:** las mismas reglas que VFR (slew, pausa larga, etc.).
+- **Debriefing:** las mismas partes que VFR (checklist, despegue, aterrizaje), y donde estaban «maniobras» va «navegación», con los errores de cada ejercicio en el mapa.
