@@ -1,6 +1,21 @@
 // Lo que se graba del vuelo para el debriefing con mapa: un punto por segundo, las fases y lo que dijo el instructor. Puro.
-import type { Muestra } from "./evaluador.ts";
+import { toleranciaViraje, type Muestra } from "./evaluador.ts";
 import type { EstadoRepaso } from "./repaso.ts";
+import type { Checklist } from "./checklistVoz.ts";
+import { debriefingRepaso } from "./debriefingRepaso.ts";
+import type { Idioma } from "./idiomaInstructor.ts";
+import { MANIOBRAS, type ManiobraId, type ResultadoComun } from "./maniobras.ts";
+import type { Nivel } from "./nivel.ts";
+import { toleranciaRecto } from "./evaluadorRecto.ts";
+import { toleranciaLento } from "./evaluadorLento.ts";
+import { toleranciaRumbos } from "./evaluadorRumbos.ts";
+import { toleranciaAltitud } from "./evaluadorAltitud.ts";
+import { toleranciaCombinado } from "./evaluadorCombinado.ts";
+import { toleranciaCircuito } from "./evaluadorCircuito.ts";
+import { toleranciaFalla } from "./evaluadorFalla.ts";
+import { toleranciaS } from "./evaluadorS.ts";
+import { toleranciaOcho } from "./evaluadorOcho.ts";
+import { toleranciaAlrededor } from "./evaluadorAlrededor.ts";
 
 /** [t, lat, lon, altitud, velocidad, rumbo, inclinación, bola, agl]: arreglo y no objeto para que una hora pese poco. */
 export type Punto = [t: number, lat: number, lon: number, altitud: number, velocidad: number, rumbo: number, inclinacion: number, bola: number, agl: number];
@@ -74,4 +89,137 @@ export function puntoEn(puntos: Punto[], t: number): Punto | null {
     else b = k;
   }
   return Math.abs(puntos[a][0] - t) <= Math.abs(puntos[b][0] - t) ? puntos[a] : puntos[b];
+}
+
+// ── Los errores, cada uno con su momento ──
+
+/** La tolerancia de cada campo de `fuera`, por maniobra y nivel. */
+export const TOLERANCIAS: Record<ManiobraId, (n: Nivel) => Record<string, number>> = {
+  "viraje-escarpado": toleranciaViraje,
+  "recto-nivelado": toleranciaRecto,
+  "vuelo-lento": toleranciaLento,
+  "virajes-rumbos": toleranciaRumbos,
+  "ascensos-descensos": toleranciaAltitud,
+  "virajes-ascendiendo": toleranciaCombinado,
+  "toques-despegues": toleranciaCircuito,
+  "falla-motor": toleranciaFalla,
+  "s-camino": toleranciaS,
+  "ocho-pilones": toleranciaOcho,
+  "ocho-alrededor": toleranciaAlrededor,
+  familiarizacion: () => ({}),
+};
+
+/** Unidad de `peor` por campo; "maniobra.campo" cuando una maniobra usa el mismo nombre con otra unidad. */
+export const UNIDAD: Record<string, string> = {
+  altitud: "ft", velocidad: "kt", inclinacion: "°", rumbo: "°", bola: "", ala: "°", alas: "°", radio: "%", simetria: "%", cruce: "s",
+  rotacion: "kt", ascenso: "kt", final: "kt", toque: "ft/min", reaccion: "s", planeo: "kt", checklist: "", recuperacion: "s",
+};
+export const unidadDe = (_id: ManiobraId, campo: string): string => UNIDAD[`${_id}.${campo}`] ?? UNIDAD[campo] ?? "";
+
+type TramoCampo = { campo: string; inicio: number; fin: number; peor: number };
+const esTramo = (x: unknown): x is { inicio: number; fin: number; peor: number } =>
+  !!x && typeof (x as { inicio?: unknown }).inicio === "number" && typeof (x as { fin?: unknown }).fin === "number" && typeof (x as { peor?: unknown }).peor === "number";
+
+/** Todos los tramos fuera de tolerancia del resultado, también los anidados por lado (viraje escarpado). Las muestras no se recorren. */
+export function tramosFuera(r: unknown): TramoCampo[] {
+  const out: TramoCampo[] = [];
+  const visitar = (x: unknown) => {
+    if (!x || typeof x !== "object") return;
+    if (Array.isArray(x)) return x.forEach(visitar);
+    for (const [k, v] of Object.entries(x)) {
+      if (k === "muestras") continue;
+      if (k === "fuera" && v && typeof v === "object" && !Array.isArray(v)) {
+        for (const [campo, tramos] of Object.entries(v)) if (Array.isArray(tramos)) for (const tr of tramos) if (esTramo(tr)) out.push({ campo, inicio: tr.inicio, fin: tr.fin, peor: tr.peor });
+      } else visitar(v);
+    }
+  };
+  visitar(r);
+  return out;
+}
+
+export type IntentoVuelo = { n: number; maniobra: ManiobraId; calificacion: number; aprobado: boolean; inicio: number; fin: number };
+export type ErrorVuelo = {
+  n: number;
+  fase: FaseMapa | "checklist";
+  inicio: number | null;
+  fin: number | null;
+  intento?: number;
+  maniobra?: ManiobraId;
+  campo?: string;
+  peor?: number;
+  tol?: number;
+  texto?: Record<Idioma, string>;
+};
+export interface Grabacion {
+  version: 1;
+  leccion: number;
+  puntos: Punto[];
+  fases: TramoFase[];
+  voz: { t: number; texto: string }[];
+  intentos: IntentoVuelo[];
+  errores: ErrorVuelo[];
+  explicaciones: { intento: number; lineas: Record<Idioma, string[]> }[];
+  bien: Record<Idioma, string[]>;
+  zona: { lat: number; lon: number; radioNm: number; poligono?: [number, number][] } | null;
+  anulada: { t: number; motivo: string } | null;
+}
+
+const IDIOMAS: Idioma[] = ["es", "en"];
+
+/** Al terminar (o anularse) la lección: los errores ya ubicados, para que la página de un vuelo guardado solo los lea. */
+export function cerrarGrabacion(
+  g: Grabador,
+  x: { leccion: number; e: EstadoRepaso; cl: Checklist; resultados: { maniobra: ManiobraId; resultado: ResultadoComun }[] },
+): Grabacion {
+  const { e } = x;
+  const faseEn = (t: number): FaseMapa => g.fases.find((f) => t >= f.inicio && t <= f.fin)?.fase ?? "zona";
+  const sinNumero: Omit<ErrorVuelo, "n">[] = [];
+
+  const intentos: IntentoVuelo[] = x.resultados.map(({ maniobra, resultado: r }, i) => ({
+    n: i + 1, maniobra, calificacion: r.calificacion, aprobado: r.aprobado, inicio: r.muestras[0]?.t ?? 0, fin: r.muestras[r.muestras.length - 1]?.t ?? 0,
+  }));
+  x.resultados.forEach(({ maniobra, resultado: r }, i) => {
+    const tol = TOLERANCIAS[maniobra](r.nivel ?? 3);
+    for (const tr of tramosFuera(r)) {
+      sinNumero.push({ fase: faseEn(tr.inicio), inicio: tr.inicio, fin: tr.fin, intento: i + 1, maniobra, campo: tr.campo, peor: tr.peor, tol: tol[tr.campo] });
+    }
+  });
+  const explicaciones = x.resultados
+    .map(({ maniobra, resultado: r }, i) => ({
+      intento: i + 1,
+      lineas: Object.fromEntries(IDIOMAS.map((idioma) => [idioma, MANIOBRAS[maniobra].explicar(r, idioma).filter((l) => l.tipo === "mal").map((l) => l.texto)])) as Record<Idioma, string[]>,
+    }))
+    .filter((x) => x.lineas.es.length > 0);
+
+  // El debriefing de la lección: despegue y aterrizaje en su evento; el checklist en un solo renglón (en inglés solo cuenta).
+  const deb = { es: debriefingRepaso(e, x.cl, "es"), en: debriefingRepaso(e, x.cl, "en") };
+  const parte = (idioma: Idioma, id: string) => deb[idioma].partes.find((p) => p.id === id)!;
+  const eventos = e.vuelo?.eventos ?? [];
+  const momento = { despegue: eventos.find((v) => v.tipo === "despegue")?.t ?? null, aterrizaje: eventos.filter((v) => v.tipo === "aterrizaje").at(-1)?.t ?? null };
+  for (const id of ["despegue", "aterrizaje"] as const) {
+    parte("es", id).repetir.forEach((texto, k) =>
+      sinNumero.push({ fase: id, inicio: momento[id], fin: momento[id], texto: { es: texto, en: parte("en", id).repetir[k] ?? texto } }),
+    );
+  }
+  const cl = { es: parte("es", "checklist").repetir, en: parte("en", "checklist").repetir };
+  if (cl.es.length) sinNumero.push({ fase: "checklist", inicio: null, fin: null, texto: { es: cl.es.join("; "), en: cl.en.join("; ") } });
+
+  const errores = sinNumero
+    .sort((a, b) => (a.inicio ?? Number.MAX_VALUE) - (b.inicio ?? Number.MAX_VALUE))
+    .map((err, k) => ({ n: k + 1, ...err }));
+  const bien = Object.fromEntries(IDIOMAS.map((idioma) => [idioma, deb[idioma].partes.flatMap((p) => p.bien)])) as Record<Idioma, string[]>;
+  const z = e.zona;
+  return {
+    version: 1,
+    leccion: x.leccion,
+    puntos: g.puntos,
+    fases: g.fases,
+    voz: g.voz,
+    intentos,
+    errores,
+    explicaciones,
+    bien,
+    zona: z ? { lat: z.lat, lon: z.lon, radioNm: z.radioNm, ...(z.poligono ? { poligono: z.poligono } : {}) } : null,
+    anulada: e.etapa === "invalido" ? { t: g.puntos[g.puntos.length - 1]?.[0] ?? 0, motivo: e.motivo ?? "" } : null,
+  };
 }

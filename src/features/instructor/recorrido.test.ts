@@ -3,8 +3,14 @@ import assert from "node:assert/strict";
 import type { Muestra } from "./evaluador.ts";
 import type { EvaluacionVuelo, FaseVuelo } from "./fasesVuelo.ts";
 import { crearRepaso, type EstadoRepaso, type EtapaRepaso } from "./repaso.ts";
-import type { ManiobraId } from "./maniobras.ts";
-import { CAMPO_PUNTO, crearGrabador, faseMapa, grabarMuestra, grabarVoz, puntoEn, type Punto } from "./recorrido.ts";
+import { MANIOBRAS, type ManiobraId, type ResultadoComun } from "./maniobras.ts";
+import { CAMPO_PUNTO, cerrarGrabacion, crearGrabador, faseMapa, grabarMuestra, grabarVoz, puntoEn, TOLERANCIAS, tramosFuera, unidadDe, type Punto } from "./recorrido.ts";
+import { grabacionDemo } from "./recorridoDemo.ts";
+import type { Nivel } from "./nivel.ts";
+import { simularRumbos } from "./simular.ts";
+import { toleranciaRumbos } from "./evaluadorRumbos.ts";
+import { crearChecklist, type Checklist } from "./checklistVoz.ts";
+import { CHECKLIST_VOZ_C172 } from "../../data/checklistVozC172.ts";
 
 const muestra = (x: Partial<Muestra> = {}): Muestra => ({
   t: 0, inclinacion: 0, altitud: 6500, velocidad: 100, rumbo: 90, bola: 0, agl: 1500, peso: 2300, enTierra: false, slew: false, tasa: 1, pausa: false,
@@ -92,4 +98,131 @@ test("2 horas de vuelo caben en menos de 450 KB", () => {
   }
   assert.equal(g.puntos.length, 7200);
   assert.ok(JSON.stringify(g.puntos).length < 450_000, `${JSON.stringify(g.puntos).length}`);
+});
+
+// ── Errores y grabación final ──
+
+const calificar = (id: ManiobraId, ms: Muestra[], nivel: Nivel = 3): ResultadoComun => {
+  const d = MANIOBRAS[id];
+  let ev = d.armar(ms[0], nivel);
+  for (const m of ms.slice(1)) ev = d.avanzar(ev, m);
+  return d.resultado(ev)!;
+};
+const corrido = (ms: Muestra[], seg: number) => ms.map((m) => ({ ...m, t: m.t + seg }));
+const checklistLeido = (cambiar?: (cl: Checklist) => void) => {
+  const cl = crearChecklist(CHECKLIST_VOZ_C172);
+  cl.leidas = cl.secciones.map((s) => s.id);
+  for (const s of cl.secciones) cl.puntos[s.id] = cl.puntos[s.id].map(() => ({ estado: "dicho" as const }));
+  cambiar?.(cl);
+  return cl;
+};
+/** Una lección terminada: despegue en t 100, aterrizaje en t 2000, zona de 200 a 1900. */
+const leccion = (x: Partial<EstadoRepaso> = {}): EstadoRepaso => {
+  const e = crearRepaso("practica", ["virajes-rumbos", "virajes-rumbos"], 2);
+  return {
+    ...e,
+    etapa: "terminado",
+    vuelo: { fase: "terminado", eventos: [{ t: 100, tipo: "despegue", pista: null }, { t: 2000, tipo: "aterrizaje", pista: null }] } as unknown as EvaluacionVuelo,
+    tomas: { ...e.tomas, rotacionKt: 57, vy: { suma: 74 * 3, n: 3 }, final: { min: 63, max: 70, n: 5 }, tocoEnPista: true },
+    zona: { nombre: { es: "Cajititlán", en: "Cajititlan" }, lat: 20.44, lon: -103.31, radioNm: 3 },
+    ...x,
+  };
+};
+const grabadorConFases = () => {
+  const g = crearGrabador();
+  g.fases = [{ fase: "rodaje", inicio: 0, fin: 100 }, { fase: "despegue", inicio: 100, fin: 200 }, { fase: "zona", inicio: 200, fin: 1900 }, { fase: "aterrizaje", inicio: 1900, fin: 2010 }];
+  g.puntos = [[0, 20.5, -103.3, 5000, 0, 90, 0, 0, 0], [2100, 20.5, -103.3, 5000, 0, 90, 0, 0, 0]];
+  return g;
+};
+const malRumbo = () => calificar("virajes-rumbos", corrido(simularRumbos({ pasarse: 25 }), 300), 2);
+const bienRumbo = () => calificar("virajes-rumbos", corrido(simularRumbos(), 600), 2);
+
+test("cada campo de cada maniobra tiene unidad y nombre", () => {
+  for (const id of Object.keys(MANIOBRAS) as ManiobraId[])
+    for (const campo of Object.keys(TOLERANCIAS[id](3))) {
+      assert.equal(typeof unidadDe(id, campo), "string", `${id}.${campo}`);
+      assert.ok(MANIOBRAS[id].celdas.some((c) => c.campo === campo), `celda ${id}.${campo}`);
+    }
+});
+
+test("tramosFuera encuentra los fuera anidados, sin entrar a las muestras", () => {
+  const r = {
+    lados: [{ fuera: { altitud: [{ inicio: 1, fin: 2, peor: 120 }], bola: [] } }, { fuera: { velocidad: [{ inicio: 5, fin: 9, peor: -12 }] } }],
+    muestras: [{ fuera: { x: [{ inicio: 0, fin: 0, peor: 1 }] } }],
+  };
+  assert.deepEqual(tramosFuera(r), [{ campo: "altitud", inicio: 1, fin: 2, peor: 120 }, { campo: "velocidad", inicio: 5, fin: 9, peor: -12 }]);
+});
+
+test("un error de rumbos queda en su momento, en la zona y con la tolerancia del nivel", () => {
+  const gr = cerrarGrabacion(grabadorConFases(), { leccion: 4, e: leccion(), cl: checklistLeido(), resultados: [{ maniobra: "virajes-rumbos", resultado: malRumbo() }] });
+  const err = gr.errores.find((x) => x.campo === "rumbo")!;
+  assert.ok(err, "hay error de rumbo");
+  assert.equal(err.tol, toleranciaRumbos(2).rumbo);
+  assert.equal(err.intento, 1);
+  assert.equal(err.maniobra, "virajes-rumbos");
+  assert.equal(err.fase, "zona");
+  assert.ok(err.inicio! >= gr.intentos[0].inicio && err.inicio! <= gr.intentos[0].fin);
+  assert.ok(gr.explicaciones.some((x) => x.intento === 1 && x.lineas.es.length > 0 && x.lineas.en.length > 0));
+});
+
+test("la misma maniobra dos veces en práctica: dos intentos, errores de cada uno", () => {
+  const gr = cerrarGrabacion(grabadorConFases(), {
+    leccion: 4, e: leccion(), cl: checklistLeido(),
+    resultados: [{ maniobra: "virajes-rumbos", resultado: bienRumbo() }, { maniobra: "virajes-rumbos", resultado: calificar("virajes-rumbos", corrido(simularRumbos({ pasarse: 25 }), 900), 2) }],
+  });
+  assert.deepEqual(gr.intentos.map((i) => i.n), [1, 2]);
+  assert.ok(gr.errores.length > 0);
+  assert.ok(gr.errores.every((x) => x.intento === 2));
+});
+
+test("errores en orden de tiempo y numerados; el checklist al final, sin momento, en un solo renglón", () => {
+  const sinLeer = checklistLeido((cl) => {
+    cl.puntos["arranque"][0] = { estado: "saltado" };
+    cl.puntos["arranque"][1] = { estado: "saltado" };
+  });
+  const gr = cerrarGrabacion(grabadorConFases(), { leccion: 4, e: leccion(), cl: sinLeer, resultados: [{ maniobra: "virajes-rumbos", resultado: malRumbo() }] });
+  assert.deepEqual(gr.errores.map((x) => x.n), gr.errores.map((_, k) => k + 1));
+  const conT = gr.errores.filter((x) => x.inicio !== null).map((x) => x.inicio!);
+  assert.deepEqual(conT, [...conT].sort((a, b) => a - b));
+  const ultimo = gr.errores.at(-1)!;
+  assert.equal(ultimo.fase, "checklist");
+  assert.equal(ultimo.inicio, null);
+  assert.equal(gr.errores.filter((x) => x.fase === "checklist").length, 1);
+  assert.doesNotMatch(ultimo.texto!.en, /[áéíóúñ¿¡]/);
+});
+
+test("rotar fuera de Vr es un error del despegue en el t del evento; tocar fuera de la pista, del aterrizaje", () => {
+  const e = leccion();
+  const gr = cerrarGrabacion(grabadorConFases(), { leccion: 4, e: { ...e, tomas: { ...e.tomas, rotacionKt: 40, tocoEnPista: false } }, cl: checklistLeido(), resultados: [] });
+  const despegue = gr.errores.find((x) => x.fase === "despegue")!;
+  assert.equal(despegue.inicio, 100);
+  assert.match(despegue.texto!.es, /40 kt/);
+  const aterrizaje = gr.errores.find((x) => x.fase === "aterrizaje")!;
+  assert.equal(aterrizaje.inicio, 2000);
+});
+
+test("lección sin errores: lista vacía y renglones de bien en los dos idiomas", () => {
+  const gr = cerrarGrabacion(grabadorConFases(), { leccion: 4, e: leccion(), cl: checklistLeido(), resultados: [{ maniobra: "virajes-rumbos", resultado: bienRumbo() }] });
+  assert.equal(gr.errores.length, 0);
+  assert.ok(gr.bien.es.length > 0);
+  assert.equal(gr.bien.es.length, gr.bien.en.length);
+  assert.equal(gr.anulada, null);
+  assert.equal(gr.version, 1);
+  assert.equal(gr.leccion, 4);
+});
+
+test("lección anulada: anulada con el t del último punto y el motivo", () => {
+  const motivo = "Usaste el modo slew: la lección no se califica.";
+  const gr = cerrarGrabacion(grabadorConFases(), { leccion: 4, e: leccion({ etapa: "invalido", motivo }), cl: checklistLeido(), resultados: [] });
+  assert.deepEqual(gr.anulada, { t: 2100, motivo });
+});
+
+test("el vuelo de demostración trae recorrido, 2 intentos y un error de rumbo en la zona", () => {
+  const gr = grabacionDemo();
+  assert.ok(gr.puntos.length > 300);
+  assert.equal(gr.intentos.length, 2);
+  const rumbo = gr.errores.find((x) => x.campo === "rumbo")!;
+  assert.equal(rumbo.fase, "zona");
+  assert.ok(gr.fases.some((f) => f.fase === "zona"));
+  assert.ok(gr.voz.length > 0);
 });
