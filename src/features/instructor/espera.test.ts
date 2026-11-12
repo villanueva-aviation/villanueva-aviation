@@ -42,12 +42,12 @@ function muestra(t: number, a: Avion, inclinacion: number): Muestra {
 // Espera sobre el VOR: acercamiento 270, giros a la derecha, alejamiento 090 (radial 090).
 const ESPERA: DatosEspera = { acercamiento: 270, giros: "derecha", tramoSeg: 60, carta: false };
 
-/** Llega por el radial 090 desde 8 NM, entrada directa y dos vueltas con tramos de `tramo` segundos. */
+/** Llega por el radial 090 desde 10 NM, entrada directa (que ya es la vuelta) y otra vuelta, con tramos de `tramo` segundos. */
 function esperaDirecta(tramo = 60): Muestra[] {
-  const a: Avion = { x: 8, y: 0, rumbo: 270 };
-  const llegada = volarTramos(a, [[288, 0]], 0);
+  const a: Avion = { x: 10, y: 0, rumbo: 270 };
+  const llegada = volarTramos(a, [[360, 0]], 0);
   const vuelta: Tramo[] = [[1, 0], [60, 3], [tramo, 0], [60, 3], [tramo, 0]];
-  return [muestra(-1, { x: 8.03, y: 0, rumbo: 270 }, 0), ...llegada, ...volarTramos(a, [...vuelta, ...vuelta, [40, 0]], 288)];
+  return [muestra(-1, { x: 10.03, y: 0, rumbo: 270 }, 0), ...llegada, ...volarTramos(a, [...vuelta, ...vuelta, [40, 0]], 360)];
 }
 
 function volar(ms: Muestra[], nivel: Nivel = 2, responder: string | null = "directa", espera: DatosEspera = ESPERA): EvaluacionEspera {
@@ -94,16 +94,17 @@ test("entradaVolada: un tramo largo en el rumbo de llegada antes de virar no la 
   assert.equal(entradaVolada(ms, 90, "derecha"), "directa");
 });
 
-test("espera completa: directa dicha y volada, tramos de 60 s, virajes a 3°/s → 100", () => {
+test("espera completa: directa dicha y volada, tramos de 60 s, virajes a 3°/s → 100; la entrada directa ya es la vuelta", () => {
   const e = volar(esperaDirecta());
   assert.equal(e.fase, "terminado");
+  assert.equal(e.cruces.length, 2, "termina al volver al fijo, sin otra vuelta");
   const r = e.resultado!;
   assert.deepEqual(r.fuera, { dicha: [], volada: [], tramo: [], acercamiento: [], virajes: [], distancia: [], altitud: [] });
   assert.equal(r.volada, "directa");
   assert.equal(r.correcta, "directa");
   assert.deepEqual(r.tramos, [59]);
   assert.ok(e.acerc.length >= 5, "se calificó el acercamiento");
-  assert.equal(r.tasas.length, 4);
+  assert.equal(r.tasas.length, 2);
   for (const x of r.tasas) assert.ok(Math.abs(x - 3) < 0.01);
   assert.ok(r.maxDistancia > 1.5 && r.maxDistancia < 2.5);
   assert.equal(r.aprobado, true);
@@ -123,19 +124,19 @@ test("sin respuesta a la pregunta: error en la entrada dicha", () => {
   assert.equal(r.dicha, null);
 });
 
-test("armada a 2 NM: sale por su radial y sin preguntar hasta pasar 8 NM", () => {
+test("armada a 2 NM: sale por su radial y sin preguntar hasta pasar 10 NM", () => {
   const a: Avion = { x: 2, y: 0, rumbo: 90 };
-  const ms = [muestra(0, a, 0), ...volarTramos(a, [[212, 0]], 1)]; // llega a 7.9 NM
+  const ms = [muestra(0, a, 0), ...volarTramos(a, [[284, 0]], 1)]; // llega a 9.9 NM
   let e = volar(ms);
   assert.equal(e.fase, "posicionando");
   assert.equal(e.preguntar, false);
-  e = volar([...ms, ...volarTramos(a, [[10, 0]], 213)]);
+  e = volar([...ms, ...volarTramos(a, [[10, 0]], 285)]);
   assert.equal(e.fase, "llegando");
   assert.equal(e.ejercicio.llegada, 90);
 });
 
 test("preguntar se enciende a 120 s del fijo y una sola vez", () => {
-  const ms = esperaDirecta().slice(0, 289);
+  const ms = esperaDirecta().slice(0, 361);
   let e = armarEspera(ms[0], 2, { intento: 0, examen: false, estacion: VOR, espera: ESPERA, llegada: 90 });
   let veces = 0;
   let distancia = 0;
@@ -201,9 +202,9 @@ test("el instructor dice a qué altitud cruzar el fijo y avisa si te sales de el
   assert.match(ordenEspera("posiciona", "llega", e, "en")!, /cross the fix at 9,000 feet/);
   // Antes del fijo no avisa la altitud: todavía puede estar subiendo.
   assert.equal(avisoEspera(e, ms[19], "practica", "es"), null);
-  const v = volar(ms.slice(0, 400), 2, "directa", { ...ESPERA, altitudFt: 9000 });
+  const v = volar(ms.slice(0, 472), 2, "directa", { ...ESPERA, altitudFt: 9000 });
   assert.equal(v.fase, "entrada");
-  assert.equal(avisoEspera(v, ms[399], "practica", "es")?.texto, "Mantén 9,000 pies");
+  assert.equal(avisoEspera(v, ms[471], "practica", "es")?.texto, "Mantén 9,000 pies");
 });
 
 test("rutaEspera: el regreso queda en la zona de la entrada, a 10° o más de las fronteras, y la salida a 20–40° de él", () => {
@@ -227,18 +228,18 @@ test("la práctica toca gota, paralela y directa, una por intento; el examen, cu
   assert.deepEqual(entradas, ["gota", "paralela", "directa"]);
 });
 
-test("el instructor da el radial de salida al empezar y el de regreso a 8 millas", () => {
+test("el instructor da el radial de salida al empezar y el de regreso a 10 millas", () => {
   const m = muestra(0, { x: 0.5, y: 0, rumbo: 90 }, 0);
   const e = armarEspera(m, 2, { intento: 0, examen: false, estacion: VOR, espera: { ...ESPERA, altitudFt: 9000 }, llegada: 90 });
   const r = String(e.ejercicio.salida).padStart(3, "0");
-  assert.equal(ordenEspera(null, "posiciona", e, "es"), `Intercepta el radial ${r} alejándote y sube a 9,000 pies. A 8 millas te doy el regreso.`);
+  assert.equal(ordenEspera(null, "posiciona", e, "es"), `Intercepta el radial ${r} alejándote y sube a 9,000 pies. A 10 millas te doy el regreso.`);
   assert.match(ordenEspera(null, "posiciona", e, "en")!, new RegExp(`^Intercept the ${r} radial outbound and climb to 9,000 feet\\.`));
   assert.match(ordenEspera("posiciona", "llega", e, "es")!, /^Regresa a la estación por el radial 090\./);
 });
 
 test("no avisa «Regresa al radial» mientras intercepta: solo después de establecerse", () => {
-  // A 8.5 NM en el radial 060, el regreso es por el 090: 30° fuera mientras vira para interceptarlo.
-  const a: Avion = { x: 8.5 * Math.sin(60 * RAD), y: 8.5 * Math.cos(60 * RAD), rumbo: 240 };
+  // A 10.5 NM en el radial 060, el regreso es por el 090: 30° fuera mientras vira para interceptarlo.
+  const a: Avion = { x: 10.5 * Math.sin(60 * RAD), y: 10.5 * Math.cos(60 * RAD), rumbo: 240 };
   const ms = [muestra(0, a, 0), ...volarTramos(a, [[5, 0]], 1)];
   const e = volar(ms);
   assert.equal(e.fase, "llegando");
@@ -249,12 +250,11 @@ test("no avisa «Regresa al radial» mientras intercepta: solo después de estab
   assert.equal(avisoEspera(b, fuera, "practica", "es")?.clave, "llegada");
 });
 
-test("el minuto de la vuelta cuenta desde el través del fijo si nivela antes (viró 20 s tarde)", () => {
-  const a: Avion = { x: 8, y: 0, rumbo: 270 };
-  const llegada = volarTramos(a, [[288, 0]], 0);
-  const entrada: Tramo[] = [[1, 0], [60, 3], [60, 0], [60, 3], [60, 0]];
+test("el minuto de la directa cuenta desde el través del fijo si nivela antes (viró 20 s tarde)", () => {
+  const a: Avion = { x: 10, y: 0, rumbo: 270 };
+  const llegada = volarTramos(a, [[360, 0]], 0);
   const tarde: Tramo[] = [[20, 0], [60, 3], [60, 0], [60, 3], [120, 0]];
-  const e = volar([muestra(-1, { x: 8.03, y: 0, rumbo: 270 }, 0), ...llegada, ...volarTramos(a, [...entrada, ...tarde], 288)]);
+  const e = volar([muestra(-1, { x: 10.03, y: 0, rumbo: 270 }, 0), ...llegada, ...volarTramos(a, tarde, 360)]);
   assert.equal(e.fase, "terminado", e.motivo);
   assert.equal(e.resultado!.tramos.length, 1);
   // Nivela 0.55 NM antes del través: unos 20 s menos de los 60 volados (el través lleva 5° de margen).
@@ -263,14 +263,14 @@ test("el minuto de la vuelta cuenta desde el través del fijo si nivela antes (v
 
 test("la entrada se explica a una milla del fijo; sobre el fijo solo «vuela tu entrada»", () => {
   const ms = esperaDirecta();
-  const lejos = volar(ms.slice(0, 200));
-  assert.equal(pasoEspera(lejos, ms[199]), "respondida", "ya contestó: no se vuelve a preguntar");
-  const cerca = volar(ms.slice(0, 256));
-  assert.equal(pasoEspera(cerca, ms[255]), "prepara");
+  const lejos = volar(ms.slice(0, 272));
+  assert.equal(pasoEspera(lejos, ms[271]), "respondida", "ya contestó: no se vuelve a preguntar");
+  const cerca = volar(ms.slice(0, 328));
+  assert.equal(pasoEspera(cerca, ms[327]), "prepara");
   assert.match(ordenEspera("respondida", "prepara", cerca, "es")!, /^Entrada directa: /);
   assert.equal(ordenEspera("respondida", "respondida", lejos, "es"), null);
-  assert.equal(pasoEspera({ ...cerca, examen: true }, ms[255]), "respondida", "en el examen no se explica");
-  const fijo = volar(ms.slice(0, 300));
+  assert.equal(pasoEspera({ ...cerca, examen: true }, ms[327]), "respondida", "en el examen no se explica");
+  const fijo = volar(ms.slice(0, 372));
   assert.equal(fijo.fase, "entrada");
   assert.match(ordenEspera("prepara", "entra", fijo, "es")!, /^Sobre el fijo: vuela tu entrada\./);
   // Sin la explicación de antes (sin distancia), la da sobre el fijo.
@@ -279,7 +279,7 @@ test("la entrada se explica a una milla del fijo; sobre el fijo solo «vuela tu 
 
 test("sobre el fijo, en práctica, pide el curso de acercamiento en el HSI si no está puesto", () => {
   const ms = esperaDirecta();
-  const fijo = volar(ms.slice(0, 300));
+  const fijo = volar(ms.slice(0, 372));
   // navObs 270 = el curso de acercamiento: no hace falta.
   assert.doesNotMatch(ordenEspera("prepara", "entra", fijo, "es")!, /HSI/);
   const mal = { ...fijo, previo: { ...fijo.previo, navObs: 90 } };
@@ -313,7 +313,7 @@ test("cono de silencio: la espera sigue, el cruce sale por posición y la califi
 });
 
 test("a menos de 2 NM del VOR no avisa «Regresa al radial», ni de salida ni de llegada", () => {
-  const b = volar(esperaDirecta().slice(0, 240));
+  const b = volar(esperaDirecta().slice(0, 312));
   assert.equal(b.fase, "llegando");
   // 1.5 NM al este, 20° fuera del 090.
   const cerca = muestra(240, { x: 1.5 * Math.cos(20 * RAD), y: 1.5 * Math.sin(20 * RAD), rumbo: 270 }, 0);
@@ -326,4 +326,31 @@ test("a menos de 2 NM del VOR no avisa «Regresa al radial», ni de salida ni de
 test("cualquier avión vuela la espera (el programa IFR no pide el C172)", () => {
   const e = volar(esperaDirecta().map((m) => ({ ...m, titulo: "Beechcraft Baron G58" })));
   assert.equal(e.fase, "terminado", e.motivo);
+});
+
+test("la gota no es la vuelta: después de la entrada pide una vuelta completa", () => {
+  // Llega por el radial 230 con rumbo 050: gota (10° a la derecha, un minuto, 210° a la derecha) y luego la vuelta.
+  const a: Avion = { x: 10.03 * Math.sin(230 * RAD), y: 10.03 * Math.cos(230 * RAD), rumbo: 50 };
+  const ms = [muestra(0, a, 0), ...volarTramos(a, [[362, 0], [2, 5], [60, 0], [70, 3], [80, 0]], 1)];
+  const gota = (xs: Muestra[]) => {
+    let e = armarEspera(xs[0], 2, { intento: 0, examen: false, estacion: VOR, espera: ESPERA, llegada: 230 });
+    for (const m of xs.slice(1)) {
+      e = avanzarEspera(e, m);
+      if (e.preguntar) e = responderEntrada(e, "gota", m.rumbo);
+    }
+    return e;
+  };
+  const entrada = gota(ms);
+  assert.equal(entrada.fase, "vueltas", entrada.motivo);
+  assert.equal(entrada.cruces.length, 2);
+  const lap = volarTramos(a, [[1, 0], [60, 3], [60, 0], [60, 3], [80, 0]], ms.length);
+  const e = gota([...ms, ...lap]);
+  assert.equal(e.fase, "terminado", e.motivo);
+  assert.equal(e.resultado!.volada, "gota");
+});
+
+test("los avisos de la espera se repiten cada 30 s, no cada 8", () => {
+  const b = volar(esperaDirecta().slice(0, 100));
+  const fuera = muestra(100, { x: 6 * Math.cos(10 * RAD), y: 6 * Math.sin(10 * RAD), rumbo: 270 }, 0);
+  assert.equal(avisoEspera(b, fuera, "practica", "es")?.repetir, 30);
 });

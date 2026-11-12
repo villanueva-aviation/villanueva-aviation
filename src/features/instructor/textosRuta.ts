@@ -4,7 +4,7 @@ import type { Linea } from "./explicacion.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import { desvioGrados, norm180, norm360, puntos } from "./navIfr.ts";
 import { tolRuta, type Nivel } from "./nivel.ts";
-import { ANULADO, luz, type Aviso, type Luz } from "./voz.ts";
+import { ANULADO, luz, REPETIR_IFR_SEG, type Aviso, type Luz } from "./voz.ts";
 import { CONO_NM, distanciaVor } from "./vorSim.ts";
 
 // Qué dice el instructor en las rutas de acercamiento y alejamiento (programa IFR, lección 2). Puro.
@@ -99,7 +99,7 @@ export function avisoRuta(e: EvaluacionRuta | null, m: Muestra | null, modo: "pr
   const en = idioma === "en";
   const curso = e.fase === "acercandose" ? e.ejercicio.entrada + 180 : e.ejercicio.salida;
   if (m.navObs !== undefined && Math.abs(norm180(m.navObs - curso)) > 5)
-    return { clave: "obs", nivel: "ambar", texto: en ? `Set course ${tres(curso)} on the OBS` : `Pon el curso ${tres(curso)} en el OBS` };
+    return { clave: "obs", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Set course ${tres(curso)} on the OBS` : `Pon el curso ${tres(curso)} en el OBS` };
   const d = desvioAhora(e, m);
   // Cerca del VOR la aguja es demasiado sensible (y en el cono no vale): no se corrige la deriva.
   const dist = e.estacion ? distanciaVor(m, e.estacion) : null;
@@ -107,7 +107,7 @@ export function avisoRuta(e: EvaluacionRuta | null, m: Muestra | null, modo: "pr
     const derecha = d < 0; // el curso queda del lado contrario al desvío
     return {
       clave: "deriva",
-      nivel: "ambar",
+      nivel: "ambar", repetir: REPETIR_IFR_SEG,
       texto: en
         ? `The needle is drifting to the ${derecha ? "right" : "left"}: correct about 10 degrees that way.`
         : `La barra se te va a la ${derecha ? "derecha" : "izquierda"}: corrige unos 10° hacia ese lado.`,
@@ -115,7 +115,7 @@ export function avisoRuta(e: EvaluacionRuta | null, m: Muestra | null, modo: "pr
   }
   if (Math.abs(m.altitud - e.inicio.altitud) > 300) {
     const alt = (Math.round(e.inicio.altitud / 100) * 100).toLocaleString("en-US");
-    return { clave: "altitud", nivel: "ambar", texto: en ? `Hold ${alt} feet` : `Mantén ${alt} pies` };
+    return { clave: "altitud", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Hold ${alt} feet` : `Mantén ${alt} pies` };
   }
   return null;
 }

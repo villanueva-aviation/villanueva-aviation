@@ -96,7 +96,7 @@ export function inventarEspera(azar: () => number = Math.random, elevacionFt?: n
 
 /**
  * Lección 4, la salida guiada (Erik, 2026-11-11): el radial de regreso cae en la zona de `entrada`, a 10° o más de sus
- * fronteras, y el de salida queda a 20–40° de él (a 8 NM, unas 3–5 NM para interceptar). `llegada` fija el regreso.
+ * fronteras, y el de salida queda a 20–40° de él (a 10 NM, unas 3.5–6 NM para interceptar). `llegada` fija el regreso.
  */
 export function rutaEspera(alejamiento: number, giros: Giros, entrada: Entrada, azar: () => number = Math.random, llegada?: number): { salida: number; llegada: number } {
   const ok = (r: number) => [-10, 0, 10].every((d) => entradaEspera(norm(r + 180 + d), alejamiento, giros) === entrada);

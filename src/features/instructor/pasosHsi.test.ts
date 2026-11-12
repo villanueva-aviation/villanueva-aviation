@@ -32,9 +32,9 @@ const ESPERA: DatosEspera = { acercamiento: 270, giros: "derecha", tramoSeg: 60,
 
 /** Entrada directa por el radial 090; devuelve la evaluación y la muestra tras `n` muestras. */
 function directa(n: number, responder = true): [EvaluacionEspera, Muestra] {
-  const a: Avion = { x: 8, y: 0, rumbo: 270 };
+  const a: Avion = { x: 10, y: 0, rumbo: 270 };
   const vuelta: [number, number][] = [[1, 0], [60, 3], [60, 0], [60, 3], [60, 0]];
-  const ms = [muestra(-1, { x: 8.03, y: 0, rumbo: 270 }, 0), ...volarTramos(a, [[288, 0], ...vuelta, ...vuelta, [40, 0]], 0)].slice(0, n);
+  const ms = [muestra(-1, { x: 10.03, y: 0, rumbo: 270 }, 0), ...volarTramos(a, [[360, 0], ...vuelta, ...vuelta, [40, 0]], 0)].slice(0, n);
   let e = armarEspera(ms[0], 2, { intento: 2, examen: false, estacion: VOR, espera: ESPERA, llegada: 90 });
   for (const m of ms.slice(1)) {
     e = avanzarEspera(e, m);
@@ -45,13 +45,13 @@ function directa(n: number, responder = true): [EvaluacionEspera, Muestra] {
 const estados = (p: ReturnType<typeof pasosHsi>) => p!.map((x) => x.estado);
 
 test("pasos HSI: no salen antes de decir la entrada ni en el examen", () => {
-  assert.equal(pasosHsi(...directa(200, false), "es"), null);
-  const [e, m] = directa(200);
+  assert.equal(pasosHsi(...directa(272, false), "es"), null);
+  const [e, m] = directa(272);
   assert.equal(pasosHsi({ ...e, examen: true }, m, "es"), null);
 });
 
 test("pasos HSI de la directa con los números del ejercicio; el CRS ya puesto se tacha", () => {
-  const p = pasosHsi(...directa(200), "es")!;
+  const p = pasosHsi(...directa(272), "es")!;
   assert.deepEqual(p.map((x) => x.texto), [
     "CRS en 270 (inbound) y mariposa en 090 (outbound).",
     "Sobre la estación, vira a la derecha al 090.",
@@ -60,16 +60,16 @@ test("pasos HSI de la directa con los números del ejercicio; el CRS ya puesto s
     "Sobre la estación, vira de nuevo al 090.",
   ]);
   assert.deepEqual(estados(p), ["hecho", "actual", "pendiente", "pendiente", "pendiente"]);
-  for (const x of pasosHsi(...directa(200), "en")!) assert.doesNotMatch(x.texto, /[áéíóúñ¿¡]/i);
+  for (const x of pasosHsi(...directa(272), "en")!) assert.doesNotMatch(x.texto, /[áéíóúñ¿¡]/i);
 });
 
 test("pasos HSI: se tachan conforme vuela la entrada", () => {
-  // Nivelado en el alejamiento (cruce ≈ 288, viraje de 60 s): vira al 090 hecho, cronómetro en curso.
-  assert.deepEqual(estados(pasosHsi(...directa(370), "es")), ["hecho", "hecho", "actual", "pendiente", "pendiente"]);
+  // Nivelado en el alejamiento (cruce ≈ 360, viraje de 60 s): vira al 090 hecho, cronómetro en curso.
+  assert.deepEqual(estados(pasosHsi(...directa(442), "es")), ["hecho", "hecho", "actual", "pendiente", "pendiente"]);
   // Virando de regreso: el minuto ya pasó.
-  assert.deepEqual(estados(pasosHsi(...directa(420), "es")), ["hecho", "hecho", "hecho", "actual", "pendiente"]);
+  assert.deepEqual(estados(pasosHsi(...directa(492), "es")), ["hecho", "hecho", "hecho", "actual", "pendiente"]);
   // De nuevo sobre la estación: todo hecho.
-  assert.deepEqual(estados(pasosHsi(...directa(560), "es")), ["hecho", "hecho", "hecho", "hecho", "hecho"]);
+  assert.deepEqual(estados(pasosHsi(...directa(632), "es")), ["hecho", "hecho", "hecho", "hecho", "hecho"]);
 });
 
 test("pasos HSI de la gota: la mariposa 30° hacia el lado de la espera", () => {

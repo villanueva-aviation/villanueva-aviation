@@ -190,3 +190,13 @@ test("en inglés: orden, aviso, paraVoz y lectura final", () => {
   assert.equal(l[0], "Not passed. Score: 90 out of 100.");
   assert.ok(l.every((x) => !/[áéíóúñ]/.test(x)), l.join(" | "));
 });
+
+test("filtrarAviso: un aviso con repetir 30 no se repite a los 8 s, sí a los 30", () => {
+  const lento: Aviso = { clave: "llegada", nivel: "ambar", texto: "Regresa al radial", repetir: 30 };
+  let s = filtrarAviso(MEMORIA_VACIA, lento, 0);
+  assert.equal(s.decir, "Regresa al radial");
+  s = filtrarAviso(s.mem, lento, 8);
+  assert.equal(s.decir, null);
+  s = filtrarAviso(s.mem, lento, 30);
+  assert.equal(s.decir, "Regresa al radial");
+});

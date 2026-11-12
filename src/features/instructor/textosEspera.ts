@@ -5,7 +5,7 @@ import type { Linea } from "./explicacion.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import { desvioGrados, norm180, norm360, puntos } from "./navIfr.ts";
 import { tolEspera, type Nivel } from "./nivel.ts";
-import { ANULADO, luz, type Aviso, type Luz } from "./voz.ts";
+import { ANULADO, luz, REPETIR_IFR_SEG, type Aviso, type Luz } from "./voz.ts";
 import { CONO_NM } from "./vorSim.ts";
 
 // Qué dice el instructor en los patrones de espera (programa IFR, lección 4). Puro.
@@ -175,21 +175,21 @@ export function avisoEspera(e: EvaluacionEspera | null, m: Muestra | null, modo:
     if (!lejos || !e.enRadial || m.navRadial === undefined || Math.abs(puntos(desvioGrados({ radial: ej.salida, desde: true }, m.navRadial))) <= 2) return null;
     return {
       clave: "salida",
-      nivel: "ambar",
+      nivel: "ambar", repetir: REPETIR_IFR_SEG,
       texto: en ? `Get back on the ${tres(ej.salida)} radial: course ${tres(ej.salida)} FROM.` : `Regresa al radial ${tres(ej.salida)}: curso ${tres(ej.salida)} FROM.`,
     };
   }
   if (e.fase === "llegando" && lejos && e.enRadial && m.navRadial !== undefined && Math.abs(puntos(desvioGrados({ radial: ej.llegada, desde: false }, m.navRadial))) > 2)
     return {
       clave: "llegada",
-      nivel: "ambar",
+      nivel: "ambar", repetir: REPETIR_IFR_SEG,
       texto: en ? `Get back on the ${tres(ej.llegada)} radial: course ${tres(ej.llegada + 180)} TO.` : `Regresa al radial ${tres(ej.llegada)}: curso ${tres(ej.llegada + 180)} TO.`,
     };
   if (modo === "practica" && e.tramo && m.t - e.tramo.desde >= ej.tramoSeg)
-    return { clave: "minuto", nivel: "ambar", texto: ej.tramoSeg === 60 ? (en ? "One minute: turn." : "Un minuto: vira.") : en ? "Time: turn." : "Tiempo: vira." };
+    return { clave: "minuto", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: ej.tramoSeg === 60 ? (en ? "One minute: turn." : "Un minuto: vira.") : en ? "Time: turn." : "Tiempo: vira." };
   if (e.fase !== "llegando" && Math.abs(m.altitud - ej.altitudFt) > tolEspera(e.nivel).altitudFt) {
     const alt = pies(ej.altitudFt);
-    return { clave: "altitud", nivel: "ambar", texto: en ? `Hold ${alt} feet` : `Mantén ${alt} pies` };
+    return { clave: "altitud", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Hold ${alt} feet` : `Mantén ${alt} pies` };
   }
   return null;
 }
@@ -209,7 +209,8 @@ export function briefingEspera(idioma: Idioma, nivel: Nivel = 2): string[] {
       `After takeoff I'll give you a radial to fly out on; at ${SALIDA_NM} miles, the radial to fly back to the station on.`,
       "Standard holds turn right; the instruction says when they turn left. Turns are standard rate: 3 degrees per second.",
       "Before the fix I'll ask which entry you'll fly. Compare your heading to the fix with the outbound course: teardrop, parallel or direct.",
-      `Outbound, time one minute from wings level (within ${T.tramoSeg} seconds), then turn to the inbound course.`,
+      "After the entry you fly one full lap; on a direct entry, the entry is your lap.",
+      `Outbound, time one minute from abeam the fix or wings level, whichever comes later (within ${T.tramoSeg} seconds), then turn to the inbound course.`,
       `Inbound, keep the needle within ${uno(T.puntos)} ${T.puntos === 1 ? "dot" : "dots"}, and don't go more than ${T.maxNm} miles from the VOR.`,
       `From the fix on, hold the holding altitude within ${T.altitudFt} feet.`,
       "When you're ready, press «Ready, let's start».",
@@ -220,7 +221,8 @@ export function briefingEspera(idioma: Idioma, nivel: Nivel = 2): string[] {
     `Al despegar te digo por qué radial salir; a ${SALIDA_NM} millas, por cuál regresar a la estación.`,
     "La espera estándar vira a la derecha; la instrucción dice cuándo vira a la izquierda. Los virajes son de tasa estándar: 3° por segundo.",
     "Antes del fijo te pregunto qué entrada vas a hacer. Compara tu rumbo al fijo con el curso de alejamiento: gota, paralela o directa.",
-    `En el alejamiento, cuenta un minuto desde que nivelas las alas (dentro de ${T.tramoSeg} segundos) y vira al curso de acercamiento.`,
+    "Después de la entrada das una vuelta completa; en la directa, la entrada ya es tu vuelta.",
+    `En el alejamiento, cuenta un minuto desde el través del fijo o desde que nivelas, lo que pase después (dentro de ${T.tramoSeg} segundos), y vira al curso de acercamiento.`,
     `En el acercamiento, mantén la barra dentro de ${uno(T.puntos)} ${T.puntos === 1 ? "punto" : "puntos"} y no te alejes más de ${T.maxNm} millas del VOR.`,
     `Desde el fijo, mantén la altitud de la espera dentro de ${T.altitudFt} pies.`,
     "Cuando estés listo, presiona «Listo, empiezo».",

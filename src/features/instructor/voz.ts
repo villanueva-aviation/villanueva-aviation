@@ -14,7 +14,9 @@ import { tolViraje } from "./nivel.ts";
 
 export type CampoAviso = Campo;
 export type Luz = "gris" | "verde" | "ambar" | "rojo";
-export type Aviso = { clave: string; nivel: "ambar" | "rojo"; texto: string };
+export type Aviso = { clave: string; nivel: "ambar" | "rojo"; texto: string; /** Segundos para repetirlo; si no, REPETIR_AVISO_SEG. */ repetir?: number };
+/** La navegación IFR se corrige despacio: sus avisos se repiten cada medio minuto (Erik, 2026-11-12). */
+export const REPETIR_IFR_SEG = 30;
 type Modo = "practica" | "checkride";
 
 const ASENTAR_SEG = 2;
@@ -109,14 +111,14 @@ export const MEMORIA_VACIA: MemoriaAviso = { clave: null, desde: 0, libreDesde: 
 /** Tanto tiempo dentro de la banda para que el mismo aviso se pueda volver a decir de inmediato. */
 const LIBRE_SEG = 2;
 
-/** Cada aviso se dice una vez; se repite tras REPETIR_AVISO_SEG o tras volver a la banda por LIBRE_SEG. */
+/** Cada aviso se dice una vez; se repite tras su `repetir` (REPETIR_AVISO_SEG si no trae) o tras volver a la banda por LIBRE_SEG. */
 export function filtrarAviso(mem: MemoriaAviso, aviso: Aviso | null, t: number): { decir: string | null; mem: MemoriaAviso } {
   if (!aviso) {
     const libreDesde = mem.libreDesde ?? t;
     if (t - libreDesde >= LIBRE_SEG) return { decir: null, mem: MEMORIA_VACIA };
     return { decir: null, mem: { ...mem, libreDesde } };
   }
-  if (aviso.clave !== mem.clave || t - mem.desde >= REPETIR_AVISO_SEG) {
+  if (aviso.clave !== mem.clave || t - mem.desde >= (aviso.repetir ?? REPETIR_AVISO_SEG)) {
     return { decir: aviso.texto, mem: { clave: aviso.clave, desde: t, libreDesde: null } };
   }
   return { decir: null, mem: { ...mem, libreDesde: null } };

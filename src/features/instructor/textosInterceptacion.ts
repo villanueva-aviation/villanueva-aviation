@@ -6,7 +6,7 @@ import type { Linea } from "./explicacion.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import { distanciaConsejo, norm180 } from "./navIfr.ts";
 import { tolInterceptacion, type Nivel } from "./nivel.ts";
-import { ANULADO, luz, type Aviso, type Luz } from "./voz.ts";
+import { ANULADO, luz, REPETIR_IFR_SEG, type Aviso, type Luz } from "./voz.ts";
 
 // Qué dice el instructor en la interceptación de radiales (programa IFR). Puro.
 
@@ -95,10 +95,10 @@ export function avisoInterceptacion(e: EvaluacionInterceptacion | null, m: Muest
   const en = idioma === "en";
   const curso = e.ejercicio.curso;
   if (m.navObs !== undefined && Math.abs(norm180(m.navObs - curso)) > 5)
-    return { clave: "obs", nivel: "ambar", texto: en ? `Set course ${tres(curso)} on the OBS` : `Pon el curso ${tres(curso)} en el OBS` };
+    return { clave: "obs", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Set course ${tres(curso)} on the OBS` : `Pon el curso ${tres(curso)} en el OBS` };
   if (Math.abs(m.altitud - e.inicio.altitud) > 300) {
     const alt = (Math.round(e.inicio.altitud / 100) * 100).toLocaleString("en-US");
-    return { clave: "altitud", nivel: "ambar", texto: en ? `Hold ${alt} feet` : `Mantén ${alt} pies` };
+    return { clave: "altitud", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Hold ${alt} feet` : `Mantén ${alt} pies` };
   }
   return null;
 }

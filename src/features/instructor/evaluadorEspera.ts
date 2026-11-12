@@ -9,18 +9,20 @@ import { tolEspera, type Nivel } from "./nivel.ts";
 import { conCono, distanciaVor, type VorElegido } from "./vorSim.ts";
 
 // Patrones de espera (programa IFR, lección 4; reglas en el plan 2026-11-11 lecciones 2 a 4). Puro.
-// Llega al fijo (el VOR) por un radial, dice la entrada, la vuela y da una vuelta completa. Termina al tercer paso por el fijo.
+// Llega al fijo (el VOR) por un radial, dice la entrada, la vuela y da una vuelta completa. Termina al tercer paso por el fijo;
+// en la directa el circuito de la entrada ya es la vuelta y termina al segundo (Erik, 2026-11-12).
 
 export type FaseEspera = "posicionando" | "llegando" | "entrada" | "vueltas" | "terminado" | "invalido";
 export type CampoEspera = "dicha" | "volada" | "tramo" | "acercamiento" | "virajes" | "distancia" | "altitud";
 export const CAMPOS_ESPERA: CampoEspera[] = ["dicha", "volada", "tramo", "acercamiento", "virajes", "distancia", "altitud"];
 const CODIGO: Record<CampoEspera, string> = { dicha: "1", volada: "2", tramo: "3", acercamiento: "4", virajes: "5", distancia: "6", altitud: "7" };
 
-/** salida: el radial por el que se aleja hasta 8 NM; llegada: el de regreso al fijo. */
+/** salida: el radial por el que se aleja hasta 10 NM; llegada: el de regreso al fijo. */
 export type EjercicioEspera = DatosEspera & { salida: number; llegada: number; altitudFt: number };
 
 /** Sale por un radial hasta esto del VOR; ahí el instructor le da el radial de regreso. */
-export const SALIDA_NM = 8;
+/** 10 y no 8: más tiempo para interceptar el radial de regreso (Erik, 2026-11-12). */
+export const SALIDA_NM = 10;
 /** Una entrada por práctica, en este orden; el examen sortea una. */
 export const ENTRADAS_PRACTICA: Entrada[] = ["gota", "paralela", "directa"];
 /** A cuántos segundos del fijo pregunta la entrada. */
@@ -202,7 +204,10 @@ export function avanzarEspera(e: EvaluacionEspera, crudo: Muestra): EvaluacionEs
   // Cruzó el fijo desde el lado de la espera.
   n.cruces = [...e.cruces, m.t];
   if (n.fase === "entrada") {
-    return { ...n, fase: "vueltas", volada: entradaVolada(muestras.slice(e.kCruce), radialEspera(ej), ej.giros), tramo: null, vistoTramo: false, tNivel: null };
+    const volada = entradaVolada(muestras.slice(e.kCruce), radialEspera(ej), ej.giros);
+    if (volada === "directa") return terminar({ ...n, volada });
+    // Lo medido en una gota o una paralela no es la vuelta: se mide de nuevo.
+    return { ...n, fase: "vueltas", volada, tramo: null, vistoTramo: false, tNivel: null, tramos: [], fueraTramo: [], acerc: [] };
   }
   return terminar(n);
 }
@@ -219,24 +224,22 @@ function seguir(n: EvaluacionEspera, m: Muestra, antes: Muestra, dist: number | 
     n.giro = n.giro ? { ...n.giro, hasta: m.t, suma: n.giro.suma + norm180(m.rumbo - antes.rumbo) } : { desde: m.t, hasta: m.t, suma: 0 };
   } else if (n.giro) cerrarGiro(n);
 
-  // El tramo de alejamiento: en la vuelta empieza al través del fijo o al nivelar, lo que ocurra después (en la entrada,
-  // al nivelar); sigue hasta que vuelve a virar.
+  // El tramo de alejamiento empieza al través del fijo o al nivelar, lo que ocurra después (en la gota y la paralela el
+  // través ya quedó atrás al nivelar); sigue hasta que vuelve a virar.
   const haciaFuera = Math.abs(norm180(m.rumbo - radialEspera(ej))) <= RUMBO_TRAMO;
-  const alTraves = n.fase !== "vueltas" || m.navRadial === undefined || Math.abs(norm180(m.navRadial - radialEspera(ej))) <= TRAVES;
+  const alTraves = m.navRadial === undefined || Math.abs(norm180(m.navRadial - radialEspera(ej))) <= TRAVES;
   if (haciaFuera && (n.tramo ? banco < VIRAJE : banco < NIVELADO && alTraves)) {
     n.tramo = n.tramo ? { ...n.tramo, hasta: m.t } : { desde: m.t, hasta: m.t };
     n.vistoTramo = true;
   } else if (n.tramo) {
-    if (n.fase === "vueltas") {
-      const dur = n.tramo.hasta - n.tramo.desde;
-      n.tramos = [...n.tramos, dur];
-      if (Math.abs(dur - ej.tramoSeg) > T.tramoSeg) n.fueraTramo = [...n.fueraTramo, { inicio: n.tramo.desde, fin: n.tramo.hasta, peor: dur - ej.tramoSeg }];
-    }
+    const dur = n.tramo.hasta - n.tramo.desde;
+    n.tramos = [...n.tramos, dur];
+    if (Math.abs(dur - ej.tramoSeg) > T.tramoSeg) n.fueraTramo = [...n.fueraTramo, { inicio: n.tramo.desde, fin: n.tramo.hasta, peor: dur - ej.tramoSeg }];
     n.tramo = null;
   }
 
-  // El acercamiento de la vuelta: desde 15 s después de nivelar hasta el fijo, sin lo de muy cerca.
-  if (n.fase !== "vueltas" || !n.vistoTramo || n.tramo) return;
+  // El acercamiento: desde 15 s después de nivelar hasta el fijo, sin lo de muy cerca.
+  if (!n.vistoTramo || n.tramo) return;
   if (n.tNivel === null && banco < NIVELADO && Math.abs(norm180(m.rumbo - ej.acercamiento)) <= RUMBO_TRAMO) n.tNivel = m.t;
   if (n.tNivel !== null && m.t - n.tNivel >= NIVELAR_SEG && (dist === null || dist >= CERCA_NM) && m.navRadial !== undefined)
     n.acerc = [...n.acerc, { t: m.t, v: puntos(desvioGrados({ radial: radialEspera(ej), desde: false }, m.navRadial)) }];
@@ -262,12 +265,15 @@ function terminar(e: EvaluacionEspera): EvaluacionEspera {
   const validas = entradasValidas([rc - 5, rc, rc + 5, ...(n.rumboPregunta !== null ? [n.rumboPregunta] : [])], alejamiento, ej.giros);
   const dicha = n.dicha ?? null;
   const volada = n.volada ?? null;
-  const [c1, c2, c3] = n.cruces;
+  // Dos cruces en la directa (la entrada fue la vuelta), tres en las demás.
+  const [c1, c2] = n.cruces;
+  const ultimo = n.cruces[n.cruces.length - 1];
+  const vuelta = n.cruces.length > 2 ? c2 : c1;
   const fuera: Record<CampoEspera, Tramo[]> = {
     dicha: dicha && validas.includes(dicha) ? [] : [{ inicio: c1, fin: c1, peor: 1 }],
-    volada: volada && validas.includes(volada) ? [] : [{ inicio: c1, fin: c2, peor: 1 }],
+    volada: volada && validas.includes(volada) ? [] : [{ inicio: c1, fin: c2 ?? ultimo, peor: 1 }],
     // Una vuelta sin tramo de alejamiento también es error.
-    tramo: n.tramos.length ? n.fueraTramo : [{ inicio: c2, fin: c3, peor: ej.tramoSeg }],
+    tramo: n.tramos.length ? n.fueraTramo : [{ inicio: vuelta, fin: ultimo, peor: ej.tramoSeg }],
     acercamiento: analizar(n.acerc, T.puntos).tramos,
     virajes: n.fueraVirajes,
     distancia: analizar(n.dist, T.maxNm).tramos,
