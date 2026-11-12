@@ -21,6 +21,7 @@ import { DatosEsperaForm } from "../features/instructor/DatosEsperaForm";
 import { ENTRADAS_PRACTICA, radialEspera, responderEntrada } from "../features/instructor/evaluadorEspera";
 import { autorizacionEspera, PREGUNTA_ENTRADA } from "../features/instructor/textosEspera";
 import { useEscucha } from "../features/instructor/useEscucha";
+import { CLAVE_REANUDAR, leerReanudable, paraReanudar } from "../features/instructor/reanudar";
 import { lecturaFinalDe, MANIOBRAS } from "../features/instructor/maniobras";
 import {
   alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, instruirEnRampa, maniobraActual, maniobrasDe, nombreManiobra, pisoZona, ponerVor, siguienteManiobra,
@@ -112,6 +113,9 @@ const T = {
     escuchandoEntrada: "🎤 Escuchando tu entrada…",
     escuche: (x: string, d: string | null) => (!x ? "No te escuché: toca un botón." : d ? `Escuché: «${x}» → ${d}` : `Escuché: «${x}»: no la entendí, toca un botón.`),
     entradaDicha: (d: string) => `Tu entrada: ${d} ✓`,
+    aMedias: (de: string, min: number) => `Tienes esta lección a medias (${de}, hace ${min} min). Los ejercicios terminados ya están guardados; el que estabas volando empieza de nuevo.`,
+    continuar: "Continuar la lección",
+    seguimos: (de: string) => `Seguimos con la lección: ${de}.`,
   },
   en: {
     titulo: (l: string) => `${l} · C172`,
@@ -182,6 +186,9 @@ const T = {
     escuchandoEntrada: "🎤 Listening for your entry…",
     escuche: (x: string, d: string | null) => (!x ? "I didn't hear you: tap a button." : d ? `I heard: "${x}" → ${d}` : `I heard: "${x}": I didn't get it, tap a button.`),
     entradaDicha: (d: string) => `Your entry: ${d} ✓`,
+    aMedias: (de: string, min: number) => `You have this lesson half done (${de}, ${min} min ago). Finished exercises are already saved; the one you were flying starts over.`,
+    continuar: "Continue the lesson",
+    seguimos: (de: string) => `Back to the lesson: ${de}.`,
   },
 };
 
@@ -521,7 +528,79 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     guardarLeccion();
   }, [terminado, deb, decir, idioma, t, guardarLeccion]);
 
+  // La lección a medias en el navegador, para seguirla si se recarga la página (cada 5 s y al salir).
+  const claveReanudar = `${programa}-${leccion?.numero}`;
+  const guardarParaReanudar = useCallback(() => {
+    const e = repasoRef.current;
+    try {
+      if (!e || e.etapa === "terminado" || e.etapa === "invalido") return localStorage.removeItem(CLAVE_REANUDAR);
+      const g = paraReanudar({
+        clave: claveReanudar, en: Date.now(), sesionId, modo: e.modo, repaso: e, cl: clRef.current, grabador: grabador.current, resultados: resultadosVuelo.current,
+        espera: esperaRef.current, llegada: llegadaRef.current, esperaUsada: esperaUsada.current, rutaPrimera: rutaPrimera.current,
+        dichos: [...dichos.current], respondidas: [...respondidas.current],
+      });
+      localStorage.setItem(CLAVE_REANUDAR, JSON.stringify(g));
+    } catch {
+      // Sin almacenamiento (o lleno): la lección sigue, solo no se puede reanudar.
+    }
+  }, [claveReanudar, sesionId]);
+  const conLeccion = !!repaso;
+  useEffect(() => {
+    if (!conLeccion) return;
+    const id = window.setInterval(guardarParaReanudar, 5000);
+    window.addEventListener("pagehide", guardarParaReanudar);
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener("pagehide", guardarParaReanudar);
+    };
+  }, [conLeccion, guardarParaReanudar]);
+  const [aMedias, setAMedias] = useState(() => {
+    try {
+      return leerReanudable(localStorage.getItem(CLAVE_REANUDAR), claveReanudar, Date.now());
+    } catch {
+      return null;
+    }
+  });
+  const olvidarReanudable = () => {
+    setAMedias(null);
+    try {
+      localStorage.removeItem(CLAVE_REANUDAR);
+    } catch {
+      // nada que borrar
+    }
+  };
+  const continuar = () => {
+    const g = aMedias;
+    if (!g) return;
+    reiniciar();
+    setModo(g.modo);
+    setSesionId(g.sesionId as ReturnType<typeof crypto.randomUUID>);
+    clRef.current = g.cl;
+    setCl(g.cl);
+    dichos.current = new Set(g.dichos);
+    respondidas.current = new Set(g.respondidas);
+    leido.current = false;
+    setGuardado({ estado: "no" });
+    grabador.current = g.grabador;
+    resultadosVuelo.current = g.resultados;
+    setMapa({ estado: "no" });
+    setFinEn(null);
+    setListo(false);
+    casosRef.current = undefined;
+    esperaRef.current = g.espera;
+    setDatosEspera(g.espera);
+    llegadaRef.current = g.llegada;
+    setLlegada(g.llegada);
+    esperaUsada.current = g.esperaUsada;
+    rutaPrimera.current = g.rutaPrimera;
+    setAMedias(null);
+    poner(g.repaso);
+    const de = g.repaso.programa === "ifr" ? t.ejercicio(Math.min(g.repaso.actual + 1, g.repaso.sorteo.length), g.repaso.sorteo.length) : t.maniobra(Math.min(g.repaso.actual + 1, g.repaso.sorteo.length), g.repaso.sorteo.length, nombreManiobra(g.repaso.sorteo[Math.min(g.repaso.actual, g.repaso.sorteo.length - 1)], idioma));
+    decirRef.current([t.seguimos(de)]);
+  };
+
   const empezar = () => {
+    olvidarReanudable();
     reiniciar();
     clRef.current = crearChecklist(SECCIONES);
     setCl(clRef.current);
@@ -539,6 +618,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     if (leccion) poner(crearRepaso(modo, maniobrasDe(leccion, Math.random, modo), nivel, programa));
   };
   const nueva = () => {
+    olvidarReanudable();
     reiniciar();
     grabador.current = crearGrabador(ifr);
     resultadosVuelo.current = [];
@@ -612,7 +692,20 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
           </div>
         </div>
         {!escucha.supported && <p className="text-sm text-gold-300">{t.sinMicrofono}</p>}
-        <Button className="w-full" onClick={empezar}>{t.empezar}</Button>
+        {aMedias && (
+          <section className="space-y-2 rounded-xl border border-gold-500/40 p-4 text-sm text-white/85">
+            <p>
+              {t.aMedias(
+                aMedias.repaso.programa === "ifr"
+                  ? t.ejercicio(Math.min(aMedias.repaso.actual + 1, aMedias.repaso.sorteo.length), aMedias.repaso.sorteo.length)
+                  : `${Math.min(aMedias.repaso.actual + 1, aMedias.repaso.sorteo.length)}/${aMedias.repaso.sorteo.length}`,
+                Math.max(1, Math.round((Date.now() - aMedias.en) / 60000)),
+              )}
+            </p>
+            <Button className="w-full" onClick={continuar}>{t.continuar}</Button>
+          </section>
+        )}
+        <Button className="w-full" variant={aMedias ? "secondary" : undefined} onClick={empezar}>{t.empezar}</Button>
         <Link to={menuRuta} className="block text-center text-sm text-white/60 underline">{ifr ? t.menuIfr : t.menu}</Link>
       </div>
     );
