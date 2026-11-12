@@ -90,7 +90,14 @@ export function useSpeechRecognition(lang = "es-MX"): UseSpeechRecognitionResult
     setError(null);
     setErrorCode(null);
     setListening(true);
-    recognitionRef.current.start();
+    try {
+      recognitionRef.current.start();
+    } catch {
+      // Ya estaba escuchando u otro reconocimiento lo tiene: sin esto `listening` se queda en true para siempre.
+      setErrorCode("no-arranco");
+      setError("No se pudo abrir el micrófono, intenta de nuevo.");
+      setListening(false);
+    }
   }, []);
 
   const stop = useCallback(() => {

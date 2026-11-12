@@ -5,6 +5,8 @@ import type { Idioma } from "./idiomaInstructor";
 import type { useVoz } from "./useVoz";
 
 const ESCUCHA_MS = 8000;
+/** Tope duro: si el micrófono nunca arranca o nunca avisa que terminó, la voz vuelve (Erik, 2026-11-11: se quedó callada). */
+const TOPE_MS = ESCUCHA_MS + 3000;
 
 export type AlTerminar = (texto: string, error: string | null) => void;
 
@@ -20,6 +22,17 @@ export function useEscucha(idioma: Idioma, voz: ReturnType<typeof useVoz>) {
   const escucho = useRef(false);
   const { decir, retener, hablando, activa } = voz;
   const { start, stop, listening, transcript, errorCode } = mic;
+  const oido = useRef({ transcript, errorCode });
+  oido.current = { transcript, errorCode };
+
+  const cerrar = useCallback(
+    (texto: string, error: string | null) => {
+      retener(false);
+      setFase("inactivo");
+      fin.current(texto, error);
+    },
+    [retener],
+  );
 
   const escuchar = useCallback(
     (texto: string, tipo: TipoPieza, clave: string | undefined, alTerminar: AlTerminar) => {
@@ -59,10 +72,18 @@ export function useEscucha(idioma: Idioma, voz: ReturnType<typeof useVoz>) {
       return;
     }
     if (!escucho.current && !errorCode) return; // todavía no arranca
-    retener(false);
-    setFase("inactivo");
-    fin.current(transcript.trim(), errorCode);
-  }, [fase, listening, errorCode, transcript, retener]);
+    cerrar(transcript.trim(), errorCode);
+  }, [fase, listening, errorCode, transcript, cerrar]);
+
+  useEffect(() => {
+    if (fase !== "escuchando") return;
+    const id = window.setTimeout(() => {
+      stop();
+      const texto = oido.current.transcript.trim();
+      cerrar(texto, texto ? null : (oido.current.errorCode ?? "sin-respuesta"));
+    }, TOPE_MS);
+    return () => window.clearTimeout(id);
+  }, [fase, stop, cerrar]);
 
   return { fase, escuchar, supported: mic.supported };
 }
