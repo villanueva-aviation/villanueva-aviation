@@ -266,3 +266,11 @@ test("tonos: sube al abrir una sección, baja al cerrarla, y al cambiar de secci
   assert.equal(c.abierta, null);
   assert.deepEqual(tonosChecklist(c1, c), ["cierra"]);
 });
+
+test("tono por punto: bien al verse hecho o dicho, mal si se vence sin hacerse", () => {
+  const hecho = avanzarChecklist(decir(abrirAA(), ["asientos y cinturones", "freno de estacionamiento"]), con({ t: 3, freno: true }), ctx);
+  assert.equal(respuestasCopiloto(hecho, new Set()).find((r) => r.texto === "Puesto.")?.ok, true);
+  let vencido = decir(abrirAA(), ["asientos y cinturones", "freno de estacionamiento"]);
+  for (let t = 1; t <= 11; t++) vencido = avanzarChecklist(vencido, con({ t, freno: false }), ctx);
+  assert.equal(respuestasCopiloto(vencido, new Set()).find((r) => r.texto.startsWith("Revisa"))?.ok, false);
+});

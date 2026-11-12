@@ -192,26 +192,30 @@ const respuesta = (dicho: string) => {
  * «Copiloto a bordo»: el cadete dice el reto y el copiloto contesta la respuesta cuando lo ve hecho en el simulador
  * (o en cuanto se dice, si no se puede ver). Si se vence sin hacerse, pide revisarlo. `clave` cambia al releer la sección.
  */
-export function respuestasCopiloto(cl: Checklist, ya: ReadonlySet<string>): { clave: string; texto: string }[] {
+export function respuestasCopiloto(cl: Checklist, ya: ReadonlySet<string>): { clave: string; texto: string; ok: boolean }[] {
   return cl.secciones.flatMap((s) =>
-    s.puntos.flatMap((punto, k) => {
+    s.puntos.flatMap((punto, k): { clave: string; texto: string; ok: boolean }[] => {
       const p = cl.puntos[s.id][k];
       const clave = `${punto.id}@${p.t}`;
       if (ya.has(clave)) return [];
-      if (p.estado === "hecho" || p.estado === "dicho") return [{ clave, texto: respuesta(punto.dicho) }];
+      if (p.estado === "hecho" || p.estado === "dicho") return [{ clave, texto: respuesta(punto.dicho), ok: true }];
       if (p.estado === "no-hecho")
-        return [{ clave, texto: `Revisa ${reto(punto.dicho).toLowerCase()}${p.detalle ? `: ${p.detalle}` : ""}.` }];
+        return [{ clave, texto: `Revisa ${reto(punto.dicho).toLowerCase()}${p.detalle ? `: ${p.detalle}` : ""}.`, ok: false }];
       return [];
     }),
   );
 }
+
+/** Cómo se confirma cada punto: lo contesta el copiloto, suena un tono o nada (Erik, 2026-11-11: sonido por defecto). */
+export type ModoPunto = "copiloto" | "sonido" | "sin-sonido";
+export const MODOS_PUNTO: ModoPunto[] = ["copiloto", "sonido", "sin-sonido"];
 
 /** Todo lo que toca decir, en orden: primero el copiloto (null = sin copiloto) y después el aviso de la sección. */
 export function porDecir(
   cl: Checklist,
   avisosDichos: ReadonlySet<SeccionId>,
   respondidas: ReadonlySet<string> | null,
-): ({ tipo: "copiloto"; clave: string; texto: string } | { tipo: "aviso"; id: SeccionId; texto: string })[] {
+): ({ tipo: "copiloto"; clave: string; texto: string; ok: boolean } | { tipo: "aviso"; id: SeccionId; texto: string })[] {
   return [
     ...(respondidas ? respuestasCopiloto(cl, respondidas).map((r) => ({ tipo: "copiloto" as const, ...r })) : []),
     ...avisosPorDecir(cl, avisosDichos).map((a) => ({ tipo: "aviso" as const, ...a })),

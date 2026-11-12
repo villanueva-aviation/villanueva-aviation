@@ -4,7 +4,7 @@ import { Button } from "../components/ui/Button";
 import { AVIONES_VOZ } from "../data/checklistVozAviones";
 import type { SeccionId } from "../data/checklistVozC172";
 import { useAuth } from "../features/auth/AuthContext";
-import { avanzarChecklist, crearChecklist, oir, porDecir, tonosChecklist, type Checklist, type EstadoPunto } from "../features/instructor/checklistVoz";
+import { avanzarChecklist, crearChecklist, MODOS_PUNTO, oir, porDecir, respuestasCopiloto, tonosChecklist, type Checklist, type EstadoPunto, type ModoPunto } from "../features/instructor/checklistVoz";
 import { sonarTonos } from "../features/instructor/tonos";
 import { debriefingRepaso, esperaApagado, paraGuardarRepaso } from "../features/instructor/debriefingRepaso";
 import type { Muestra } from "../features/instructor/evaluador";
@@ -58,6 +58,8 @@ const T = {
     modo: { practica: "Práctica", checkride: "Checkride" },
     modoDetalle: { practica: "Puedes repetir una maniobra o pasar a la siguiente.", checkride: "Un intento calificado por maniobra." },
     empezar: "Empezar",
+    alRevisar: "Al revisar cada punto del checklist:",
+    modoPunto: { copiloto: "Copiloto", sonido: "Sonido", "sin-sonido": "Sin sonido" },
     estado: { conectado: "Conectado a MSFS", "sin-simulador": "Abre MSFS 2020 con el C172", "sin-lector": "No encuentro el lector: ábrelo otra vez" },
     etapa: {
       rampa: "En la plataforma: checklist y rodaje", salida: "Hacia la zona de trabajo", maniobra: "Maniobras", "fuera-de-zona": "Fuera de la zona",
@@ -123,6 +125,8 @@ const T = {
     modo: { practica: "Practice", checkride: "Checkride" },
     modoDetalle: { practica: "You can repeat a maneuver or move on to the next one.", checkride: "One graded attempt per maneuver." },
     empezar: "Start",
+    alRevisar: "When each checklist item is checked:",
+    modoPunto: { copiloto: "Copilot", sonido: "Sound", "sin-sonido": "No sound" },
     estado: { conectado: "Connected to MSFS", "sin-simulador": "Open MSFS 2020 with the C172", "sin-lector": "Reader not found: open it again" },
     etapa: {
       rampa: "On the ramp: checklist and taxi", salida: "To the practice area", maniobra: "Maneuvers", "fuera-de-zona": "Outside the area",
@@ -180,6 +184,16 @@ const COLOR_PUNTO: Record<EstadoPunto, string> = {
   pendiente: "text-white/50", revisando: "text-gold-400", hecho: "text-green-400", dicho: "text-white", "no-hecho": "text-red-400", saltado: "text-red-400",
 };
 
+const CLAVE_MODO_PUNTO = "instructor-modo-punto";
+function leerModoPunto(): ModoPunto {
+  try {
+    const x = localStorage.getItem(CLAVE_MODO_PUNTO);
+    return MODOS_PUNTO.includes(x as ModoPunto) ? (x as ModoPunto) : "sonido";
+  } catch {
+    return "sonido";
+  }
+}
+
 function leerIdioma(): Idioma {
   try {
     return localStorage.getItem(CLAVE_IDIOMA) === "en" ? "en" : "es";
@@ -206,6 +220,16 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const clRef = useRef(cl);
   const ultimaT = useRef(0);
   const dichos = useRef(new Set<SeccionId>());
+  const respondidas = useRef(new Set<string>());
+  const [modoPunto, setModoPunto] = useState<ModoPunto>(leerModoPunto);
+  const cambiarModoPunto = (x: ModoPunto) => {
+    setModoPunto(x);
+    try {
+      localStorage.setItem(CLAVE_MODO_PUNTO, x);
+    } catch {
+      // Sin almacenamiento se usa solo en esta visita.
+    }
+  };
   const [guardado, setGuardado] = useState<{ estado: "no" | "guardando" | "listo" | "error"; error?: string }>({ estado: "no" });
   const enCursoRef = useRef(false);
   const aeroRef = useRef<Parameters<typeof alMuestrearRepaso>[2]>(null);
@@ -387,13 +411,19 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     setCl(clRef.current);
   });
   const decirChecklist = escucha.decir;
+  // Cada punto se confirma según el modo (todos se marcan contestados, para que cambiar de modo no repita lo de antes);
+  // al cerrar una sección el instructor dice qué faltó.
   useEffect(() => {
     if (cl.abierta) dichos.current.delete(cl.abierta);
-    for (const x of porDecir(cl, dichos.current, null)) {
+    const nuevas = respuestasCopiloto(cl, respondidas.current);
+    const lista = porDecir(cl, dichos.current, modoPunto === "copiloto" ? respondidas.current : null);
+    for (const r of nuevas) respondidas.current.add(r.clave);
+    if (modoPunto === "sonido") sonarTonos(nuevas.map((r) => (r.ok ? "punto" : "falta")));
+    for (const x of lista) {
       if (x.tipo === "aviso") dichos.current.add(x.id);
       decirChecklist(x.texto);
     }
-  }, [cl, decirChecklist]);
+  }, [cl, decirChecklist, modoPunto]);
 
   // Al terminar: debriefing leído y la lección guardada una vez.
   const deb = repaso && terminado && listo ? debriefingRepaso(repaso, cl, idioma) : null;
@@ -522,6 +552,17 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
             pisoZona(leccion.maniobra) < 1500,
           )).map((l) => <li key={l}>{l}</li>)}
         </ol>
+        <div className="space-y-1.5 text-sm">
+          <p className="text-white/70">{t.alRevisar}</p>
+          <div className="flex gap-2" role="radiogroup" aria-label={t.alRevisar}>
+            {MODOS_PUNTO.map((x) => (
+              <button key={x} type="button" role="radio" aria-checked={modoPunto === x} onClick={() => cambiarModoPunto(x)}
+                className={`flex-1 rounded-lg border px-3 py-2 ${modoPunto === x ? "border-gold-500 bg-gold-500/15 text-gold-100" : "border-white/15 text-white"}`}>
+                {t.modoPunto[x]}
+              </button>
+            ))}
+          </div>
+        </div>
         {!escucha.supported && <p className="text-sm text-gold-300">{t.sinMicrofono}</p>}
         <Button className="w-full" onClick={empezar}>{t.empezar}</Button>
         <Link to={menuRuta} className="block text-center text-sm text-white/60 underline">{ifr ? t.menuIfr : t.menu}</Link>

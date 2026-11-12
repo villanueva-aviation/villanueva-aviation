@@ -17,7 +17,9 @@ import {
   respuestasCopiloto,
   resumenChecklist,
   tonosChecklist,
+  MODOS_PUNTO,
   type Checklist,
+  type ModoPunto,
   type EstadoPunto,
 } from "../features/instructor/checklistVoz";
 import { sonarTonos } from "../features/instructor/tonos";
@@ -84,7 +86,7 @@ export function AdminVuelo() {
   const clRef = useRef<Checklist>(cl);
   const ultimaT = useRef(0);
   const dichos = useRef(new Set<SeccionId>());
-  const [copiloto, setCopiloto] = useState(false);
+  const [modoPunto, setModoPunto] = useState<ModoPunto>("sonido");
   const respondidas = useRef(new Set<string>());
   const [escuchar, setEscuchar] = useState(false);
   const [oido, setOido] = useState("");
@@ -103,21 +105,20 @@ export function AdminVuelo() {
   const escucha = useChecklistVoz(escuchar, voz, alOir);
   const { decir } = escucha;
 
-  // El copiloto contesta cada punto cuando lo ve hecho; al cerrar una sección el instructor dice qué faltó,
-  // una vez por lectura. Todo en el orden de porDecir: la última respuesta va antes del aviso.
+  // Cada punto se confirma según el modo: el copiloto lo contesta, suena un tono o nada. Todos se marcan contestados,
+  // así cambiar de modo no repite lo de antes. Al cerrar una sección el instructor dice qué faltó, una vez por lectura;
+  // en el orden de porDecir la última respuesta va antes del aviso.
   useEffect(() => {
     if (cl.abierta) dichos.current.delete(cl.abierta);
-    for (const x of porDecir(cl, dichos.current, copiloto ? respondidas.current : null)) {
+    const nuevas = respuestasCopiloto(cl, respondidas.current);
+    const lista = porDecir(cl, dichos.current, modoPunto === "copiloto" ? respondidas.current : null);
+    for (const r of nuevas) respondidas.current.add(r.clave);
+    if (modoPunto === "sonido") sonarTonos(nuevas.map((r) => (r.ok ? "punto" : "falta")));
+    for (const x of lista) {
       if (x.tipo === "aviso") dichos.current.add(x.id);
-      else respondidas.current.add(x.clave);
       decir(x.texto);
     }
-  }, [cl, copiloto, decir]);
-  // Al encenderlo no contesta lo que ya se había dicho.
-  const alternarCopiloto = () => {
-    if (!copiloto) for (const r of respuestasCopiloto(clRef.current, respondidas.current)) respondidas.current.add(r.clave);
-    setCopiloto((x) => !x);
-  };
+  }, [cl, modoPunto, decir]);
 
   // Arma con `m` si se puede; si no, deja el motivo y vuelve a intentar con la siguiente muestra.
   const armar = (m: Muestra) => {
@@ -253,9 +254,14 @@ export function AdminVuelo() {
             <Button variant={escuchar ? "secondary" : "primary"} onClick={() => setEscuchar((x) => !x)} disabled={!escucha.supported}>
               {escuchar ? "Dejar de escuchar" : "Escuchar checklist"}
             </Button>
-            <label htmlFor="copiloto" className="flex items-center gap-2 text-sm text-white/80">
-              <input id="copiloto" type="checkbox" checked={copiloto} onChange={alternarCopiloto} />
-              Copiloto a bordo
+            <label htmlFor="modo-punto" className="flex items-center gap-2 text-sm text-white/80">
+              Cada punto:
+              <select id="modo-punto" value={modoPunto} onChange={(ev) => setModoPunto(ev.target.value as ModoPunto)}
+                className="rounded-lg border border-white/15 bg-navy-950 px-2 py-1 text-white">
+                {MODOS_PUNTO.map((x) => (
+                  <option key={x} value={x}>{x === "copiloto" ? "Copiloto" : x === "sonido" ? "Sonido" : "Sin sonido"}</option>
+                ))}
+              </select>
             </label>
             {escucha.escuchando && <Badge tone="green">Escuchando</Badge>}
             {!escucha.supported && <span className="text-sm text-red-400">Este navegador no reconoce voz.</span>}
