@@ -4,7 +4,7 @@ import { traducirMotivo } from "./idiomaInstructor";
 import { MANIOBRAS } from "./maniobras";
 import { MapaVuelo } from "./MapaVuelo";
 import { RepeticionVuelo, mmss } from "./RepeticionVuelo";
-import { nombreManiobra } from "./repaso";
+import { nombreHecha } from "./repaso";
 import { CAMPO_PUNTO as C, unidadDe, type ErrorVuelo, type FaseMapa, type Grabacion } from "./recorrido";
 
 type Pestana = "todo" | "checklist" | FaseMapa;
@@ -102,7 +102,7 @@ export function DebriefingMapa({ grabacion: g, idioma }: { grabacion: Grabacion;
       const i = g.intentos.find((x) => x.n === e.intento);
       gr = {
         clave,
-        titulo: i ? t.intento(i.n, nombreManiobra(i.maniobra, idioma), i.calificacion) : nombrePestana(e.fase),
+        titulo: i ? t.intento(i.n, nombreHecha(i.maniobra, i.entrada, idioma), i.calificacion) : nombrePestana(e.fase),
         errores: [],
         explicacion: g.explicaciones.find((x) => x.intento === e.intento)?.lineas[idioma] ?? [],
       };

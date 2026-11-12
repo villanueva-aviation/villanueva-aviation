@@ -1,7 +1,7 @@
 // Debriefing por fases del repaso general y el renglón que se guarda. Puro.
 import { resumenChecklist, type Checklist } from "./checklistVoz.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
-import { nombreManiobra, type EstadoRepaso } from "./repaso.ts";
+import { entradaDe, nombreHecha, type EstadoRepaso } from "./repaso.ts";
 import { calificarTomas, VEL_C172 as V } from "./tomas.ts";
 import { tolFinal } from "./nivel.ts";
 
@@ -75,7 +75,7 @@ export function debriefingRepaso(e: EstadoRepaso, cl: Checklist, idioma: Idioma)
 
   const maniobras = { ...nueva("maniobras"), ...(e.programa === "ifr" ? { titulo: t.navegacion } : {}) };
   for (const h of e.hechas) {
-    const nombre = nombreManiobra(h.id, idioma);
+    const nombre = nombreHecha(h.id, entradaDe(h.resultado), idioma);
     if (!h.resultado) maniobras.repetir.push(`${nombre}: ${t.noVolada}`);
     else (h.resultado.aprobado ? maniobras.bien : maniobras.repetir).push(`${nombre}: ${h.resultado.calificacion}/100`);
   }

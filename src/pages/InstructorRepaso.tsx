@@ -25,7 +25,7 @@ import { useEscucha } from "../features/instructor/useEscucha";
 import { CLAVE_REANUDAR, leerReanudable, paraReanudar } from "../features/instructor/reanudar";
 import { lecturaFinalDe, MANIOBRAS } from "../features/instructor/maniobras";
 import {
-  alMuestrearRepaso, alResultado, armaManiobra, avionDe, crearRepaso, instruirEnRampa, maniobraActual, maniobrasDe, nombreManiobra, pisoZona, ponerVor, siguienteManiobra,
+  alMuestrearRepaso, alResultado, armaManiobra, avionDe, avionParaGuardar, crearRepaso, entradaDe, nombreHecha, instruirEnRampa, maniobraActual, maniobrasDe, nombreManiobra, pisoZona, ponerVor, siguienteManiobra,
   type EstadoRepaso, type EtapaRepaso,
 } from "../features/instructor/repaso";
 import type { IntentoSesion, Modo } from "../features/instructor/sesion";
@@ -525,7 +525,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     setGuardado({ estado: "guardando" });
     const g = paraGuardarRepaso(e, clRef.current);
     const res = await guardarIntento({
-      maniobra: claveLeccion(leccion), avion: e.avion?.nombre ?? "C172", modo: e.modo,
+      maniobra: claveLeccion(leccion), avion: avionParaGuardar(e.avion), modo: e.modo,
       resultado: { aprobado: g.aprobado, calificacion: g.calificacion, elementos: g.elementos, avisos: [], muestras: [] },
       detalle: g.detalle, sesionId,
     });
@@ -883,7 +883,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
                   const HojaDe = HOJA[h.id];
                   return (
                     <details key={i} className="mt-2 rounded-lg border border-white/10 px-3 py-2">
-                      <summary className="cursor-pointer text-white/80">{nombreManiobra(h.id, idioma)} · {h.resultado.calificacion}/100</summary>
+                      <summary className="cursor-pointer text-white/80">{nombreHecha(h.id, entradaDe(h.resultado), idioma)} · {h.resultado.calificacion}/100</summary>
                       <div className="mt-2 space-y-3">
                         <HojaDe resultado={h.resultado} idioma={idioma} />
                         <Explicacion resultado={h.resultado} idioma={idioma} def={MANIOBRAS[h.id]} />

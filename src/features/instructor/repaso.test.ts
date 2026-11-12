@@ -11,7 +11,7 @@ import {
   type EstadoRepaso, type Zona,
 } from "./repaso.ts";
 import { LECCIONES, REPASO, leccionIfrDe } from "./lecciones.ts";
-import { avionDe, conSenal, instruirEnRampa, ponerVor } from "./repaso.ts";
+import { avionDe, avionParaGuardar, conSenal, entradaDe, instruirEnRampa, nombreHecha, ponerVor } from "./repaso.ts";
 import { elegirVor } from "./vorSim.ts";
 
 test("una lección de maniobra la vuela 5 veces; el repaso sortea 4", () => {
@@ -428,4 +428,20 @@ test("IFR: los ejercicios de la lección mandan cuántas maniobras hay en práct
   const otra = { ...l1, ejercicios: { practica: 3, examen: 1 } };
   assert.equal(maniobrasDe(otra, Math.random, "practica").length, 3);
   assert.equal(maniobrasDe(otra, Math.random, "checkride").length, 1);
+});
+
+test("el avión se guarda con 20 caracteres o menos, cortado en una palabra (la base no acepta más)", () => {
+  assert.equal(avionParaGuardar(avionDe("Black Square A36TC Bonanza Professional Villanueva Aviation 2026 XB-BNZ")), "Black Square A36TC");
+  assert.equal(avionParaGuardar(avionDe("Cessna Skyhawk G1000 Asobo")), "Cessna 172");
+  assert.equal(avionParaGuardar(undefined), "C172");
+  assert.equal(avionParaGuardar(avionDe("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA")).length, 20);
+});
+
+test("cada espera hecha dice su entrada, para no confundir tres «Patrones de espera»", () => {
+  const res = (correcta: string) => ({ aprobado: true, calificacion: 100, elementos: {}, avisos: [], muestras: [], correcta }) as never;
+  assert.equal(nombreHecha("espera", entradaDe(res("gota")), "es"), "Patrones de espera (entrada en gota)");
+  assert.equal(nombreHecha("espera", "directa", "es"), "Patrones de espera (entrada directa)");
+  assert.doesNotMatch(nombreHecha("espera", "paralela", "en"), /[áéíóúñ¿¡]/);
+  assert.match(nombreHecha("espera", "paralela", "en"), /\(parallel entry\)$/);
+  assert.equal(nombreHecha("espera", entradaDe(null), "es"), "Patrones de espera");
 });

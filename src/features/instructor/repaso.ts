@@ -13,6 +13,8 @@ import { aNm } from "../home/navGeo.ts";
 import type { Nivel } from "./nivel.ts";
 import type { Leccion } from "./lecciones.ts";
 import { conCono, type VorElegido } from "./vorSim.ts";
+import type { Entrada } from "../entrenador/esperas.ts";
+import { NOMBRE_ENTRADA } from "./textosEspera.ts";
 
 const RAD = Math.PI / 180;
 
@@ -183,6 +185,14 @@ export function avionDe(titulo: string): Avion {
   const voz: AvionVoz | null = esC172(titulo) ? "c172" : /152/.test(titulo) ? "c152" : /arrow|pa-?28r/i.test(titulo) ? "arrow" : null;
   return { nombre: voz ? AVIONES_VOZ[voz].nombre : titulo, voz, c172: voz === "c172" };
 }
+
+/** La base acepta 20 caracteres en `avion`: el título de MSFS se corta en una palabra (Erik, 2026-11-12). */
+export function avionParaGuardar(a: Avion | undefined): string {
+  const n = (a?.nombre ?? "C172").trim();
+  if (n.length <= 20) return n;
+  const corte = n.slice(0, 21).lastIndexOf(" ");
+  return corte > 0 ? n.slice(0, corte) : n.slice(0, 20);
+}
 type Paso = { estado: EstadoRepaso; decir: string[] };
 
 /** Un avión que se mueve más de esto entre dos muestras, más rápido que SALTO_KT, se movió de golpe. */
@@ -248,6 +258,16 @@ export function nombreManiobra(id: ManiobraId, idioma: Idioma): string {
   const t = MANIOBRAS[id].titulo[idioma].replace(/^C172 | C172$/, "");
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
+
+/** Con su entrada: tres «Patrones de espera» seguidos confunden al cadete (Erik, 2026-11-12). */
+export function nombreHecha(id: ManiobraId, entrada: Entrada | undefined, idioma: Idioma): string {
+  const base = nombreManiobra(id, idioma);
+  if (id !== "espera" || !entrada) return base;
+  return `${base} (${idioma === "en" ? `${NOMBRE_ENTRADA.en[entrada]} entry` : `entrada ${NOMBRE_ENTRADA.es[entrada]}`})`;
+}
+
+/** La entrada que tocaba en una espera calificada; en las demás maniobras, nada. */
+export const entradaDe = (r: ResultadoComun | null | undefined): Entrada | undefined => (r as { correcta?: Entrada } | null | undefined)?.correcta;
 
 export const crearRepaso = (modo: Modo, sorteo: ManiobraId[], nivel: Nivel = 3, programa: "vfr" | "ifr" = "vfr"): EstadoRepaso => ({
   etapa: "rampa", modo, sorteo, actual: 0, hechas: sorteo.map((id) => ({ id, resultado: null, intentoId: null })), zona: null, vuelo: null, tomas: crearTomas(),

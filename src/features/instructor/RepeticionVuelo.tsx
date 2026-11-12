@@ -14,8 +14,8 @@ const VELOCIDADES = [1, 4, 16] as const;
 const VOZ_SEG = 20;
 
 const T = {
-  es: { altitud: "Altitud", velocidad: "Velocidad", rumbo: "Rumbo", inclinacion: "Inclinación", bola: "Bola", radial: "Radial", barra: "Barra", instructor: "Instructor", play: "Reproducir", pausa: "Pausa", perfil: "Perfil del vuelo: altitud en blanco, velocidad en azul. Arrastra para moverte." },
-  en: { altitud: "Altitude", velocidad: "Airspeed", rumbo: "Heading", inclinacion: "Bank", bola: "Ball", radial: "Radial", barra: "Needle", instructor: "Instructor", play: "Play", pausa: "Pause", perfil: "Flight profile: altitude in white, airspeed in blue. Drag to move." },
+  es: { altitud: "Altitud", velocidad: "Velocidad", rumbo: "Rumbo", inclinacion: "Inclinación", bola: "Bola", radial: "Radial", barra: "Barra", aTope: "a tope", instructor: "Instructor", play: "Reproducir", pausa: "Pausa", perfil: "Perfil del vuelo: altitud en blanco, velocidad en azul. Arrastra para moverte." },
+  en: { altitud: "Altitude", velocidad: "Airspeed", rumbo: "Heading", inclinacion: "Bank", bola: "Ball", radial: "Radial", barra: "Needle", aTope: "full scale", instructor: "Instructor", play: "Play", pausa: "Pause", perfil: "Flight profile: altitude in white, airspeed in blue. Drag to move." },
 };
 
 export const mmss = (seg: number) => `${Math.floor(Math.max(0, seg) / 60)}:${String(Math.floor(Math.max(0, seg) % 60)).padStart(2, "0")}`;
@@ -141,8 +141,8 @@ export function RepeticionVuelo({ grabacion, cursorT, alMover, idioma }: { graba
           {lectura(t.bola, p[C.bola].toFixed(2))}
           {p[C.radial] !== undefined && (
             <>
-              {lectura(t.radial, String(Math.round(p[C.radial]!) % 360 || 360).padStart(3, "0"))}
-              {lectura(t.barra, `${p[C.desv]!.toFixed(1)}`)}
+              {lectura(t.radial, String(Math.round((((p[C.radial]! % 360) + 360) % 360)) || 360).padStart(3, "0"))}
+              {lectura(t.barra, Math.abs(p[C.desv]!) > 5 ? t.aTope : p[C.desv]!.toFixed(1))}
               {lectura("DME", `${p[C.dme]!.toFixed(1)} NM`)}
             </>
           )}

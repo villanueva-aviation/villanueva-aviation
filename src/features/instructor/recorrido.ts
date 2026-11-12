@@ -1,6 +1,7 @@
 // Lo que se graba del vuelo para el debriefing con mapa: un punto por segundo, las fases y lo que dijo el instructor. Puro.
 import { toleranciaViraje, type Muestra } from "./evaluador.ts";
-import type { EstadoRepaso } from "./repaso.ts";
+import { entradaDe, type EstadoRepaso } from "./repaso.ts";
+import type { Entrada } from "../entrenador/esperas.ts";
 import type { Checklist } from "./checklistVoz.ts";
 import { debriefingRepaso } from "./debriefingRepaso.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
@@ -157,7 +158,7 @@ export function tramosFuera(r: unknown): TramoCampo[] {
   return out;
 }
 
-export type IntentoVuelo = { n: number; maniobra: ManiobraId; calificacion: number; aprobado: boolean; inicio: number; fin: number };
+export type IntentoVuelo = { n: number; maniobra: ManiobraId; calificacion: number; aprobado: boolean; inicio: number; fin: number; /** Solo la espera; los mapas viejos no la traen. */ entrada?: Entrada };
 export type ErrorVuelo = {
   n: number;
   fase: FaseMapa | "checklist";
@@ -203,6 +204,7 @@ export function cerrarGrabacion(
 
   const intentos: IntentoVuelo[] = x.resultados.map(({ maniobra, resultado: r }, i) => ({
     n: i + 1, maniobra, calificacion: r.calificacion, aprobado: r.aprobado, inicio: r.muestras[0]?.t ?? 0, fin: r.muestras[r.muestras.length - 1]?.t ?? 0,
+    ...(entradaDe(r) ? { entrada: entradaDe(r) } : {}),
   }));
   x.resultados.forEach(({ maniobra, resultado: r }, i) => {
     const tol = TOLERANCIAS[maniobra](r.nivel ?? 3);
