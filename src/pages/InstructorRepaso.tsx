@@ -18,7 +18,8 @@ import { altitudEspera, casosExamen, entradaDicha, inventarEspera, rutaEspera, t
 import { elegirVor, vorsCercanos, vorsParaLeccion, type VorSim } from "../features/instructor/vorSim";
 import type { Entrada } from "../features/entrenador/esperas";
 import { DatosEsperaForm } from "../features/instructor/DatosEsperaForm";
-import { ENTRADAS_PRACTICA, radialEspera, responderEntrada } from "../features/instructor/evaluadorEspera";
+import { ENTRADAS_PRACTICA, radialEspera, responderEntrada, type EvaluacionEspera } from "../features/instructor/evaluadorEspera";
+import { pasosHsi } from "../features/instructor/pasosHsi";
 import { autorizacionEspera, PREGUNTA_ENTRADA } from "../features/instructor/textosEspera";
 import { useEscucha } from "../features/instructor/useEscucha";
 import { CLAVE_REANUDAR, leerReanudable, paraReanudar } from "../features/instructor/reanudar";
@@ -114,6 +115,7 @@ const T = {
     escuchandoEntrada: "🎤 Escuchando tu entrada…",
     escuche: (x: string, d: string | null) => (!x ? "No te escuché: toca un botón." : d ? `Escuché: «${x}» → ${d}` : `Escuché: «${x}»: no la entendí, toca un botón.`),
     entradaDicha: (d: string) => `Tu entrada: ${d} ✓`,
+    pasosHsi: "Paso a paso en el HSI",
     aMedias: (de: string, min: number) => `Tienes esta lección a medias (${de}, hace ${min} min). Los ejercicios terminados ya están guardados; el que estabas volando empieza de nuevo.`,
     continuar: "Continuar la lección",
     seguimos: (de: string) => `Seguimos con la lección: ${de}.`,
@@ -188,6 +190,7 @@ const T = {
     escuchandoEntrada: "🎤 Listening for your entry…",
     escuche: (x: string, d: string | null) => (!x ? "I didn't hear you: tap a button." : d ? `I heard: "${x}" → ${d}` : `I heard: "${x}": I didn't get it, tap a button.`),
     entradaDicha: (d: string) => `Your entry: ${d} ✓`,
+    pasosHsi: "Step by step on the HSI",
     aMedias: (de: string, min: number) => `You have this lesson half done (${de}, ${min} min ago). Finished exercises are already saved; the one you were flying starts over.`,
     continuar: "Continue the lesson",
     seguimos: (de: string) => `Back to the lesson: ${de}.`,
@@ -412,6 +415,8 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   // Lo que oyó el micrófono, en pantalla hasta el siguiente ejercicio.
   const [oidoEntrada, setOidoEntrada] = useState<{ texto: string; entrada: Entrada | null } | null>(null);
   const faseEv: string | undefined = ev?.fase;
+  // La guía de Álvaro (/resumen-hsi) con los números de este ejercicio; solo en práctica.
+  const guiaHsi = def.id === "espera" && ev && muestra ? pasosHsi(ev as EvaluacionEspera, muestra, idioma) : null;
   useEffect(() => {
     if (faseEv === undefined || faseEv === "posicionando") setOidoEntrada(null);
   }, [faseEv]);
@@ -787,6 +792,16 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
             </p>
           )}
           {def.id === "espera" && ev?.dicha && <p className="text-emerald-300">{t.entradaDicha(t.entradas[ev.dicha as Entrada])}</p>}
+          {guiaHsi && (
+            <div className="rounded-lg border border-gold-500/30 p-3">
+              <p className="mb-1 font-semibold text-gold-100">{t.pasosHsi}</p>
+              <ol className="list-decimal space-y-1 pl-5">
+                {guiaHsi.map((p) => (
+                  <li key={p.texto} className={p.estado === "actual" ? "text-gold-200" : p.estado === "hecho" ? "text-white/50 line-through" : "text-white/70"}>{p.texto}</li>
+                ))}
+              </ol>
+            </div>
+          )}
           {def.id === "espera" && ev?.fase === "llegando" && ev.dicha === undefined && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-white/70">{t.tuEntrada}</span>
