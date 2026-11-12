@@ -128,6 +128,8 @@ export interface ContextoArmado {
   /** Lección 4: la espera (de la carta o inventada) y el radial por el que llega. */
   espera?: DatosEspera;
   llegada?: number;
+  /** Lección 4: el radial de salida del primer ejercicio, ya dicho en tierra (con `llegada`). */
+  salida?: number;
 }
 
 /** IFR: lo que el mapa del debriefing dibuja de cada intento (rumbos magnéticos). */

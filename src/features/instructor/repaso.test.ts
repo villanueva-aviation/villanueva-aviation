@@ -11,7 +11,7 @@ import {
   type EstadoRepaso, type Zona,
 } from "./repaso.ts";
 import { LECCIONES, REPASO, leccionIfrDe } from "./lecciones.ts";
-import { conSenal, ponerVor } from "./repaso.ts";
+import { conSenal, instruirEnRampa, ponerVor } from "./repaso.ts";
 import { elegirVor } from "./vorSim.ts";
 
 test("una lección de maniobra la vuela 5 veces; el repaso sortea 4", () => {
@@ -381,6 +381,18 @@ test("IFR: en el cono de silencio (a menos de 2 NM del VOR) cuenta como con señ
   assert.equal(conSenal({ ...m, lat: VOR.lat + 1 / 60, lon: VOR.lon }, VOR), true);
   assert.equal(conSenal({ ...m, lat: VOR.lat + 3 / 60, lon: VOR.lon }, VOR), false);
   assert.equal(conSenal({ ...m, navMhz: 113.1, lat: VOR.lat + 1 / 60, lon: VOR.lon }, VOR), false, "otra frecuencia no");
+});
+
+test("IFR: al cerrar «Antes del despegue» se instruye una vez en tierra y al despegar solo se recuerda", () => {
+  const ms = vueloIfr();
+  const r = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr"), VOR), ms.slice(0, 1)).e;
+  const p = instruirEnRampa(r, "es", "Al despegar intercepta el radial 250 alejándote y sube a 9,000 pies.");
+  assert.deepEqual(p.decir, ["Sintoniza GDL, 117.50, en NAV1, con la barra en NAV. Al despegar intercepta el radial 250 alejándote y sube a 9,000 pies."]);
+  assert.deepEqual(instruirEnRampa(p.estado, "es").decir, [], "una sola vez");
+  const { decir } = correr(p.estado, ms.slice(1));
+  assert.ok(decir.includes("Recuerda: GDL en NAV1, 117.50. Arriba de 1,000 pies sobre el terreno empezamos."), decir.join(" | "));
+  assert.ok(!decir.some((d) => d.startsWith("Sintoniza")), decir.join(" | "));
+  assert.deepEqual(instruirEnRampa(r, "en").decir, ["Tune GDL, 117.50, on NAV1, with the needle on NAV."]);
 });
 
 test("IFR: sin VOR elegido al despegar, pide elegir uno", () => {

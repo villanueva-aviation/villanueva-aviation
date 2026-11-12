@@ -116,7 +116,10 @@ export const radialEspera = (ej: DatosEspera) => norm(ej.acercamiento + 180);
 export function armarEspera(m: Muestra, nivel: Nivel = 2, ctx: ContextoArmado = { intento: 0, examen: false }): EvaluacionEspera {
   const espera = ctx.espera ?? inventarEspera();
   const entrada = ENTRADAS_PRACTICA[ctx.examen ? Math.floor(Math.random() * ENTRADAS_PRACTICA.length) : ctx.intento % ENTRADAS_PRACTICA.length];
-  const ruta = rutaEspera(radialEspera(espera), espera.giros, entrada, Math.random, ctx.llegada);
+  const ruta =
+    ctx.salida !== undefined && ctx.llegada !== undefined
+      ? { salida: ctx.salida, llegada: ctx.llegada }
+      : rutaEspera(radialEspera(espera), espera.giros, entrada, Math.random, ctx.llegada);
   const e: EvaluacionEspera = {
     fase: "posicionando", nivel, examen: ctx.examen, vor: ctx.vor, estacion: ctx.estacion, enRadial: false,
     ejercicio: { ...espera, ...ruta, altitudFt: espera.altitudFt ?? altitudEspera(m.altitud - m.agl) }, preguntar: false, preguntado: false, dicha: undefined,

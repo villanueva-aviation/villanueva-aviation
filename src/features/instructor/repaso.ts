@@ -170,6 +170,8 @@ export interface EstadoRepaso {
   vor: VorElegido | null;
   /** IFR: desde cuándo no hay señal del VOR en maniobra. */
   sinSenalDesde: number | null;
+  /** IFR: ya se dijo en tierra qué sintonizar; al despegar solo se recuerda. */
+  instruido?: boolean;
 }
 type Paso = { estado: EstadoRepaso; decir: string[] };
 
@@ -199,6 +201,8 @@ const T = {
     finCircuitos: "Terminamos los circuitos. Sal de la pista y rueda a la plataforma.",
     eligeVor: "Elige un VOR.",
     sintoniza: (mhz: string, id: string) => `Sintoniza ${mhz} en NAV1, ${id}. Arriba de 1,000 pies sobre el terreno empezamos.`,
+    sintonizaRampa: (mhz: string, id: string) => `Sintoniza ${id}, ${mhz}, en NAV1, con la barra en NAV.`,
+    recuerda: (mhz: string, id: string) => `Recuerda: ${id} en NAV1, ${mhz}. Arriba de 1,000 pies sobre el terreno empezamos.`,
     conSenal: (id: string) => `Tenemos señal de ${id}. Primer ejercicio.`,
     sinSenal: (id: string) => `Perdí la señal de ${id}: revisa NAV1 o acércate al VOR.`,
     devueltaSenal: (id: string) => `Señal de ${id} de vuelta. Seguimos.`,
@@ -220,6 +224,8 @@ const T = {
     finCircuitos: "We're done with the patterns. Exit the runway and taxi to the ramp.",
     eligeVor: "Pick a VOR.",
     sintoniza: (mhz: string, id: string) => `Tune ${mhz} on NAV1, ${id}. We start above 1,000 feet above the ground.`,
+    sintonizaRampa: (mhz: string, id: string) => `Tune ${id}, ${mhz}, on NAV1, with the needle on NAV.`,
+    recuerda: (mhz: string, id: string) => `Remember: ${id} on NAV1, ${mhz}. We start above 1,000 feet above the ground.`,
     conSenal: (id: string) => `We have ${id}. First exercise.`,
     sinSenal: (id: string) => `I lost ${id}: check NAV1 or get closer to the VOR.`,
     devueltaSenal: (id: string) => `${id} is back. Let's continue.`,
@@ -246,6 +252,13 @@ export const conSenal = (m: Muestra, vor: VorElegido) => !!conCono(m, vor).navSe
 export function ponerVor(e: EstadoRepaso, v: VorElegido): EstadoRepaso {
   if (e.etapa !== "rampa" && e.etapa !== "salida") return e;
   return { ...e, vor: v, motivo: e.motivo === T.es.eligeVor || e.motivo === T.en.eligeVor ? undefined : e.motivo };
+}
+
+/** IFR, al cerrar «Antes del despegue» en tierra: qué sintonizar y, en la lección 4, la autorización (`extra`). Una vez. */
+export function instruirEnRampa(e: EstadoRepaso, idioma: Idioma, extra?: string): Paso {
+  if (e.programa !== "ifr" || e.etapa !== "rampa" || !e.vor || e.instruido) return { estado: e, decir: [] };
+  const texto = T[idioma].sintonizaRampa(e.vor.mhz.toFixed(2), e.vor.ident);
+  return { estado: { ...e, instruido: true }, decir: [extra ? `${texto} ${extra}` : texto] };
 }
 
 const anular = (e: EstadoRepaso, motivo: string, idioma: Idioma): Paso => ({ estado: { ...e, etapa: "invalido", motivo: traducirMotivo(motivo, idioma) }, decir: [] });
@@ -295,7 +308,7 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
     const senal = !!vor && conSenal(m, vor);
     if (etapa === "rampa" && nuevos.some((x) => x.tipo === "despegue")) {
       etapa = "salida";
-      if (vor) decir.push(t.sintoniza(vor.mhz.toFixed(2), vor.ident));
+      if (vor) decir.push((e.instruido ? t.recuerda : t.sintoniza)(vor.mhz.toFixed(2), vor.ident));
       else motivo = t.eligeVor;
     } else if (etapa === "salida") {
       if (!vor) motivo = t.eligeVor;

@@ -6,7 +6,7 @@ import { avanzarEspera, armarEspera, responderEntrada, type EvaluacionEspera } f
 import { MANIOBRAS } from "./maniobras.ts";
 import { altitudEspera, entradaDicha, entradasValidas, entradaVolada, inventarEspera, norm180, rutaEspera, type DatosEspera } from "./navIfr.ts";
 import type { Nivel } from "./nivel.ts";
-import { avisoEspera, briefingEspera, ordenEspera } from "./textosEspera.ts";
+import { autorizacionEspera, avisoEspera, briefingEspera, listaPasosEspera, ordenEspera, pasoEspera } from "./textosEspera.ts";
 import type { VorElegido } from "./vorSim.ts";
 
 // Simulador local: VOR en 0,0 (declinación 0), 100 kt, una muestra por segundo. x al este, y al norte, en NM.
@@ -259,6 +259,47 @@ test("el minuto de la vuelta cuenta desde el través del fijo si nivela antes (v
   assert.equal(e.resultado!.tramos.length, 1);
   // Nivela 0.55 NM antes del través: unos 20 s menos de los 60 volados (el través lleva 5° de margen).
   assert.ok(e.resultado!.tramos[0] >= 38 && e.resultado!.tramos[0] <= 45, String(e.resultado!.tramos));
+});
+
+test("la entrada se explica a una milla del fijo; sobre el fijo solo «vuela tu entrada»", () => {
+  const ms = esperaDirecta();
+  const lejos = volar(ms.slice(0, 200));
+  assert.equal(pasoEspera(lejos, ms[199]), "respondida", "ya contestó: no se vuelve a preguntar");
+  const cerca = volar(ms.slice(0, 256));
+  assert.equal(pasoEspera(cerca, ms[255]), "prepara");
+  assert.match(ordenEspera("respondida", "prepara", cerca, "es")!, /^Entrada directa: /);
+  assert.equal(ordenEspera("respondida", "respondida", lejos, "es"), null);
+  assert.equal(pasoEspera({ ...cerca, examen: true }, ms[255]), "respondida", "en el examen no se explica");
+  const fijo = volar(ms.slice(0, 300));
+  assert.equal(fijo.fase, "entrada");
+  assert.match(ordenEspera("prepara", "entra", fijo, "es")!, /^Sobre el fijo: vuela tu entrada\./);
+  // Sin la explicación de antes (sin distancia), la da sobre el fijo.
+  assert.match(ordenEspera("respondida", "entra", fijo, "es")!, /^Entrada directa: /);
+});
+
+test("sobre el fijo, en práctica, pide el curso de acercamiento en el HSI si no está puesto", () => {
+  const ms = esperaDirecta();
+  const fijo = volar(ms.slice(0, 300));
+  // navObs 270 = el curso de acercamiento: no hace falta.
+  assert.doesNotMatch(ordenEspera("prepara", "entra", fijo, "es")!, /HSI/);
+  const mal = { ...fijo, previo: { ...fijo.previo, navObs: 90 } };
+  assert.match(ordenEspera("prepara", "entra", mal, "es")!, /Pon el curso 270 en el HSI/);
+  assert.match(ordenEspera("prepara", "entra", mal, "en")!, /Set course 270 on the HSI/);
+  assert.doesNotMatch(ordenEspera("prepara", "entra", { ...mal, examen: true }, "es")!, /HSI/);
+});
+
+test("«Di tu entrada» se tacha en cuanto contesta", () => {
+  const l = listaPasosEspera("respondida", "es");
+  assert.deepEqual(l.map((p) => p.estado), ["hecho", "hecho", "hecho", "actual", "pendiente"]);
+});
+
+test("con la ruta del primer ejercicio armada en tierra, la espera la usa, y la autorización la dice", () => {
+  const m = muestra(0, { x: 0.5, y: 0, rumbo: 90 }, 0);
+  const e = armarEspera(m, 2, { intento: 0, examen: false, estacion: VOR, espera: ESPERA, llegada: 120, salida: 150 });
+  assert.equal(e.ejercicio.salida, 150);
+  assert.equal(e.ejercicio.llegada, 120);
+  assert.equal(autorizacionEspera(150, 9000, "es"), "Al despegar intercepta el radial 150 alejándote y sube a 9,000 pies.");
+  assert.equal(autorizacionEspera(150, 9000, "en"), "After takeoff intercept the 150 radial outbound and climb to 9,000 feet.");
 });
 
 /** El cono de silencio: a menos de 1.5 NM del VOR no hay señal y la aguja da cualquier cosa. */

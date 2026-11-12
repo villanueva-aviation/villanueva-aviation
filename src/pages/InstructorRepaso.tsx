@@ -14,16 +14,16 @@ import { cerrarGrabacion, crearGrabador, grabarMuestra, grabarVoz } from "../fea
 import { DebriefingMapa } from "../features/instructor/DebriefingMapa";
 import type { ManiobraId, ResultadoComun } from "../features/instructor/maniobras";
 import { claveLeccion, estadoLeccion, leccionDe, leccionIfrDe, lineaEjercicios } from "../features/instructor/lecciones";
-import { casosExamen, entradaDicha, type CasoInterceptacion, type DatosEspera } from "../features/instructor/navIfr";
+import { altitudEspera, casosExamen, entradaDicha, inventarEspera, rutaEspera, type CasoInterceptacion, type DatosEspera } from "../features/instructor/navIfr";
 import { elegirVor, vorsCercanos, vorsParaLeccion, type VorSim } from "../features/instructor/vorSim";
 import type { Entrada } from "../features/entrenador/esperas";
 import { DatosEsperaForm } from "../features/instructor/DatosEsperaForm";
-import { responderEntrada } from "../features/instructor/evaluadorEspera";
-import { PREGUNTA_ENTRADA } from "../features/instructor/textosEspera";
+import { ENTRADAS_PRACTICA, radialEspera, responderEntrada } from "../features/instructor/evaluadorEspera";
+import { autorizacionEspera, PREGUNTA_ENTRADA } from "../features/instructor/textosEspera";
 import { useEscucha } from "../features/instructor/useEscucha";
 import { lecturaFinalDe, MANIOBRAS } from "../features/instructor/maniobras";
 import {
-  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, maniobraActual, maniobrasDe, nombreManiobra, pisoZona, ponerVor, siguienteManiobra,
+  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, instruirEnRampa, maniobraActual, maniobrasDe, nombreManiobra, pisoZona, ponerVor, siguienteManiobra,
   type EstadoRepaso, type EtapaRepaso,
 } from "../features/instructor/repaso";
 import type { IntentoSesion, Modo } from "../features/instructor/sesion";
@@ -109,6 +109,9 @@ const T = {
     menuIfr: "Volver al menú IFR",
     tuEntrada: "Tu entrada:",
     entradas: { directa: "Directa", paralela: "Paralela", gota: "Gota" } as Record<Entrada, string>,
+    escuchandoEntrada: "🎤 Escuchando tu entrada…",
+    escuche: (x: string, d: string | null) => (!x ? "No te escuché: toca un botón." : d ? `Escuché: «${x}» → ${d}` : `Escuché: «${x}»: no la entendí, toca un botón.`),
+    entradaDicha: (d: string) => `Tu entrada: ${d} ✓`,
   },
   en: {
     titulo: (l: string) => `${l} · C172`,
@@ -176,6 +179,9 @@ const T = {
     menuIfr: "Back to the IFR menu",
     tuEntrada: "Your entry:",
     entradas: { directa: "Direct", paralela: "Parallel", gota: "Teardrop" } as Record<Entrada, string>,
+    escuchandoEntrada: "🎤 Listening for your entry…",
+    escuche: (x: string, d: string | null) => (!x ? "I didn't hear you: tap a button." : d ? `I heard: "${x}" → ${d}` : `I heard: "${x}": I didn't get it, tap a button.`),
+    entradaDicha: (d: string) => `Your entry: ${d} ✓`,
   },
 };
 
@@ -249,6 +255,8 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const llegadaRef = useRef(llegada);
   llegadaRef.current = llegada;
   const esperaUsada = useRef(false);
+  // Lección 4: la ruta del primer ejercicio, dicha en tierra al cerrar «Antes del despegue».
+  const rutaPrimera = useRef<{ salida: number; llegada: number } | null>(null);
 
   const actualId = repaso ? maniobraActual(repaso) : null;
   const def = MANIOBRAS[actualId ?? "recto-nivelado"];
@@ -305,12 +313,14 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const contexto = useCallback(
     () => {
       const espera = esperaRef.current;
+      const primera = esperaUsada.current ? null : rutaPrimera.current;
       return {
         intento: repasoRef.current?.actual ?? 0, examen: modo === "checkride", casos: casosRef.current, vor: repasoRef.current?.vor?.ident,
         estacion: repasoRef.current?.vor ?? undefined,
         // Con carta, la misma en cada intento; inventada, solo en el primero (después cada intento inventa la suya).
         espera: espera && (espera.carta || !esperaUsada.current) ? espera : undefined,
-        llegada: llegadaRef.current ?? undefined,
+        llegada: primera?.llegada ?? llegadaRef.current ?? undefined,
+        salida: primera?.salida,
       };
     },
     [modo],
@@ -383,6 +393,12 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const preguntar = def.id === "espera" && !!ev?.preguntar;
   const preguntaHecha = useRef(false);
   const { escuchar, supported: micEntrada } = escuchaEntrada;
+  // Lo que oyó el micrófono, en pantalla hasta el siguiente ejercicio.
+  const [oidoEntrada, setOidoEntrada] = useState<{ texto: string; entrada: Entrada | null } | null>(null);
+  const faseEv: string | undefined = ev?.fase;
+  useEffect(() => {
+    if (faseEv === undefined || faseEv === "posicionando") setOidoEntrada(null);
+  }, [faseEv]);
   useEffect(() => {
     if (!preguntar) {
       preguntaHecha.current = false;
@@ -398,6 +414,8 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     // Si no se entiende, la respuesta queda pendiente para los botones.
     escuchar(pregunta, "orden", "pregunta", (texto) => {
       const d = entradaDicha(texto, idioma);
+      setOidoEntrada({ texto, entrada: d });
+      sonarTonos([d ? "punto" : "falta"]);
       if (d) responder(d);
     });
   }, [preguntar, micEntrada, escuchar, decir, idioma, responder]);
@@ -424,6 +442,35 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       decirChecklist(x.texto);
     }
   }, [cl, decirChecklist, modoPunto]);
+
+  // IFR: al cerrar «Antes del despegue» en tierra, qué sintonizar; en la lección 4 también el primer ejercicio
+  // (radial de salida y altitud), que queda armado desde aquí. Sin checklist se dice al despegar, como antes.
+  const abiertaAntes = useRef<SeccionId | null>(null);
+  useEffect(() => {
+    const antes = abiertaAntes.current;
+    abiertaAntes.current = cl.abierta;
+    if (antes !== "antes-despegar" || cl.abierta === "antes-despegar") return;
+    let e = repasoRef.current;
+    const m = muestraRef.current;
+    if (!e || e.programa !== "ifr" || e.etapa !== "rampa" || e.instruido || !m) return;
+    if (!e.vor && m.lat !== undefined && m.lon !== undefined) {
+      const cerca = vorsParaLeccion(vorsCercanos(vorsRef.current, m.lat, m.lon), !!leccion?.requiereDme).find((v) => v.apto);
+      if (cerca) e = ponerVor(e, elegirVor(cerca, m));
+    }
+    let extra: string | undefined;
+    if (leccion?.maniobra === "espera" && e.vor) {
+      const base = esperaRef.current ?? inventarEspera(Math.random, aeroRef.current?.elevacionFt);
+      const espera = { ...base, altitudFt: base.altitudFt ?? altitudEspera(aeroRef.current?.elevacionFt ?? m.altitud - m.agl) };
+      const entrada = ENTRADAS_PRACTICA[e.modo === "checkride" ? Math.floor(Math.random() * ENTRADAS_PRACTICA.length) : 0];
+      rutaPrimera.current = rutaEspera(radialEspera(espera), espera.giros, entrada, Math.random, llegadaRef.current ?? undefined);
+      esperaRef.current = espera;
+      setDatosEspera(espera);
+      extra = autorizacionEspera(rutaPrimera.current.salida, espera.altitudFt, idioma);
+    }
+    const r = instruirEnRampa(e, idioma, extra);
+    poner(r.estado);
+    decirRef.current(r.decir);
+  }, [cl.abierta, leccion, idioma]);
 
   // Al terminar: debriefing leído y la lección guardada una vez.
   const deb = repaso && terminado && listo ? debriefingRepaso(repaso, cl, idioma) : null;
@@ -488,6 +535,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     setListo(false);
     casosRef.current = ifr && modo === "checkride" ? casosExamen() : undefined;
     esperaUsada.current = false;
+    rutaPrimera.current = null;
     if (leccion) poner(crearRepaso(modo, maniobrasDe(leccion, Math.random, modo), nivel, programa));
   };
   const nueva = () => {
@@ -628,6 +676,15 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       {actualId && !resultado && (
         <section className="space-y-2 rounded-xl border border-white/10 p-4 text-sm text-white/85">
           <p className="font-semibold text-white">{def.textoPaso(paso, ev, idioma)}</p>
+          {def.id === "espera" && ev?.fase === "llegando" && escuchaEntrada.fase === "escuchando" && (
+            <p className="text-emerald-300">{t.escuchandoEntrada}</p>
+          )}
+          {def.id === "espera" && oidoEntrada && (
+            <p className={oidoEntrada.entrada ? "text-white" : "text-gold-300"}>
+              {t.escuche(oidoEntrada.texto, oidoEntrada.entrada && t.entradas[oidoEntrada.entrada])}
+            </p>
+          )}
+          {def.id === "espera" && ev?.dicha && <p className="text-emerald-300">{t.entradaDicha(t.entradas[ev.dicha as Entrada])}</p>}
           {def.id === "espera" && ev?.fase === "llegando" && ev.dicha === undefined && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-white/70">{t.tuEntrada}</span>
