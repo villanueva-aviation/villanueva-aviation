@@ -376,6 +376,13 @@ test("IFR: con otra frecuencia en NAV1 no empieza (Review Focus 1)", () => {
   assert.equal(conSenal({ ...vueloIfr()[0], gpsNav: true }, VOR), false, "el GPS manejando la barra no cuenta");
 });
 
+test("IFR: en el cono de silencio (a menos de 2 NM del VOR) cuenta como con señal; más lejos, no", () => {
+  const m = { ...vueloIfr()[0], navSenal: false };
+  assert.equal(conSenal({ ...m, lat: VOR.lat + 1 / 60, lon: VOR.lon }, VOR), true);
+  assert.equal(conSenal({ ...m, lat: VOR.lat + 3 / 60, lon: VOR.lon }, VOR), false);
+  assert.equal(conSenal({ ...m, navMhz: 113.1, lat: VOR.lat + 1 / 60, lon: VOR.lon }, VOR), false, "otra frecuencia no");
+});
+
 test("IFR: sin VOR elegido al despegar, pide elegir uno", () => {
   const { e } = correr(crearRepaso("practica", IFR, 2, "ifr"), vueloIfr());
   assert.equal(e.motivo, "Elige un VOR.");

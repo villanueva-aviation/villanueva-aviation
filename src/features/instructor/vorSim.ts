@@ -39,6 +39,24 @@ export function distanciaVor(m: Muestra, v: { lat: number; lon: number }): numbe
   return Math.hypot(d.x, d.y);
 }
 
+/** Cono de silencio: a menos de esto del VOR la aguja no vale; manda la posición (Erik, 2026-11-11). */
+export const CONO_NM = 2;
+
+/** El radial magnético del avión desde el VOR, por lat/lon. Sin posición, null. */
+export function radialPorPosicion(m: Muestra, v: VorElegido): number | null {
+  if (m.lat === undefined || m.lon === undefined) return null;
+  const d = aNm(m.lat, m.lon, v.lat, v.lon);
+  return (((Math.atan2(d.x, d.y) * 180) / Math.PI - v.decl) % 360 + 360) % 360;
+}
+
+/** Dentro del cono, con el VOR sintonizado: la muestra con señal y el radial por posición. Fuera, la misma muestra. */
+export function conCono(m: Muestra, v: VorElegido | undefined): Muestra {
+  if (!v || m.navMhz === undefined || Math.abs(m.navMhz - v.mhz) >= 0.03) return m;
+  const d = distanciaVor(m, v);
+  const r = radialPorPosicion(m, v);
+  return d !== null && d < CONO_NM && r !== null ? { ...m, navSenal: true, navRadial: r } : m;
+}
+
 /** Los arcos piden DME: los VOR sin él se ven pero no se pueden elegir. */
 export const vorsParaLeccion = <T extends VorSim>(cercanos: T[], requiereDme: boolean): (T & { apto: boolean })[] =>
   cercanos.map((v) => ({ ...v, apto: !requiereDme || v.dme }));

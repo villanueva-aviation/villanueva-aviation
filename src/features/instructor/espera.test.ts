@@ -248,3 +248,36 @@ test("no avisa «Regresa al radial» mientras intercepta: solo después de estab
   const fuera = muestra(100, { x: 6 * Math.cos(10 * RAD), y: 6 * Math.sin(10 * RAD), rumbo: 270 }, 0);
   assert.equal(avisoEspera(b, fuera, "practica", "es")?.clave, "llegada");
 });
+
+test("el minuto de la vuelta cuenta desde el través del fijo si nivela antes (viró 20 s tarde)", () => {
+  const a: Avion = { x: 8, y: 0, rumbo: 270 };
+  const llegada = volarTramos(a, [[288, 0]], 0);
+  const entrada: Tramo[] = [[1, 0], [60, 3], [60, 0], [60, 3], [60, 0]];
+  const tarde: Tramo[] = [[20, 0], [60, 3], [60, 0], [60, 3], [120, 0]];
+  const e = volar([muestra(-1, { x: 8.03, y: 0, rumbo: 270 }, 0), ...llegada, ...volarTramos(a, [...entrada, ...tarde], 288)]);
+  assert.equal(e.fase, "terminado", e.motivo);
+  assert.equal(e.resultado!.tramos.length, 1);
+  // Nivela 0.55 NM antes del través: unos 20 s menos de los 60 volados (el través lleva 5° de margen).
+  assert.ok(e.resultado!.tramos[0] >= 38 && e.resultado!.tramos[0] <= 45, String(e.resultado!.tramos));
+});
+
+/** El cono de silencio: a menos de 1.5 NM del VOR no hay señal y la aguja da cualquier cosa. */
+const cono = (ms: Muestra[]) => ms.map((m) => (Math.hypot(m.lat! * 60, m.lon! * 60) < 1.5 ? { ...m, navSenal: false, navRadial: 0 } : m));
+
+test("cono de silencio: la espera sigue, el cruce sale por posición y la calificación no cambia", () => {
+  const e = volar(cono(esperaDirecta()));
+  assert.equal(e.fase, "terminado", e.motivo);
+  assert.equal(e.resultado!.calificacion, 100);
+  assert.equal(e.resultado!.volada, "directa");
+});
+
+test("a menos de 2 NM del VOR no avisa «Regresa al radial», ni de salida ni de llegada", () => {
+  const b = volar(esperaDirecta().slice(0, 240));
+  assert.equal(b.fase, "llegando");
+  // 1.5 NM al este, 20° fuera del 090.
+  const cerca = muestra(240, { x: 1.5 * Math.cos(20 * RAD), y: 1.5 * Math.sin(20 * RAD), rumbo: 270 }, 0);
+  assert.equal(avisoEspera(b, cerca, "practica", "es"), null);
+  const sale = armarEspera(muestra(0, { x: 0.3, y: 0, rumbo: 90 }, 0), 2, { intento: 0, examen: false, estacion: VOR, espera: ESPERA, llegada: 90 });
+  const s = { ...sale, enRadial: true };
+  assert.equal(avisoEspera(s, muestra(1, { x: 1.5 * Math.cos(50 * RAD), y: 1.5 * Math.sin(50 * RAD), rumbo: 90 }, 0), "practica", "es"), null);
+});

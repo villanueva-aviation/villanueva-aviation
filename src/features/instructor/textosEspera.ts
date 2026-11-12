@@ -1,11 +1,12 @@
 import { comoSeVuela, entradaEspera, type Entrada } from "../entrenador/esperas.ts";
 import type { Muestra } from "./evaluador.ts";
-import { CAMPOS_ESPERA, SALIDA_NM, radialEspera, type CampoEspera, type EvaluacionEspera, type ResultadoEspera } from "./evaluadorEspera.ts";
+import { CAMPOS_ESPERA, distanciaEspera, SALIDA_NM, radialEspera, type CampoEspera, type EvaluacionEspera, type ResultadoEspera } from "./evaluadorEspera.ts";
 import type { Linea } from "./explicacion.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import { desvioGrados, norm360, puntos } from "./navIfr.ts";
 import { tolEspera, type Nivel } from "./nivel.ts";
 import { ANULADO, luz, type Aviso, type Luz } from "./voz.ts";
+import { CONO_NM } from "./vorSim.ts";
 
 // Qué dice el instructor en los patrones de espera (programa IFR, lección 4). Puro.
 
@@ -137,15 +138,18 @@ export function avisoEspera(e: EvaluacionEspera | null, m: Muestra | null, modo:
   if (!e || !m || e.fase === "terminado" || e.fase === "invalido") return null;
   const en = idioma === "en";
   const ej = e.ejercicio;
+  const d = distanciaEspera(e, m);
+  // Cerca del VOR la aguja es demasiado sensible (y en el cono no vale): ahí no se corrige el radial.
+  const lejos = d === null || d >= CONO_NM;
   if (e.fase === "posicionando") {
-    if (!e.enRadial || m.navRadial === undefined || Math.abs(puntos(desvioGrados({ radial: ej.salida, desde: true }, m.navRadial))) <= 2) return null;
+    if (!lejos || !e.enRadial || m.navRadial === undefined || Math.abs(puntos(desvioGrados({ radial: ej.salida, desde: true }, m.navRadial))) <= 2) return null;
     return {
       clave: "salida",
       nivel: "ambar",
       texto: en ? `Get back on the ${tres(ej.salida)} radial: course ${tres(ej.salida)} FROM.` : `Regresa al radial ${tres(ej.salida)}: curso ${tres(ej.salida)} FROM.`,
     };
   }
-  if (e.fase === "llegando" && e.enRadial && m.navRadial !== undefined && Math.abs(puntos(desvioGrados({ radial: ej.llegada, desde: false }, m.navRadial))) > 2)
+  if (e.fase === "llegando" && lejos && e.enRadial && m.navRadial !== undefined && Math.abs(puntos(desvioGrados({ radial: ej.llegada, desde: false }, m.navRadial))) > 2)
     return {
       clave: "llegada",
       nivel: "ambar",

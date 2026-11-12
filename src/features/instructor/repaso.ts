@@ -11,7 +11,7 @@ import { AGL_MIN } from "./evaluadorS.ts";
 import { aNm } from "../home/navGeo.ts";
 import type { Nivel } from "./nivel.ts";
 import type { Leccion } from "./lecciones.ts";
-import type { VorElegido } from "./vorSim.ts";
+import { conCono, type VorElegido } from "./vorSim.ts";
 
 const RAD = Math.PI / 180;
 
@@ -239,8 +239,8 @@ export const crearRepaso = (modo: Modo, sorteo: ManiobraId[], nivel: Nivel = 3, 
   programa, vor: null, sinSenalDesde: null,
 });
 
-/** IFR: hay señal del VOR de la lección en NAV1 y la barra es del VOR, no del GPS. */
-export const conSenal = (m: Muestra, vor: VorElegido) => !!m.navSenal && !m.gpsNav && m.navMhz !== undefined && Math.abs(m.navMhz - vor.mhz) < 0.03;
+/** IFR: hay señal del VOR de la lección en NAV1 (o está en el cono, encima de él) y la barra es del VOR, no del GPS. */
+export const conSenal = (m: Muestra, vor: VorElegido) => !!conCono(m, vor).navSenal && !m.gpsNav && m.navMhz !== undefined && Math.abs(m.navMhz - vor.mhz) < 0.03;
 
 /** IFR: el VOR se elige en la rampa o, a más tardar, en la salida. */
 export function ponerVor(e: EstadoRepaso, v: VorElegido): EstadoRepaso {

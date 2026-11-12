@@ -3,7 +3,7 @@ import { MOTIVO_GPS, MOTIVO_LECTOR, MOTIVO_SENAL, MOTIVO_SIN_SENAL } from "./eva
 import type { ContextoArmado, ResultadoComun } from "./maniobras.ts";
 import { CASOS_RUTA, desvioGrados, generarRuta, pasoEstacion, puntos, type EjercicioRuta } from "./navIfr.ts";
 import { tolRuta, type Nivel } from "./nivel.ts";
-import { distanciaVor, type VorElegido } from "./vorSim.ts";
+import { conCono, distanciaVor, type VorElegido } from "./vorSim.ts";
 
 // Rutas de acercamiento y alejamiento (programa IFR, lección 2; reglas en el plan 2026-11-11 lecciones 2 a 4). Puro.
 // Se acerca por un radial (TO), pasa la estación y se aleja por otro (FROM). El desvío sale del radial del avión, no de la barra.
@@ -104,8 +104,9 @@ function empezarSiPuede(e: EvaluacionRuta, m: Muestra): EvaluacionRuta {
   return { ...e, fase: "acercandose", ejercicio: e.generar(m.navRadial), inicio: m, mhz: m.navMhz, muestras: [m] };
 }
 
-export function avanzarRuta(e: EvaluacionRuta, m: Muestra): EvaluacionRuta {
+export function avanzarRuta(e: EvaluacionRuta, crudo: Muestra): EvaluacionRuta {
   if (e.fase === "terminado" || e.fase === "invalido") return e;
+  const m = conCono(crudo, e.estacion);
   if (m.t <= e.previo.t) return e;
   const motivo = invalidez(m, e.previo) ?? (lectorViejoNav(m) ? MOTIVO_LECTOR : null);
   if (motivo) return anular(e, m, motivo);

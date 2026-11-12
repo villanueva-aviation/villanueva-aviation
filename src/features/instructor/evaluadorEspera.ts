@@ -6,7 +6,7 @@ import {
   altitudEspera, desvioGrados, entradasValidas, entradaVolada, inventarEspera, norm180, pasoEstacion, puntos, rutaEspera, type DatosEspera,
 } from "./navIfr.ts";
 import { tolEspera, type Nivel } from "./nivel.ts";
-import { distanciaVor, type VorElegido } from "./vorSim.ts";
+import { conCono, distanciaVor, type VorElegido } from "./vorSim.ts";
 
 // Patrones de espera (programa IFR, lección 4; reglas en el plan 2026-11-11 lecciones 2 a 4). Puro.
 // Llega al fijo (el VOR) por un radial, dice la entrada, la vuela y da una vuelta completa. Termina al tercer paso por el fijo.
@@ -36,6 +36,8 @@ const VIRAJE_MIN_SEG = 20;
 const RUMBO_TRAMO = 45;
 const NIVELAR_SEG = 15;
 const CERCA_NM = 1;
+/** Al través del fijo: el radial del avión a 90° (con 5 de margen) del de alejamiento, ya del lado de afuera. */
+const TRAVES = 95;
 
 export interface ResultadoEspera extends ResultadoComun {
   maniobra: "espera";
@@ -105,7 +107,7 @@ export interface EvaluacionEspera {
 
 const anular = (e: EvaluacionEspera, m: Muestra, motivo: string): EvaluacionEspera => ({ ...e, fase: "invalido", motivo, previo: m });
 
-const distancia = (e: EvaluacionEspera, m: Muestra): number | null =>
+export const distanciaEspera = (e: Pick<EvaluacionEspera, "estacion">, m: Muestra): number | null =>
   (e.estacion ? distanciaVor(m, e.estacion) : null) ?? (m.navTieneDme ? (m.navDme ?? null) : null);
 
 /** El radial del lado de la espera: el curso de alejamiento. */
@@ -141,7 +143,7 @@ export function responderEntrada(e: EvaluacionEspera, dicha: Entrada | null, rum
 }
 
 function empezarSiPuede(e: EvaluacionEspera, m: Muestra): EvaluacionEspera {
-  const d = distancia(e, m);
+  const d = distanciaEspera(e, m);
   if (!m.navSenal || m.navRadial === undefined) return e;
   if (d !== null && d < SALIDA_NM)
     return { ...e, enRadial: e.enRadial || Math.abs(puntos(desvioGrados({ radial: e.ejercicio.salida, desde: true }, m.navRadial))) <= 2 };
@@ -150,8 +152,10 @@ function empezarSiPuede(e: EvaluacionEspera, m: Muestra): EvaluacionEspera {
   return { ...e, fase: "llegando", enRadial: false, lado: pasoEstacion(true, m.navRadial, llegada), inicio: m, mhz: m.navMhz, muestras: [m] };
 }
 
-export function avanzarEspera(e: EvaluacionEspera, m: Muestra): EvaluacionEspera {
+export function avanzarEspera(e: EvaluacionEspera, crudo: Muestra): EvaluacionEspera {
   if (e.fase === "terminado" || e.fase === "invalido") return e;
+  // Sobre el fijo manda la posición: la aguja no vale en el cono y el cruce se ve en su momento.
+  const m = conCono(crudo, e.estacion);
   if (m.t <= e.previo.t) return e;
   const motivo = invalidez(m, e.previo) ?? (lectorViejoNav(m) ? MOTIVO_LECTOR : null);
   if (motivo) return anular(e, m, motivo);
@@ -169,7 +173,7 @@ export function avanzarEspera(e: EvaluacionEspera, m: Muestra): EvaluacionEspera
   if (m.t - e.inicio.t > LIMITE_ESPERA_SEG) return anular(n, m, MOTIVO_TIEMPO);
   const ej = e.ejercicio;
   const radial = m.navRadial ?? ej.llegada;
-  const dist = distancia(e, m);
+  const dist = distanciaEspera(e, m);
 
   if (n.fase === "llegando") {
     n.enRadial ||= Math.abs(puntos(desvioGrados({ radial: ej.llegada, desde: false }, radial))) <= 2;
@@ -212,9 +216,11 @@ function seguir(n: EvaluacionEspera, m: Muestra, antes: Muestra, dist: number | 
     n.giro = n.giro ? { ...n.giro, hasta: m.t, suma: n.giro.suma + norm180(m.rumbo - antes.rumbo) } : { desde: m.t, hasta: m.t, suma: 0 };
   } else if (n.giro) cerrarGiro(n);
 
-  // El tramo de alejamiento: empieza con las alas niveladas y sigue hasta que vuelve a virar.
+  // El tramo de alejamiento: en la vuelta empieza al través del fijo o al nivelar, lo que ocurra después (en la entrada,
+  // al nivelar); sigue hasta que vuelve a virar.
   const haciaFuera = Math.abs(norm180(m.rumbo - radialEspera(ej))) <= RUMBO_TRAMO;
-  if (haciaFuera && (n.tramo ? banco < VIRAJE : banco < NIVELADO)) {
+  const alTraves = n.fase !== "vueltas" || m.navRadial === undefined || Math.abs(norm180(m.navRadial - radialEspera(ej))) <= TRAVES;
+  if (haciaFuera && (n.tramo ? banco < VIRAJE : banco < NIVELADO && alTraves)) {
     n.tramo = n.tramo ? { ...n.tramo, hasta: m.t } : { desde: m.t, hasta: m.t };
     n.vistoTramo = true;
   } else if (n.tramo) {

@@ -5,6 +5,7 @@ import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import { desvioGrados, norm180, norm360, puntos } from "./navIfr.ts";
 import { tolRuta, type Nivel } from "./nivel.ts";
 import { ANULADO, luz, type Aviso, type Luz } from "./voz.ts";
+import { CONO_NM, distanciaVor } from "./vorSim.ts";
 
 // Qué dice el instructor en las rutas de acercamiento y alejamiento (programa IFR, lección 2). Puro.
 
@@ -100,7 +101,9 @@ export function avisoRuta(e: EvaluacionRuta | null, m: Muestra | null, modo: "pr
   if (m.navObs !== undefined && Math.abs(norm180(m.navObs - curso)) > 5)
     return { clave: "obs", nivel: "ambar", texto: en ? `Set course ${tres(curso)} on the OBS` : `Pon el curso ${tres(curso)} en el OBS` };
   const d = desvioAhora(e, m);
-  if (modo === "practica" && d !== null && Math.abs(d) > tolRuta(e.nivel).puntos / 2) {
+  // Cerca del VOR la aguja es demasiado sensible (y en el cono no vale): no se corrige la deriva.
+  const dist = e.estacion ? distanciaVor(m, e.estacion) : null;
+  if (modo === "practica" && d !== null && (dist === null || dist >= CONO_NM) && Math.abs(d) > tolRuta(e.nivel).puntos / 2) {
     const derecha = d < 0; // el curso queda del lado contrario al desvío
     return {
       clave: "deriva",

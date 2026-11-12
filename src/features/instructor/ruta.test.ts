@@ -100,3 +100,11 @@ test("el examen de la ruta va en medio como mínimo y el briefing en inglés no 
   assert.equal(MANIOBRAS["ruta-vor"].nivelExamen?.(1), 2);
   for (const l of briefingRuta("en")) assert.doesNotMatch(l, /[áéíóúñ¿¡]/i);
 });
+
+test("cono de silencio: sin señal a menos de 1.5 NM del VOR la ruta no se anula", () => {
+  const pasos = [...ida(10), ...vuelta(220)];
+  let e = iniciarRuta(base(0, ...pasos[0]), 2, () => EJ, { intento: 0, examen: false, estacion: VOR });
+  pasos.slice(1).forEach((p, i) => (e = avanzarRuta(e, base(i + 1, ...p, p[1] < 1.5 ? { navSenal: false, navRadial: 0 } : {}))));
+  assert.equal(e.fase, "terminado", e.motivo);
+  assert.equal(e.resultado!.calificacion, 100);
+});
