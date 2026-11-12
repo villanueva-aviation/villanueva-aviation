@@ -5,11 +5,12 @@ import { NOMBRE_ENTRADA } from "./textosEspera.ts";
 
 type R = Pick<
   ResultadoEspera,
-  "aprobado" | "fuera" | "ejercicio" | "vor" | "dicha" | "volada" | "correcta" | "tramos" | "tasas" | "peorAcercamiento" | "maxDistancia" | "nivel"
+  "aprobado" | "fuera" | "ejercicio" | "vor" | "dicha" | "volada" | "correcta" | "tramos" | "tasas" | "peorAcercamiento" | "maxDistancia" | "peorAltitud" | "nivel"
 >;
 
 const tres = (r: number) => String(Math.round(((r % 360) + 360) % 360) || 360).padStart(3, "0");
 const uno = (x: number) => String(Math.round(x * 10) / 10);
+const pies = (ft: number) => ft.toLocaleString("en-US");
 
 const T = {
   es: { titulo: "Patrón de espera", si: "APROBADO", no: "NO APROBADO", tolerancia: "Tolerancia", peor: "Peor valor", curso: "Curso de acercamiento", giros: { derecha: "virajes a la derecha", izquierda: "virajes a la izquierda" }, nada: "ninguna" },
@@ -33,6 +34,10 @@ export function HojaEspera({ resultado, idioma = "es" }: { resultado: R; idioma?
     { campo: "acercamiento" as const, nombre: en ? `Inbound within ${Tol.puntos} dots` : `Acercamiento dentro de ${Tol.puntos} puntos`, valor: `${uno(resultado.peorAcercamiento)} ${en ? "dots" : "puntos"}` },
     { campo: "virajes" as const, nombre: en ? `Turns at 3 ±${Tol.tasaGrados} °/s` : `Virajes a 3 ±${Tol.tasaGrados} °/s`, valor: tasa === null ? "—" : `${uno(tasa)} °/s` },
     { campo: "distancia" as const, nombre: en ? `Within ${Tol.maxNm} NM of the VOR` : `A ${Tol.maxNm} NM o menos del VOR`, valor: `${uno(resultado.maxDistancia)} NM` },
+    // Los resultados guardados antes de 2026-11-11 no tienen altitud.
+    ...(resultado.fuera.altitud
+      ? [{ campo: "altitud" as const, nombre: en ? `Holding altitude ${pies(ej.altitudFt)} ft ±${Tol.altitudFt} ft` : `Altitud de la espera ${pies(ej.altitudFt)} ft ±${Tol.altitudFt} ft`, valor: `${resultado.peorAltitud > 0 ? "+" : ""}${Math.round(resultado.peorAltitud)} ft` }]
+      : []),
   ];
   const malos = filas.filter((f) => resultado.fuera[f.campo].length > 0).length;
   const resumen = en

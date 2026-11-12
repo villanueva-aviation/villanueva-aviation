@@ -581,7 +581,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       )}
 
       {eligeVor && leccion.maniobra === "espera" && (
-        <DatosEsperaForm datos={datosEspera} llegada={llegada} cambiar={setDatosEspera} cambiarLlegada={setLlegada} idioma={idioma} />
+        <DatosEsperaForm datos={datosEspera} llegada={llegada} cambiar={setDatosEspera} cambiarLlegada={setLlegada} idioma={idioma} elevacionFt={aeropuerto?.elevacionFt} />
       )}
 
       {actualId && !resultado && (

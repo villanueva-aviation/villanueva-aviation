@@ -4,9 +4,9 @@ import { generarSituacion } from "../entrenador/esperas.ts";
 import type { Muestra } from "./evaluador.ts";
 import { avanzarEspera, armarEspera, responderEntrada, type EvaluacionEspera } from "./evaluadorEspera.ts";
 import { MANIOBRAS } from "./maniobras.ts";
-import { entradaDicha, entradasValidas, entradaVolada, inventarEspera, type DatosEspera } from "./navIfr.ts";
+import { altitudEspera, entradaDicha, entradasValidas, entradaVolada, inventarEspera, type DatosEspera } from "./navIfr.ts";
 import type { Nivel } from "./nivel.ts";
-import { briefingEspera } from "./textosEspera.ts";
+import { avisoEspera, briefingEspera, ordenEspera } from "./textosEspera.ts";
 import type { VorElegido } from "./vorSim.ts";
 
 // Simulador local: VOR en 0,0 (declinación 0), 100 kt, una muestra por segundo. x al este, y al norte, en NM.
@@ -50,8 +50,8 @@ function esperaDirecta(tramo = 60): Muestra[] {
   return [muestra(-1, { x: 8.03, y: 0, rumbo: 270 }, 0), ...llegada, ...volarTramos(a, [...vuelta, ...vuelta, [40, 0]], 288)];
 }
 
-function volar(ms: Muestra[], nivel: Nivel = 2, responder: string | null = "directa"): EvaluacionEspera {
-  let e = armarEspera(ms[0], nivel, { intento: 0, examen: false, estacion: VOR, espera: ESPERA });
+function volar(ms: Muestra[], nivel: Nivel = 2, responder: string | null = "directa", espera: DatosEspera = ESPERA): EvaluacionEspera {
+  let e = armarEspera(ms[0], nivel, { intento: 0, examen: false, estacion: VOR, espera });
   for (const m of ms.slice(1)) {
     e = avanzarEspera(e, m);
     if (e.preguntar && responder) e = responderEntrada(e, responder as "directa", m.rumbo);
@@ -98,7 +98,7 @@ test("espera completa: directa dicha y volada, tramos de 60 s, virajes a 3°/s �
   const e = volar(esperaDirecta());
   assert.equal(e.fase, "terminado");
   const r = e.resultado!;
-  assert.deepEqual(r.fuera, { dicha: [], volada: [], tramo: [], acercamiento: [], virajes: [], distancia: [] });
+  assert.deepEqual(r.fuera, { dicha: [], volada: [], tramo: [], acercamiento: [], virajes: [], distancia: [], altitud: [] });
   assert.equal(r.volada, "directa");
   assert.equal(r.correcta, "directa");
   assert.deepEqual(r.tramos, [59]);
@@ -170,4 +170,38 @@ test("inventarEspera coincide con generarSituacion: acercamiento = alejamiento +
 test("el examen de la espera va en medio como mínimo y el briefing en inglés no tiene caracteres del español", () => {
   assert.equal(MANIOBRAS.espera.nivelExamen?.(1), 2);
   for (const l of briefingEspera("en")) assert.doesNotMatch(l, /[áéíóúñ¿¡]/i);
+});
+
+test("altitud de la espera inventada: elevación + 3000 ft, al millar de arriba (MMGL 5016 → 9000)", () => {
+  assert.equal(altitudEspera(5016), 9000);
+  assert.equal(altitudEspera(2000), 5000);
+  assert.equal(inventarEspera(Math.random, 5016).altitudFt, 9000);
+  assert.equal(inventarEspera().altitudFt, undefined);
+});
+
+test("sin altitud en la espera, sale del terreno bajo el avión al armarla", () => {
+  // El simulador vuela a 5000 ft con 3000 ft AGL: terreno a 2000 → 5000.
+  assert.equal(volar(esperaDirecta()).ejercicio.altitudFt, 5000);
+});
+
+test("200 ft debajo de la altitud de la espera: error de altitud en medio, no en fácil", () => {
+  const alta = { ...ESPERA, altitudFt: 5200 };
+  const medio = volar(esperaDirecta(), 2, "directa", alta).resultado!;
+  assert.equal(medio.fuera.altitud.length, 1);
+  assert.equal(medio.peorAltitud, -200);
+  assert.equal(medio.calificacion, 80);
+  assert.equal(volar(esperaDirecta(), 1, "directa", alta).resultado!.fuera.altitud.length, 0);
+});
+
+test("el instructor dice a qué altitud cruzar el fijo y avisa si te sales de ella en la espera", () => {
+  const ms = esperaDirecta();
+  const e = volar(ms.slice(0, 20), 2, "directa", { ...ESPERA, altitudFt: 9000 });
+  assert.equal(e.fase, "llegando");
+  assert.match(ordenEspera("posiciona", "llega", e, "es")!, /cruza el fijo a 9,000 pies/);
+  assert.match(ordenEspera("posiciona", "llega", e, "en")!, /cross the fix at 9,000 feet/);
+  // Antes del fijo no avisa la altitud: todavía puede estar subiendo.
+  assert.equal(avisoEspera(e, ms[19], "practica", "es"), null);
+  const v = volar(ms.slice(0, 400), 2, "directa", { ...ESPERA, altitudFt: 9000 });
+  assert.equal(v.fase, "entrada");
+  assert.equal(avisoEspera(v, ms[399], "practica", "es")?.texto, "Mantén 9,000 pies");
 });

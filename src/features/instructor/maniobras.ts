@@ -818,11 +818,13 @@ const defEspera: DefManiobra<EvaluacionEspera, ResultadoEspera> = {
       { codigo: "4", texto: `Acercamiento dentro de ${T.puntos} puntos`, textoEn: `Inbound within ${T.puntos} dots` },
       { codigo: "5", texto: `Virajes a 3 ±${T.tasaGrados} °/s`, textoEn: `Turns at 3 ±${T.tasaGrados} °/s` },
       { codigo: "6", texto: `A ${T.maxNm} NM o menos del VOR`, textoEn: `Within ${T.maxNm} NM of the VOR` },
+      { codigo: "7", texto: `Altitud de la espera ±${T.altitudFt} ft`, textoEn: `Holding altitude ±${T.altitudFt} ft` },
     ];
   },
   celdas: [
     celda("dicha", "Entrada dicha", "Entry called"), celda("volada", "Entrada volada", "Entry flown"), celda("tramo", "Tramo", "Leg"),
     celda("acercamiento", "Acercamiento", "Inbound"), celda("virajes", "Virajes", "Turns"), celda("distancia", "Distancia", "Distance"),
+    celda("altitud", "Altitud", "Altitude"),
   ],
   temas: ["c172"],
   armar: armarEspera,

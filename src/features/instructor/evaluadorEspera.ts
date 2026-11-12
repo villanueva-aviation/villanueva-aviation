@@ -3,7 +3,7 @@ import { analizar, invalidez, lectorViejoNav, type Muestra, type Tramo } from ".
 import { MOTIVO_GPS, MOTIVO_LECTOR, MOTIVO_SENAL, MOTIVO_SIN_SENAL } from "./evaluadorInterceptacion.ts";
 import type { ContextoArmado, ResultadoComun } from "./maniobras.ts";
 import {
-  desvioGrados, entradasValidas, entradaVolada, inventarEspera, norm180, pasoEstacion, puntos, redondear10, type DatosEspera,
+  altitudEspera, desvioGrados, entradasValidas, entradaVolada, inventarEspera, norm180, pasoEstacion, puntos, redondear10, type DatosEspera,
 } from "./navIfr.ts";
 import { tolEspera, type Nivel } from "./nivel.ts";
 import { distanciaVor, type VorElegido } from "./vorSim.ts";
@@ -12,11 +12,11 @@ import { distanciaVor, type VorElegido } from "./vorSim.ts";
 // Llega al fijo (el VOR) por un radial, dice la entrada, la vuela y da una vuelta completa. Termina al tercer paso por el fijo.
 
 export type FaseEspera = "posicionando" | "llegando" | "entrada" | "vueltas" | "terminado" | "invalido";
-export type CampoEspera = "dicha" | "volada" | "tramo" | "acercamiento" | "virajes" | "distancia";
-export const CAMPOS_ESPERA: CampoEspera[] = ["dicha", "volada", "tramo", "acercamiento", "virajes", "distancia"];
-const CODIGO: Record<CampoEspera, string> = { dicha: "1", volada: "2", tramo: "3", acercamiento: "4", virajes: "5", distancia: "6" };
+export type CampoEspera = "dicha" | "volada" | "tramo" | "acercamiento" | "virajes" | "distancia" | "altitud";
+export const CAMPOS_ESPERA: CampoEspera[] = ["dicha", "volada", "tramo", "acercamiento", "virajes", "distancia", "altitud"];
+const CODIGO: Record<CampoEspera, string> = { dicha: "1", volada: "2", tramo: "3", acercamiento: "4", virajes: "5", distancia: "6", altitud: "7" };
 
-export type EjercicioEspera = DatosEspera & { llegada: number };
+export type EjercicioEspera = DatosEspera & { llegada: number; altitudFt: number };
 
 /** A menos de esto del VOR la espera no empieza: el cadete se aleja primero. */
 export const MIN_INICIO_NM = 6;
@@ -49,6 +49,8 @@ export interface ResultadoEspera extends ResultadoComun {
   tasas: number[];
   peorAcercamiento: number;
   maxDistancia: number;
+  /** ft sobre (+) o bajo (−) la altitud de la espera, el peor desde el primer cruce. */
+  peorAltitud: number;
   fuera: Record<CampoEspera, Tramo[]>;
 }
 
@@ -94,6 +96,7 @@ export interface EvaluacionEspera {
   fueraVirajes: Tramo[];
   acerc: Punto[];
   dist: Punto[];
+  alt: Punto[];
   muestras: Muestra[];
 }
 
@@ -109,10 +112,10 @@ export function armarEspera(m: Muestra, nivel: Nivel = 2, ctx: ContextoArmado = 
   const espera = ctx.espera ?? inventarEspera();
   const e: EvaluacionEspera = {
     fase: "posicionando", nivel, examen: ctx.examen, vor: ctx.vor, estacion: ctx.estacion, llegadaFija: ctx.llegada !== undefined,
-    ejercicio: { ...espera, llegada: ctx.llegada ?? redondear10(m.navRadial ?? 0) }, preguntar: false, preguntado: false, dicha: undefined,
+    ejercicio: { ...espera, llegada: ctx.llegada ?? redondear10(m.navRadial ?? 0), altitudFt: espera.altitudFt ?? altitudEspera(m.altitud - m.agl) }, preguntar: false, preguntado: false, dicha: undefined,
     rumboPregunta: null, rumboCruce: null, cruces: [], kCruce: -1, volada: undefined, lado: false, inicio: m, previo: m, mhz: m.navMhz,
     sinSenalDesde: null, tramo: null, vistoTramo: false, giro: null, tNivel: null, tramos: [], fueraTramo: [], tasas: [], fueraVirajes: [],
-    acerc: [], dist: [], muestras: [m],
+    acerc: [], dist: [], alt: [], muestras: [m],
   };
   if (m.enTierra) return anular(e, m, "Despega primero: la maniobra se arma en el aire.");
   if (lectorViejoNav(m)) return anular(e, m, MOTIVO_LECTOR);
@@ -196,6 +199,7 @@ function seguir(n: EvaluacionEspera, m: Muestra, antes: Muestra, dist: number | 
   const T = tolEspera(n.nivel);
   const banco = Math.abs(m.inclinacion);
   if (dist !== null) n.dist = [...n.dist, { t: m.t, v: dist }];
+  n.alt = [...n.alt, { t: m.t, v: m.altitud - ej.altitudFt }];
 
   if (banco >= VIRAJE) {
     n.giro = n.giro ? { ...n.giro, hasta: m.t, suma: n.giro.suma + norm180(m.rumbo - antes.rumbo) } : { desde: m.t, hasta: m.t, suma: 0 };
@@ -251,6 +255,7 @@ function terminar(e: EvaluacionEspera): EvaluacionEspera {
     acercamiento: analizar(n.acerc, T.puntos).tramos,
     virajes: n.fueraVirajes,
     distancia: analizar(n.dist, T.maxNm).tramos,
+    altitud: analizar(n.alt, T.altitudFt).tramos,
   };
   const errores = CAMPOS_ESPERA.filter((c) => fuera[c].length).length;
   const resultado: ResultadoEspera = {
@@ -271,6 +276,7 @@ function terminar(e: EvaluacionEspera): EvaluacionEspera {
     tasas: n.tasas,
     peorAcercamiento: Math.max(0, ...n.acerc.map((p) => Math.abs(p.v))),
     maxDistancia: Math.max(0, ...n.dist.map((p) => p.v)),
+    peorAltitud: n.alt.reduce((a, p) => (Math.abs(p.v) > Math.abs(a) ? p.v : a), 0),
     fuera,
   };
   return { ...n, fase: "terminado", resultado };

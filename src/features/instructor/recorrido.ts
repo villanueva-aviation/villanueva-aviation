@@ -122,7 +122,7 @@ export const TOLERANCIAS: Record<ManiobraId, (n: Nivel) => Record<string, number
   "interceptar-radial": (n) => ({ sobrepaso: tolInterceptacion(n).sobrepasoPuntos, corto: tolInterceptacion(n).cortoSeg, interceptar: LIMITE_SEG }),
   "ruta-vor": (n) => ({ acercamiento: tolRuta(n).puntos, alejamiento: tolRuta(n).puntos }),
   "arco-dme": (n) => ({ entrada: tolArco(n).distanciaNm, distancia: tolArco(n).distanciaNm, salida: tolInterceptacion(n).sobrepasoPuntos }),
-  espera: (n) => ({ dicha: 0, volada: 0, tramo: tolEspera(n).tramoSeg, acercamiento: tolEspera(n).puntos, virajes: tolEspera(n).tasaGrados, distancia: tolEspera(n).maxNm }),
+  espera: (n) => ({ dicha: 0, volada: 0, tramo: tolEspera(n).tramoSeg, acercamiento: tolEspera(n).puntos, virajes: tolEspera(n).tasaGrados, distancia: tolEspera(n).maxNm, altitud: tolEspera(n).altitudFt }),
 };
 
 /** Unidad de `peor` por campo; "maniobra.campo" cuando una maniobra usa el mismo nombre con otra unidad. */

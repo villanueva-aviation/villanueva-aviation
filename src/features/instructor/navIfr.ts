@@ -18,7 +18,11 @@ export const norm360 = (g: number) => ((g % 360) + 360) % 360;
 export const redondear10 = (g: number) => norm360(Math.round(g / 10) * 10);
 
 /** La espera de la lección 4: de la carta del cadete o inventada. `acercamiento`: el curso hacia el VOR. */
-export type DatosEspera = { acercamiento: number; giros: Giros; tramoSeg: number; carta: boolean };
+/** altitudFt: la de la carta, o la que propone el programa; sin ella sale del terreno al armar. */
+export type DatosEspera = { acercamiento: number; giros: Giros; tramoSeg: number; carta: boolean; altitudFt?: number };
+
+/** La altitud de una espera inventada: elevación + 3000 ft, al millar de arriba (MMGL 5016 → 9000, Erik 2026-11-11). */
+export const altitudEspera = (elevacionFt: number) => Math.ceil((elevacionFt + 3000) / 1000) * 1000;
 
 /**
  * ¿Ya está del otro lado de la estación respecto a `radialLado`? Con histéresis: pasa a partir de 100° y regresa a 80° o menos,
@@ -84,9 +88,10 @@ export function generarArco(radialAvion: number, dme: number, azar: () => number
 }
 
 /** Lección 4 sin carta: la espera de las preguntas de esperas, con tramos de un minuto. */
-export function inventarEspera(azar: () => number = Math.random): DatosEspera {
+export function inventarEspera(azar: () => number = Math.random, elevacionFt?: number): DatosEspera {
   const s = generarSituacion(azar);
-  return { acercamiento: norm(s.alejamiento + 180), giros: s.giros, tramoSeg: 60, carta: false };
+  const e: DatosEspera = { acercamiento: norm(s.alejamiento + 180), giros: s.giros, tramoSeg: 60, carta: false };
+  return elevacionFt === undefined ? e : { ...e, altitudFt: altitudEspera(elevacionFt) };
 }
 
 /** Las entradas que valen con cualquiera de estos rumbos de llegada (cerca de una frontera valen las dos). */

@@ -29,6 +29,7 @@ export function pasoEspera(e: EvaluacionEspera | null, _m: Muestra | null): Paso
 
 const tres = (r: number) => String(Math.round(norm360(r)) || 360).padStart(3, "0");
 const uno = (x: number) => String(Math.round(x * 10) / 10);
+const pies = (ft: number) => (Math.round(ft / 100) * 100).toLocaleString("en-US");
 const minutos = (seg: number, en: boolean) => {
   const n = Math.round((seg / 60) * 10) / 10;
   return en ? `${n} minute${n === 1 ? "" : "s"}` : `${n} minuto${n === 1 ? "" : "s"}`;
@@ -62,8 +63,8 @@ function texto(paso: PasoEspera, e: EvaluacionEspera | null, idioma: Idioma): st
     case "llega": {
       const sobre = e.vor ?? (en ? "the VOR" : "el VOR");
       return en
-        ? `Hold over ${sobre}: inbound course ${tres(ej.acercamiento)}, ${derecha ? "right" : "left"} turns, ${minutos(ej.tramoSeg, true)} legs. Arrive on the ${tres(ej.llegada)} radial.`
-        : `Espera sobre ${sobre}: curso de acercamiento ${tres(ej.acercamiento)}, virajes a la ${derecha ? "derecha" : "izquierda"}, tramos de ${minutos(ej.tramoSeg, false)}. Llega por el radial ${tres(ej.llegada)}.`;
+        ? `Hold over ${sobre}: inbound course ${tres(ej.acercamiento)}, ${derecha ? "right" : "left"} turns, ${minutos(ej.tramoSeg, true)} legs. Arrive on the ${tres(ej.llegada)} radial and cross the fix at ${pies(ej.altitudFt)} feet.`
+        : `Espera sobre ${sobre}: curso de acercamiento ${tres(ej.acercamiento)}, virajes a la ${derecha ? "derecha" : "izquierda"}, tramos de ${minutos(ej.tramoSeg, false)}. Llega por el radial ${tres(ej.llegada)} y cruza el fijo a ${pies(ej.altitudFt)} pies.`;
     }
     case "pregunta":
       return PREGUNTA_ENTRADA[idioma];
@@ -118,17 +119,17 @@ export function queHacerEspera(paso: PasoEspera | null, idioma: Idioma): string 
 }
 
 export function semaforoEspera(e: EvaluacionEspera | null, m: Muestra | null): Record<CampoEspera, Luz> {
-  const gris: Record<CampoEspera, Luz> = { dicha: "gris", volada: "gris", tramo: "gris", acercamiento: "gris", virajes: "gris", distancia: "gris" };
+  const gris: Record<CampoEspera, Luz> = { dicha: "gris", volada: "gris", tramo: "gris", acercamiento: "gris", virajes: "gris", distancia: "gris", altitud: "gris" };
   if (!e || !m || (e.fase !== "entrada" && e.fase !== "vueltas")) return gris;
   const T = tolEspera(e.nivel);
   const ultima = e.dist[e.dist.length - 1];
-  const s = { ...gris, distancia: luz(ultima ? Math.max(0, ultima.v) : null, T.maxNm) };
+  const s = { ...gris, distancia: luz(ultima ? Math.max(0, ultima.v) : null, T.maxNm), altitud: luz(Math.abs(m.altitud - e.ejercicio.altitudFt), T.altitudFt) };
   if (e.fase === "vueltas" && e.tNivel !== null && m.navRadial !== undefined)
     s.acercamiento = luz(Math.abs(puntos(desvioGrados({ radial: radialEspera(e.ejercicio), desde: false }, m.navRadial))), T.puntos);
   return s;
 }
 
-/** El radial de llegada, el minuto (solo práctica) y la altitud (no se califica, spec). */
+/** El radial de llegada, el minuto (solo práctica) y, desde el fijo, la altitud de la espera. */
 export function avisoEspera(e: EvaluacionEspera | null, m: Muestra | null, modo: "practica" | "checkride", idioma: Idioma): Aviso | null {
   if (!e || !m || e.fase === "posicionando" || e.fase === "terminado" || e.fase === "invalido") return null;
   const en = idioma === "en";
@@ -141,8 +142,8 @@ export function avisoEspera(e: EvaluacionEspera | null, m: Muestra | null, modo:
     };
   if (modo === "practica" && e.tramo && m.t - e.tramo.desde >= ej.tramoSeg)
     return { clave: "minuto", nivel: "ambar", texto: ej.tramoSeg === 60 ? (en ? "One minute: turn." : "Un minuto: vira.") : en ? "Time: turn." : "Tiempo: vira." };
-  if (Math.abs(m.altitud - e.inicio.altitud) > 300) {
-    const alt = (Math.round(e.inicio.altitud / 100) * 100).toLocaleString("en-US");
+  if (e.fase !== "llegando" && Math.abs(m.altitud - ej.altitudFt) > tolEspera(e.nivel).altitudFt) {
+    const alt = pies(ej.altitudFt);
     return { clave: "altitud", nivel: "ambar", texto: en ? `Hold ${alt} feet` : `Mantén ${alt} pies` };
   }
   return null;
@@ -157,6 +158,7 @@ export function briefingEspera(idioma: Idioma, nivel: Nivel = 2): string[] {
       "Before the fix I'll ask which entry you'll fly. Compare your heading to the fix with the outbound course: teardrop, parallel or direct.",
       `Outbound, time one minute from wings level (within ${T.tramoSeg} seconds), then turn to the inbound course.`,
       `Inbound, keep the needle within ${uno(T.puntos)} ${T.puntos === 1 ? "dot" : "dots"}, and don't go more than ${T.maxNm} miles from the VOR.`,
+      `From the fix on, hold the holding altitude within ${T.altitudFt} feet.`,
       "When you're ready, press «Ready, let's start».",
     ];
   }
@@ -166,6 +168,7 @@ export function briefingEspera(idioma: Idioma, nivel: Nivel = 2): string[] {
     "Antes del fijo te pregunto qué entrada vas a hacer. Compara tu rumbo al fijo con el curso de alejamiento: gota, paralela o directa.",
     `En el alejamiento, cuenta un minuto desde que nivelas las alas (dentro de ${T.tramoSeg} segundos) y vira al curso de acercamiento.`,
     `En el acercamiento, mantén la barra dentro de ${uno(T.puntos)} ${T.puntos === 1 ? "punto" : "puntos"} y no te alejes más de ${T.maxNm} millas del VOR.`,
+    `Desde el fijo, mantén la altitud de la espera dentro de ${T.altitudFt} pies.`,
     "Cuando estés listo, presiona «Listo, empiezo».",
   ];
 }
@@ -188,6 +191,9 @@ export function explicarEspera(r: ResultadoEspera, idioma: Idioma): Linea[] {
   if (r.fuera.acercamiento.length)
     mal(en ? `Inbound you got ${uno(r.peorAcercamiento)} dots off the course.` : `En el acercamiento te saliste ${uno(r.peorAcercamiento)} puntos del curso.`);
   for (const tr of r.fuera.virajes) mal(en ? `Turn at ${uno(tr.peor + 3)} degrees per second.` : `Viraje a ${uno(tr.peor + 3)}°/s.`);
+  if (r.fuera.altitud?.length)
+    mal(en ? `You were ${Math.abs(Math.round(r.peorAltitud))} feet ${r.peorAltitud < 0 ? "below" : "above"} the holding altitude (${pies(r.ejercicio.altitudFt)}).`
+      : `Te saliste ${Math.abs(Math.round(r.peorAltitud))} pies ${r.peorAltitud < 0 ? "debajo" : "arriba"} de la altitud de la espera (${pies(r.ejercicio.altitudFt)}).`);
   if (r.fuera.distancia.length) mal(en ? `You got ${uno(r.maxDistancia)} miles from the VOR.` : `Te alejaste ${uno(r.maxDistancia)} millas del VOR.`);
   if (!lineas.length) lineas.push({ tipo: "bien", texto: en ? "Clean hold: the right entry, a one-minute leg and on course inbound." : "Espera limpia: la entrada correcta, el minuto de alejamiento y en el curso de acercamiento." });
   return lineas;
@@ -199,15 +205,15 @@ export function repetirEspera(r: ResultadoEspera, idioma: Idioma): string | null
 }
 
 const ETIQUETA: Record<Idioma, Record<CampoEspera, string>> = {
-  es: { dicha: "decir la entrada", volada: "volar la entrada", tramo: "el minuto de alejamiento", acercamiento: "el curso de acercamiento", virajes: "la tasa de los virajes", distancia: "quedarte cerca del VOR" },
-  en: { dicha: "calling the entry", volada: "flying the entry", tramo: "the one-minute outbound leg", acercamiento: "the inbound course", virajes: "the turn rate", distancia: "staying close to the VOR" },
+  es: { dicha: "decir la entrada", volada: "volar la entrada", tramo: "el minuto de alejamiento", acercamiento: "el curso de acercamiento", virajes: "la tasa de los virajes", distancia: "quedarte cerca del VOR", altitud: "mantener la altitud de la espera" },
+  en: { dicha: "calling the entry", volada: "flying the entry", tramo: "the one-minute outbound leg", acercamiento: "the inbound course", virajes: "the turn rate", distancia: "staying close to the VOR", altitud: "holding the holding altitude" },
 };
 
 export function masFalladoEspera(rs: ResultadoEspera[], idioma: Idioma): string | null {
   let peor: CampoEspera | null = null;
   let max = 0;
   for (const c of CAMPOS_ESPERA) {
-    const n = rs.filter((r) => r.fuera[c].length).length;
+    const n = rs.filter((r) => r.fuera[c]?.length).length;
     if (n > max) [peor, max] = [c, n];
   }
   if (!peor) return null;
