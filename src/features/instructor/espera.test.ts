@@ -322,3 +322,8 @@ test("a menos de 2 NM del VOR no avisa «Regresa al radial», ni de salida ni de
   const s = { ...sale, enRadial: true };
   assert.equal(avisoEspera(s, muestra(1, { x: 1.5 * Math.cos(50 * RAD), y: 1.5 * Math.sin(50 * RAD), rumbo: 90 }, 0), "practica", "es"), null);
 });
+
+test("cualquier avión vuela la espera (el programa IFR no pide el C172)", () => {
+  const e = volar(esperaDirecta().map((m) => ({ ...m, titulo: "Beechcraft Baron G58" })));
+  assert.equal(e.fase, "terminado", e.motivo);
+});

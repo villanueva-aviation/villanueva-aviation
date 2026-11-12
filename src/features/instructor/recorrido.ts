@@ -227,7 +227,9 @@ export function cerrarGrabacion(
       sinNumero.push({ fase: id, inicio: momento[id], fin: momento[id], texto: { es: texto, en: parte("en", id).repetir[k] ?? texto } }),
     );
   }
-  const cl = { es: parte("es", "checklist").repetir, en: parte("en", "checklist").repetir };
+  // Otro avión sin checklist por voz: no hay esa parte.
+  const sinChecklist = !deb.es.partes.some((p) => p.id === "checklist");
+  const cl = sinChecklist ? { es: [], en: [] } : { es: parte("es", "checklist").repetir, en: parte("en", "checklist").repetir };
   if (cl.es.length) sinNumero.push({ fase: "checklist", inicio: null, fin: null, texto: { es: cl.es.join("; "), en: cl.en.join("; ") } });
 
   const errores = sinNumero

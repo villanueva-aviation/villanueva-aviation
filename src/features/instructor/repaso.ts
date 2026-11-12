@@ -1,5 +1,6 @@
 // Lección 13, repaso general: sorteo de maniobras, zona de trabajo y la lección de rampa a rampa. Puro, para poder probarlo.
-import type { Muestra } from "./evaluador.ts";
+import { esC172, type Muestra } from "./evaluador.ts";
+import { AVIONES_VOZ, type AvionVoz } from "../../data/checklistVozAviones.ts";
 import type { Aeropuerto } from "./aeropuertoSim.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import { MANIOBRAS, type ManiobraId, type ResultadoComun } from "./maniobras.ts";
@@ -172,6 +173,15 @@ export interface EstadoRepaso {
   sinSenalDesde: number | null;
   /** IFR: ya se dijo en tierra qué sintonizar; al despegar solo se recuerda. */
   instruido?: boolean;
+  /** El avión de la lección, del título del simulador al empezar. */
+  avion?: Avion;
+}
+
+/** voz: su checklist por voz (null = no hay); c172: las velocidades del debriefing son del C172. */
+export type Avion = { nombre: string; voz: AvionVoz | null; c172: boolean };
+export function avionDe(titulo: string): Avion {
+  const voz: AvionVoz | null = esC172(titulo) ? "c172" : /152/.test(titulo) ? "c152" : /arrow|pa-?28r/i.test(titulo) ? "arrow" : null;
+  return { nombre: voz ? AVIONES_VOZ[voz].nombre : titulo, voz, c172: voz === "c172" };
 }
 type Paso = { estado: EstadoRepaso; decir: string[] };
 
@@ -275,9 +285,9 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
   if (e.etapa === "terminado" || e.etapa === "invalido") return { estado: e, decir: [] };
   const t = T[idioma];
   if (!e.vuelo) {
-    const vuelo = armarVuelo(m, a);
+    const vuelo = armarVuelo(m, a, e.programa === "ifr");
     if (vuelo.fase === "invalido") return anular({ ...e, vuelo }, vuelo.motivo ?? "", idioma);
-    if (e.programa === "ifr") return { estado: { ...e, vuelo }, decir: [] };
+    if (e.programa === "ifr") return { estado: { ...e, vuelo, avion: avionDe(m.titulo) }, decir: [] };
     const zona = zonaRepaso(vuelo.aeropuerto, azar);
     return { estado: { ...e, vuelo, zona, motivo: zona ? undefined : t.espera }, decir: [] };
   }

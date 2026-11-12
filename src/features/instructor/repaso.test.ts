@@ -11,7 +11,7 @@ import {
   type EstadoRepaso, type Zona,
 } from "./repaso.ts";
 import { LECCIONES, REPASO, leccionIfrDe } from "./lecciones.ts";
-import { conSenal, instruirEnRampa, ponerVor } from "./repaso.ts";
+import { avionDe, conSenal, instruirEnRampa, ponerVor } from "./repaso.ts";
 import { elegirVor } from "./vorSim.ts";
 
 test("una lección de maniobra la vuela 5 veces; el repaso sortea 4", () => {
@@ -393,6 +393,18 @@ test("IFR: al cerrar «Antes del despegue» se instruye una vez en tierra y al d
   assert.ok(decir.includes("Recuerda: GDL en NAV1, 117.50. Arriba de 1,000 pies sobre el terreno empezamos."), decir.join(" | "));
   assert.ok(!decir.some((d) => d.startsWith("Sintoniza")), decir.join(" | "));
   assert.deepEqual(instruirEnRampa(r, "en").decir, ["Tune GDL, 117.50, on NAV1, with the needle on NAV."]);
+});
+
+test("IFR: cualquier avión; el checklist por voz solo para C172, C152 y Arrow", () => {
+  const baron = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr"), VOR), vueloIfr().map((m) => ({ ...m, titulo: "Beechcraft Baron G58" })));
+  assert.notEqual(baron.e.etapa, "invalido", baron.e.motivo);
+  assert.deepEqual(baron.e.avion, { nombre: "Beechcraft Baron G58", voz: null, c172: false });
+  assert.deepEqual(avionDe("Piper PA-28R Arrow III"), { nombre: "Piper Arrow III", voz: "arrow", c172: false });
+  assert.deepEqual(avionDe("Cessna 152 Asobo"), { nombre: "Cessna 152", voz: "c152", c172: false });
+  assert.deepEqual(avionDe("Cessna Skyhawk G1000 Asobo"), { nombre: "Cessna 172", voz: "c172", c172: true });
+  // El VFR sigue en el C172.
+  const vfr = correr(crearRepaso("practica", [...SORTEO]), vueloIfr().map((m) => ({ ...m, titulo: "Beechcraft Baron G58" })));
+  assert.equal(vfr.e.etapa, "invalido");
 });
 
 test("IFR: sin VOR elegido al despegar, pide elegir uno", () => {

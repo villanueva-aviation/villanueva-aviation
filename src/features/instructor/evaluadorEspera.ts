@@ -136,7 +136,7 @@ export function armarEspera(m: Muestra, nivel: Nivel = 2, ctx: ContextoArmado = 
 
 export function armarSoloEspera(e: EvaluacionEspera | null, m: Muestra): boolean {
   if (e && e.fase !== "invalido") return false;
-  return !!m.navSenal && !m.gpsNav && !m.enTierra && m.agl >= 1000 && invalidez(m, null) === null;
+  return !!m.navSenal && !m.gpsNav && !m.enTierra && m.agl >= 1000 && invalidez(m, null, true) === null;
 }
 
 /** La respuesta a «¿Qué entrada vas a hacer?». Solo cuenta antes del fijo. */
@@ -160,7 +160,7 @@ export function avanzarEspera(e: EvaluacionEspera, crudo: Muestra): EvaluacionEs
   // Sobre el fijo manda la posición: la aguja no vale en el cono y el cruce se ve en su momento.
   const m = conCono(crudo, e.estacion);
   if (m.t <= e.previo.t) return e;
-  const motivo = invalidez(m, e.previo) ?? (lectorViejoNav(m) ? MOTIVO_LECTOR : null);
+  const motivo = invalidez(m, e.previo, true) ?? (lectorViejoNav(m) ? MOTIVO_LECTOR : null);
   if (motivo) return anular(e, m, motivo);
   if (e.fase === "posicionando") return empezarSiPuede({ ...e, previo: m }, m);
   if (m.gpsNav) return anular(e, m, MOTIVO_GPS);

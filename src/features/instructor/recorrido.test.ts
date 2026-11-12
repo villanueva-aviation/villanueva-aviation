@@ -166,6 +166,12 @@ test("un error de rumbos queda en su momento, en la zona y con la tolerancia del
   assert.ok(gr.explicaciones.some((x) => x.intento === 1 && x.lineas.es.length > 0 && x.lineas.en.length > 0));
 });
 
+test("otro avión sin checklist por voz: el mapa se cierra sin la parte de checklist", () => {
+  const e = { ...leccion(), avion: { nombre: "Beechcraft Baron G58", voz: null, c172: false } };
+  const gr = cerrarGrabacion(grabadorConFases(), { leccion: 4, e, cl: checklistLeido(), resultados: [{ maniobra: "virajes-rumbos", resultado: bienRumbo() }] });
+  assert.ok(gr.errores.every((x) => x.fase !== "checklist"));
+});
+
 test("la misma maniobra dos veces en práctica: dos intentos, errores de cada uno", () => {
   const gr = cerrarGrabacion(grabadorConFases(), {
     leccion: 4, e: leccion(), cl: checklistLeido(),

@@ -24,7 +24,7 @@ import { useEscucha } from "../features/instructor/useEscucha";
 import { CLAVE_REANUDAR, leerReanudable, paraReanudar } from "../features/instructor/reanudar";
 import { lecturaFinalDe, MANIOBRAS } from "../features/instructor/maniobras";
 import {
-  alMuestrearRepaso, alResultado, armaManiobra, crearRepaso, instruirEnRampa, maniobraActual, maniobrasDe, nombreManiobra, pisoZona, ponerVor, siguienteManiobra,
+  alMuestrearRepaso, alResultado, armaManiobra, avionDe, crearRepaso, instruirEnRampa, maniobraActual, maniobrasDe, nombreManiobra, pisoZona, ponerVor, siguienteManiobra,
   type EstadoRepaso, type EtapaRepaso,
 } from "../features/instructor/repaso";
 import type { IntentoSesion, Modo } from "../features/instructor/sesion";
@@ -45,7 +45,7 @@ const SECCIONES = AVIONES_VOZ.c172.secciones;
 
 const T = {
   es: {
-    titulo: (l: string) => `${l} · C172`,
+    titulo: (l: string, avion: string) => `${l} · ${avion}`,
     briefing: (m: string | null, circuitos: string[] | null, bajo = false) => [
       "Vuelo completo en el C172, de la plataforma a la plataforma.",
       "Lee el checklist en voz alta, en español: el instructor revisa lo que se puede leer del simulador.",
@@ -90,14 +90,15 @@ const T = {
     mapaNoGuardado: (e: string) => `No se pudo guardar el mapa del vuelo: ${e}`,
     verDespues: "Ver este vuelo después",
     briefingIfr: (ejercicios: string) => [
-      "Vuelo completo en el C172, de la plataforma a la plataforma.",
-      "Lee el checklist en voz alta, en español: el instructor revisa lo que se puede leer del simulador.",
+      "Vuelo completo en el avión que quieras, de la plataforma a la plataforma.",
+      "En el C172, el C152 o el Arrow lee el checklist en voz alta, en español: el instructor revisa lo que se puede leer del simulador. En otro avión haz tu checklist por tu cuenta.",
       "En la plataforma elige el VOR y sintonízalo en NAV1, con la barra en NAV, no en GPS.",
       "Despega; arriba de 1,000 pies sobre el terreno y con señal del VOR empiezan los ejercicios.",
       ejercicios,
       "Regresa, aterriza y apaga en la plataforma.",
       "Al final escuchas el debriefing por fases.",
     ],
+    abreMsfs: "Abre MSFS 2020",
     etapaIfr: { salida: "Subiendo: sintoniza el VOR", maniobra: "Ejercicios", "fuera-de-zona": "Sin señal del VOR" } as Partial<Record<EtapaRepaso, string>>,
     ejercicio: (n: number, de: number) => `Ejercicio ${n} de ${de}`,
     siguienteIfr: "Siguiente ejercicio",
@@ -118,7 +119,7 @@ const T = {
     seguimos: (de: string) => `Seguimos con la lección: ${de}.`,
   },
   en: {
-    titulo: (l: string) => `${l} · C172`,
+    titulo: (l: string, avion: string) => `${l} · ${avion}`,
     briefing: (m: string | null, circuitos: string[] | null, bajo = false) => [
       "A full flight in the C172, from ramp to ramp.",
       "Read the checklist aloud, in Spanish: the instructor checks what the simulator can report.",
@@ -163,14 +164,15 @@ const T = {
     mapaNoGuardado: (e: string) => `Couldn't save the flight map: ${e}`,
     verDespues: "See this flight later",
     briefingIfr: (ejercicios: string) => [
-      "A full flight in the C172, from ramp to ramp.",
-      "Read the checklist aloud, in Spanish: the instructor checks what the simulator can report.",
+      "A full flight in the aircraft of your choice, from ramp to ramp.",
+      "In the C172, C152 or Arrow read the checklist aloud, in Spanish: the instructor checks what the simulator can report. In another aircraft run your checklist on your own.",
       "On the ramp pick the VOR and tune it on NAV1, with the needle on NAV, not GPS.",
       "Take off; the exercises start above 1,000 feet above the ground with the VOR signal.",
       ejercicios,
       "Come back, land and shut down on the ramp.",
       "At the end you hear the debriefing by phase.",
     ],
+    abreMsfs: "Open MSFS 2020",
     etapaIfr: { salida: "Climbing: tune the VOR", maniobra: "Exercises", "fuera-de-zona": "No VOR signal" } as Partial<Record<EtapaRepaso, string>>,
     ejercicio: (n: number, de: number) => `Exercise ${n} of ${de}`,
     siguienteIfr: "Next exercise",
@@ -284,13 +286,16 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
         if (cerca) e = ponerVor(e, elegirVor(cerca, m));
       }
       const antes = e.etapa;
+      const sinAvion = !e.avion;
       const r = alMuestrearRepaso(e, m, aeroRef.current, idioma, Math.random, enCursoRef.current);
       e = r.estado;
+      // IFR: con el avión ya conocido, el checklist es el suyo (o ninguno).
+      if (sinAvion && e.avion?.voz && e.avion.voz !== "c172") clRef.current = crearChecklist(AVIONES_VOZ[e.avion.voz].secciones);
       // Hasta la muestra que termina o anula la lección; después el avión sigue en rampa y no se graba.
       if (antes !== "terminado" && antes !== "invalido") grabarMuestra(grabador.current, m, e);
       decir.push(...r.decir);
       ultimaT.current = m.t;
-      clRef.current = avanzarChecklist(clRef.current, m, { elevacionFt: e.vuelo?.aeropuerto?.elevacionFt ?? null, limites: AVIONES_VOZ.c172.limites });
+      clRef.current = avanzarChecklist(clRef.current, m, { elevacionFt: e.vuelo?.aeropuerto?.elevacionFt ?? null, limites: AVIONES_VOZ[e.avion?.voz ?? "c172"].limites });
     }
     if (e !== repasoRef.current) poner(e);
     setCl(clRef.current);
@@ -379,6 +384,10 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     if (filtrado.decir && avisoCrudo) decir(paraVoz(filtrado.decir, idioma), "aviso", avisoCrudo.clave);
   }, [enManiobra, paso, ev, muestra, avisoCrudo, decir, idioma, def]);
 
+  // IFR en un avión sin checklist por voz: sin checklist (el cadete lo hace por su cuenta) y fuera del debriefing.
+  const conChecklist = !repaso?.avion || repaso.avion.voz !== null;
+  const nombreAvion = repaso?.avion?.nombre ?? (ifr && muestra ? avionDe(muestra.titulo).nombre : "C172");
+
   // Al apagar el motor todavía faltan puntos del «Apagado»: el debriefing espera a que cierre la sección (hasta 60 s).
   const terminado = repaso?.etapa === "terminado";
   const [finEn, setFinEn] = useState<number | null>(null);
@@ -389,10 +398,10 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   useEffect(() => {
     if (!terminado || finEn === null || listo) return;
     const seg = (Date.now() - finEn) / 1000;
-    if (!esperaApagado(cl, seg)) return setListo(true);
+    if (!conChecklist || !esperaApagado(cl, seg)) return setListo(true);
     const id = window.setTimeout(() => setListo(true), Math.max(0, 60 - seg) * 1000);
     return () => window.clearTimeout(id);
-  }, [terminado, finEn, listo, cl]);
+  }, [terminado, finEn, listo, cl, conChecklist]);
 
   // Lección 4: «¿Qué entrada vas a hacer?» con el micrófono; también hay botones. El checklist calla mientras.
   const escuchaEntrada = useEscucha(idioma, voz);
@@ -429,7 +438,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
 
   // Checklist por voz, en español, mientras dura la lección. Al cerrar una sección el instructor dice qué faltó.
   const enVuelo = !!repaso && repaso.etapa !== "terminado" && repaso.etapa !== "invalido";
-  const escucha = useChecklistVoz((enVuelo || (terminado && !listo)) && escuchaEntrada.fase === "inactivo", voz, (texto) => {
+  const escucha = useChecklistVoz(conChecklist && (enVuelo || (terminado && !listo)) && escuchaEntrada.fase === "inactivo", voz, (texto) => {
     const antes = clRef.current;
     clRef.current = oir(antes, texto, ultimaT.current);
     sonarTonos(tonosChecklist(antes, clRef.current));
@@ -511,7 +520,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     setGuardado({ estado: "guardando" });
     const g = paraGuardarRepaso(e, clRef.current);
     const res = await guardarIntento({
-      maniobra: claveLeccion(leccion), avion: "C172", modo: e.modo,
+      maniobra: claveLeccion(leccion), avion: e.avion?.nombre ?? "C172", modo: e.modo,
       resultado: { aprobado: g.aprobado, calificacion: g.calificacion, elementos: g.elementos, avisos: [], muestras: [] },
       detalle: g.detalle, sesionId,
     });
@@ -648,8 +657,8 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
 
   const cabecera = (
     <header className="flex items-baseline justify-between gap-3">
-      <h1 className="font-display text-base font-bold text-white">{t.titulo(leccion.nombre[idioma])}</h1>
-      <span className={`text-xs ${COLOR_ESTADO[estado]}`}>{t.estado[estado]}</span>
+      <h1 className="font-display text-base font-bold text-white">{t.titulo(leccion.nombre[idioma], nombreAvion)}</h1>
+      <span className={`text-xs ${COLOR_ESTADO[estado]}`}>{ifr && estado === "sin-simulador" ? t.abreMsfs : t.estado[estado]}</span>
     </header>
   );
 
@@ -811,7 +820,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
         <button type="button" onClick={pasar} className="text-sm text-white/60 underline">{ifr ? t.siguienteIfr : t.siguiente}</button>
       )}
 
-      {enVuelo && (
+      {enVuelo && conChecklist && (
         <section className="rounded-xl border border-white/10 p-4 text-sm">
           <p className="flex justify-between font-semibold text-white">
             <span>{t.checklist}{seccion ? ` · ${seccion.titulo}` : ""}</span>
@@ -851,6 +860,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
             <div key={p.id} className="text-sm">
               <p className="font-semibold text-gold-200">{p.titulo}</p>
               {p.bien.map((x) => <p key={x} className="text-emerald-200">✓ {x}</p>)}
+              {p.notas?.map((x) => <p key={x} className="text-white/60">· {x}</p>)}
               {p.repetir.map((x) => <p key={x} className="text-red-200">✗ {x}</p>)}
               {p.id === "maniobras" &&
                 repaso.hechas.map((h, i) => {

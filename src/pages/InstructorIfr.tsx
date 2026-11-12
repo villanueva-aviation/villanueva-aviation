@@ -15,7 +15,7 @@ const TEORIA: Partial<Record<number, TemaIfr>> = { 1: "interceptacion", 2: "ruta
 const T = {
   es: {
     titulo: "Instructor virtual IFR",
-    intro: "Navegación con VOR en el C172, de la plataforma a la plataforma: teoría, práctica y examen por tema.",
+    intro: "Navegación con VOR en el avión que quieras, de la plataforma a la plataforma: teoría, práctica y examen por tema.",
     proximamente: "Próximamente",
     ultimo: "Último vuelo",
     teoria: "Teoría con dibujos",
@@ -23,7 +23,7 @@ const T = {
   },
   en: {
     titulo: "IFR virtual instructor",
-    intro: "VOR navigation in the C172, from ramp to ramp: theory, practice and a graded flight for each topic.",
+    intro: "VOR navigation in the aircraft of your choice, from ramp to ramp: theory, practice and a graded flight for each topic.",
     proximamente: "Coming soon",
     ultimo: "Last flight",
     teoria: "Illustrated theory",

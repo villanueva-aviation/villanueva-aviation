@@ -80,13 +80,13 @@ export function armarArco(m: Muestra, nivel: Nivel = 2, ctx: ContextoArmado = { 
 
 export function armarSoloArco(e: EvaluacionArco | null, m: Muestra): boolean {
   if (e && e.fase !== "invalido") return false;
-  return !!m.navSenal && !!m.navTieneDme && !m.gpsNav && !m.enTierra && m.agl >= 1000 && invalidez(m, null) === null;
+  return !!m.navSenal && !!m.navTieneDme && !m.gpsNav && !m.enTierra && m.agl >= 1000 && invalidez(m, null, true) === null;
 }
 
 export function avanzarArco(e: EvaluacionArco, m: Muestra): EvaluacionArco {
   if (e.fase === "terminado" || e.fase === "invalido") return e;
   if (m.t <= e.previo.t) return e;
-  const motivo = invalidez(m, e.previo) ?? (lectorViejoNav(m) ? MOTIVO_LECTOR : m.gpsNav ? MOTIVO_GPS : null);
+  const motivo = invalidez(m, e.previo, true) ?? (lectorViejoNav(m) ? MOTIVO_LECTOR : m.gpsNav ? MOTIVO_GPS : null);
   if (motivo) return anular(e, m, motivo);
   const muestras = [...e.muestras, m];
 

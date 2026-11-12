@@ -10,6 +10,8 @@ export interface Parte {
   titulo: string;
   bien: string[];
   repetir: string[];
+  /** Lo que no se califica, para que se sepa por qué. */
+  notas?: string[];
 }
 
 const kt = (x: number) => Math.round(x);
@@ -28,6 +30,7 @@ const T = {
     final: (ok: boolean, a: number, b: number, f: string) => (ok ? `Final entre ${a} y ${b} kt (${V.aprox} ${f})` : `Final entre ${a} y ${b} kt: mantén ${V.aprox} kt, ${f}`),
     pista: (ok: boolean) => (ok ? "Tocaste en la pista" : "Tocaste fuera de la pista"),
     noVolada: "No se voló",
+    sinVelocidades: "Velocidades: sin datos de este avión",
   },
   en: {
     titulos: { checklist: "Checklist", despegue: "Takeoff", maniobras: "Maneuvers", aterrizaje: "Landing" },
@@ -41,6 +44,7 @@ const T = {
     final: (ok: boolean, a: number, b: number, f: string) => (ok ? `Final between ${a} and ${b} kt (${V.aprox} ${f})` : `Final between ${a} and ${b} kt: hold ${V.aprox} kt, ${f}`),
     pista: (ok: boolean) => (ok ? "Touched down on the runway" : "Touched down off the runway"),
     noVolada: "Not flown",
+    sinVelocidades: "Speeds: no data for this aircraft",
   },
 };
 
@@ -60,9 +64,14 @@ export function debriefingRepaso(e: EstadoRepaso, cl: Checklist, idioma: Idioma)
   checklist.bien.push(t.enOrden(r.enOrden));
   checklist.repetir.push(...t.saltados(r.saltados), ...t.noHechos(r.noHechos), ...t.noLeidas(r.noLeidas));
 
+  // Otro avión (solo IFR): sin su checklist no hay parte de checklist, y las velocidades del C172 no se le aplican.
+  const conChecklist = !e.avion || e.avion.voz !== null;
+  const velocidades = !e.avion || e.avion.c172;
   const despegue = nueva("despegue");
-  poner(despegue, c.despegue.rotacion, t.rotacion(!!c.despegue.rotacion, kt(e.tomas.rotacionKt ?? 0)));
-  poner(despegue, c.despegue.vy, t.vy(!!c.despegue.vy, kt(e.tomas.vy.suma / Math.max(1, e.tomas.vy.n))));
+  if (velocidades) {
+    poner(despegue, c.despegue.rotacion, t.rotacion(!!c.despegue.rotacion, kt(e.tomas.rotacionKt ?? 0)));
+    poner(despegue, c.despegue.vy, t.vy(!!c.despegue.vy, kt(e.tomas.vy.suma / Math.max(1, e.tomas.vy.n))));
+  } else despegue.notas = [t.sinVelocidades];
 
   const maniobras = { ...nueva("maniobras"), ...(e.programa === "ifr" ? { titulo: t.navegacion } : {}) };
   for (const h of e.hechas) {
@@ -72,12 +81,12 @@ export function debriefingRepaso(e: EstadoRepaso, cl: Checklist, idioma: Idioma)
   }
 
   const aterrizaje = nueva("aterrizaje");
-  poner(aterrizaje, c.aterrizaje.final, t.final(!!c.aterrizaje.final, kt(e.tomas.final.min), kt(e.tomas.final.max), `-${tf.menos}/+${tf.mas}`));
+  if (velocidades) poner(aterrizaje, c.aterrizaje.final, t.final(!!c.aterrizaje.final, kt(e.tomas.final.min), kt(e.tomas.final.max), `-${tf.menos}/+${tf.mas}`));
   poner(aterrizaje, c.aterrizaje.enPista, t.pista(!!c.aterrizaje.enPista));
 
   const aprobado =
-    e.modo === "practica" ? null : e.hechas.every((h) => h.resultado?.aprobado) && r.saltados.length === 0 && r.noLeidas.length === 0;
-  return { partes: [checklist, despegue, maniobras, aterrizaje], aprobado };
+    e.modo === "practica" ? null : e.hechas.every((h) => h.resultado?.aprobado) && (!conChecklist || (r.saltados.length === 0 && r.noLeidas.length === 0));
+  return { partes: [...(conChecklist ? [checklist] : []), despegue, maniobras, aterrizaje], aprobado };
 }
 
 const ESPERA_APAGADO_SEG = 60;

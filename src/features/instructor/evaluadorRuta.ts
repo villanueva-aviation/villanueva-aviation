@@ -93,7 +93,7 @@ export function armarRuta(m: Muestra, nivel: Nivel = 2, ctx: ContextoArmado = { 
 
 export function armarSoloRuta(e: EvaluacionRuta | null, m: Muestra): boolean {
   if (e && e.fase !== "invalido") return false;
-  return !!m.navSenal && !m.gpsNav && !m.enTierra && m.agl >= 1000 && invalidez(m, null) === null;
+  return !!m.navSenal && !m.gpsNav && !m.enTierra && m.agl >= 1000 && invalidez(m, null, true) === null;
 }
 
 /** Posicionado (o sin forma de medir la distancia): genera el ejercicio con el radial de ahora. */
@@ -108,7 +108,7 @@ export function avanzarRuta(e: EvaluacionRuta, crudo: Muestra): EvaluacionRuta {
   if (e.fase === "terminado" || e.fase === "invalido") return e;
   const m = conCono(crudo, e.estacion);
   if (m.t <= e.previo.t) return e;
-  const motivo = invalidez(m, e.previo) ?? (lectorViejoNav(m) ? MOTIVO_LECTOR : null);
+  const motivo = invalidez(m, e.previo, true) ?? (lectorViejoNav(m) ? MOTIVO_LECTOR : null);
   if (motivo) return anular(e, m, motivo);
   if (e.fase === "posicionando") return empezarSiPuede({ ...e, previo: m }, m);
   if (m.gpsNav) return anular(e, m, MOTIVO_GPS);

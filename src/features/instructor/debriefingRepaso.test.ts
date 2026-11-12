@@ -120,3 +120,18 @@ test("lo que se guarda", () => {
   assert.equal(paraGuardarRepaso(repaso("practica", CUATRO), checklist()).aprobado, false);
   assert.equal(paraGuardarRepaso(repaso("practica", [null]), checklist()).calificacion, 0);
 });
+
+test("otro avión: sin checklist no hay parte de checklist, y las velocidades del C172 no se califican", () => {
+  const e = { ...repaso("checkride", CUATRO), avion: { nombre: "Beechcraft Baron G58", voz: null, c172: false } };
+  const d = debriefingRepaso(e, crearChecklist(CHECKLIST_VOZ_C172), "es");
+  assert.deepEqual(d.partes.map((p) => p.id), ["despegue", "maniobras", "aterrizaje"]);
+  const despegue = d.partes[0];
+  assert.deepEqual([...despegue.bien, ...despegue.repetir], []);
+  assert.deepEqual(despegue.notas, ["Velocidades: sin datos de este avión"]);
+  assert.deepEqual(d.partes[2].bien, ["Tocaste en la pista"]);
+  assert.equal(d.aprobado, true, "el checklist sin leer no reprueba si el avión no tiene checklist");
+  // Arrow: con checklist, sin velocidades.
+  const arrow = debriefingRepaso({ ...e, avion: { nombre: "Piper Arrow III", voz: "arrow", c172: false } }, checklist(), "en");
+  assert.equal(arrow.partes[0].id, "checklist");
+  assert.deepEqual(arrow.partes[1].notas, ["Speeds: no data for this aircraft"]);
+});

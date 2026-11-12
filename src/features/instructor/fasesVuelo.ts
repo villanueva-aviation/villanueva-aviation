@@ -39,12 +39,13 @@ const cercano = (m: Muestra, a: Aeropuerto | null) => (a && distNm(m, a) <= AERO
 
 const invalido = (ev: EvaluacionVuelo, motivo: string): EvaluacionVuelo => ({ ...ev, fase: "invalido", motivo });
 
-export function armarVuelo(m: Muestra, a: Aeropuerto | null): EvaluacionVuelo {
+/** `cualquierAvion`: el programa IFR no pide el C172. */
+export function armarVuelo(m: Muestra, a: Aeropuerto | null, cualquierAvion = false): EvaluacionVuelo {
   const ev: EvaluacionVuelo = {
     fase: "rampa", previo: m, aeropuerto: cercano(m, a), eventos: [], aireDesde: null, tierraDesde: m.enTierra ? m.t : null, pistaCarrera: null, maxDistNm: 0,
   };
   if (lectorViejoVuelo(m)) return invalido(ev, "Tu lector es de una versión anterior: baja el nuevo de Descargas para las lecciones.");
-  if (!esC172(m.titulo)) return invalido(ev, `En esta versión las lecciones son en el C172 y tu avión es «${m.titulo}».`);
+  if (!cualquierAvion && !esC172(m.titulo)) return invalido(ev, `En esta versión las lecciones son en el C172 y tu avión es «${m.titulo}».`);
   if (!m.enTierra || (m.gs ?? 0) >= QUIETO_KT) return invalido(ev, "Empieza en tierra, detenido en la plataforma.");
   if (m.motor) ev.eventos.push({ t: m.t, tipo: "motor-encendido" });
   return ev;
