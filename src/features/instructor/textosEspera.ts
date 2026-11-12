@@ -1,6 +1,6 @@
 import { comoSeVuela, entradaEspera, type Entrada } from "../entrenador/esperas.ts";
 import type { Muestra } from "./evaluador.ts";
-import { CAMPOS_ESPERA, MIN_INICIO_NM, radialEspera, type CampoEspera, type EvaluacionEspera, type ResultadoEspera } from "./evaluadorEspera.ts";
+import { CAMPOS_ESPERA, SALIDA_NM, radialEspera, type CampoEspera, type EvaluacionEspera, type ResultadoEspera } from "./evaluadorEspera.ts";
 import type { Linea } from "./explicacion.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import { desvioGrados, norm360, puntos } from "./navIfr.ts";
@@ -59,12 +59,14 @@ function texto(paso: PasoEspera, e: EvaluacionEspera | null, idioma: Idioma): st
   const derecha = ej.giros === "derecha";
   switch (paso) {
     case "posiciona":
-      return en ? `Fly away from the VOR: we start at ${MIN_INICIO_NM} miles.` : `Aléjate del VOR: a ${MIN_INICIO_NM} millas empezamos.`;
+      return en
+        ? `Intercept the ${tres(ej.salida)} radial outbound and climb to ${pies(ej.altitudFt)} feet. At ${SALIDA_NM} miles I'll give you the way back.`
+        : `Intercepta el radial ${tres(ej.salida)} alejándote y sube a ${pies(ej.altitudFt)} pies. A ${SALIDA_NM} millas te doy el regreso.`;
     case "llega": {
       const sobre = e.vor ?? (en ? "the VOR" : "el VOR");
       return en
-        ? `Hold over ${sobre}: inbound course ${tres(ej.acercamiento)}, ${derecha ? "right" : "left"} turns, ${minutos(ej.tramoSeg, true)} legs. Arrive on the ${tres(ej.llegada)} radial and cross the fix at ${pies(ej.altitudFt)} feet.`
-        : `Espera sobre ${sobre}: curso de acercamiento ${tres(ej.acercamiento)}, virajes a la ${derecha ? "derecha" : "izquierda"}, tramos de ${minutos(ej.tramoSeg, false)}. Llega por el radial ${tres(ej.llegada)} y cruza el fijo a ${pies(ej.altitudFt)} pies.`;
+        ? `Fly back to the station on the ${tres(ej.llegada)} radial. Hold over ${sobre}: inbound course ${tres(ej.acercamiento)}, ${derecha ? "right" : "left"} turns, ${minutos(ej.tramoSeg, true)} legs; cross the fix at ${pies(ej.altitudFt)} feet.`
+        : `Regresa a la estación por el radial ${tres(ej.llegada)}. Espera sobre ${sobre}: curso de acercamiento ${tres(ej.acercamiento)}, virajes a la ${derecha ? "derecha" : "izquierda"}, tramos de ${minutos(ej.tramoSeg, false)}; cruza el fijo a ${pies(ej.altitudFt)} pies.`;
     }
     case "pregunta":
       return PREGUNTA_ENTRADA[idioma];
@@ -97,8 +99,8 @@ export function textoPasoEspera(paso: PasoEspera | null, e: EvaluacionEspera | n
 
 const PASOS: PasoEspera[] = ["posiciona", "llega", "pregunta", "entra", "vuelta"];
 const NOMBRE_PASO: Record<Idioma, string[]> = {
-  es: ["Aléjate a 6 millas", "Llega al fijo", "Di tu entrada", "Vuela la entrada", "Una vuelta completa"],
-  en: ["Fly out to 6 miles", "Fly to the fix", "Call your entry", "Fly the entry", "One full lap"],
+  es: ["Sal por el radial", "Regresa al fijo", "Di tu entrada", "Vuela la entrada", "Una vuelta completa"],
+  en: ["Fly out on the radial", "Fly back to the fix", "Call your entry", "Fly the entry", "One full lap"],
 };
 
 export function listaPasosEspera(paso: PasoEspera | null, idioma: Idioma): { nombre: string; estado: "hecho" | "actual" | "pendiente" }[] {
@@ -108,7 +110,8 @@ export function listaPasosEspera(paso: PasoEspera | null, idioma: Idioma): { nom
 
 export function queHacerEspera(paso: PasoEspera | null, idioma: Idioma): string {
   const en = idioma === "en";
-  if (paso === "posiciona") return en ? "Fly away from the VOR; the exercise starts by itself." : "Aléjate del VOR; el ejercicio empieza solo.";
+  if (paso === "posiciona")
+    return en ? `Intercept the outbound radial and fly out; at ${SALIDA_NM} miles I'll give you the way back.` : `Intercepta el radial de salida y aléjate; a ${SALIDA_NM} millas te doy el regreso.`;
   if (paso === "llega" || paso === "pregunta")
     return en
       ? "Compare your heading to the fix with the outbound course to pick the entry: teardrop, parallel or direct."
@@ -131,10 +134,18 @@ export function semaforoEspera(e: EvaluacionEspera | null, m: Muestra | null): R
 
 /** El radial de llegada, el minuto (solo práctica) y, desde el fijo, la altitud de la espera. */
 export function avisoEspera(e: EvaluacionEspera | null, m: Muestra | null, modo: "practica" | "checkride", idioma: Idioma): Aviso | null {
-  if (!e || !m || e.fase === "posicionando" || e.fase === "terminado" || e.fase === "invalido") return null;
+  if (!e || !m || e.fase === "terminado" || e.fase === "invalido") return null;
   const en = idioma === "en";
   const ej = e.ejercicio;
-  if (e.fase === "llegando" && m.navRadial !== undefined && Math.abs(puntos(desvioGrados({ radial: ej.llegada, desde: false }, m.navRadial))) > 2)
+  if (e.fase === "posicionando") {
+    if (!e.enRadial || m.navRadial === undefined || Math.abs(puntos(desvioGrados({ radial: ej.salida, desde: true }, m.navRadial))) <= 2) return null;
+    return {
+      clave: "salida",
+      nivel: "ambar",
+      texto: en ? `Get back on the ${tres(ej.salida)} radial: course ${tres(ej.salida)} FROM.` : `Regresa al radial ${tres(ej.salida)}: curso ${tres(ej.salida)} FROM.`,
+    };
+  }
+  if (e.fase === "llegando" && e.enRadial && m.navRadial !== undefined && Math.abs(puntos(desvioGrados({ radial: ej.llegada, desde: false }, m.navRadial))) > 2)
     return {
       clave: "llegada",
       nivel: "ambar",
@@ -154,6 +165,7 @@ export function briefingEspera(idioma: Idioma, nivel: Nivel = 2): string[] {
   if (idioma === "en") {
     return [
       "Today you'll fly a holding pattern over the VOR: the fix, a turn, an outbound leg, another turn and the inbound course back to the fix.",
+      `After takeoff I'll give you a radial to fly out on; at ${SALIDA_NM} miles, the radial to fly back to the station on.`,
       "Standard holds turn right; the instruction says when they turn left. Turns are standard rate: 3 degrees per second.",
       "Before the fix I'll ask which entry you'll fly. Compare your heading to the fix with the outbound course: teardrop, parallel or direct.",
       `Outbound, time one minute from wings level (within ${T.tramoSeg} seconds), then turn to the inbound course.`,
@@ -164,6 +176,7 @@ export function briefingEspera(idioma: Idioma, nivel: Nivel = 2): string[] {
   }
   return [
     "Hoy vas a volar una espera sobre el VOR: el fijo, un viraje, el tramo de alejamiento, otro viraje y el curso de acercamiento de regreso al fijo.",
+    `Al despegar te digo por qué radial salir; a ${SALIDA_NM} millas, por cuál regresar a la estación.`,
     "La espera estándar vira a la derecha; la instrucción dice cuándo vira a la izquierda. Los virajes son de tasa estándar: 3° por segundo.",
     "Antes del fijo te pregunto qué entrada vas a hacer. Compara tu rumbo al fijo con el curso de alejamiento: gota, paralela o directa.",
     `En el alejamiento, cuenta un minuto desde que nivelas las alas (dentro de ${T.tramoSeg} segundos) y vira al curso de acercamiento.`,

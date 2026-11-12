@@ -846,7 +846,11 @@ const defEspera: DefManiobra<EvaluacionEspera, ResultadoEspera> = {
   repetir: repetirEspera,
   masFallado: masFalladoEspera,
   paraGuardar: paraGuardarEspera,
-  figuras: ({ ejercicio: { acercamiento, giros, tramoSeg, llegada } }) => ({ espera: { acercamiento, giros, tramoSeg }, radiales: [{ radial: llegada, desde: false }] }),
+  figuras: ({ ejercicio: { acercamiento, giros, tramoSeg, llegada, salida } }) => ({
+    espera: { acercamiento, giros, tramoSeg },
+    // Los resultados de antes de la salida guiada (2026-11-11) no traen `salida`.
+    radiales: [{ radial: llegada, desde: false }, ...(salida === undefined ? [] : [{ radial: salida, desde: true }])],
+  }),
 };
 
 export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {

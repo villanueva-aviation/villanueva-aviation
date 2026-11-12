@@ -49,7 +49,7 @@ export const LECCIONES_IFR: Leccion[] = [
   ifr(1, "Interceptación de radiales", "Radial interception", "interceptar-radial", { ejercicios: { practica: 5, examen: 2 } }),
   ifr(2, "Rutas de acercamiento y alejamiento", "Inbound and outbound courses", "ruta-vor", { ejercicios: { practica: 3, examen: 1 } }),
   ifr(3, "Arcos DME", "DME arcs", "arco-dme", { ejercicios: { practica: 3, examen: 1 }, requiereDme: true }),
-  ifr(4, "Patrones de espera", "Holding patterns", "espera", { ejercicios: { practica: 2, examen: 1 } }),
+  ifr(4, "Patrones de espera", "Holding patterns", "espera", { ejercicios: { practica: 3, examen: 1 } }),
   ifr(5, "Vuelo mezclado", "Mixed flight"),
   ifr(6, "Checkride IFR", "IFR checkride"),
 ];

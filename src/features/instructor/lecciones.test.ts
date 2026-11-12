@@ -76,7 +76,7 @@ test("IFR 2 a 4: su maniobra, sus ejercicios y su clave; los arcos piden DME", (
   assert.deepEqual(arco.ejercicios, { practica: 3, examen: 1 });
   assert.equal(arco.requiereDme, true);
   assert.equal(espera.maniobra, "espera");
-  assert.deepEqual(espera.ejercicios, { practica: 2, examen: 1 });
+  assert.deepEqual(espera.ejercicios, { practica: 3, examen: 1 });
   assert.equal(ruta.requiereDme, undefined);
   assert.deepEqual(["2", "3", "4"].map((n) => claveLeccion(leccionIfrDe(n)!)), ["ifr-2", "ifr-3", "ifr-4"]);
   assert.ok(LECCIONES_GUARDADAS["ifr-4"]);
@@ -90,7 +90,7 @@ test("el briefing IFR cuenta los ejercicios de cada lección", () => {
   const [l1, l2, , l4] = LECCIONES_IFR;
   assert.equal(lineaEjercicios(l1, false, "es"), "Son 5 interceptaciones, cada una con otro radial.");
   assert.equal(lineaEjercicios(l2, false, "es"), "Son 3 ejercicios de práctica, con consejos.");
-  assert.equal(lineaEjercicios(l4, false, "en"), "2 practice exercises, with tips.");
+  assert.equal(lineaEjercicios(l4, false, "en"), "3 practice exercises, with tips.");
   assert.equal(lineaEjercicios(l4, true, "es"), "Es 1 ejercicio calificado, sin consejos.");
   assert.equal(lineaEjercicios(l2, true, "en"), "One graded exercise, no tips.");
 });

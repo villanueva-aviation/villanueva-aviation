@@ -3,7 +3,7 @@ import { analizar, invalidez, lectorViejoNav, type Muestra, type Tramo } from ".
 import { MOTIVO_GPS, MOTIVO_LECTOR, MOTIVO_SENAL, MOTIVO_SIN_SENAL } from "./evaluadorInterceptacion.ts";
 import type { ContextoArmado, ResultadoComun } from "./maniobras.ts";
 import {
-  altitudEspera, desvioGrados, entradasValidas, entradaVolada, inventarEspera, norm180, pasoEstacion, puntos, redondear10, type DatosEspera,
+  altitudEspera, desvioGrados, entradasValidas, entradaVolada, inventarEspera, norm180, pasoEstacion, puntos, rutaEspera, type DatosEspera,
 } from "./navIfr.ts";
 import { tolEspera, type Nivel } from "./nivel.ts";
 import { distanciaVor, type VorElegido } from "./vorSim.ts";
@@ -16,10 +16,13 @@ export type CampoEspera = "dicha" | "volada" | "tramo" | "acercamiento" | "viraj
 export const CAMPOS_ESPERA: CampoEspera[] = ["dicha", "volada", "tramo", "acercamiento", "virajes", "distancia", "altitud"];
 const CODIGO: Record<CampoEspera, string> = { dicha: "1", volada: "2", tramo: "3", acercamiento: "4", virajes: "5", distancia: "6", altitud: "7" };
 
-export type EjercicioEspera = DatosEspera & { llegada: number; altitudFt: number };
+/** salida: el radial por el que se aleja hasta 8 NM; llegada: el de regreso al fijo. */
+export type EjercicioEspera = DatosEspera & { salida: number; llegada: number; altitudFt: number };
 
-/** A menos de esto del VOR la espera no empieza: el cadete se aleja primero. */
-export const MIN_INICIO_NM = 6;
+/** Sale por un radial hasta esto del VOR; ahí el instructor le da el radial de regreso. */
+export const SALIDA_NM = 8;
+/** Una entrada por práctica, en este orden; el examen sortea una. */
+export const ENTRADAS_PRACTICA: Entrada[] = ["gota", "paralela", "directa"];
 /** A cuántos segundos del fijo pregunta la entrada. */
 export const PREGUNTA_SEG = 120;
 export const LIMITE_ESPERA_SEG = 1800;
@@ -65,8 +68,8 @@ export interface EvaluacionEspera {
   examen: boolean;
   vor?: string;
   estacion?: VorElegido;
-  /** La llegada vino del cadete («Llego por el radial»); si no, sale del radial al posicionarse. */
-  llegadaFija: boolean;
+  /** Ya estuvo a 2 puntos o menos del radial que toca (la salida, luego el regreso): antes no avisa, está interceptando. */
+  enRadial: boolean;
   ejercicio: EjercicioEspera;
   preguntar: boolean;
   preguntado: boolean;
@@ -110,9 +113,11 @@ export const radialEspera = (ej: DatosEspera) => norm(ej.acercamiento + 180);
 
 export function armarEspera(m: Muestra, nivel: Nivel = 2, ctx: ContextoArmado = { intento: 0, examen: false }): EvaluacionEspera {
   const espera = ctx.espera ?? inventarEspera();
+  const entrada = ENTRADAS_PRACTICA[ctx.examen ? Math.floor(Math.random() * ENTRADAS_PRACTICA.length) : ctx.intento % ENTRADAS_PRACTICA.length];
+  const ruta = rutaEspera(radialEspera(espera), espera.giros, entrada, Math.random, ctx.llegada);
   const e: EvaluacionEspera = {
-    fase: "posicionando", nivel, examen: ctx.examen, vor: ctx.vor, estacion: ctx.estacion, llegadaFija: ctx.llegada !== undefined,
-    ejercicio: { ...espera, llegada: ctx.llegada ?? redondear10(m.navRadial ?? 0), altitudFt: espera.altitudFt ?? altitudEspera(m.altitud - m.agl) }, preguntar: false, preguntado: false, dicha: undefined,
+    fase: "posicionando", nivel, examen: ctx.examen, vor: ctx.vor, estacion: ctx.estacion, enRadial: false,
+    ejercicio: { ...espera, ...ruta, altitudFt: espera.altitudFt ?? altitudEspera(m.altitud - m.agl) }, preguntar: false, preguntado: false, dicha: undefined,
     rumboPregunta: null, rumboCruce: null, cruces: [], kCruce: -1, volada: undefined, lado: false, inicio: m, previo: m, mhz: m.navMhz,
     sinSenalDesde: null, tramo: null, vistoTramo: false, giro: null, tNivel: null, tramos: [], fueraTramo: [], tasas: [], fueraVirajes: [],
     acerc: [], dist: [], alt: [], muestras: [m],
@@ -137,11 +142,12 @@ export function responderEntrada(e: EvaluacionEspera, dicha: Entrada | null, rum
 
 function empezarSiPuede(e: EvaluacionEspera, m: Muestra): EvaluacionEspera {
   const d = distancia(e, m);
-  if (d !== null && d < MIN_INICIO_NM) return e;
   if (!m.navSenal || m.navRadial === undefined) return e;
-  const llegada = e.llegadaFija ? e.ejercicio.llegada : redondear10(m.navRadial);
+  if (d !== null && d < SALIDA_NM)
+    return { ...e, enRadial: e.enRadial || Math.abs(puntos(desvioGrados({ radial: e.ejercicio.salida, desde: true }, m.navRadial))) <= 2 };
+  const llegada = e.ejercicio.llegada;
   // Si empieza del otro lado del radial de llegada, primero tiene que regresar a él.
-  return { ...e, fase: "llegando", ejercicio: { ...e.ejercicio, llegada }, lado: pasoEstacion(true, m.navRadial, llegada), inicio: m, mhz: m.navMhz, muestras: [m] };
+  return { ...e, fase: "llegando", enRadial: false, lado: pasoEstacion(true, m.navRadial, llegada), inicio: m, mhz: m.navMhz, muestras: [m] };
 }
 
 export function avanzarEspera(e: EvaluacionEspera, m: Muestra): EvaluacionEspera {
@@ -166,6 +172,7 @@ export function avanzarEspera(e: EvaluacionEspera, m: Muestra): EvaluacionEspera
   const dist = distancia(e, m);
 
   if (n.fase === "llegando") {
+    n.enRadial ||= Math.abs(puntos(desvioGrados({ radial: ej.llegada, desde: false }, radial))) <= 2;
     if (!n.preguntado && (dist === null || (dist / Math.max(m.gs ?? m.velocidad, 1)) * 3600 <= PREGUNTA_SEG)) {
       n.preguntar = true;
       n.preguntado = true;
