@@ -832,7 +832,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
         </div>
       )}
       {repaso.modo === "practica" && actualId && !resultado && (
-        <button type="button" onClick={pasar} className="text-sm text-white/60 underline">{ifr ? t.siguienteIfr : t.siguiente}</button>
+        <button type="button" onClick={pasar} className="block text-sm text-white/60 underline">{ifr ? t.siguienteIfr : t.siguiente}</button>
       )}
 
       {enVuelo && conChecklist && (
@@ -912,7 +912,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       )}
 
       {enVuelo && (
-        <button type="button" onClick={nueva} className="text-sm text-white/60 underline">{t.salir}</button>
+        <button type="button" onClick={nueva} className="block text-sm text-white/60 underline">{t.salir}</button>
       )}
 
       {(terminado || repaso.etapa === "invalido") && (
