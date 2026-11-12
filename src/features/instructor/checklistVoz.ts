@@ -153,6 +153,12 @@ export function avanzarChecklist(cl0: Checklist, m: Muestra, ctx: ContextoRevisi
 const lista = (s: SeccionVoz, ps: Punto[], estado: EstadoPunto) =>
   s.puntos.flatMap((p, k) => (ps[k].estado === estado ? [ps[k].detalle ? `${reto(p.dicho)} (${ps[k].detalle})` : reto(p.dicho)] : []));
 
+/** Los tonos de lo que acaba de oír: baja al cerrar la sección abierta, sube al abrir otra (Erik, 2026-11-11). */
+export function tonosChecklist(antes: Checklist, ahora: Checklist): ("cierra" | "abre")[] {
+  if (antes.abierta === ahora.abierta) return [];
+  return [...(antes.abierta ? (["cierra"] as const) : []), ...(ahora.abierta ? (["abre"] as const) : [])];
+}
+
 /** Lo que dice el instructor al cerrar la sección; null mientras siga abierta o tenga puntos revisando. */
 export function avisoSeccion(cl: Checklist, id: SeccionId): string | null {
   const s = cl.secciones.find((x) => x.id === id);

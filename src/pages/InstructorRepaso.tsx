@@ -4,7 +4,8 @@ import { Button } from "../components/ui/Button";
 import { AVIONES_VOZ } from "../data/checklistVozAviones";
 import type { SeccionId } from "../data/checklistVozC172";
 import { useAuth } from "../features/auth/AuthContext";
-import { avanzarChecklist, crearChecklist, oir, porDecir, type Checklist, type EstadoPunto } from "../features/instructor/checklistVoz";
+import { avanzarChecklist, crearChecklist, oir, porDecir, tonosChecklist, type Checklist, type EstadoPunto } from "../features/instructor/checklistVoz";
+import { sonarTonos } from "../features/instructor/tonos";
 import { debriefingRepaso, esperaApagado, paraGuardarRepaso } from "../features/instructor/debriefingRepaso";
 import type { Muestra } from "../features/instructor/evaluador";
 import { textosReporte, type Idioma } from "../features/instructor/idiomaInstructor";
@@ -380,7 +381,9 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   // Checklist por voz, en español, mientras dura la lección. Al cerrar una sección el instructor dice qué faltó.
   const enVuelo = !!repaso && repaso.etapa !== "terminado" && repaso.etapa !== "invalido";
   const escucha = useChecklistVoz((enVuelo || (terminado && !listo)) && escuchaEntrada.fase === "inactivo", voz, (texto) => {
-    clRef.current = oir(clRef.current, texto, ultimaT.current);
+    const antes = clRef.current;
+    clRef.current = oir(antes, texto, ultimaT.current);
+    sonarTonos(tonosChecklist(antes, clRef.current));
     setCl(clRef.current);
   });
   const decirChecklist = escucha.decir;

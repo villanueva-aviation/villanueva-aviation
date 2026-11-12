@@ -16,9 +16,11 @@ import {
   porDecir,
   respuestasCopiloto,
   resumenChecklist,
+  tonosChecklist,
   type Checklist,
   type EstadoPunto,
 } from "../features/instructor/checklistVoz";
+import { sonarTonos } from "../features/instructor/tonos";
 import type { SeccionId } from "../data/checklistVozC172";
 import { AVIONES_VOZ, type AvionVoz } from "../data/checklistVozAviones";
 import { useVoz } from "../features/instructor/useVoz";
@@ -91,7 +93,9 @@ export function AdminVuelo() {
   const voz = useVoz("es", () => null);
 
   const alOir = (texto: string) => {
-    clRef.current = oir(clRef.current, texto, ultimaT.current);
+    const antes = clRef.current;
+    clRef.current = oir(antes, texto, ultimaT.current);
+    sonarTonos(tonosChecklist(antes, clRef.current));
     setCl(clRef.current);
     setOido(texto);
     setOidos((xs) => [texto, ...xs].slice(0, 12));

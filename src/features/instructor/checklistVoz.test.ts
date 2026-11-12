@@ -5,7 +5,7 @@ import { AVIONES_VOZ } from "../../data/checklistVozAviones.ts";
 import { ES_V15 } from "./revisionSim.ts";
 import type { Muestra } from "./evaluador.ts";
 import { simularVuelo } from "./simularVuelo.ts";
-import { avanzarChecklist, avisoSeccion, avisosPorDecir, crearChecklist, oir, PIEZA_AVISO, porDecir, respuestasCopiloto, resumenChecklist, type Checklist } from "./checklistVoz.ts";
+import { avanzarChecklist, avisoSeccion, avisosPorDecir, crearChecklist, oir, PIEZA_AVISO, porDecir, respuestasCopiloto, resumenChecklist, tonosChecklist, type Checklist } from "./checklistVoz.ts";
 import { encolar, siguiente } from "./colaVoz.ts";
 
 const PUNTOS = CHECKLIST_VOZ_C172.flatMap((s) => s.puntos);
@@ -251,4 +251,18 @@ test("dream como lo escribe el reconocimiento cuenta como trim", () => {
   assert.deepEqual(estados(ad, "antes-despegar").slice(0, 4), ["dicho", "dicho", "revisando", "revisando"]);
   const cr = decir(nuevo(), ["checklist crucero", "potencia", "dream ajustado"]);
   assert.equal(cr.puntos.crucero[1].estado, "dicho");
+});
+
+test("tonos: sube al abrir una sección, baja al cerrarla, y al cambiar de sección baja y sube", () => {
+  const [s1, s2] = CHECKLIST_VOZ_C172;
+  const c0 = crearChecklist(CHECKLIST_VOZ_C172);
+  const c1 = oir(c0, `checklist ${s1.claves[0]}`, 0);
+  assert.deepEqual(tonosChecklist(c0, c1), ["abre"]);
+  assert.deepEqual(tonosChecklist(c1, oir(c1, "lo que sea", 0)), []);
+  assert.deepEqual(tonosChecklist(c1, oir(c1, "checklist completo", 0)), ["cierra"]);
+  assert.deepEqual(tonosChecklist(c1, oir(c1, `checklist ${s2.claves[0]}`, 0)), ["cierra", "abre"]);
+  let c = c1;
+  for (const p of s1.puntos) c = oir(c, p.dicho, 0);
+  assert.equal(c.abierta, null);
+  assert.deepEqual(tonosChecklist(c1, c), ["cierra"]);
 });
