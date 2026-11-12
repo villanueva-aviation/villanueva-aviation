@@ -1,10 +1,9 @@
-import { Check, Lock } from "lucide-react";
+import { Check } from "lucide-react";
 
 export interface StepperStage {
   key: string;
   label: string;
   done: boolean;
-  locked?: boolean;
 }
 
 export function ModuleStepper({
@@ -37,7 +36,7 @@ export function ModuleStepper({
                 stage.done ? "bg-gold-500 text-navy-950" : "border border-current"
               }`}
             >
-              {stage.done ? <Check size={11} /> : stage.locked ? <Lock size={10} /> : i + 1}
+              {stage.done ? <Check size={11} /> : i + 1}
             </span>
             {stage.label}
           </button>

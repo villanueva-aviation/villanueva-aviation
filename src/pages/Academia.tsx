@@ -54,7 +54,7 @@ export function Academia() {
       <PageHero
         eyebrow="Academia"
         title="Educación aeronáutica estructurada por módulos"
-        description="Cada módulo combina lecciones, ejercicios interactivos y una evaluación final. Avanza a tu ritmo y desbloquea el siguiente nivel de formación."
+        description="Cada módulo combina lecciones, ejercicios interactivos y una evaluación final. Todos están abiertos: empieza por el tema que quieras y avanza a tu ritmo."
       />
 
       <Container className="py-16 md:py-24">

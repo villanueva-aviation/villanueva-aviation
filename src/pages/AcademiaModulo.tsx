@@ -18,7 +18,6 @@ import { LessonFlow } from "../features/academia/LessonFlow";
 import { Quiz } from "../features/academia/Quiz";
 import { ProyectoFinal } from "../features/academia/ProyectoFinal";
 import { ModuloFeedback } from "../features/academia/ModuloFeedback";
-import { useBloqueoPorProyecto, type BloqueoProyecto } from "../features/academia/useBloqueoPorProyecto";
 import { Reveal } from "../components/ui/Reveal";
 import { MisionesModulo } from "../features/academia/MisionesModulo";
 import { MISIONES } from "../data/misiones";
@@ -66,30 +65,6 @@ function ModuloCompletadoBanner({ slug }: { slug: string }) {
   );
 }
 
-const ETAPAS_BLOQUEABLES = ["interactividad", "practica", "evaluacion", "proyecto"];
-
-function EtapaBloqueada({ bloqueo }: { bloqueo: BloqueoProyecto }) {
-  const rechazada = bloqueo.motivo === "rechazada";
-  return (
-    <div className="flex flex-col items-center gap-3 rounded-2xl border border-gold-500/25 bg-gold-500/[0.06] px-6 py-14 text-center">
-      <Lock size={22} className="text-gold-400" />
-      <p className="max-w-md text-sm font-medium text-white">
-        {rechazada
-          ? `El proyecto final de ${bloqueo.moduloPrevioTitulo} necesita correcciones`
-          : `Primero envía el proyecto final de ${bloqueo.moduloPrevioTitulo}`}
-      </p>
-      {rechazada && bloqueo.motivoRechazo && <p className="max-w-md text-sm text-white/65">{bloqueo.motivoRechazo}</p>}
-      <p className="max-w-md text-xs text-white/50">
-        Las lecciones siguen abiertas. Los ejercicios, la práctica, la evaluación y el proyecto de este módulo se
-        desbloquean cuando el proyecto anterior esté enviado y sin correcciones pendientes.
-      </p>
-      <Button to={`${ROUTES.academiaModulo(bloqueo.moduloPrevioSlug)}?etapa=proyecto`} className="mt-2">
-        {rechazada ? "Corregir mi proyecto" : "Ir al proyecto"}
-      </Button>
-    </div>
-  );
-}
-
 const STAGE_LABELS: Record<ActividadTipo | "introduccion" | "misiones", string> = {
   introduccion: "Introducción",
   misiones: "Misiones",
@@ -106,8 +81,6 @@ export function AcademiaModulo() {
   const { isActividadCompletada, completarActividad, registrarExamen, moduloProgreso, loading: progresoLoading } = useProgress();
 
   // Los módulos con misiones juntan lección e interactividad en una sola etapa.
-  // ponytail: solo Fundamentos (el primer módulo) usa misiones y nunca está bloqueado por un proyecto
-  // previo; si otro módulo las usa, sus interactivos quedarían fuera del bloqueo de ETAPAS_BLOQUEABLES.
   const misiones = slug ? MISIONES[slug] : undefined;
   const stageKeys = useMemo(() => {
     if (!modulo) return [];
@@ -124,7 +97,6 @@ export function AcademiaModulo() {
   const [activeStage, setActiveStage] = useState<string>(
     etapaInicial && stageKeys.includes(etapaInicial) ? etapaInicial : "introduccion",
   );
-  const bloqueo = useBloqueoPorProyecto(slug);
   const { user } = useAuth();
   const esBienvenida = searchParams.get("bienvenida") === "1";
 
@@ -159,12 +131,9 @@ export function AcademiaModulo() {
       key,
       label: STAGE_LABELS[key as ActividadTipo | "introduccion" | "misiones"],
       done,
-      locked: !!bloqueo && ETAPAS_BLOQUEABLES.includes(key),
     };
   });
 
-  // Mientras carga el estado del proyecto previo, las etapas bloqueables no se muestran (evita parpadeo).
-  const mostrarEtapa = !ETAPAS_BLOQUEABLES.includes(activeStage) || bloqueo === null;
 
   return (
     <div>
@@ -206,7 +175,6 @@ export function AcademiaModulo() {
         )}
 
         <Reveal key={activeStage} className="mt-10">
-          {!mostrarEtapa && bloqueo && <EtapaBloqueada bloqueo={bloqueo} />}
 
           {activeStage === "introduccion" && (
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
@@ -293,7 +261,7 @@ export function AcademiaModulo() {
             </div>
           )}
 
-          {mostrarEtapa && activeStage === "interactividad" && interactividadActividades.length > 0 && (
+          {activeStage === "interactividad" && interactividadActividades.length > 0 && (
             <div className="flex flex-col gap-6">
               {interactividadActividades.map((actividad) => {
                 const completada = isActividadCompletada(modulo.slug, actividad.id);
@@ -334,7 +302,7 @@ export function AcademiaModulo() {
             </div>
           )}
 
-          {mostrarEtapa && activeStage === "practica" && practicaActividad && (
+          {activeStage === "practica" && practicaActividad && (
             <div className="flex flex-col gap-6">
               {practicaPreguntas ? (
                 <Quiz
@@ -358,7 +326,7 @@ export function AcademiaModulo() {
             </div>
           )}
 
-          {mostrarEtapa && activeStage === "evaluacion" && evaluacionActividad && (
+          {activeStage === "evaluacion" && evaluacionActividad && (
             <div className="flex flex-col gap-6">
               {evaluacionPreguntas ? (
                 <Quiz
@@ -385,7 +353,7 @@ export function AcademiaModulo() {
             </div>
           )}
 
-          {mostrarEtapa && activeStage === "proyecto" && proyectoActividad && (
+          {activeStage === "proyecto" && proyectoActividad && (
             <div className="flex flex-col gap-6">
               {isActividadCompletada(modulo.slug, proyectoActividad.id) ? (
                 <div className="flex flex-col items-center gap-3 rounded-2xl border border-gold-500/30 bg-gold-500/10 px-6 py-14 text-center">
