@@ -9,7 +9,7 @@ import { grabacionDemo } from "./recorridoDemo.ts";
 import type { Nivel } from "./nivel.ts";
 import { simularRumbos } from "./simular.ts";
 import { toleranciaRumbos } from "./evaluadorRumbos.ts";
-import { avanzarInterceptacion, iniciarInterceptacion } from "./evaluadorInterceptacion.ts";
+import { avanzarInterceptacion, iniciarInterceptacion, responderTipo } from "./evaluadorInterceptacion.ts";
 import { crearChecklist, type Checklist } from "./checklistVoz.ts";
 import { CHECKLIST_VOZ_C172 } from "../../data/checklistVozC172.ts";
 
@@ -258,14 +258,16 @@ test("IFR: el grabador con nav guarda radial, barra en puntos y DME; sin nav, lo
 
 /** Interceptación alejándose por el radial 090 que se pasa 1.4 puntos (medio: error). */
 function interceptacionPasada(): ResultadoComun {
-  const ej = { caso: "alejandose" as const, radial: 90, desde: true, curso: 90 };
-  const en = (t: number, desv: number, rumbo: number) => conNav({ t: 300 + t, navRadial: (90 + desv + 360) % 360, rumbo, navDme: 6 + t / 60 });
-  let e = iniciarInterceptacion(en(0, 20, 60), 2, ej, { intento: 0, examen: false, vor: "GDL" });
-  const vuelo: [number, number][] = [];
+  const ej = { tipo: "normal" as const, radial: 90, desde: true, curso: 90, referencia: 60 };
+  const en = (t: number, desv: number, rumbo: number, dme = 6) => conNav({ t: 300 + t, navRadial: (90 + desv + 360) % 360, rumbo, navDme: dme });
+  let e = responderTipo(iniciarInterceptacion(en(0, 20, 60), 2, ej, { intento: 0, examen: false, vor: "GDL" }), "normal");
+  const vuelo: [number, number, number?][] = [];
   for (let d = 19; d >= 0; d--) vuelo.push([d, 60]);
   vuelo.push([-1, 100], [-2, 100], [-2.8, 100], [-2, 80], [-1, 80]);
   for (let k = 0; k < 35; k++) vuelo.push([0, 90]);
-  vuelo.forEach(([d, r], i) => (e = avanzarInterceptacion(e, en(i + 1, d, r))));
+  // A dist0 + 4 (10 NM) termina el alejamiento.
+  vuelo.push([0, 90, 10.1]);
+  vuelo.forEach(([d, r, dme], i) => (e = avanzarInterceptacion(e, en(i + 1, d, r, dme))));
   return e.resultado!;
 }
 

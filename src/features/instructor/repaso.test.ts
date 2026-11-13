@@ -354,7 +354,7 @@ test("«S»: la zona va de 600 ft AGL hacia arriba y la salida lo dice", () => {
 // ── IFR: la misma lección de rampa a rampa, con el VOR en lugar de la zona ──
 
 const VOR = elegirVor({ ident: "GDL", region: "MM", lat: A.lat, lon: A.lon, mhz: 117.5, dme: true }, BASE);
-const IFR = Array(5).fill("interceptar-radial");
+const IFR = Array(4).fill("interceptar-radial");
 /** El vuelo simulado con NAV1 en `mhz`; `sinSenal(i, m)` apaga la señal en esas muestras. */
 const vueloIfr = (mhz = 117.5, sinSenal: (i: number, m: Muestra) => boolean = () => false) =>
   simularVuelo().map((m, i) => ({ ...m, navMhz: mhz, navObs: 0, navRadial: 0, navDesv: 0, navDesde: 2 as const, navDme: 3, navTieneDme: true, navSenal: !sinSenal(i, m), gpsNav: false }));
@@ -423,7 +423,7 @@ test("IFR: el checkride va en medio como mínimo y son 2 interceptaciones; el VF
 
 test("IFR: los ejercicios de la lección mandan cuántas maniobras hay en práctica y en examen", () => {
   const l1 = leccionIfrDe("1")!;
-  assert.equal(maniobrasDe(l1, Math.random, "practica").length, 5);
+  assert.equal(maniobrasDe(l1, Math.random, "practica").length, 4);
   assert.equal(maniobrasDe(l1, Math.random, "checkride").length, 2);
   const otra = { ...l1, ejercicios: { practica: 3, examen: 1 } };
   assert.equal(maniobrasDe(otra, Math.random, "practica").length, 3);
@@ -444,4 +444,25 @@ test("cada espera hecha dice su entrada, para no confundir tres «Patrones de es
   assert.doesNotMatch(nombreHecha("espera", "paralela", "en"), /[áéíóúñ¿¡]/);
   assert.match(nombreHecha("espera", "paralela", "en"), /\(parallel entry\)$/);
   assert.equal(nombreHecha("espera", entradaDe(null), "es"), "Patrones de espera");
+});
+
+test("IFR 1 y 2: un tramo reprobado en práctica avanza; el vuelo no se detiene a repetir", () => {
+  for (const id of ["interceptar-radial", "ruta-pasada"] as const) {
+    const e = { ...crearRepaso("practica", Array(4).fill(id), 2, "ifr"), etapa: "maniobra" as const };
+    const r = alResultado(e, res(false), "a", "es");
+    assert.equal(r.estado.actual, 1, id);
+    assert.ok(!r.decir.includes("Puedes repetirla o pasar a la siguiente."), r.decir.join(" | "));
+  }
+});
+
+test("cada tramo hecho dice su tipo y su sentido", () => {
+  const tramo = (ej: object) => ({ aprobado: true, calificacion: 100, elementos: {}, avisos: [], muestras: [], ejercicio: ej }) as never;
+  assert.equal(nombreHecha("ruta-pasada", "pasada-acercamiento", "es"), "Rutas pasadas (acercamiento)");
+  assert.equal(nombreHecha("ruta-pasada", "normal-acercamiento", "es"), "Interceptación normal (acercamiento)");
+  assert.equal(nombreHecha("ruta-pasada", "normal-acercamiento", "en"), "Normal intercept (inbound)");
+  assert.equal(nombreHecha("interceptar-radial", "normal-alejamiento", "es"), "Interceptación de radiales (alejamiento)");
+  assert.equal(nombreHecha("interceptar-radial", "normal-alejamiento", "en"), "Radial interception (outbound)");
+  assert.equal(nombreHecha("ruta-pasada", "pasada-alejamiento", "en"), "Passed routes (outbound)");
+  assert.equal(entradaDe(tramo({ tipo: "pasada", desde: false })), "pasada-acercamiento");
+  assert.equal(entradaDe(tramo({ radial: 90, desde: true })), "normal-alejamiento", "los viejos sin tipo cuentan como normales");
 });

@@ -259,15 +259,35 @@ export function nombreManiobra(id: ManiobraId, idioma: Idioma): string {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
-/** Con su entrada: tres «Patrones de espera» seguidos confunden al cadete (Erik, 2026-11-12). */
-export function nombreHecha(id: ManiobraId, entrada: Entrada | undefined, idioma: Idioma): string {
+const SENTIDO = { es: { alejamiento: "alejamiento", acercamiento: "acercamiento" }, en: { alejamiento: "outbound", acercamiento: "inbound" } };
+const NORMAL = { es: "Interceptación normal", en: "Normal intercept" };
+
+/**
+ * Con su variante: tres «Patrones de espera» seguidos confunden al cadete (Erik, 2026-11-12). La espera trae su entrada;
+ * un tramo IFR trae `tipo-sentido`, y si el tipo no es el de la lección (el normal del examen de la 2) se nombra por el tipo.
+ */
+export function nombreHecha(id: ManiobraId, variante: string | undefined, idioma: Idioma): string {
   const base = nombreManiobra(id, idioma);
-  if (id !== "espera" || !entrada) return base;
-  return `${base} (${idioma === "en" ? `${NOMBRE_ENTRADA.en[entrada]} entry` : `entrada ${NOMBRE_ENTRADA.es[entrada]}`})`;
+  if (!variante) return base;
+  if (id === "espera") {
+    const e = variante as Entrada;
+    return `${base} (${idioma === "en" ? `${NOMBRE_ENTRADA.en[e]} entry` : `entrada ${NOMBRE_ENTRADA.es[e]}`})`;
+  }
+  if (id !== "interceptar-radial" && id !== "ruta-pasada") return base;
+  const [tipo, sentido] = variante.split("-") as [string, "alejamiento" | "acercamiento"];
+  const nombre = tipo === "pasada" ? nombreManiobra("ruta-pasada", idioma) : id === "ruta-pasada" ? NORMAL[idioma] : base;
+  return `${nombre} (${SENTIDO[idioma][sentido]})`;
 }
 
-/** La entrada que tocaba en una espera calificada; en las demás maniobras, nada. */
-export const entradaDe = (r: ResultadoComun | null | undefined): Entrada | undefined => (r as { correcta?: Entrada } | null | undefined)?.correcta;
+/** La entrada que tocaba en una espera calificada, o el tipo y sentido de un tramo IFR; en las demás maniobras, nada. */
+export function entradaDe(r: ResultadoComun | null | undefined): string | undefined {
+  const x = r as { correcta?: Entrada; ejercicio?: { tipo?: string; desde?: unknown } } | null | undefined;
+  if (x?.correcta) return x.correcta;
+  const ej = x?.ejercicio;
+  // El arco también trae `desde`, pero es un radial (número); el de un tramo es alejándose sí o no.
+  if (typeof ej?.desde !== "boolean") return undefined;
+  return `${ej.tipo ?? "normal"}-${ej.desde ? "alejamiento" : "acercamiento"}`;
+}
 
 export const crearRepaso = (modo: Modo, sorteo: ManiobraId[], nivel: Nivel = 3, programa: "vfr" | "ifr" = "vfr"): EstadoRepaso => ({
   etapa: "rampa", modo, sorteo, actual: 0, hechas: sorteo.map((id) => ({ id, resultado: null, intentoId: null })), zona: null, vuelo: null, tomas: crearTomas(),
@@ -411,14 +431,15 @@ function avanzarManiobra(e: EstadoRepaso, idioma: Idioma): Paso {
 }
 
 const enManiobras = (e: EstadoRepaso) => e.etapa === "maniobra" || e.etapa === "fuera-de-zona";
+const encadenado = (e: EstadoRepaso) => e.sorteo[e.actual] === "interceptar-radial" || e.sorteo[e.actual] === "ruta-pasada";
 
 /** Un resultado calificado de la maniobra actual, ya guardado (id null si no se pudo). */
 export function alResultado(e: EstadoRepaso, r: ResultadoComun, intentoId: string | null, idioma: Idioma): Paso {
   if (!enManiobras(e)) return { estado: e, decir: [] };
   const hechas = e.hechas.map((h, i) => (i === e.actual ? { ...h, resultado: r, intentoId } : h));
   const estado = { ...e, hechas };
-  // Un circuito no se repite en el aire: el siguiente ya va en camino.
-  if (e.modo === "checkride" || r.aprobado || deCircuitos(e)) return avanzarManiobra(estado, idioma);
+  // Un circuito no se repite en el aire: el siguiente ya va en camino. Un tramo IFR tampoco: el siguiente sale de donde quedó.
+  if (e.modo === "checkride" || r.aprobado || deCircuitos(e) || encadenado(e)) return avanzarManiobra(estado, idioma);
   return { estado, decir: [T[idioma].repetir] };
 }
 

@@ -1,7 +1,6 @@
 // Lo que se graba del vuelo para el debriefing con mapa: un punto por segundo, las fases y lo que dijo el instructor. Puro.
 import { toleranciaViraje, type Muestra } from "./evaluador.ts";
 import { entradaDe, type EstadoRepaso } from "./repaso.ts";
-import type { Entrada } from "../entrenador/esperas.ts";
 import type { Checklist } from "./checklistVoz.ts";
 import { debriefingRepaso } from "./debriefingRepaso.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
@@ -161,7 +160,7 @@ export function tramosFuera(r: unknown): TramoCampo[] {
   return out;
 }
 
-export type IntentoVuelo = { n: number; maniobra: ManiobraId; calificacion: number; aprobado: boolean; inicio: number; fin: number; /** Solo la espera; los mapas viejos no la traen. */ entrada?: Entrada };
+export type IntentoVuelo = { n: number; maniobra: ManiobraId; calificacion: number; aprobado: boolean; inicio: number; fin: number; /** La entrada de la espera o el tipo y sentido de un tramo IFR (`entradaDe`); los mapas viejos no la traen. */ entrada?: string };
 export type ErrorVuelo = {
   n: number;
   fase: FaseMapa | "checklist";
