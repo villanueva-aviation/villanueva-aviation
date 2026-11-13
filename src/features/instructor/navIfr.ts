@@ -2,16 +2,20 @@ import { entradaEspera, generarSituacion, norm, type Entrada, type Giros } from 
 import type { Muestra } from "./evaluador.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
 import { normalizar } from "./preguntas.ts";
+import { CONO_NM, distanciaVor, radialPorPosicion, type VorElegido } from "./vorSim.ts";
 
 // Geometría del VOR y los ejercicios del programa IFR. Puro.
 // Radiales y cursos en grados magnéticos, como los da el radio NAV1.
 
-export type CasoInterceptacion = "alejandose" | "acercandose" | "alejandose-amplio" | "acercandose-amplio" | "contrario";
-/** `curso`: lo que va en el OBS. Alejándose (FROM) es el radial; acercándose (TO), el radial + 180. */
-export type Ejercicio = { caso: CasoInterceptacion; radial: number; desde: boolean; curso: number };
-
-/** Las 5 prácticas de la lección 1: el ángulo y el sentido cambian; la distancia es la que haya (el consejo la dice). */
-export const CASOS_PRACTICA: CasoInterceptacion[] = ["alejandose", "acercandose", "alejandose-amplio", "acercandose-amplio", "contrario"];
+/** Normal: el radial pedido queda delante (a menos de 90° del del avión); ruta pasada: queda atrás (Erik, 2026-11-13). */
+export type TipoTramo = "normal" | "pasada";
+/** Un tramo del vuelo encadenado: alejándose (FROM) o acercándose (TO). `esperarNm`: no se anuncia antes de esa distancia. */
+export type Tramo = { desde: boolean; tipo: TipoTramo; esperarNm?: number };
+/**
+ * `curso`: lo que va en el OBS. Alejándose (FROM) es el radial; acercándose (TO), el radial + 180.
+ * `referencia`: el radial (o, junto al VOR, el rumbo) contra el que se decide si es normal o ruta pasada.
+ */
+export type Ejercicio = { tipo: TipoTramo; radial: number; desde: boolean; curso: number; referencia: number };
 
 export const norm180 = (g: number) => ((((g + 180) % 360) + 360) % 360) - 180;
 export const norm360 = (g: number) => ((g % 360) + 360) % 360;
@@ -42,35 +46,32 @@ export function desvioGrados(ej: Pick<Ejercicio, "radial" | "desde">, radialAvio
 /** Puntos de la barra: uno cada 2° en un VOR. */
 export const puntos = (grados: number) => grados / 2;
 
-/** Grados entre el radial del avión y el pedido para quedar a unas 2.5 NM: entre 15 y 60; amplio, 30 más (hasta 90). */
-export function deltaRadial(dme: number, amplio: boolean): number {
-  const base = Math.min(60, Math.max(15, (Math.asin(Math.min(1, 2.5 / Math.max(dme, 0.1))) * 180) / Math.PI));
-  return Math.round(amplio ? Math.min(90, base + 30) : base);
+export const tipoDe = (radial: number, referencia: number): TipoTramo => (Math.abs(norm180(radial - referencia)) > 90 ? "pasada" : "normal");
+
+/** Normal a 20–60° de la referencia, ruta pasada a 120–160°: en decenas, nunca a menos de 10° de la frontera de 90°. */
+export function generarTramo(tramo: Tramo, referencia: number, azar: () => number = Math.random): Ejercicio {
+  const signo = azar() < 0.5 ? 1 : -1;
+  const desfase = (tramo.tipo === "normal" ? 20 : 120) + 10 * Math.floor(azar() * 5);
+  const radial = redondear10(referencia + signo * desfase);
+  return { tipo: tramo.tipo, radial, desde: tramo.desde, curso: tramo.desde ? radial : norm360(radial + 180), referencia };
 }
 
-export function generarEjercicio(caso: CasoInterceptacion, radialAvion: number, dme: number, rumbo: number, azar: () => number = Math.random): Ejercicio {
-  if (caso === "contrario") {
-    // El radial de al lado, en el sentido que obliga a virar más de 90°.
-    const radial = redondear10(radialAvion + 20);
-    const desde = Math.abs(norm180(radial - rumbo)) > 90;
-    return { caso, radial, desde, curso: desde ? radial : norm360(radial + 180) };
+/** Los tramos de la lección: 4 seguidos en práctica, 2 en el examen; el de la lección 2 mezcla una normal y una pasada. */
+export function tramosDe(leccion: 1 | 2, examen: boolean, azar: () => number = Math.random): Tramo[] {
+  if (examen) {
+    if (leccion === 1) return [{ desde: true, tipo: "normal" }, { desde: false, tipo: "normal" }];
+    return azar() < 0.5 ? [{ desde: true, tipo: "pasada" }, { desde: false, tipo: "normal" }] : [{ desde: true, tipo: "normal" }, { desde: false, tipo: "pasada" }];
   }
-  const signo = azar() < 0.5 ? 1 : -1;
-  const radial = redondear10(radialAvion + signo * deltaRadial(dme, caso.endsWith("amplio")));
-  const desde = caso.startsWith("alejandose");
-  return { caso, radial, desde, curso: desde ? radial : norm360(radial + 180) };
+  const tipo: TipoTramo = leccion === 1 ? "normal" : "pasada";
+  // Lección 2: tras pasar el VOR, a 3 NM, para que haya un «al través» (Erik, 2026-11-13).
+  return [{ desde: true, tipo }, { desde: false, tipo }, tipo === "pasada" ? { desde: true, tipo, esperarNm: 3 } : { desde: true, tipo }, { desde: false, tipo }];
 }
 
-/** Lección 2: se acerca por `entrada` (curso entrada + 180, TO), pasa la estación y se aleja por `salida` (FROM). */
-export type EjercicioRuta = { entrada: number; salida: number; giro: number };
-
-/** Cuánto vira sobre la estación en cada práctica. */
-export const CASOS_RUTA = [45, 90, 135];
-
-export function generarRuta(radialAvion: number, giro: number, azar: () => number = Math.random): EjercicioRuta {
-  const entrada = redondear10(radialAvion);
-  const signo = azar() < 0.5 ? 1 : -1;
-  return { entrada, salida: norm360(entrada + 180 + signo * giro), giro };
+/** Contra qué se mide el tramo: junto al VOR, la pista (o el rumbo); lejos, el radial del avión. */
+export function referenciaTramo(m: Muestra, vor: VorElegido | undefined, rumboPista?: number): number {
+  const dist = vor ? distanciaVor(m, vor) : m.navTieneDme ? (m.navDme ?? null) : null;
+  if (dist !== null && dist < CONO_NM) return rumboPista ?? m.rumbo;
+  return m.navRadial ?? (vor ? radialPorPosicion(m, vor) : null) ?? m.rumbo;
 }
 
 /**
@@ -117,6 +118,18 @@ const PALABRAS_ENTRADA: [Entrada, string[]][] = [
   ["gota", ["gota", "lagrima", "teardrop", "tear drop"]],
 ];
 
+const PALABRAS_TIPO: [TipoTramo, string[]][] = [
+  ["normal", ["normal"]],
+  ["pasada", ["pasada", "pasado", "passed", "behind"]],
+];
+
+/** Lo que contestó el cadete a «¿normal o ruta pasada?»; si dijo las dos o ninguna, null. */
+export function tipoDicho(texto: string, idioma: Idioma): TipoTramo | null {
+  const t = ` ${normalizar(texto, idioma)} `;
+  const dichos = PALABRAS_TIPO.filter(([, ps]) => ps.some((p) => t.includes(` ${p} `))).map(([x]) => x);
+  return dichos.length === 1 ? dichos[0] : null;
+}
+
 /** La entrada que dijo el cadete; si dijo dos distintas o ninguna, null. */
 export function entradaDicha(texto: string, idioma: Idioma): Entrada | null {
   const t = ` ${normalizar(texto, idioma)} `;
@@ -162,11 +175,6 @@ export function entradaVolada(ms: Muestra[], alejamiento: number, giros: Giros):
   if ((giro > 0) !== (giros === "derecha")) return "paralela";
   const lado = giros === "derecha" ? -1 : 1;
   return Math.abs(norm180(h1 - (alejamiento + lado * 30))) < Math.abs(norm180(h1 - alejamiento)) ? "gota" : "directa";
-}
-
-/** El examen: una interceptación alejándose y una acercándose, sin consejos. */
-export function casosExamen(azar: () => number = Math.random): [CasoInterceptacion, CasoInterceptacion] {
-  return [azar() < 0.5 ? "alejandose" : "alejandose-amplio", azar() < 0.5 ? "acercandose" : "acercandose-amplio"];
 }
 
 /** Cerca, la barra se mueve rápido; lejos, tarda (Erik). */

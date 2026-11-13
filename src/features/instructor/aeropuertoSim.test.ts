@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { AEROPUERTO_PRUEBA, aCrudo, leerAeropuerto, pistaBajo } from "./aeropuertoSim.ts";
+import { AEROPUERTO_PRUEBA, aCrudo, leerAeropuerto, pistaBajo, pistaProbable } from "./aeropuertoSim.ts";
 
 const crudo = {
   icao: "MMGL", nombre: "Guadalajara", lat: 20.5218, lon: -103.3112, altM: 1528,
@@ -53,4 +53,16 @@ test("aCrudo es la inversa", () => {
   assert.deepEqual(idents(a), idents(AEROPUERTO_PRUEBA));
   assert.deepEqual(a.frecuencias, AEROPUERTO_PRUEBA.frecuencias);
   assert.ok(Math.abs(a.elevacionFt - AEROPUERTO_PRUEBA.elevacionFt) <= 1);
+});
+
+test("pistaProbable: el rumbo magnético del umbral más cercano al avión", () => {
+  const [e11, e29] = AEROPUERTO_PRUEBA.pistas[0].extremos;
+  // Parado junto al umbral de la 29, de lado (rumbo 200 magnético, 205 verdadero: declinación +5).
+  const m = {
+    t: 0, inclinacion: 0, altitud: 5016, velocidad: 0, rumbo: 200, rumboV: 205, bola: 0, agl: 0, peso: 2300, enTierra: true, slew: false, tasa: 1,
+    pausa: false, titulo: "C172", lat: e29.lat + 0.001, lon: e29.lon,
+  };
+  assert.equal(pistaProbable(m, AEROPUERTO_PRUEBA), e29.rumboV - 5);
+  assert.equal(pistaProbable({ ...m, lat: e11.lat - 0.001, lon: e11.lon }, AEROPUERTO_PRUEBA), e11.rumboV - 5);
+  assert.equal(pistaProbable({ ...m, lat: undefined }, AEROPUERTO_PRUEBA), null);
 });

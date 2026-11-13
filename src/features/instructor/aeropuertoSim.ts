@@ -106,6 +106,21 @@ export function pistaBajo(m: Pick<Muestra, "lat" | "lon" | "rumboV">, a: Aeropue
   return null;
 }
 
+/** IFR en tierra: el rumbo magnético del umbral más cercano, la pista por la que va a despegar. Sin posición, null. */
+export function pistaProbable(m: Pick<Muestra, "lat" | "lon" | "rumbo" | "rumboV">, a: Aeropuerto): number | null {
+  if (m.lat === undefined || m.lon === undefined) return null;
+  const { lat, lon } = m;
+  const extremos = a.pistas.flatMap((p) => p.extremos);
+  if (!extremos.length) return null;
+  const lejos = (e: Extremo) => {
+    const d = aNm(lat, lon, e.lat, e.lon);
+    return Math.hypot(d.x, d.y);
+  };
+  const cerca = extremos.reduce((x, y) => (lejos(y) < lejos(x) ? y : x));
+  const decl = m.rumboV === undefined ? 0 : m.rumboV - m.rumbo;
+  return norm(cerca.rumboV - decl);
+}
+
 /** MMGL aproximado, para pruebas y simulación: el aeropuerto real sale del simulador. */
 export const AEROPUERTO_PRUEBA: Aeropuerto = leerAeropuerto({
   icao: "MMGL",
