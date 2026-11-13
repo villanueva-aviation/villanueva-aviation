@@ -3,10 +3,9 @@ import assert from "node:assert/strict";
 import type { Muestra } from "./evaluador.ts";
 import { armarEspera, avanzarEspera, responderEntrada, type EvaluacionEspera } from "./evaluadorEspera.ts";
 import type { DatosEspera } from "./navIfr.ts";
-import { pasosArco, pasosHsi, pasosInterceptacion, pasosRuta } from "./pasosHsi.ts";
+import { pasosArco, pasosHsi, pasosInterceptacion } from "./pasosHsi.ts";
 import type { VorElegido } from "./vorSim.ts";
 import type { EvaluacionInterceptacion } from "./evaluadorInterceptacion.ts";
-import type { EvaluacionRuta } from "./evaluadorRuta.ts";
 import type { EvaluacionArco } from "./evaluadorArco.ts";
 
 // El mismo simulador de espera.test.ts: VOR en 0,0, 100 kt, una muestra por segundo.
@@ -87,8 +86,12 @@ test("pasos HSI de la gota: la mariposa 30° hacia el lado de la espera", () => 
 const en = (rumbo: number, extra: Partial<Muestra> = {}): Muestra => ({ ...muestra(0, { x: 5, y: 0, rumbo }, 0), navObs: 0, navDesv: 30, ...extra });
 const textos = (p: { texto: string }[] | null) => p!.map((x) => x.texto);
 
-test("lección 1, acercándose: DC30 con la cabeza de la flecha y los números del ejercicio", () => {
-  const e = { fase: "interceptando", examen: false, ejercicio: { caso: "acercandose", radial: 270, desde: false, curso: 90 }, inicio: en(0, { navRadial: 240 }) } as unknown as EvaluacionInterceptacion;
+/** Un tramo armado a mano: ya contestado «normal» salvo que se diga otra cosa. */
+const tramo = (ejercicio: object, extra: object = {}) =>
+  ({ fase: "interceptando", examen: false, dicho: "normal", atraves: false, medirDesde: 0, signo: 1, ejercicio, inicio: en(0), ...extra }) as unknown as EvaluacionInterceptacion;
+
+test("lección 1, acercándose: DC30 con la cabeza de la flecha (la referencia del tramo) y los números del ejercicio", () => {
+  const e = tramo({ tipo: "normal", radial: 270, desde: false, curso: 90, referencia: 240 });
   assert.deepEqual(textos(pasosInterceptacion(e, en(90, { navObs: 90 }), "es")), [
     "Mariposa en 090 (rumbo deseado).",
     "DC30: deseada 090, cabeza 060, me paso 30°: vira al 030.",
@@ -98,11 +101,23 @@ test("lección 1, acercándose: DC30 con la cabeza de la flecha y los números d
   assert.deepEqual(estados(pasosInterceptacion(e, en(90, { navObs: 90 }), "es")), ["actual", "pendiente", "hecho", "pendiente"]);
   assert.deepEqual(estados(pasosInterceptacion(e, en(30, { navObs: 90 }), "es")), ["hecho", "hecho", "hecho", "actual"]);
   assert.deepEqual(estados(pasosInterceptacion({ ...e, fase: "establecido" }, en(90, { navObs: 90, navDesv: 1 }), "es")), ["hecho", "hecho", "hecho", "hecho"]);
+});
+
+test("la guía sale hasta que contesta normal o ruta pasada; nunca en el examen ni esperando el tramo", () => {
+  const e = tramo({ tipo: "normal", radial: 270, desde: false, curso: 90, referencia: 240 });
+  assert.equal(pasosInterceptacion({ ...e, dicho: undefined }, en(90), "es"), null);
   assert.equal(pasosInterceptacion({ ...e, examen: true }, en(90), "es"), null);
+  assert.equal(pasosInterceptacion({ ...e, fase: "esperando", ejercicio: null }, en(90), "es"), null);
+  assert.notEqual(pasosInterceptacion({ ...e, dicho: null }, en(90), "es"), null, "contestó algo que no se entendió: ya se le corrigió");
+});
+
+test("contestó «ruta pasada» en una normal: ve la tarjeta correcta, la normal", () => {
+  const e = tramo({ tipo: "normal", radial: 90, desde: true, curso: 90, referencia: 60 }, { dicho: "pasada" });
+  assert.equal(textos(pasosInterceptacion(e, en(90), "es"))[1], "CD45: cola 060, deseada 090, me paso 45°: vira al 135.");
 });
 
 test("lección 1, alejándose: CD45 con la cola de la flecha; en inglés sin acentos", () => {
-  const e = { fase: "interceptando", examen: false, ejercicio: { caso: "alejandose", radial: 90, desde: true, curso: 90 }, inicio: en(0, { navRadial: 60 }) } as unknown as EvaluacionInterceptacion;
+  const e = tramo({ tipo: "normal", radial: 90, desde: true, curso: 90, referencia: 60 });
   const p = textos(pasosInterceptacion(e, en(90), "es"));
   assert.equal(p[0], "Mariposa en 090 (rumbo y radial coinciden).");
   assert.equal(p[1], "CD45: cola 060, deseada 090, me paso 45°: vira al 135.");
@@ -110,27 +125,51 @@ test("lección 1, alejándose: CD45 con la cola de la flecha; en inglés sin ace
   for (const x of textos(pasosInterceptacion(e, en(90), "en"))) assert.doesNotMatch(x, /[áéíóúñ¿¡]/i);
 });
 
-test("lección 2, giro de 135°: la regla de los 45° de la guía, tachándose", () => {
-  const e = { fase: "acercandose", examen: false, ejercicio: { entrada: 90, salida: 45, giro: 135 }, establecidoVuelta: null } as unknown as EvaluacionRuta;
-  assert.deepEqual(textos(pasosRuta(e, en(270), "es")), [
-    "CRS en 270 (TO): mantén la barra centrada hacia la estación.",
-    "Sobre la estación: mariposa y CRS en 045; vira a la derecha al 045.",
-    "Al través (cambia la flechita), mariposa en 090, del lado del CDI, y vira esos 45°.",
-    "CDI vivo: vira al lado contrario de la estación, al 045.",
+// Ruta pasada por el radial 150 saliendo del R-290 (el ejemplo de Erik): al través en el R-240.
+const PASADA_AL = { tipo: "pasada", radial: 150, desde: true, curso: 150, referencia: 290 };
+const PASADA_AC = { tipo: "pasada", radial: 150, desde: false, curso: 330, referencia: 290 };
+
+test("ruta pasada de alejamiento: la tarjeta de la guía con la mariposa a 45° del lado de la estación", () => {
+  const e = tramo(PASADA_AL, { fase: "reposicionando", dicho: "pasada", medirDesde: null });
+  const antes = en(150, { navRadial: 290, navObs: 150 });
+  assert.deepEqual(textos(pasosInterceptacion(e, antes, "es")), [
+    "Mariposa y CRS al 150 (radial y rumbo coinciden).",
+    "Vira al 150.",
+    "Al través (cambia la flechita), mariposa a 45° del lado de la estación: 105.",
+    "Vira al 105.",
+    "CDI vivo: vira al lado contrario de la estación, al 150.",
   ]);
-  assert.deepEqual(estados(pasosRuta(e, en(270), "es")), ["actual", "pendiente", "pendiente", "pendiente"]);
-  const fuera = { ...e, fase: "alejandose" } as EvaluacionRuta;
-  assert.deepEqual(estados(pasosRuta(fuera, en(300), "es")), ["hecho", "actual", "pendiente", "pendiente"]);
-  assert.deepEqual(estados(pasosRuta(fuera, en(45), "es")), ["hecho", "hecho", "actual", "pendiente"]);
-  assert.deepEqual(estados(pasosRuta(fuera, en(90), "es")), ["hecho", "hecho", "hecho", "actual"]);
-  assert.deepEqual(estados(pasosRuta({ ...fuera, establecidoVuelta: 5 }, en(45), "es")), ["hecho", "hecho", "hecho", "hecho"]);
+  assert.deepEqual(estados(pasosInterceptacion(e, antes, "es")), ["hecho", "hecho", "actual", "pendiente", "pendiente"]);
+  // Al través en el R-240: desde ahí el lado es el del evaluador.
+  const atraves = { ...e, fase: "interceptando", atraves: true, medirDesde: 0, signo: 1 } as EvaluacionInterceptacion;
+  assert.deepEqual(estados(pasosInterceptacion(atraves, en(150, { navRadial: 240 }), "es")), ["hecho", "hecho", "hecho", "actual", "pendiente"]);
+  assert.match(textos(pasosInterceptacion(atraves, en(150, { navRadial: 240 }), "es"))[2], /: 105\.$/);
+  assert.deepEqual(estados(pasosInterceptacion(atraves, en(105, { navRadial: 200 }), "es")), ["hecho", "hecho", "hecho", "hecho", "actual"]);
+  assert.deepEqual(estados(pasosInterceptacion({ ...atraves, fase: "establecido" }, en(150), "es")), ["hecho", "hecho", "hecho", "hecho", "hecho"]);
+  // Del otro lado de la línea del radial, los 45° van al otro lado.
+  assert.match(textos(pasosInterceptacion(e, en(150, { navRadial: 10 }), "es"))[2], /: 195\.$/);
 });
 
-test("lección 2, giro de 90° o menos: sobre la estación vira y centra; sin ejercicio todavía, nada", () => {
-  const e = { fase: "acercandose", examen: false, ejercicio: { entrada: 90, salida: 180, giro: 90 }, establecidoVuelta: null } as unknown as EvaluacionRuta;
-  assert.deepEqual(textos(pasosRuta(e, en(270), "es")).slice(1), ["Sobre la estación: mariposa y CRS en 180; vira a la izquierda al 180.", "CDI vivo: centra la barra en el 180."]);
-  assert.equal(pasosRuta({ ...e, ejercicio: null, fase: "posicionando" }, en(270), "es"), null);
-  for (const x of textos(pasosRuta(e, en(270), "en"))) assert.doesNotMatch(x, /[áéíóúñ¿¡]/i);
+test("ruta pasada de acercamiento: la regla de 1 minuto, con el viraje de 90° hacia el lado del CDI", () => {
+  const e = tramo(PASADA_AC, { fase: "reposicionando", dicho: "pasada", medirDesde: null });
+  const antes = en(150, { navRadial: 290, navObs: 330 });
+  assert.deepEqual(textos(pasosInterceptacion(e, antes, "es")), [
+    "Mariposa al 150 (radial solicitado).",
+    "CRS al 330 (rumbo contrario).",
+    "Vira al 150.",
+    "Al través (cambia la flechita), cronómetro 1 minuto.",
+    "Pasado el minuto, vira 90° hacia el lado del CDI: 060.",
+    "CDI vivo: vira hacia la estación, al 330.",
+  ]);
+  assert.deepEqual(estados(pasosInterceptacion(e, antes, "es")), ["hecho", "hecho", "hecho", "actual", "pendiente", "pendiente"]);
+  const minuto = { ...e, atraves: true, medirDesde: 60 } as EvaluacionInterceptacion;
+  assert.deepEqual(estados(pasosInterceptacion(minuto, en(150, { navRadial: 240 }), "es")), ["hecho", "hecho", "hecho", "hecho", "actual", "pendiente"]);
+  // Pasado el minuto el lado es el del evaluador (acercándose, el signo va al revés del radial).
+  const midiendo = { ...minuto, fase: "interceptando", signo: -1 } as EvaluacionInterceptacion;
+  assert.match(textos(pasosInterceptacion(midiendo, en(60, { navRadial: 230 }), "es"))[4], /: 060\.$/);
+  assert.deepEqual(estados(pasosInterceptacion(midiendo, en(60, { navRadial: 230 }), "es")), ["hecho", "hecho", "hecho", "hecho", "hecho", "actual"]);
+  for (const x of [...textos(pasosInterceptacion(e, antes, "en")), ...textos(pasosInterceptacion(tramo(PASADA_AL, { dicho: "pasada" }), antes, "en"))])
+    assert.doesNotMatch(x, /[áéíóúñ¿¡]/i);
 });
 
 test("lección 3: media milla antes del arco y del radial, con el lado y los rumbos del ejercicio", () => {

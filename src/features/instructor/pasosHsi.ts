@@ -5,8 +5,7 @@ import type { Muestra } from "./evaluador.ts";
 import { radialEspera, type EvaluacionEspera } from "./evaluadorEspera.ts";
 import type { EvaluacionArco } from "./evaluadorArco.ts";
 import type { EvaluacionInterceptacion } from "./evaluadorInterceptacion.ts";
-import type { EvaluacionRuta } from "./evaluadorRuta.ts";
-import { norm180 } from "./navIfr.ts";
+import { desvioGrados, norm180, type Ejercicio } from "./navIfr.ts";
 import { viraALaDerecha } from "./textosArco.ts";
 
 export type EstadoPaso = "hecho" | "actual" | "pendiente";
@@ -85,13 +84,20 @@ const conEstados = (lista: [boolean, string][]): PasoHsi[] => {
 };
 const lado = (derecha: boolean, en: boolean) => (en ? (derecha ? "right" : "left") : derecha ? "derecha" : "izquierda");
 
-/** Lección 1: DC30 acercándose (cabeza de la flecha), CD45 alejándose (cola), con el radial de cuando empezó. */
+/**
+ * Lecciones 1 y 2: la tarjeta del tramo, hasta que el cadete contesta «normal» o «ruta pasada» (no se le adelanta la
+ * respuesta). Sale la tarjeta que toca aunque haya contestado mal: ya se le corrigió de voz.
+ */
 export function pasosInterceptacion(e: EvaluacionInterceptacion, m: Muestra, idioma: "es" | "en"): PasoHsi[] | null {
-  const r0 = e.inicio.navRadial;
-  if (e.examen || e.fase === "invalido" || r0 === undefined) return null;
+  const ej = e.ejercicio;
+  if (e.examen || e.fase === "invalido" || e.fase === "esperando" || !ej || e.dicho === undefined) return null;
+  if (ej.tipo === "pasada") return pasosPasada(e, ej, m, idioma === "en");
+  const ref = (ej as Partial<Ejercicio>).referencia ?? e.inicio.navRadial;
+  if (ref === undefined) return null;
   const en = idioma === "en";
-  const { curso, desde } = e.ejercicio;
-  const flecha = desde ? r0 : r0 + 180;
+  const { curso, desde } = ej;
+  // DC30 acercándose (cabeza de la flecha), CD45 alejándose (cola), con el radial de donde salió el tramo.
+  const flecha = desde ? ref : ref + 180;
   const signo = Math.sign(norm180(desde ? curso - flecha : flecha - curso)) || 0;
   const vira = desde ? curso + 45 * signo : flecha + 30 * signo;
   const [D, F, X] = [tres(curso), tres(flecha), tres(vira)];
@@ -115,31 +121,40 @@ export function pasosInterceptacion(e: EvaluacionInterceptacion, m: Muestra, idi
   ]);
 }
 
-/** Lección 2: acercándose TO; sobre la estación, al radial de salida (con la regla de los 45° si gira más de 90°). */
-export function pasosRuta(e: EvaluacionRuta, m: Muestra, idioma: "es" | "en"): PasoHsi[] | null {
-  const ej = e.ejercicio;
-  if (e.examen || !ej || e.fase === "invalido" || e.fase === "posicionando") return null;
-  const en = idioma === "en";
-  const entra = ej.entrada + 180;
-  const derecha = norm180(ej.salida - entra) > 0;
-  const quince = ej.salida + (derecha ? 45 : -45);
-  const [I, S, Q] = [tres(entra), tres(ej.salida), tres(quince)];
-  const fuera = e.fase !== "acercandose";
-  const listo = e.fase === "terminado" || e.establecidoVuelta !== null;
-  const conRegla = ej.giro > 90;
-  const en45 = conRegla && fuera && cerca(m, quince);
-  const sobre: [boolean, string] = [
-    listo || en45 || (fuera && cerca(m, ej.salida)),
-    en ? `Over the station: heading bug and CRS on ${S}; turn ${lado(derecha, true)} to ${S}.` : `Sobre la estación: mariposa y CRS en ${S}; vira a la ${lado(derecha, false)} al ${S}.`,
-  ];
-  const primero: [boolean, string] = [fuera, en ? `CRS on ${I} (TO): keep the needle centered toward the station.` : `CRS en ${I} (TO): mantén la barra centrada hacia la estación.`];
-  if (!conRegla)
-    return conEstados([primero, sobre, [listo, en ? `CDI alive: center the needle on ${S}.` : `CDI vivo: centra la barra en el ${S}.`]]);
+/**
+ * Lección 2 (las tarjetas de /resumen-hsi): alejándose, regla de los 45°; acercándose, regla de 1 minuto. El lado de la
+ * estación es de qué lado de la línea del radial va el avión: en vivo mientras se reposiciona (vuela paralelo, no la
+ * cruza) y, ya midiendo, el que fijó el evaluador, para que el número no cambie al cruzar el radial.
+ */
+function pasosPasada(e: EvaluacionInterceptacion, ej: Ejercicio, m: Muestra, en: boolean): PasoHsi[] {
+  const midiendo = e.fase !== "reposicionando";
+  const lado = midiendo ? e.signo : Math.sign(desvioGrados(ej, m.navRadial ?? ej.radial)) || 1;
+  // `lado` es el de desvioGrados (al revés acercándose); s = −signo(radial del avión − radial pedido).
+  const s = -(ej.desde ? lado : -lado);
+  const listo = e.fase === "establecido" || e.fase === "terminado";
+  const R = tres(ej.radial);
+  if (ej.desde) {
+    const q = ej.curso + 45 * s;
+    const Q = tres(q);
+    const en45 = listo || (e.atraves && cerca(m, q));
+    return conEstados([
+      [e.atraves || crsEn(m, ej.curso), en ? `Heading bug and CRS on ${R} (radial and heading match).` : `Mariposa y CRS al ${R} (radial y rumbo coinciden).`],
+      [e.atraves || cerca(m, ej.curso), en ? `Turn to ${R}.` : `Vira al ${R}.`],
+      [e.atraves, en ? `Abeam (the flag flips), heading bug 45° toward the station: ${Q}.` : `Al través (cambia la flechita), mariposa a 45° del lado de la estación: ${Q}.`],
+      [en45, en ? `Turn to ${Q}.` : `Vira al ${Q}.`],
+      [listo, en ? `CDI alive: turn away from the station, to ${R}.` : `CDI vivo: vira al lado contrario de la estación, al ${R}.`],
+    ]);
+  }
+  const g = ej.radial + 90 * s;
+  const C = tres(ej.curso);
+  const virado = e.atraves || cerca(m, ej.radial);
   return conEstados([
-    primero,
-    sobre,
-    [listo || en45, en ? `Abeam (the flag flips), heading bug on ${Q}, on the CDI side, and turn those 45°.` : `Al través (cambia la flechita), mariposa en ${Q}, del lado del CDI, y vira esos 45°.`],
-    [listo, en ? `CDI alive: turn away from the station, to ${S}.` : `CDI vivo: vira al lado contrario de la estación, al ${S}.`],
+    [virado, en ? `Heading bug on ${R} (requested radial).` : `Mariposa al ${R} (radial solicitado).`],
+    [e.atraves || crsEn(m, ej.curso), en ? `CRS on ${C} (opposite heading).` : `CRS al ${C} (rumbo contrario).`],
+    [virado, en ? `Turn to ${R}.` : `Vira al ${R}.`],
+    [e.atraves, en ? "Abeam (the flag flips), start a 1-minute timer." : "Al través (cambia la flechita), cronómetro 1 minuto."],
+    [listo || (midiendo && cerca(m, g)), en ? `After the minute, turn 90° toward the CDI side: ${tres(g)}.` : `Pasado el minuto, vira 90° hacia el lado del CDI: ${tres(g)}.`],
+    [listo, en ? `CDI alive: turn toward the station, to ${C}.` : `CDI vivo: vira hacia la estación, al ${C}.`],
   ]);
 }
 
@@ -178,8 +193,7 @@ export function pasosArco(e: EvaluacionArco, m: Muestra, idioma: "es" | "en"): P
 /** La guía para la maniobra que se esté volando; null si no tiene (o en el examen). */
 export function pasosHsiDe(id: string, ev: unknown, m: Muestra, idioma: "es" | "en"): PasoHsi[] | null {
   if (id === "espera") return pasosHsi(ev as EvaluacionEspera, m, idioma);
-  if (id === "interceptar-radial") return pasosInterceptacion(ev as EvaluacionInterceptacion, m, idioma);
-  if (id === "ruta-vor") return pasosRuta(ev as EvaluacionRuta, m, idioma);
+  if (id === "interceptar-radial" || id === "ruta-pasada") return pasosInterceptacion(ev as EvaluacionInterceptacion, m, idioma);
   if (id === "arco-dme") return pasosArco(ev as EvaluacionArco, m, idioma);
   return null;
 }
