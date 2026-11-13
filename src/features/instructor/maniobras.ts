@@ -69,7 +69,7 @@ import {
   type PasoFamiliarizacion,
 } from "./textosFamiliarizacion.ts";
 import { tolInterceptacion } from "./nivel.ts";
-import type { CasoInterceptacion, DatosEspera } from "./navIfr.ts";
+import type { DatosEspera, Ejercicio, Tramo } from "./navIfr.ts";
 import type { Giros } from "../entrenador/esperas.ts";
 import type { VorElegido } from "./vorSim.ts";
 import {
@@ -117,11 +117,13 @@ export interface ResultadoComun {
   nivel?: Nivel;
 }
 
-/** Con qué armar cada intento: el número de intento en la lección y, en el examen, los casos ya sorteados. `vor`: el ident para la voz. */
+/** Con qué armar cada intento: el número de intento en la lección y, en IFR 1 y 2, los tramos ya sorteados. `vor`: el ident para la voz. */
 export interface ContextoArmado {
   intento: number;
   examen: boolean;
-  casos?: CasoInterceptacion[];
+  tramos?: Tramo[];
+  /** IFR 1 y 2: el ejercicio del primer tramo, ya dicho en tierra (solo con `intento` 0). */
+  primero?: Ejercicio;
   vor?: string;
   /** IFR: el VOR de la lección, para medir la distancia por lat/lon. */
   estacion?: VorElegido;
@@ -712,7 +714,7 @@ const defInterceptacion: DefManiobra<EvaluacionInterceptacion, ResultadoIntercep
   nivelExamen: (n) => (Math.max(2, n) as Nivel),
   avanzar: avanzarInterceptacion,
   armarSolo: armarSoloInterceptacion,
-  fase: (e) => (e.fase === "interceptando" || e.fase === "establecido" ? "en-curso" : e.fase),
+  fase: (e) => (e.fase === "esperando" ? "armado" : e.fase === "terminado" || e.fase === "invalido" ? e.fase : "en-curso"),
   motivo: (e) => e.motivo,
   resultado: (e) => e.resultado ?? null,
   paso: pasoInterceptacion,
