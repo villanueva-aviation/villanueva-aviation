@@ -1,6 +1,6 @@
 import { analizar, invalidez, lectorViejoNav, type Muestra, type Tramo as TramoFuera } from "./evaluador.ts";
 import type { ContextoArmado, ResultadoComun } from "./maniobras.ts";
-import { desvioGrados, generarTramo, norm180, pasoEstacion, puntos, referenciaTramo, type Ejercicio, type TipoTramo, type Tramo } from "./navIfr.ts";
+import { desvioGrados, generarTramo, norm180, pasoEstacion, puntos, referenciaTramo, tipoDe, type Ejercicio, type TipoTramo, type Tramo } from "./navIfr.ts";
 import { tolInterceptacion, type Nivel } from "./nivel.ts";
 import { CONO_NM, conCono, distanciaVor, type VorElegido } from "./vorSim.ts";
 
@@ -22,6 +22,10 @@ export const MINUTO_SEG = 60;
 /** Desde aquí se mide el ángulo: antes, el cadete todavía está virando hacia el rumbo de interceptación. */
 const ANGULO_DESDE_SEG = 20;
 const SIN_SENAL_SEG = 10;
+/** Dentro de la tolerancia de establecido tanto tiempo también cuenta como llegar al radial. */
+const ESTABLECIDO_SEG = 30;
+/** Dentro del cono el radial sale de la posición: ya dice si llegó, salvo encima de la estación. */
+const CRUCE_MIN_NM = 0.5;
 
 export const MOTIVO_LECTOR = "Actualiza el lector a v1.6 para el programa IFR.";
 export const MOTIVO_GPS = "La barra la está manejando el GPS: cambia a NAV.";
@@ -86,6 +90,8 @@ export interface EvaluacionInterceptacion {
   /** Acercándose: ya pasó al otro lado de la estación. */
   lado: boolean;
   minDist: number | null;
+  /** Antes de llegar: desde cuándo está dentro de `establecidoPuntos`. */
+  cercaDesde: number | null;
 }
 
 const anular = (e: EvaluacionInterceptacion, m: Muestra, motivo: string): EvaluacionInterceptacion => ({ ...e, fase: "invalido", motivo, previo: m });
@@ -106,7 +112,7 @@ function vacia(m: Muestra, nivel: Nivel, tramo: Tramo, ctx: ContextoArmado): Eva
   return {
     fase: "esperando", nivel, tramo, ejercicio: null, vor: ctx.vor, estacion: ctx.estacion, examen: ctx.examen, inicio: m, previo: m, signo: 1, cruce: null,
     pasado: [], corto: { desde: null, tramos: [], max: 0 }, angulos: [], sinSenalDesde: null, muestras: [], preguntar: false, dicho: undefined,
-    medirDesde: null, atraves: false, finNm: null, lado: false, minDist: null,
+    medirDesde: null, atraves: false, finNm: null, lado: false, minDist: null, cercaDesde: null,
   };
 }
 
@@ -131,8 +137,11 @@ export function iniciarInterceptacion(m0: Muestra, nivel: Nivel, ejercicio: Ejer
 
 export function armarInterceptacion(m0: Muestra, nivel: Nivel = 2, ctx: ContextoArmado = { intento: 0, examen: false }): EvaluacionInterceptacion {
   const tramo = ctx.tramos?.[ctx.intento] ?? { desde: true, tipo: "normal" };
-  if (ctx.intento === 0 && ctx.primero) return iniciarInterceptacion(m0, nivel, ctx.primero, ctx);
   const m = conCono(m0, ctx.estacion);
+  // El primero se dijo en tierra; si desde donde va ya no es del tipo que toca (VOR lejos de la pista, despegue por
+  // otra cabecera), se sortea otro y la orden de armado lo dice.
+  const p = ctx.intento === 0 ? ctx.primero : undefined;
+  if (p && tipoDe(p.radial, referenciaTramo(m, ctx.estacion)) === p.tipo) return iniciarInterceptacion(m0, nivel, p, ctx);
   const e = vacia(m, nivel, tramo, ctx);
   const motivo = motivoAlArmar(m);
   if (motivo) return anular(e, m, motivo);
@@ -207,14 +216,24 @@ export function avanzarInterceptacion(e: EvaluacionInterceptacion, crudo: Muestr
     n.fase = "interceptando";
     n.signo = desvioGrados(ej, radial) >= 0 ? 1 : -1;
   }
-  // Dentro del cono la aguja no vale.
-  if (dist !== null && dist < CONO_NM) return n;
-
   const T = tolInterceptacion(e.nivel);
   const d = desvioPuntos(n, m);
+  n.cercaDesde = Math.abs(d) <= T.establecidoPuntos ? (e.cercaDesde ?? m.t) : null;
+  const llego = d <= 0 || Math.abs(d) <= 0.25 || m.t - (n.cercaDesde ?? m.t) >= ESTABLECIDO_SEG;
+  // Dentro del cono la aguja no vale para sobrepasos ni para quedarse corto, pero el radial por posición sí dice si
+  // ya llegó: con la regla de 1 minuto se llega al radial a unas 2 NM de la estación.
+  if (dist !== null && dist < CONO_NM) {
+    if (!n.cruce && dist >= CRUCE_MIN_NM && llego) {
+      n.cruce = m;
+      n.fase = "establecido";
+      n.corto = cerrarCorto(n.corto);
+    }
+    return n;
+  }
+
   const angulo = Math.abs(norm180(m.rumbo - ej.curso));
   if (!n.cruce) {
-    if (d <= 0 || Math.abs(d) <= 0.25) {
+    if (llego) {
       n.cruce = m;
       n.fase = "establecido";
       n.corto = cerrarCorto(n.corto);

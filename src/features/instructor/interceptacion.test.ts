@@ -309,3 +309,65 @@ test("textos en inglés sin caracteres del español", () => {
   ];
   for (const linea of textos) assert.doesNotMatch(linea, /[áéíóúñ¿¡]/i);
 });
+
+// Revisión final: un simulador cinemático (VOR en el origen, x este, y norte, NM; viraje estándar de 3°/s).
+const radialDe = (x: number, y: number) => (((Math.atan2(x, y) * 180) / Math.PI) + 360) % 360;
+const n180 = (g: number) => ((((g + 180) % 360) + 360) % 360) - 180;
+const enXY = (t: number, x: number, y: number, rumbo: number, kt: number): Muestra => ({ ...en(t, radialDe(x, y), rumbo, Math.hypot(x, y)), velocidad: kt });
+
+/** Ruta pasada de acercamiento volada como dice la tarjeta (regla de 1 minuto), desde 8 NM en el R-290. */
+function unMinuto(radial: number, kt: number): EvaluacionInterceptacion {
+  const gs = kt / 3600;
+  let [x, y, rumbo, t] = [8 * Math.sin((290 * Math.PI) / 180), 8 * Math.cos((290 * Math.PI) / 180), 290, 0];
+  const ej: Ejercicio = { tipo: "pasada", radial, desde: false, curso: (radial + 180) % 360, referencia: 290 };
+  let e = responderTipo(iniciarInterceptacion(enXY(0, x, y, rumbo, kt), 2, ej, { intento: 0, examen: false }), "pasada");
+  let [fase, reloj, meta] = ["vira", -1, radial];
+  while (e.fase !== "terminado" && e.fase !== "invalido" && t < 2000) {
+    const r = radialDe(x, y);
+    if (fase === "vira" && Math.abs(n180(r - (radial + 180))) >= 90) [fase, reloj] = ["minuto", t];
+    else if (fase === "minuto" && t - reloj >= 60) [fase, meta] = ["corta", (radial - 90 * Math.sign(n180(r - radial)) + 360) % 360];
+    else if (fase === "corta" && Math.abs(n180(r - radial)) <= 10) [fase, meta] = ["adentro", (radial + 180) % 360];
+    else if (fase === "adentro") meta = (radial + 180 + Math.max(-30, Math.min(30, 3 * n180(r - radial))) + 360) % 360;
+    const d = n180(meta - rumbo);
+    rumbo = (rumbo + Math.sign(d) * Math.min(3, Math.abs(d)) + 360) % 360;
+    x += gs * Math.sin((rumbo * Math.PI) / 180);
+    y += gs * Math.cos((rumbo * Math.PI) / 180);
+    e = avanzarInterceptacion(e, enXY(++t, x, y, rumbo, kt));
+  }
+  return e;
+}
+
+test("ruta pasada de acercamiento con la regla de 1 minuto a 80 y 90 kt: llega al radial dentro de las 2 NM y aprueba", () => {
+  for (const kt of [80, 90])
+    for (const radial of [130, 150, 170]) {
+      const e = unMinuto(radial, kt);
+      assert.equal(e.fase, "terminado", `${kt} kt R-${radial}: ${e.motivo}`);
+      assert.deepEqual(e.resultado!.fuera.interceptar, [], `${kt} kt R-${radial}`);
+      assert.equal(e.resultado!.aprobado, true, `${kt} kt R-${radial}: ${JSON.stringify(e.resultado!.elementos)}`);
+    }
+});
+
+test("dentro del cono, a menos de media milla, no se da por llegado al radial", () => {
+  const ej: Ejercicio = { tipo: "normal", radial: 90, desde: false, curso: 270, referencia: 60 };
+  let e = iniciarInterceptacion(en(0, 80, 270, 0.3), 2, ej, { intento: 0, examen: false });
+  e = seguir(e, [[90, 270, 0.3]]);
+  assert.equal(e.cruce, null);
+});
+
+test("a 0.8 puntos del lado de la estación por 30 s cuenta como llegar al radial (como antes del vuelo encadenado)", () => {
+  const e = volar([...rampa(20, 2, 60), ...quieto(1.6, 90, 35), FIN]);
+  assert.equal(e.fase, "terminado");
+  assert.deepEqual(e.resultado!.fuera.interceptar, []);
+});
+
+test("el primer tramo dicho en tierra se cambia en el aire si ya no es del tipo que toca", () => {
+  const tramos = [{ desde: true, tipo: "normal" as const }];
+  // En tierra la referencia era el 290: el 330 era normal. En el aire va por el 200: el 330 queda a 130°.
+  const primero: Ejercicio = { tipo: "normal", radial: 330, desde: true, curso: 330, referencia: 290 };
+  const otro = armarInterceptacion(en(0, 200, 200), 2, { intento: 0, examen: false, tramos, primero });
+  assert.equal(otro.ejercicio!.tipo, "normal");
+  assert.ok(Math.abs(n180(otro.ejercicio!.radial - 200)) <= 90, String(otro.ejercicio!.radial));
+  // Si sigue siendo normal desde donde va, se queda el que oyó en tierra.
+  const igual = armarInterceptacion(en(0, 300, 300), 2, { intento: 0, examen: false, tramos, primero });
+  assert.equal(igual.ejercicio!.radial, 330);
+});

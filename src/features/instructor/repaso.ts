@@ -255,7 +255,9 @@ const T = {
 
 /** «Recto y nivelado C172» → «Recto y nivelado»; «C172 steep turn» → «Steep turn». */
 export function nombreManiobra(id: ManiobraId, idioma: Idioma): string {
-  const t = MANIOBRAS[id].titulo[idioma].replace(/^C172 | C172$/, "");
+  // Los mapas de la lección 2 de antes del vuelo encadenado (2026-11-13) traen `ruta-vor`, que ya no existe.
+  const titulo = MANIOBRAS[id]?.titulo ?? { es: "Rutas de acercamiento y alejamiento", en: "Inbound and outbound courses" };
+  const t = titulo[idioma].replace(/^C172 | C172$/, "");
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 

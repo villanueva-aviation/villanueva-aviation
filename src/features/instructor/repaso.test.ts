@@ -466,3 +466,8 @@ test("cada tramo hecho dice su tipo y su sentido", () => {
   assert.equal(entradaDe(tramo({ tipo: "pasada", desde: false })), "pasada-acercamiento");
   assert.equal(entradaDe(tramo({ radial: 90, desde: true })), "normal-alejamiento", "los viejos sin tipo cuentan como normales");
 });
+
+test("un mapa viejo de la lección 2 (ruta-vor, ya borrada) se nombra sin tronar", () => {
+  assert.equal(nombreManiobra("ruta-vor" as never, "es"), "Rutas de acercamiento y alejamiento");
+  assert.equal(nombreHecha("ruta-vor" as never, undefined, "en"), "Inbound and outbound courses");
+});

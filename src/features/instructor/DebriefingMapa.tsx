@@ -46,7 +46,7 @@ function textoError(e: ErrorVuelo, idioma: Idioma): string {
   if (e.texto) return e.texto[idioma];
   if (!e.maniobra || !e.campo || e.peor === undefined) return "";
   const u = unidadDe(e.maniobra, e.campo);
-  const nombre = MANIOBRAS[e.maniobra].celdas.find((c) => c.campo === e.campo)?.nombre[idioma] ?? e.campo;
+  const nombre = MANIOBRAS[e.maniobra]?.celdas.find((c) => c.campo === e.campo)?.nombre[idioma] ?? e.campo;
   const d = u === "" ? 2 : 0;
   const tol = e.tol ? ` (${T[idioma].tolerancia} ±${conUnidad(e.tol.toFixed(d), u)})` : "";
   return `${nombre} ${conUnidad(signo(e.peor, d), u)}${tol}`;
