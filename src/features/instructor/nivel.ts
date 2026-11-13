@@ -141,8 +141,6 @@ export const tolInterceptacion = (n: Nivel = 2) => ({
 });
 
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */
-/** Lección IFR 2: la barra dentro de `puntos` en la ida y la vuelta; establecerse en la salida en `establecerSeg`. */
-export const tolRuta = (n: Nivel = 2) => ({ puntos: por(n, 2, 1, 0.5), establecerSeg: por(n, 240, 180, 120) });
 
 /** Lección IFR 3: la distancia al arco (Erik). */
 export const tolArco = (n: Nivel = 2) => ({ distanciaNm: por(n, 1, 0.5, 0.2) });

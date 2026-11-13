@@ -5,7 +5,7 @@ import { PageHero } from "../components/layout/PageHero";
 import { Button } from "../components/ui/Button";
 import { Container } from "../components/ui/Container";
 import { useAuth } from "../features/auth/AuthContext";
-import { defDe } from "../features/instructor/maniobras";
+import { defDe, maniobraConocida } from "../features/instructor/maniobras";
 import { NOMBRE_NIVEL } from "../features/instructor/nivel";
 import { HOJA } from "../features/instructor/vistasManiobra";
 import { fetchPorRevisar, fetchSesionesRecientes, revisarIntento } from "../features/instructor/intentos";
@@ -29,7 +29,8 @@ export function AdminManiobras() {
     if (authLoading || user?.email !== FOUNDER_EMAIL) return;
     fetchPorRevisar().then(
       (data) => {
-        setPendientes(data);
+        // Las maniobras que ya no existen (la lección IFR 2 vieja, `ruta-vor`) no tienen hoja con qué revisarlas.
+        setPendientes(data.filter((i) => maniobraConocida(i.maniobra)));
         setEstado("listo");
       },
       () => setEstado("error"),

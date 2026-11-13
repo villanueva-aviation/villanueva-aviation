@@ -70,8 +70,9 @@ test("programa IFR: 6 lecciones, de la 1 a la 4 abiertas, con su propia clave", 
 
 test("IFR 2 a 4: su maniobra, sus ejercicios y su clave; los arcos piden DME", () => {
   const [, ruta, arco, espera] = LECCIONES_IFR;
-  assert.equal(ruta.maniobra, "ruta-vor");
-  assert.deepEqual(ruta.ejercicios, { practica: 3, examen: 1 });
+  assert.equal(ruta.maniobra, "ruta-pasada");
+  assert.deepEqual(ruta.nombre, { es: "Rutas pasadas", en: "Passed routes" });
+  assert.deepEqual(ruta.ejercicios, { practica: 4, examen: 2 });
   assert.equal(arco.maniobra, "arco-dme");
   assert.deepEqual(arco.ejercicios, { practica: 3, examen: 1 });
   assert.equal(arco.requiereDme, true);
@@ -82,15 +83,18 @@ test("IFR 2 a 4: su maniobra, sus ejercicios y su clave; los arcos piden DME", (
   assert.ok(LECCIONES_GUARDADAS["ifr-4"]);
 });
 
-test("IFR 1: 5 prácticas y un examen de 2", () => {
-  assert.deepEqual(LECCIONES_IFR[0].ejercicios, { practica: 5, examen: 2 });
+test("IFR 1: 4 tramos de práctica y un examen de 2", () => {
+  assert.deepEqual(LECCIONES_IFR[0].ejercicios, { practica: 4, examen: 2 });
 });
 
 test("el briefing IFR cuenta los ejercicios de cada lección", () => {
   const [l1, l2, , l4] = LECCIONES_IFR;
-  assert.equal(lineaEjercicios(l1, false, "es"), "Son 5 interceptaciones, cada una con otro radial.");
-  assert.equal(lineaEjercicios(l2, false, "es"), "Son 3 ejercicios de práctica, con consejos.");
+  assert.equal(lineaEjercicios(l1, false, "es"), "Son 4 tramos seguidos de interceptaciones normales, alejándote y acercándote.");
+  assert.equal(lineaEjercicios(l1, true, "es"), "Son 2 tramos calificados, uno alejándote y otro acercándote, sin consejos.");
+  assert.equal(lineaEjercicios(l2, false, "es"), "Son 4 tramos seguidos de rutas pasadas, alejándote y acercándote.");
+  assert.equal(lineaEjercicios(l2, true, "es"), "Son 2 tramos calificados: uno normal y una ruta pasada, sin decirte cuál. Sin consejos.");
+  for (const l of [l1, l2]) for (const c of [false, true]) assert.doesNotMatch(lineaEjercicios(l, c, "en"), /[áéíóúñ¿¡]/);
   assert.equal(lineaEjercicios(l4, false, "en"), "3 practice exercises, with tips.");
   assert.equal(lineaEjercicios(l4, true, "es"), "Es 1 ejercicio calificado, sin consejos.");
-  assert.equal(lineaEjercicios(l2, true, "en"), "One graded exercise, no tips.");
+  assert.equal(lineaEjercicios(l2, true, "en"), "2 graded legs: one normal intercept and one passed route, without telling you which. No tips.");
 });

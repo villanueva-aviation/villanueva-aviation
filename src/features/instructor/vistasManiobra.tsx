@@ -11,8 +11,7 @@ import { HojaS } from "./HojaS";
 import { HojaOcho } from "./HojaOcho";
 import { HojaAlrededor } from "./HojaAlrededor";
 import { HojaFamiliarizacion } from "./HojaFamiliarizacion";
-import { HojaInterceptacion } from "./HojaInterceptacion";
-import { HojaRuta } from "./HojaRuta";
+import { HojaInterceptacion, HojaRutaPasada } from "./HojaInterceptacion";
 import { HojaArco } from "./HojaArco";
 import { HojaEspera } from "./HojaEspera";
 import type { Idioma } from "./idiomaInstructor";
@@ -33,7 +32,7 @@ export const HOJA: Record<ManiobraId, (p: { resultado: any; idioma: Idioma }) =>
   "ocho-alrededor": HojaAlrededor,
   familiarizacion: HojaFamiliarizacion,
   "interceptar-radial": HojaInterceptacion,
-  "ruta-vor": HojaRuta,
+  "ruta-pasada": HojaRutaPasada,
   "arco-dme": HojaArco,
   espera: HojaEspera,
 };

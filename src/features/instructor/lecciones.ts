@@ -46,8 +46,8 @@ const ifr = (numero: number, es: string, en: string, maniobra?: ManiobraId, extr
   numero, nombre: { es, en }, disponible: !!maniobra, maniobra, programa: "ifr", ...extra,
 });
 export const LECCIONES_IFR: Leccion[] = [
-  ifr(1, "Interceptación de radiales", "Radial interception", "interceptar-radial", { ejercicios: { practica: 5, examen: 2 } }),
-  ifr(2, "Rutas de acercamiento y alejamiento", "Inbound and outbound courses", "ruta-vor", { ejercicios: { practica: 3, examen: 1 } }),
+  ifr(1, "Interceptación de radiales", "Radial interception", "interceptar-radial", { ejercicios: { practica: 4, examen: 2 } }),
+  ifr(2, "Rutas pasadas", "Passed routes", "ruta-pasada", { ejercicios: { practica: 4, examen: 2 } }),
   ifr(3, "Arcos DME", "DME arcs", "arco-dme", { ejercicios: { practica: 3, examen: 1 }, requiereDme: true }),
   ifr(4, "Patrones de espera", "Holding patterns", "espera", { ejercicios: { practica: 3, examen: 1 } }),
   ifr(5, "Vuelo mezclado", "Mixed flight"),
@@ -75,13 +75,19 @@ export function leccionIfrDe(numero: string | undefined): Leccion | null {
   return x?.disponible ? x : null;
 }
 
-/** La línea del briefing IFR con cuántos ejercicios tiene la lección (la 1 los describe). */
+/** La línea del briefing IFR con cuántos ejercicios tiene la lección (la 1 y la 2 son un vuelo de tramos seguidos). */
 export function lineaEjercicios(l: Leccion, checkride: boolean, idioma: Idioma): string {
   const en = idioma === "en";
   if (l.numero === 1)
     return checkride
-      ? en ? "Two graded intercepts, one outbound and one inbound, no tips." : "Son 2 interceptaciones calificadas, una alejándote y otra acercándote, sin consejos."
-      : en ? "Five intercepts, each on a different radial." : "Son 5 interceptaciones, cada una con otro radial.";
+      ? en ? "2 graded legs, one outbound and one inbound, no tips." : "Son 2 tramos calificados, uno alejándote y otro acercándote, sin consejos."
+      : en ? "4 legs in a row of normal intercepts, outbound and inbound." : "Son 4 tramos seguidos de interceptaciones normales, alejándote y acercándote.";
+  if (l.numero === 2)
+    return checkride
+      ? en
+        ? "2 graded legs: one normal intercept and one passed route, without telling you which. No tips."
+        : "Son 2 tramos calificados: uno normal y una ruta pasada, sin decirte cuál. Sin consejos."
+      : en ? "4 legs in a row of passed routes, outbound and inbound." : "Son 4 tramos seguidos de rutas pasadas, alejándote y acercándote.";
   const n = (checkride ? l.ejercicios?.examen : l.ejercicios?.practica) ?? 1;
   if (checkride)
     return n === 1 ? (en ? "One graded exercise, no tips." : "Es 1 ejercicio calificado, sin consejos.") : en ? `${n} graded exercises, no tips.` : `Son ${n} ejercicios calificados, sin consejos.`;

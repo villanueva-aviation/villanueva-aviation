@@ -6,7 +6,7 @@ import type { Checklist } from "./checklistVoz.ts";
 import { debriefingRepaso } from "./debriefingRepaso.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
 import { MANIOBRAS, type Figuras, type ManiobraId, type ResultadoComun } from "./maniobras.ts";
-import { tolArco, tolEspera, tolInterceptacion, tolRuta, type Nivel } from "./nivel.ts";
+import { tolArco, tolEspera, tolInterceptacion, type Nivel } from "./nivel.ts";
 import { LIMITE_SEG } from "./evaluadorInterceptacion.ts";
 import { toleranciaRecto } from "./evaluadorRecto.ts";
 import { toleranciaLento } from "./evaluadorLento.ts";
@@ -107,6 +107,9 @@ export function puntoEn(puntos: Punto[], t: number): Punto | null {
 // ── Los errores, cada uno con su momento ──
 
 /** La tolerancia de cada campo de `fuera`, por maniobra y nivel. */
+/** IFR 1 y 2: un tramo encadenado (identificar es sí o no). */
+const toleranciaTramo = (n: Nivel) => ({ identificar: 0, sobrepaso: tolInterceptacion(n).sobrepasoPuntos, corto: tolInterceptacion(n).cortoSeg, interceptar: LIMITE_SEG });
+
 export const TOLERANCIAS: Record<ManiobraId, (n: Nivel) => Record<string, number>> = {
   "viraje-escarpado": toleranciaViraje,
   "recto-nivelado": toleranciaRecto,
@@ -120,8 +123,8 @@ export const TOLERANCIAS: Record<ManiobraId, (n: Nivel) => Record<string, number
   "ocho-pilones": toleranciaOcho,
   "ocho-alrededor": toleranciaAlrededor,
   familiarizacion: () => ({}),
-  "interceptar-radial": (n) => ({ sobrepaso: tolInterceptacion(n).sobrepasoPuntos, corto: tolInterceptacion(n).cortoSeg, interceptar: LIMITE_SEG }),
-  "ruta-vor": (n) => ({ acercamiento: tolRuta(n).puntos, alejamiento: tolRuta(n).puntos }),
+  "interceptar-radial": (n) => toleranciaTramo(n),
+  "ruta-pasada": (n) => toleranciaTramo(n),
   "arco-dme": (n) => ({ entrada: tolArco(n).distanciaNm, distancia: tolArco(n).distanciaNm, salida: tolInterceptacion(n).sobrepasoPuntos }),
   espera: (n) => ({ dicha: 0, volada: 0, tramo: tolEspera(n).tramoSeg, acercamiento: tolEspera(n).puntos, virajes: tolEspera(n).tasaGrados, distancia: tolEspera(n).maxNm, altitud: tolEspera(n).altitudFt }),
 };
@@ -131,7 +134,7 @@ export const UNIDAD: Record<string, string> = {
   altitud: "ft", velocidad: "kt", inclinacion: "°", rumbo: "°", bola: "", ala: "°", alas: "°", radio: "%", simetria: "%", cruce: "s",
   rotacion: "kt", ascenso: "kt", final: "kt", toque: "ft/min", reaccion: "s", planeo: "kt", checklist: "", recuperacion: "s",
   "interceptar-radial.sobrepaso": " puntos", "interceptar-radial.corto": "s", "interceptar-radial.interceptar": "s",
-  "ruta-vor.acercamiento": " puntos", "ruta-vor.alejamiento": " puntos",
+  "ruta-pasada.sobrepaso": " puntos", "ruta-pasada.corto": "s", "ruta-pasada.interceptar": "s",
   "arco-dme.entrada": " NM", "arco-dme.distancia": " NM", "arco-dme.salida": " puntos",
   "espera.tramo": "s", "espera.acercamiento": " puntos", "espera.virajes": "°/s", "espera.distancia": " NM",
 };

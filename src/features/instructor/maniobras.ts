@@ -73,20 +73,13 @@ import type { DatosEspera, Ejercicio, Tramo } from "./navIfr.ts";
 import type { Giros } from "../entrenador/esperas.ts";
 import type { VorElegido } from "./vorSim.ts";
 import {
-  armarInterceptacion, armarSoloInterceptacion, avanzarInterceptacion, LIMITE_SEG, type EvaluacionInterceptacion, type ResultadoInterceptacion,
+  armarInterceptacion, armarSoloInterceptacion, avanzarInterceptacion, type EvaluacionInterceptacion, type ResultadoInterceptacion,
 } from "./evaluadorInterceptacion.ts";
 import {
-  avisoInterceptacion, briefingInterceptacion, explicarInterceptacion, listaPasosInterceptacion, masFalladoInterceptacion, ordenInterceptacion,
+  avisoInterceptacion, briefingInterceptacion, briefingRutaPasada, explicarInterceptacion, listaPasosInterceptacion, masFalladoInterceptacion, ordenInterceptacion,
   paraGuardarInterceptacion, pasoInterceptacion, queHacerInterceptacion, repetirInterceptacion, semaforoInterceptacion, textoPasoInterceptacion,
   type PasoInterceptacion,
 } from "./textosInterceptacion.ts";
-
-import { tolRuta } from "./nivel.ts";
-import { armarRuta, armarSoloRuta, avanzarRuta, type EvaluacionRuta, type ResultadoRuta } from "./evaluadorRuta.ts";
-import {
-  avisoRuta, briefingRuta, explicarRuta, listaPasosRuta, masFalladoRuta, ordenRuta, paraGuardarRuta, pasoRuta, queHacerRuta, repetirRuta, semaforoRuta,
-  textoPasoRuta, type PasoRuta,
-} from "./textosRuta.ts";
 
 import { tolArco } from "./nivel.ts";
 import { armarArco, armarSoloArco, avanzarArco, type EvaluacionArco, type ResultadoArco } from "./evaluadorArco.ts";
@@ -105,7 +98,7 @@ import {
 // Cada maniobra del instructor en un solo lugar: el programa sigue la definición de la actividad elegida.
 
 export type ManiobraId = "viraje-escarpado" | "recto-nivelado" | "vuelo-lento" | "virajes-rumbos" | "ascensos-descensos" | "virajes-ascendiendo"
-  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor" | "familiarizacion" | "interceptar-radial" | "ruta-vor" | "arco-dme" | "espera";
+  | "toques-despegues" | "falla-motor" | "s-camino" | "ocho-pilones" | "ocho-alrededor" | "familiarizacion" | "interceptar-radial" | "ruta-pasada" | "arco-dme" | "espera";
 export type FaseComun = "armado" | "en-curso" | "terminado" | "invalido";
 export interface ResultadoComun {
   aprobado: boolean;
@@ -703,12 +696,16 @@ const defInterceptacion: DefManiobra<EvaluacionInterceptacion, ResultadoIntercep
   elementosReporte: (n) => {
     const T = tolInterceptacion(n);
     return [
-      { codigo: "1", texto: `Se establece en el radial (±${T.establecidoPuntos} puntos, ${LIMITE_SEG / 60} min máximo)`, textoEn: `Settles on the radial (±${T.establecidoPuntos} dots, ${LIMITE_SEG / 60} min max)` },
+      { codigo: "1", texto: "Llega al radial antes de las 8 NM o del VOR", textoEn: "Reaches the radial before 8 NM or the VOR" },
       { codigo: "2", texto: `No se pasa más de ${T.sobrepasoPuntos} puntos`, textoEn: `Overshoots no more than ${T.sobrepasoPuntos} dots` },
       { codigo: "3", texto: `No se queda corto más de ${T.cortoSeg} s`, textoEn: `Stops short no longer than ${T.cortoSeg} s` },
+      { codigo: "4", texto: "Identifica si es normal o ruta pasada", textoEn: "Calls normal intercept or passed route" },
     ];
   },
-  celdas: [celda("sobrepaso", "Pasarse", "Overshoot"), celda("corto", "Quedarse corto", "Undershoot"), celda("interceptar", "Interceptar", "Intercept")],
+  celdas: [
+    celda("identificar", "Identificar", "Identify"), celda("sobrepaso", "Pasarse", "Overshoot"), celda("corto", "Quedarse corto", "Undershoot"),
+    celda("interceptar", "Interceptar", "Intercept"),
+  ],
   temas: ["c172"],
   armar: armarInterceptacion,
   nivelExamen: (n) => (Math.max(2, n) as Nivel),
@@ -732,41 +729,14 @@ const defInterceptacion: DefManiobra<EvaluacionInterceptacion, ResultadoIntercep
   figuras: (r) => ({ radiales: [{ radial: r.ejercicio.radial, desde: r.ejercicio.desde }] }),
 };
 
-const defRuta: DefManiobra<EvaluacionRuta, ResultadoRuta> = {
-  id: "ruta-vor",
-  insignia: "maniobra-ruta-vor-c172",
-  avion: "C172",
-  titulo: { es: "Rutas de acercamiento y alejamiento C172", en: "C172 inbound and outbound courses" },
-  tarea: { es: "Práctica IFR · Rutas de acercamiento y alejamiento", en: "IFR practice · Inbound and outbound courses" },
-  elementosReporte: (n) => {
-    const T = tolRuta(n);
-    return [
-      { codigo: "1", texto: `Se acerca por el radial dentro de ${T.puntos} puntos`, textoEn: `Tracks inbound within ${T.puntos} dots` },
-      { codigo: "2", texto: `Se aleja por el radial nuevo dentro de ${T.puntos} puntos (establecido en ${T.establecerSeg} s)`, textoEn: `Tracks outbound within ${T.puntos} dots (settled within ${T.establecerSeg} s)` },
-    ];
-  },
-  celdas: [celda("acercamiento", "Acercamiento", "Inbound"), celda("alejamiento", "Alejamiento", "Outbound")],
-  temas: ["c172"],
-  armar: armarRuta,
-  nivelExamen: (n) => (Math.max(2, n) as Nivel),
-  avanzar: avanzarRuta,
-  armarSolo: armarSoloRuta,
-  fase: (e) => (e.fase === "posicionando" ? "armado" : e.fase === "acercandose" || e.fase === "alejandose" ? "en-curso" : e.fase),
-  motivo: (e) => e.motivo,
-  resultado: (e) => e.resultado ?? null,
-  paso: pasoRuta,
-  orden: (antes, ahora, e, idioma) => ordenRuta(antes as PasoRuta | null, ahora as PasoRuta | null, e, idioma),
-  textoPaso: (paso, e, idioma) => textoPasoRuta(paso as PasoRuta | null, e, idioma),
-  pasos: (paso, idioma) => listaPasosRuta(paso as PasoRuta | null, idioma),
-  queHacer: (paso, idioma) => queHacerRuta(paso as PasoRuta | null, idioma),
-  semaforo: semaforoRuta,
-  aviso: avisoRuta,
-  briefing: briefingRuta,
-  explicar: explicarRuta,
-  repetir: repetirRuta,
-  masFallado: masFalladoRuta,
-  paraGuardar: paraGuardarRuta,
-  figuras: (r) => ({ radiales: [{ radial: r.ejercicio.entrada, desde: false }, { radial: r.ejercicio.salida, desde: true }] }),
+/** Lección IFR 2: el mismo tramo, en rutas pasadas (spec 2026-11-13). */
+const defRutaPasada: DefManiobra<EvaluacionInterceptacion, ResultadoInterceptacion> = {
+  ...defInterceptacion,
+  id: "ruta-pasada",
+  insignia: "maniobra-ruta-pasada-c172",
+  titulo: { es: "Rutas pasadas C172", en: "C172 passed routes" },
+  tarea: { es: "Práctica IFR · Rutas pasadas", en: "IFR practice · Passed routes" },
+  briefing: briefingRutaPasada,
 };
 
 const defArco: DefManiobra<EvaluacionArco, ResultadoArco> = {
@@ -863,7 +833,7 @@ export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
   "s-camino": defS, "ocho-pilones": defOcho, "ocho-alrededor": defAlrededor,
   familiarizacion: defFamiliarizacion,
   "interceptar-radial": defInterceptacion,
-  "ruta-vor": defRuta,
+  "ruta-pasada": defRutaPasada,
   "arco-dme": defArco,
   espera: defEspera,
 };
@@ -872,6 +842,9 @@ export const MANIOBRAS: Record<ManiobraId, DefManiobra> = {
 export function defDe(id: string | null | undefined): DefManiobra {
   return MANIOBRAS[id as ManiobraId] ?? defViraje;
 }
+
+/** Sin `maniobra` es un intento de antes de las actividades (viraje); un id que ya no existe no tiene hoja. */
+export const maniobraConocida = (id: string | null | undefined) => !id || id in MANIOBRAS;
 
 /** Lo que lee la voz al terminar, como `lecturaFinal` del viraje. */
 export function lecturaFinalDe(def: DefManiobra, r: ResultadoComun, idioma: Idioma): string[] {
