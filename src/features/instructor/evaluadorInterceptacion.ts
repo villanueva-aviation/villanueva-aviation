@@ -237,6 +237,10 @@ export function avanzarInterceptacion(e: EvaluacionInterceptacion, crudo: Muestr
 
 const cerrarCorto = (c: EvaluacionInterceptacion["corto"]) => ({ ...c, desde: null });
 
+/** La salida del arco DME (lección 3) termina establecida, no al pasar el VOR: el arco la cierra con esto. */
+export const cerrarInterceptacion = (e: EvaluacionInterceptacion, m: Muestra): EvaluacionInterceptacion =>
+  terminar({ ...e, corto: cerrarCorto(e.corto) }, distanciaTramo(e, m));
+
 function terminar(e: EvaluacionInterceptacion, dist: number | null): EvaluacionInterceptacion {
   const T = tolInterceptacion(e.nivel);
   const ej = e.ejercicio!;

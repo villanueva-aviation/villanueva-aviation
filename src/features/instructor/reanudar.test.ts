@@ -24,8 +24,28 @@ function enVuelo(hasta: number): EstadoRepaso {
 const guardar = (e: EstadoRepaso, en = 1000) =>
   paraReanudar({
     clave: "ifr-4", en, sesionId: "s1", modo: "practica", repaso: e, cl: crearChecklist(AVIONES_VOZ.c172.secciones), grabador: crearGrabador(true),
-    resultados: [{ maniobra: "espera", resultado: res(500) }], espera: null, llegada: null, esperaUsada: true, rutaPrimera: null, dichos: ["arranque"], respondidas: ["a"],
+    resultados: [{ maniobra: "espera", resultado: res(500) }], espera: null, llegada: null, primeraUsada: true, rutaPrimera: null, tramos: undefined, primero: null, dichos: ["arranque"], respondidas: ["a"],
   });
+
+test("reanudar: los tramos de las lecciones IFR 1 y 2 y el primero, ya dicho en tierra, vuelven igual", () => {
+  const i = ms.findIndex((m) => !m.enTierra && m.agl > 1500);
+  const tramos = [{ desde: true, tipo: "pasada" as const }, { desde: false, tipo: "pasada" as const, esperarNm: 3 }];
+  const primero = { tipo: "pasada" as const, radial: 150, desde: true, curso: 150, referencia: 290 };
+  const g = leerReanudable(JSON.stringify({ ...guardar(enVuelo(i)), tramos, primero, primeraUsada: false }), "ifr-4", 2000)!;
+  assert.deepEqual(g.tramos, tramos);
+  assert.deepEqual(g.primero, primero);
+  assert.equal(g.primeraUsada, false);
+});
+
+test("reanudar: una lección guardada antes del vuelo encadenado se lee sin tramos ni primero", () => {
+  const i = ms.findIndex((m) => !m.enTierra && m.agl > 1500);
+  const { primeraUsada: _, tramos: __, primero: ___, ...resto } = guardar(enVuelo(i));
+  const g = leerReanudable(JSON.stringify({ ...resto, esperaUsada: true }), "ifr-4", 2000)!;
+  assert.ok(g);
+  assert.equal(g.tramos, undefined);
+  assert.equal(g.primero, null);
+  assert.equal(g.primeraUsada, true, "la espera ya usada sigue usada");
+});
 
 test("reanudar: una lección en vuelo vuelve igual, sin las muestras de los resultados (solo la primera y la última)", () => {
   const i = ms.findIndex((m) => !m.enTierra && m.agl > 1500);

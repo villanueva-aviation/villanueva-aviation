@@ -3,7 +3,7 @@
 import type { SeccionId } from "../../data/checklistVozC172.ts";
 import type { Checklist } from "./checklistVoz.ts";
 import type { ManiobraId, ResultadoComun } from "./maniobras.ts";
-import type { DatosEspera } from "./navIfr.ts";
+import type { DatosEspera, Ejercicio, Tramo } from "./navIfr.ts";
 import type { Grabador } from "./recorrido.ts";
 import type { EstadoRepaso } from "./repaso.ts";
 import type { Modo } from "./sesion.ts";
@@ -26,8 +26,12 @@ export interface LeccionGuardada {
   resultados: { maniobra: ManiobraId; resultado: ResultadoComun }[];
   espera: DatosEspera | null;
   llegada: number | null;
-  esperaUsada: boolean;
+  /** El primer ejercicio (la espera o el tramo dicho en tierra) ya se usó. */
+  primeraUsada: boolean;
   rutaPrimera: { salida: number; llegada: number } | null;
+  /** Lecciones IFR 1 y 2: los tramos del vuelo y el primero, anunciado en tierra. */
+  tramos: Tramo[] | undefined;
+  primero: Ejercicio | null;
   dichos: SeccionId[];
   respondidas: string[];
 }
@@ -60,6 +64,11 @@ export function leerReanudable(texto: string | null, clave: string, ahora: numbe
   }
   if (g?.v !== 1 || g.clave !== clave || !(ahora - g.en < VIGENCIA_MS) || !g.repaso) return null;
   if (g.repaso.etapa === "terminado" || g.repaso.etapa === "invalido") return null;
+  // Las guardadas antes del vuelo encadenado (2026-11-13) traen `esperaUsada` y no traen tramos.
+  const viejo = g as Partial<LeccionGuardada> & { esperaUsada?: boolean };
   // Sin la muestra de antes, el hueco de la recarga no parece un salto ni una caída del simulador.
-  return { ...g, repaso: { ...g.repaso, vuelo: g.repaso.vuelo && { ...g.repaso.vuelo, previo: null } } };
+  return {
+    ...g, primeraUsada: viejo.primeraUsada ?? viejo.esperaUsada ?? false, primero: viejo.primero ?? null,
+    repaso: { ...g.repaso, vuelo: g.repaso.vuelo && { ...g.repaso.vuelo, previo: null } },
+  };
 }

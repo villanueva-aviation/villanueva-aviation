@@ -1,10 +1,10 @@
 import { analizar, invalidez, lectorViejoNav, type Muestra, type Tramo } from "./evaluador.ts";
 import {
-  avanzarInterceptacion, iniciarInterceptacion, MOTIVO_GPS, MOTIVO_LECTOR, MOTIVO_SENAL, MOTIVO_SIN_SENAL, type EvaluacionInterceptacion, type ResultadoInterceptacion,
+  avanzarInterceptacion, cerrarInterceptacion, desvioPuntos, iniciarInterceptacion, MOTIVO_GPS, responderTipo, MOTIVO_LECTOR, MOTIVO_SENAL, MOTIVO_SIN_SENAL, type EvaluacionInterceptacion, type ResultadoInterceptacion,
 } from "./evaluadorInterceptacion.ts";
 import type { ContextoArmado, ResultadoComun } from "./maniobras.ts";
 import { generarArco, norm180, norm360, type EjercicioArco } from "./navIfr.ts";
-import { tolArco, type Nivel } from "./nivel.ts";
+import { tolArco, tolInterceptacion, type Nivel } from "./nivel.ts";
 
 // Arcos DME (programa IFR, lección 3; reglas en el plan 2026-11-11 lecciones 2 a 4). Puro.
 // Vuela un radial hasta el arco, lo sigue y sale acercándose por otro radial; la salida es una interceptación (plan 1).
@@ -55,8 +55,13 @@ export interface EvaluacionArco {
   sobrepaso: number;
   arco: Punto[];
   salida: EvaluacionInterceptacion | null;
+  /** Saliendo: desde cuándo está establecido en el radial de salida. */
+  estableDesde: number | null;
   muestras: Muestra[];
 }
+
+/** La salida termina con tantos segundos establecido en el radial (dentro de `establecidoPuntos`). */
+const ESTABLECIDO_SEG = 30;
 
 const anular = (e: EvaluacionArco, m: Muestra, motivo: string): EvaluacionArco => ({ ...e, fase: "invalido", motivo, previo: m });
 
@@ -64,7 +69,7 @@ const anular = (e: EvaluacionArco, m: Muestra, motivo: string): EvaluacionArco =
 export function iniciarArco(m: Muestra, nivel: Nivel, ejercicio: EjercicioArco, ctx: ContextoArmado): EvaluacionArco {
   const e: EvaluacionArco = {
     fase: "hacia-arco", nivel, examen: ctx.examen, vor: ctx.vor, ctx, ejercicio, inicio: m, previo: m, mhz: m.navMhz, sinSenalDesde: null, tEntrada: null,
-    sobrepaso: 0, arco: [], salida: null, muestras: [m],
+    sobrepaso: 0, arco: [], salida: null, estableDesde: null, muestras: [m],
   };
   if (m.enTierra) return anular(e, m, "Despega primero: la maniobra se arma en el aire.");
   if (lectorViejoNav(m)) return anular(e, m, MOTIVO_LECTOR);
@@ -96,7 +101,11 @@ export function avanzarArco(e: EvaluacionArco, m: Muestra): EvaluacionArco {
     const n: EvaluacionArco = { ...e, salida: s, muestras, previo: m };
     if (s.fase === "invalido") return anular(n, m, s.motivo ?? MOTIVO_SENAL);
     if (s.fase === "terminado") return terminar(n, []);
-    return n;
+    // Ya cruzó y se queda dentro de la tolerancia: la salida está hecha sin volar hasta el VOR.
+    const dentro = !!s.cruce && Math.abs(desvioPuntos(s, m)) <= tolInterceptacion(e.nivel).establecidoPuntos;
+    const estableDesde = dentro ? (e.estableDesde ?? m.t) : null;
+    if (estableDesde !== null && m.t - estableDesde >= ESTABLECIDO_SEG) return terminar({ ...n, salida: cerrarInterceptacion(s, m) }, []);
+    return { ...n, estableDesde };
   }
 
   const otraEstacion = e.mhz !== undefined && m.navMhz !== undefined && Math.abs(m.navMhz - e.mhz) >= 0.03;
@@ -129,8 +138,9 @@ export function avanzarArco(e: EvaluacionArco, m: Muestra): EvaluacionArco {
   }
   // En el arco.
   if (m.navRadial !== undefined && Math.abs(norm180(m.navRadial - ej.hasta)) <= ANTICIPO_GRADOS) {
-    const radialSalida = { caso: "acercandose" as const, radial: ej.hasta, desde: false, curso: norm360(ej.hasta + 180) };
-    const s = iniciarInterceptacion(m, e.nivel, radialSalida, e.ctx);
+    const radialSalida = { tipo: "normal" as const, radial: ej.hasta, desde: false, curso: norm360(ej.hasta + 180), referencia: m.navRadial };
+    // Salir del arco siempre es normal: no se le pregunta.
+    const s = responderTipo(iniciarInterceptacion(m, e.nivel, radialSalida, e.ctx), "normal");
     if (s.fase === "invalido") return anular(n, m, s.motivo ?? MOTIVO_SENAL);
     return { ...n, fase: "saliendo", salida: s };
   }

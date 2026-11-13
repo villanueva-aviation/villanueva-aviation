@@ -14,7 +14,12 @@ import { cerrarGrabacion, crearGrabador, grabarMuestra, grabarVoz } from "../fea
 import { DebriefingMapa } from "../features/instructor/DebriefingMapa";
 import type { ManiobraId, ResultadoComun } from "../features/instructor/maniobras";
 import { claveLeccion, estadoLeccion, leccionDe, leccionIfrDe, lineaEjercicios } from "../features/instructor/lecciones";
-import { altitudEspera, casosExamen, entradaDicha, inventarEspera, rutaEspera, type CasoInterceptacion, type DatosEspera } from "../features/instructor/navIfr";
+import {
+  altitudEspera, entradaDicha, generarTramo, inventarEspera, referenciaTramo, rutaEspera, tipoDicho, tramosDe, type DatosEspera, type Ejercicio, type TipoTramo, type Tramo,
+} from "../features/instructor/navIfr";
+import { pistaProbable } from "../features/instructor/aeropuertoSim";
+import { responderTipo, type EvaluacionInterceptacion } from "../features/instructor/evaluadorInterceptacion";
+import { instruccionTramo, NOMBRE_TIPO, PREGUNTA_TIPO } from "../features/instructor/textosInterceptacion";
 import { elegirVor, vorsCercanos, vorsParaLeccion, type VorSim } from "../features/instructor/vorSim";
 import type { Entrada } from "../features/entrenador/esperas";
 import { DatosEsperaForm } from "../features/instructor/DatosEsperaForm";
@@ -115,6 +120,10 @@ const T = {
     escuchandoEntrada: "🎤 Escuchando tu entrada…",
     escuche: (x: string, d: string | null) => (!x ? "No te escuché: toca un botón." : d ? `Escuché: «${x}» → ${d}` : `Escuché: «${x}»: no la entendí, toca un botón.`),
     entradaDicha: (d: string) => `Tu entrada: ${d} ✓`,
+    tuTipo: "¿Normal o ruta pasada?",
+    tipos: { normal: "Normal", pasada: "Ruta pasada" } as Record<TipoTramo, string>,
+    escuchandoTipo: "🎤 Escuchando: ¿normal o ruta pasada?",
+    tipoDicho: (d: string) => `Dijiste: ${d} ✓`,
     pasosHsi: "Paso a paso en el HSI",
     aMedias: (de: string, min: number) => `Tienes esta lección a medias (${de}, hace ${min} min). Los ejercicios terminados ya están guardados; el que estabas volando empieza de nuevo.`,
     continuar: "Continuar la lección",
@@ -190,6 +199,10 @@ const T = {
     escuchandoEntrada: "🎤 Listening for your entry…",
     escuche: (x: string, d: string | null) => (!x ? "I didn't hear you: tap a button." : d ? `I heard: "${x}" → ${d}` : `I heard: "${x}": I didn't get it, tap a button.`),
     entradaDicha: (d: string) => `Your entry: ${d} ✓`,
+    tuTipo: "Normal intercept or passed route?",
+    tipos: { normal: "Normal intercept", pasada: "Passed route" } as Record<TipoTramo, string>,
+    escuchandoTipo: "🎤 Listening: normal intercept or passed route?",
+    tipoDicho: (d: string) => `You said: ${d} ✓`,
     pasosHsi: "Step by step on the HSI",
     aMedias: (de: string, min: number) => `You have this lesson half done (${de}, ${min} min ago). Finished exercises are already saved; the one you were flying starts over.`,
     continuar: "Continue the lesson",
@@ -256,9 +269,11 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const grabador = useRef(crearGrabador(ifr));
   const resultadosVuelo = useRef<{ maniobra: ManiobraId; resultado: ResultadoComun }[]>([]);
   const [mapa, setMapa] = useState<{ estado: "no" | "guardando" | "listo" | "error"; error?: string; id?: string }>({ estado: "no" });
-  // IFR: los VOR del lector y, en el examen, los dos casos sorteados al empezar.
+  // IFR: los VOR del lector y, en las lecciones 1 y 2, los tramos del vuelo (sorteados al empezar) y el primero,
+  // dicho en tierra al cerrar «Antes del despegue».
   const vorsRef = useRef<VorSim[]>([]);
-  const casosRef = useRef<CasoInterceptacion[] | undefined>(undefined);
+  const tramosRef = useRef<Tramo[] | undefined>(undefined);
+  const primeroRef = useRef<Ejercicio | null>(null);
   // Lección 4: la espera (de la carta o inventada) y el radial de llegada. Una inventada vale para un solo intento.
   const [datosEspera, setDatosEspera] = useState<DatosEspera | null>(null);
   const [llegada, setLlegada] = useState<number | null>(null);
@@ -266,7 +281,8 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   esperaRef.current = datosEspera;
   const llegadaRef = useRef(llegada);
   llegadaRef.current = llegada;
-  const esperaUsada = useRef(false);
+  // El primer ejercicio (la espera o el tramo dicho en tierra) ya se usó.
+  const primeraUsada = useRef(false);
   // Lección 4: la ruta del primer ejercicio, dicha en tierra al cerrar «Antes del despegue».
   const rutaPrimera = useRef<{ salida: number; llegada: number } | null>(null);
 
@@ -313,7 +329,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       const id = maniobraActual(e);
       if (!id) return;
       resultadosVuelo.current.push({ maniobra: id, resultado: i.resultado });
-      esperaUsada.current = true;
+      primeraUsada.current = true;
       const r = alResultado(e, i.resultado, i.id, idioma);
       poner(r.estado);
       // La calificación y, si algo salió, el primer error con cómo corregirlo; el resto queda en pantalla.
@@ -328,12 +344,13 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const contexto = useCallback(
     () => {
       const espera = esperaRef.current;
-      const primera = esperaUsada.current ? null : rutaPrimera.current;
+      const primera = primeraUsada.current ? null : rutaPrimera.current;
       return {
-        intento: repasoRef.current?.actual ?? 0, examen: modo === "checkride", casos: casosRef.current, vor: repasoRef.current?.vor?.ident,
+        intento: repasoRef.current?.actual ?? 0, examen: modo === "checkride", vor: repasoRef.current?.vor?.ident,
+        tramos: tramosRef.current, primero: primeraUsada.current ? undefined : (primeroRef.current ?? undefined),
         estacion: repasoRef.current?.vor ?? undefined,
         // Con carta, la misma en cada intento; inventada, solo en el primero (después cada intento inventa la suya).
-        espera: espera && (espera.carta || !esperaUsada.current) ? espera : undefined,
+        espera: espera && (espera.carta || !primeraUsada.current) ? espera : undefined,
         llegada: primera?.llegada ?? llegadaRef.current ?? undefined,
         salida: primera?.salida,
       };
@@ -406,19 +423,22 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     return () => window.clearTimeout(id);
   }, [terminado, finEn, listo, cl, conChecklist]);
 
-  // Lección 4: «¿Qué entrada vas a hacer?» con el micrófono; también hay botones. El checklist calla mientras.
+  // Lección 4: «¿Qué entrada vas a hacer?»; lecciones 1 y 2: «¿Interceptación normal o ruta pasada?». Con el micrófono
+  // y también con botones. El checklist calla mientras.
   const escuchaEntrada = useEscucha(idioma, voz);
   const responder = useCallback((d: Entrada) => ajustar((e) => responderEntrada(e, d, muestraRef.current?.rumbo ?? 0)), [ajustar]);
-  const preguntar = def.id === "espera" && !!ev?.preguntar;
+  const responderTramo = useCallback((d: TipoTramo) => ajustar((e: EvaluacionInterceptacion) => responderTipo(e, d)), [ajustar]);
+  const esTramo = def.id === "interceptar-radial" || def.id === "ruta-pasada";
+  const preguntar = (def.id === "espera" || esTramo) && !!ev?.preguntar;
   const preguntaHecha = useRef(false);
   const { escuchar, supported: micEntrada } = escuchaEntrada;
-  // Lo que oyó el micrófono, en pantalla hasta el siguiente ejercicio.
-  const [oidoEntrada, setOidoEntrada] = useState<{ texto: string; entrada: Entrada | null } | null>(null);
+  // Lo que oyó el micrófono (y cómo lo entendió), en pantalla hasta el siguiente ejercicio.
+  const [oidoEntrada, setOidoEntrada] = useState<{ texto: string; nombre: string | null } | null>(null);
   const faseEv: string | undefined = ev?.fase;
   // La guía de Álvaro (/resumen-hsi) con los números de este ejercicio; solo en práctica.
   const guiaHsi = ev && muestra ? pasosHsiDe(def.id, ev, muestra, idioma) : null;
   useEffect(() => {
-    if (faseEv === undefined || faseEv === "posicionando") setOidoEntrada(null);
+    if (faseEv === undefined || faseEv === "posicionando" || faseEv === "esperando") setOidoEntrada(null);
   }, [faseEv]);
   useEffect(() => {
     if (!preguntar) {
@@ -427,19 +447,26 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     }
     if (preguntaHecha.current) return;
     preguntaHecha.current = true;
-    const pregunta = paraVoz(PREGUNTA_ENTRADA[idioma], idioma);
+    const pregunta = paraVoz((esTramo ? PREGUNTA_TIPO : PREGUNTA_ENTRADA)[idioma], idioma);
     if (!micEntrada) {
       decir(pregunta, "orden", "pregunta");
       return;
     }
     // Si no se entiende, la respuesta queda pendiente para los botones.
     escuchar(pregunta, "orden", "pregunta", (texto) => {
+      if (esTramo) {
+        const d = tipoDicho(texto, idioma);
+        setOidoEntrada({ texto, nombre: d && NOMBRE_TIPO[idioma][d] });
+        sonarTonos([d ? "punto" : "falta"]);
+        if (d) responderTramo(d);
+        return;
+      }
       const d = entradaDicha(texto, idioma);
-      setOidoEntrada({ texto, entrada: d });
+      setOidoEntrada({ texto, nombre: d && T[idioma].entradas[d] });
       sonarTonos([d ? "punto" : "falta"]);
       if (d) responder(d);
     });
-  }, [preguntar, micEntrada, escuchar, decir, idioma, responder]);
+  }, [preguntar, esTramo, micEntrada, escuchar, decir, idioma, responder, responderTramo]);
 
   // Checklist por voz, en español, mientras dura la lección. Al cerrar una sección el instructor dice qué faltó.
   const enVuelo = !!repaso && repaso.etapa !== "terminado" && repaso.etapa !== "invalido";
@@ -487,6 +514,11 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       esperaRef.current = espera;
       setDatosEspera(espera);
       extra = autorizacionEspera(rutaPrimera.current.salida, espera.altitudFt, idioma);
+    } else if (tramosRef.current?.[0] && e.vor) {
+      // Lecciones 1 y 2: el primer tramo, desde la pista por la que va a despegar.
+      const pista = aeroRef.current ? (pistaProbable(m, aeroRef.current) ?? undefined) : undefined;
+      primeroRef.current = generarTramo(tramosRef.current[0], referenciaTramo(m, e.vor, pista));
+      extra = instruccionTramo(primeroRef.current, e.vor.ident, idioma, true);
     }
     const r = instruirEnRampa(e, idioma, extra);
     poner(r.estado);
@@ -550,7 +582,8 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       if (!e || e.etapa === "terminado" || e.etapa === "invalido") return localStorage.removeItem(CLAVE_REANUDAR);
       const g = paraReanudar({
         clave: claveReanudar, en: Date.now(), sesionId, modo: e.modo, repaso: e, cl: clRef.current, grabador: grabador.current, resultados: resultadosVuelo.current,
-        espera: esperaRef.current, llegada: llegadaRef.current, esperaUsada: esperaUsada.current, rutaPrimera: rutaPrimera.current,
+        espera: esperaRef.current, llegada: llegadaRef.current, primeraUsada: primeraUsada.current, rutaPrimera: rutaPrimera.current,
+        tramos: tramosRef.current, primero: primeroRef.current,
         dichos: [...dichos.current], respondidas: [...respondidas.current],
       });
       localStorage.setItem(CLAVE_REANUDAR, JSON.stringify(g));
@@ -600,12 +633,13 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     setMapa({ estado: "no" });
     setFinEn(null);
     setListo(false);
-    casosRef.current = undefined;
+    tramosRef.current = g.tramos;
+    primeroRef.current = g.primero;
     esperaRef.current = g.espera;
     setDatosEspera(g.espera);
     llegadaRef.current = g.llegada;
     setLlegada(g.llegada);
-    esperaUsada.current = g.esperaUsada;
+    primeraUsada.current = g.primeraUsada;
     rutaPrimera.current = g.rutaPrimera;
     setAMedias(null);
     poner(g.repaso);
@@ -626,8 +660,9 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     setMapa({ estado: "no" });
     setFinEn(null);
     setListo(false);
-    casosRef.current = ifr && modo === "checkride" ? casosExamen() : undefined;
-    esperaUsada.current = false;
+    tramosRef.current = leccion && (leccion.maniobra === "interceptar-radial" || leccion.maniobra === "ruta-pasada") ? tramosDe(leccion.numero as 1 | 2, modo === "checkride") : undefined;
+    primeroRef.current = null;
+    primeraUsada.current = false;
     rutaPrimera.current = null;
     if (leccion) poner(crearRepaso(modo, maniobrasDe(leccion, Math.random, modo), nivel, programa));
   };
@@ -786,10 +821,20 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
           {def.id === "espera" && ev?.fase === "llegando" && escuchaEntrada.fase === "escuchando" && (
             <p className="text-emerald-300">{t.escuchandoEntrada}</p>
           )}
-          {def.id === "espera" && oidoEntrada && (
-            <p className={oidoEntrada.entrada ? "text-white" : "text-gold-300"}>
-              {t.escuche(oidoEntrada.texto, oidoEntrada.entrada && t.entradas[oidoEntrada.entrada])}
-            </p>
+          {esTramo && ev?.preguntar && escuchaEntrada.fase === "escuchando" && <p className="text-emerald-300">{t.escuchandoTipo}</p>}
+          {(def.id === "espera" || esTramo) && oidoEntrada && (
+            <p className={oidoEntrada.nombre ? "text-white" : "text-gold-300"}>{t.escuche(oidoEntrada.texto, oidoEntrada.nombre)}</p>
+          )}
+          {esTramo && ev?.dicho && <p className="text-emerald-300">{t.tipoDicho(NOMBRE_TIPO[idioma][ev.dicho as TipoTramo])}</p>}
+          {esTramo && ev?.preguntar && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-white/70">{t.tuTipo}</span>
+              {(["normal", "pasada"] as const).map((d) => (
+                <button key={d} type="button" onClick={() => responderTramo(d)} className="rounded-full border border-gold-500 px-3 py-1 text-gold-100">
+                  {t.tipos[d]}
+                </button>
+              ))}
+            </div>
           )}
           {def.id === "espera" && ev?.dicha && <p className="text-emerald-300">{t.entradaDicha(t.entradas[ev.dicha as Entrada])}</p>}
           {guiaHsi && (
