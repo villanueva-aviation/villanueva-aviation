@@ -43,12 +43,27 @@ export const TEORIA_IFR: Record<TemaIfr, { titulo: Texto; secciones: SeccionTeor
         hsi: { rumbo: 90, curso: 90, desviacion: 1.5 },
       },
       {
-        titulo: { es: "Interceptar con 30 grados", en: "Intercepting at 30 degrees" },
+        titulo: { es: "Normal o ruta pasada: la regla de los 90°", en: "Normal intercept or passed route: the 90° rule" },
         texto: {
-          es: "Pon el curso en el OBS y vira para cortarlo con 30 grados: con curso 090 y la barra a la derecha, rumbo 120. Cuando la barra empiece a moverse hacia el centro, empieza a virar al curso para quedar centrado sin pasarte.",
-          en: "Set the course on the OBS and turn to cut it at 30 degrees: with course 090 and the needle to the right, heading 120. When the needle starts moving toward center, start your turn onto the course so you end up centered without overshooting.",
+          es: "Antes de virar, compara el radial donde vas con el radial que te piden. Si están a 90° o menos, es una interceptación normal: el radial está adelante de ti. Si están a más de 90°, es una ruta pasada: el radial quedó atrás. Ejemplo: despegas y vas por el radial 290; del 200 al 020 es normal, pero el 150 está a 140°, atrás de ti: es ruta pasada (lección 2).",
+          en: "Before turning, compare the radial you are on with the radial you are given. If they are 90° apart or less, it is a normal intercept: the radial is ahead of you. If they are more than 90° apart, it is a passed route: the radial is behind you. Example: you take off and you are on the 290 radial; from the 200 to the 020 it is normal, but the 150 is 140° away, behind you: that is a passed route (lesson 2).",
         },
-        hsi: { rumbo: 120, curso: 90, desviacion: 2 },
+      },
+      {
+        titulo: { es: "Acercándote: DC30", en: "Inbound: DC30" },
+        texto: {
+          es: "Para acercarte por un radial: Deseada, Cabeza y me paso 30°. Pon la mariposa en el rumbo deseado (el radial más 180). Mira la cabeza de la flecha del HSI: de la deseada ve hacia la cabeza y pásate 30° más; ese es tu rumbo de interceptación. Ejemplo: deseada 090, cabeza 060: vira al 030. Pon el CRS en 090 y, con el CDI vivo, vira hacia la estación, al 090.",
+          en: "To fly inbound on a radial: Desired, Head, then 30° past. Set the heading bug on the desired heading (the radial plus 180). Look at the head of the HSI arrow: go from the desired heading toward the head and 30° past it; that is your intercept heading. Example: desired 090, head 060: turn to 030. Set the CRS on 090 and, when the CDI comes alive, turn toward the station, to 090.",
+        },
+        hsi: { rumbo: 30, curso: 90, desviacion: -5 },
+      },
+      {
+        titulo: { es: "Alejándote: CD45", en: "Outbound: CD45" },
+        texto: {
+          es: "Para alejarte por un radial: Cola, Deseada y me paso 45°. Alejándote, el radial y el rumbo coinciden: pon la mariposa en el radial. Mira la cola de la flecha: de la cola ve hacia la deseada y pásate 45° más. Ejemplo: cola 060, deseada 090: vira al 135. Pon el CRS en 090 y, con el CDI vivo, vira al lado contrario de la estación, al 090.",
+          en: "To fly outbound on a radial: Tail, Desired, then 45° past. Outbound, the radial and the heading match: set the heading bug on the radial. Look at the tail of the arrow: go from the tail toward the desired heading and 45° past it. Example: tail 060, desired 090: turn to 135. Set the CRS on 090 and, when the CDI comes alive, turn away from the station, to 090.",
+        },
+        hsi: { rumbo: 135, curso: 90, desviacion: 5 },
       },
       {
         titulo: { es: "Cerca y lejos de la estación", en: "Close to and far from the station" },
@@ -58,40 +73,46 @@ export const TEORIA_IFR: Record<TemaIfr, { titulo: Texto; secciones: SeccionTeor
         },
       },
       {
-        titulo: { es: "Paso a paso", en: "Step by step" },
+        titulo: { es: "La lección: un vuelo de 4 tramos", en: "The lesson: a 4-leg flight" },
         texto: {
-          es: "1. Sintoniza e identifica el VOR en NAV1, con la barra en NAV y no en GPS. 2. Pon el curso en el OBS y revisa TO o FROM. 3. Mira de qué lado está la barra y vira hacia ella con 30 grados respecto al curso. 4. Mantén ese rumbo hasta que la barra se mueva. 5. Vira al curso y corrige poco a poco para mantenerla centrada.",
-          en: "1. Tune and identify the VOR on NAV1, with the needle on NAV, not GPS. 2. Set the course on the OBS and check TO or FROM. 3. See which side the needle is on and turn toward it, 30 degrees off the course. 4. Hold that heading until the needle moves. 5. Turn onto the course and make small corrections to keep it centered.",
+          es: "La lección es un solo vuelo. En tierra, al cerrar «Antes del despegue», el instructor te da el primer tramo: «Después del despegue, aléjate por el radial 310 de GDL». Tú dices en voz alta si es normal o ruta pasada; después sale la guía del HSI con los números. Alejándote, el tramo termina a las 8 millas; acercándote, al pasar el VOR. Luego viene el siguiente, alternando alejamiento y acercamiento. En el examen son 2 tramos y no hay guía.",
+          en: "The lesson is one flight. On the ground, when you close the Before takeoff checklist, the instructor gives you the first leg: \"After takeoff, proceed outbound on the 310 radial of GDL.\" Say out loud whether it is a normal intercept or a passed route; then the HSI guide shows up with the numbers. Outbound, the leg ends at 8 miles; inbound, when you pass the VOR. Then comes the next one, alternating outbound and inbound. The checkride has 2 legs and no guide.",
         },
       },
     ],
   },
   rutas: {
-    titulo: { es: "Rutas de acercamiento y alejamiento", en: "Inbound and outbound courses" },
+    titulo: { es: "Rutas pasadas", en: "Passed routes" },
     secciones: [
       {
-        titulo: { es: "Acercarse con TO", en: "Inbound with TO" },
+        titulo: { es: "Cuándo es ruta pasada", en: "When it is a passed route" },
         texto: {
-          es: "Para acercarte al VOR por el radial 090, pon en el OBS el radial más 180: curso 270. La bandera dice TO. Mantén la barra centrada y vas directo a la estación por ese radial.",
-          en: "To fly inbound to the VOR on the 090 radial, set the radial plus 180 on the OBS: course 270. The flag reads TO. Keep the needle centered and you fly straight to the station along that radial.",
+          es: "Una ruta pasada es un radial que quedó atrás: está a más de 90° del radial donde vas. Interceptarlo directo sería un viraje de más de 90° hacia la estación. En vez de eso se usa una de dos reglas: alejándote, la regla de los 45°; acercándote, la regla de 1 minuto. El ejemplo de las dos: vas por el radial 290 y te piden el 150.",
+          en: "A passed route is a radial that is behind you: more than 90° from the radial you are on. Intercepting it directly would mean a turn of more than 90° toward the station. Instead you use one of two rules: outbound, the 45° rule; inbound, the 1-minute rule. The example for both: you are on the 290 radial and you are given the 150.",
         },
-        hsi: { rumbo: 270, curso: 270, desviacion: 0 },
       },
       {
-        titulo: { es: "Al cruzar la estación", en: "Crossing the station" },
+        titulo: { es: "Alejándote: la regla de los 45°", en: "Outbound: the 45° rule" },
         texto: {
-          es: "Muy cerca del VOR los radiales están tan juntos que la barra se mueve rápido de un lado a otro. No la persigas: mantén el rumbo. Cuando la bandera cambia de TO a FROM, ya pasaste la estación.",
-          en: "Very close to the VOR the radials are so close together that the needle swings quickly from side to side. Don't chase it: hold your heading. When the flag changes from TO to FROM, you have passed the station.",
+          es: "1. Mariposa y CRS al 150 (radial y rumbo coinciden). 2. Vira al 150. 3. Al través de la estación (cambia la flechita), mariposa a 45° del lado de la estación: 105. 4. Vira al 105. 5. Con el CDI vivo, vira al lado contrario de la estación, al 150.",
+          en: "1. Heading bug and CRS on 150 (radial and heading match). 2. Turn to 150. 3. Abeam the station (the flag flips), heading bug 45° toward the station: 105. 4. Turn to 105. 5. When the CDI comes alive, turn away from the station, to 150.",
         },
-        hsi: { rumbo: 270, curso: 270, desviacion: -3 },
+        hsi: { rumbo: 105, curso: 150, desviacion: -4 },
       },
       {
-        titulo: { es: "Alejarse con FROM", en: "Outbound with FROM" },
+        titulo: { es: "Acercándote: la regla de 1 minuto", en: "Inbound: the 1-minute rule" },
         texto: {
-          es: "Para alejarte por otro radial, vira hacia él y pon ese mismo radial en el OBS: alejándote por el radial 180, curso 180. La bandera dice FROM. Centra la barra con un ángulo de interceptación, como en la lección 1.",
-          en: "To fly outbound on another radial, turn toward it and set that same radial on the OBS: outbound on the 180 radial, course 180. The flag reads FROM. Center the needle with an intercept angle, as in lesson 1.",
+          es: "1. Mariposa al 150 (radial solicitado). 2. CRS al 330 (rumbo contrario). 3. Vira al 150. 4. Al través (cambia la flechita), cronómetro 1 minuto. 5. Pasado el minuto, vira 90° hacia el lado del CDI: 060. 6. Con el CDI vivo, vira hacia la estación, al 330.",
+          en: "1. Heading bug on 150 (requested radial). 2. CRS on 330 (opposite heading). 3. Turn to 150. 4. Abeam (the flag flips), start a 1-minute timer. 5. After the minute, turn 90° toward the CDI side: 060. 6. When the CDI comes alive, turn toward the station, to 330.",
         },
-        hsi: { rumbo: 180, curso: 180, desviacion: 0 },
+        hsi: { rumbo: 60, curso: 330, desviacion: 5 },
+      },
+      {
+        titulo: { es: "En la lección y en el examen", en: "In the lesson and the checkride" },
+        texto: {
+          es: "En la práctica de la lección 2 todos los tramos son rutas pasadas. Alejándote, el tramo termina a las 8 millas; acercándote, al pasar el VOR, y a las 3 millas de la estación te dan el siguiente. En el examen son 2 tramos: uno normal y una ruta pasada, sin decirte cuál. Por eso la regla de los 90° va primero: identifica y luego vuela la regla que toca.",
+          en: "In lesson 2 practice every leg is a passed route. Outbound, the leg ends at 8 miles; inbound, when you pass the VOR, and 3 miles past the station you get the next one. The checkride has 2 legs: one normal intercept and one passed route, without telling you which. That is why the 90° rule comes first: identify, then fly the rule that fits.",
+        },
       },
       {
         titulo: { es: "Corregir el viento", en: "Correcting for the wind" },
