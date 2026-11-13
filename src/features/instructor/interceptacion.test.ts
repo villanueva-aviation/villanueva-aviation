@@ -6,6 +6,10 @@ import {
 } from "./evaluadorInterceptacion.ts";
 import { tramosDe, type Ejercicio, type TipoTramo } from "./navIfr.ts";
 import type { Nivel } from "./nivel.ts";
+import {
+  avisoInterceptacion, briefingInterceptacion, briefingRutaPasada, explicarInterceptacion, instruccionTramo, masFalladoInterceptacion,
+  ordenInterceptacion, pasoInterceptacion, PREGUNTA_TIPO, repetirInterceptacion, textoPasoInterceptacion, type PasoInterceptacion,
+} from "./textosInterceptacion.ts";
 
 // Simulador local. Alejándose por el radial 090 (curso 090); el radial del avión = 090 + desvío en grados. Empieza a 3 NM.
 const EJ: Ejercicio = { tipo: "normal", radial: 90, desde: true, curso: 90, referencia: 60 };
@@ -226,4 +230,82 @@ test("el segundo tramo de la lección 1 es un acercamiento normal", () => {
   const e = armarInterceptacion(base(0, 0, 90, 8), 2, { intento: 1, examen: false, tramos: tramosDe(1, false) });
   assert.equal(e.ejercicio!.desde, false);
   assert.equal(e.ejercicio!.tipo, "normal");
+});
+
+// Lo que dice el instructor.
+const PRACTICA = { intento: 0, examen: false };
+
+test("la instrucción no dice el tipo ni el curso", () => {
+  for (const idioma of ["es", "en"] as const)
+    for (const tipo of ["normal", "pasada"] as const) {
+      const s = instruccionTramo({ tipo, radial: 150, desde: true, curso: 150, referencia: 290 }, "GDL", idioma, false);
+      assert.doesNotMatch(s, /normal|pasada|passed|behind|OBS/i);
+    }
+  assert.equal(instruccionTramo({ tipo: "normal", radial: 310, desde: true, curso: 310, referencia: 290 }, "GDL", "es", true), "Después del despegue, aléjate por el radial 310 de GDL.");
+  assert.equal(instruccionTramo({ tipo: "pasada", radial: 40, desde: false, curso: 220, referencia: 200 }, "GDL", "es", false), "Acércate por el radial 040 de GDL.");
+  assert.equal(instruccionTramo({ tipo: "normal", radial: 40, desde: false, curso: 220, referencia: 60 }, "GDL", "en", false), "Proceed inbound on the 040 radial of GDL.");
+});
+
+test("la orden al empezar es la instrucción, sin el tipo; la pregunta la hace la página", () => {
+  const e = iniciarInterceptacion(en(0, 290, 150), 2, PASADA_AL, PRACTICA);
+  assert.equal(pasoInterceptacion(e, null), "intercepta");
+  const orden = ordenInterceptacion(null, "intercepta", e, "es")!;
+  assert.match(orden, /^Aléjate por el radial 150\./);
+  assert.doesNotMatch(orden, /ruta pasada|normal/i);
+  assert.equal(PREGUNTA_TIPO.es, "¿Interceptación normal o ruta pasada?");
+  // En pantalla la pregunta se queda mientras no conteste.
+  assert.match(textoPasoInterceptacion("intercepta", e, "es"), /¿Interceptación normal o ruta pasada\?/);
+});
+
+test("respondida en práctica: confirma o corrige con los grados; en el examen calla", () => {
+  const e = iniciarInterceptacion(en(0, 290, 150), 2, PASADA_AL, PRACTICA);
+  const mal = responderTipo(e, "normal");
+  assert.equal(pasoInterceptacion(mal, null), "respondida");
+  assert.equal(ordenInterceptacion("intercepta", "respondida", mal, "es"), "Es ruta pasada: el 150 queda a 140°, atrás de ti.");
+  assert.equal(ordenInterceptacion("intercepta", "respondida", mal, "en"), "It's a passed route: the 150 is 140 degrees away, behind you.");
+  assert.equal(ordenInterceptacion("intercepta", "respondida", responderTipo(e, "pasada"), "es"), "Correcto: ruta pasada.");
+  const normal = responderTipo(iniciarInterceptacion(base(0, 20, 60), 2, EJ, PRACTICA), "pasada");
+  assert.equal(ordenInterceptacion("intercepta", "respondida", normal, "es"), "Es normal: el 090 queda a 30°, adelante de ti.");
+  const examen = responderTipo(iniciarInterceptacion(en(0, 290, 150), 2, PASADA_AL, { intento: 0, examen: true }), "normal");
+  assert.equal(ordenInterceptacion("intercepta", "respondida", examen, "es"), null);
+});
+
+test("esperando y mantén dicen la distancia", () => {
+  const e = armarInterceptacion(en(0, 300, 120, 1), 2, { intento: 2, examen: false, tramos: tramosDe(2, false) });
+  assert.equal(pasoInterceptacion(e, null), "espera");
+  assert.equal(ordenInterceptacion(null, "espera", e, "es"), "Sigue alejándote; a las 3 millas te doy el siguiente radial.");
+  const m = volar([...rampa(20, 0, 60), ...quieto(0, 90, 5)]);
+  assert.equal(pasoInterceptacion(m, null), "manten");
+  assert.equal(ordenInterceptacion("respondida", "manten", m, "es"), "Barra centrada: mantenla hasta las 8 millas.");
+});
+
+test("el aviso del OBS espera a que conteste", () => {
+  const e = iniciarInterceptacion(en(0, 290, 150), 2, PASADA_AL, PRACTICA);
+  const m = { ...en(1, 285, 150), navObs: 0 };
+  assert.equal(avisoInterceptacion(e, m, "practica", "es"), null);
+  assert.equal(avisoInterceptacion(responderTipo(e, "pasada"), m, "practica", "es")?.clave, "obs");
+});
+
+test("explicar: identificación fallida, sin respuesta, y un resultado viejo sin tipo", () => {
+  const dijo = volar(PERFECTA, 2, EJ, "pasada").resultado!;
+  assert.ok(explicarInterceptacion(dijo, "es").some((l) => l.tipo === "mal" && l.texto === "Dijiste ruta pasada; era normal."));
+  const nada = volar(PERFECTA, 2, EJ, null).resultado!;
+  assert.ok(explicarInterceptacion(nada, "es").some((l) => l.texto === "No dijiste si era normal o ruta pasada."));
+  const bien = volar(PERFECTA).resultado!;
+  const viejo = { ...bien, ejercicio: { caso: "alejandose", radial: 90, desde: true, curso: 90 }, fuera: { interceptar: [], sobrepaso: [], corto: [] }, dicho: undefined } as unknown as typeof bien;
+  assert.deepEqual(explicarInterceptacion(viejo, "es").map((l) => l.tipo), ["bien"]);
+  assert.equal(masFalladoInterceptacion([viejo, dijo], "es"), "Lo que más se te complicó fue decir si era normal o ruta pasada.");
+  // El vuelo encadenado no repite tramos.
+  assert.equal(repetirInterceptacion(dijo, "es"), null);
+});
+
+test("textos en inglés sin caracteres del español", () => {
+  const e = responderTipo(iniciarInterceptacion(en(0, 290, 150), 2, PASADA_AL, PRACTICA), "normal");
+  const pasos: PasoInterceptacion[] = ["intercepta", "respondida", "manten"];
+  const textos = [
+    ...briefingInterceptacion("en"), ...briefingRutaPasada("en"), PREGUNTA_TIPO.en,
+    ...pasos.map((p) => textoPasoInterceptacion(p, e, "en")), ordenInterceptacion("intercepta", "respondida", e, "en")!,
+    ...explicarInterceptacion(volar(PERFECTA, 2, EJ, null).resultado!, "en").map((l) => l.texto),
+  ];
+  for (const linea of textos) assert.doesNotMatch(linea, /[áéíóúñ¿¡]/i);
 });
