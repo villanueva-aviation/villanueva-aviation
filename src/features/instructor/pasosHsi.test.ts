@@ -3,8 +3,11 @@ import assert from "node:assert/strict";
 import type { Muestra } from "./evaluador.ts";
 import { armarEspera, avanzarEspera, responderEntrada, type EvaluacionEspera } from "./evaluadorEspera.ts";
 import type { DatosEspera } from "./navIfr.ts";
-import { pasosHsi } from "./pasosHsi.ts";
+import { pasosArco, pasosHsi, pasosInterceptacion, pasosRuta } from "./pasosHsi.ts";
 import type { VorElegido } from "./vorSim.ts";
+import type { EvaluacionInterceptacion } from "./evaluadorInterceptacion.ts";
+import type { EvaluacionRuta } from "./evaluadorRuta.ts";
+import type { EvaluacionArco } from "./evaluadorArco.ts";
 
 // El mismo simulador de espera.test.ts: VOR en 0,0, 100 kt, una muestra por segundo.
 const VOR = { ident: "TST", region: "", lat: 0, lon: 0, mhz: 113.1, dme: true, decl: 0 } as VorElegido;
@@ -78,4 +81,72 @@ test("pasos HSI de la gota: la mariposa 30° hacia el lado de la espera", () => 
   const p = pasosHsi(e, m, "es")!;
   assert.equal(p[1].texto, "Mariposa en 060 (outbound 090 −30°).");
   assert.equal(p.length, 7);
+});
+
+// Lecciones 1 a 3: estados armados a mano (solo importa la fase, el ejercicio y la muestra).
+const en = (rumbo: number, extra: Partial<Muestra> = {}): Muestra => ({ ...muestra(0, { x: 5, y: 0, rumbo }, 0), navObs: 0, navDesv: 30, ...extra });
+const textos = (p: { texto: string }[] | null) => p!.map((x) => x.texto);
+
+test("lección 1, acercándose: DC30 con la cabeza de la flecha y los números del ejercicio", () => {
+  const e = { fase: "interceptando", examen: false, ejercicio: { caso: "acercandose", radial: 270, desde: false, curso: 90 }, inicio: en(0, { navRadial: 240 }) } as unknown as EvaluacionInterceptacion;
+  assert.deepEqual(textos(pasosInterceptacion(e, en(90, { navObs: 90 }), "es")), [
+    "Mariposa en 090 (rumbo deseado).",
+    "DC30: deseada 090, cabeza 060, me paso 30°: vira al 030.",
+    "CRS en 090.",
+    "CDI vivo: vira hacia la estación, al 090.",
+  ]);
+  assert.deepEqual(estados(pasosInterceptacion(e, en(90, { navObs: 90 }), "es")), ["actual", "pendiente", "hecho", "pendiente"]);
+  assert.deepEqual(estados(pasosInterceptacion(e, en(30, { navObs: 90 }), "es")), ["hecho", "hecho", "hecho", "actual"]);
+  assert.deepEqual(estados(pasosInterceptacion({ ...e, fase: "establecido" }, en(90, { navObs: 90, navDesv: 1 }), "es")), ["hecho", "hecho", "hecho", "hecho"]);
+  assert.equal(pasosInterceptacion({ ...e, examen: true }, en(90), "es"), null);
+});
+
+test("lección 1, alejándose: CD45 con la cola de la flecha; en inglés sin acentos", () => {
+  const e = { fase: "interceptando", examen: false, ejercicio: { caso: "alejandose", radial: 90, desde: true, curso: 90 }, inicio: en(0, { navRadial: 60 }) } as unknown as EvaluacionInterceptacion;
+  const p = textos(pasosInterceptacion(e, en(90), "es"));
+  assert.equal(p[0], "Mariposa en 090 (rumbo y radial coinciden).");
+  assert.equal(p[1], "CD45: cola 060, deseada 090, me paso 45°: vira al 135.");
+  assert.equal(p[3], "CDI vivo: vira al lado contrario de la estación, al 090.");
+  for (const x of textos(pasosInterceptacion(e, en(90), "en"))) assert.doesNotMatch(x, /[áéíóúñ¿¡]/i);
+});
+
+test("lección 2, giro de 135°: la regla de los 45° de la guía, tachándose", () => {
+  const e = { fase: "acercandose", examen: false, ejercicio: { entrada: 90, salida: 45, giro: 135 }, establecidoVuelta: null } as unknown as EvaluacionRuta;
+  assert.deepEqual(textos(pasosRuta(e, en(270), "es")), [
+    "CRS en 270 (TO): mantén la barra centrada hacia la estación.",
+    "Sobre la estación: mariposa y CRS en 045; vira a la derecha al 045.",
+    "Al través (cambia la flechita), mariposa en 090, del lado del CDI, y vira esos 45°.",
+    "CDI vivo: vira al lado contrario de la estación, al 045.",
+  ]);
+  assert.deepEqual(estados(pasosRuta(e, en(270), "es")), ["actual", "pendiente", "pendiente", "pendiente"]);
+  const fuera = { ...e, fase: "alejandose" } as EvaluacionRuta;
+  assert.deepEqual(estados(pasosRuta(fuera, en(300), "es")), ["hecho", "actual", "pendiente", "pendiente"]);
+  assert.deepEqual(estados(pasosRuta(fuera, en(45), "es")), ["hecho", "hecho", "actual", "pendiente"]);
+  assert.deepEqual(estados(pasosRuta(fuera, en(90), "es")), ["hecho", "hecho", "hecho", "actual"]);
+  assert.deepEqual(estados(pasosRuta({ ...fuera, establecidoVuelta: 5 }, en(45), "es")), ["hecho", "hecho", "hecho", "hecho"]);
+});
+
+test("lección 2, giro de 90° o menos: sobre la estación vira y centra; sin ejercicio todavía, nada", () => {
+  const e = { fase: "acercandose", examen: false, ejercicio: { entrada: 90, salida: 180, giro: 90 }, establecidoVuelta: null } as unknown as EvaluacionRuta;
+  assert.deepEqual(textos(pasosRuta(e, en(270), "es")).slice(1), ["Sobre la estación: mariposa y CRS en 180; vira a la izquierda al 180.", "CDI vivo: centra la barra en el 180."]);
+  assert.equal(pasosRuta({ ...e, ejercicio: null, fase: "posicionando" }, en(270), "es"), null);
+  for (const x of textos(pasosRuta(e, en(270), "en"))) assert.doesNotMatch(x, /[áéíóúñ¿¡]/i);
+});
+
+test("lección 3: media milla antes del arco y del radial, con el lado y los rumbos del ejercicio", () => {
+  const e = { fase: "hacia-arco", examen: false, ejercicio: { radioNm: 10, desde: 30, hasta: 90, sentido: 1, alejandose: true } } as unknown as EvaluacionArco;
+  assert.deepEqual(textos(pasosArco(e, en(30), "es")), [
+    "A 9.5 DME (media milla antes del arco), vira 90° a la derecha: rumbo 120.",
+    "En el arco mantén 10 millas: si crecen, vira 10° hacia la estación; si bajan, abre 10°.",
+    "CRS en 270 (curso de acercamiento).",
+    "Media milla antes del radial 090, vira 90° a la derecha, hacia donde apunta la cabeza de la flecha VOR.",
+    "CDI vivo: vira hacia la estación, al 270.",
+  ]);
+  assert.deepEqual(estados(pasosArco(e, en(30), "es")), ["actual", "pendiente", "pendiente", "pendiente", "pendiente"]);
+  assert.deepEqual(estados(pasosArco({ ...e, fase: "en-arco" } as EvaluacionArco, en(150, { navObs: 270 }), "es")), ["hecho", "actual", "hecho", "pendiente", "pendiente"]);
+  assert.deepEqual(estados(pasosArco({ ...e, fase: "saliendo" } as EvaluacionArco, en(250, { navObs: 270 }), "es")), ["hecho", "hecho", "hecho", "hecho", "actual"]);
+  assert.deepEqual(estados(pasosArco({ ...e, fase: "terminado" } as EvaluacionArco, en(270, { navObs: 270 }), "es")), ["hecho", "hecho", "hecho", "hecho", "hecho"]);
+  // Acercándose al arco: media milla antes es más lejos, 10.5.
+  assert.match(textos(pasosArco({ ...e, ejercicio: { ...e.ejercicio, alejandose: false } }, en(210), "es"))[0], /^A 10\.5 DME/);
+  for (const x of textos(pasosArco(e, en(30), "en"))) assert.doesNotMatch(x, /[áéíóúñ¿¡]/i);
 });

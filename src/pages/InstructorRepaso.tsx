@@ -18,8 +18,8 @@ import { altitudEspera, casosExamen, entradaDicha, inventarEspera, rutaEspera, t
 import { elegirVor, vorsCercanos, vorsParaLeccion, type VorSim } from "../features/instructor/vorSim";
 import type { Entrada } from "../features/entrenador/esperas";
 import { DatosEsperaForm } from "../features/instructor/DatosEsperaForm";
-import { ENTRADAS_PRACTICA, radialEspera, responderEntrada, type EvaluacionEspera } from "../features/instructor/evaluadorEspera";
-import { pasosHsi } from "../features/instructor/pasosHsi";
+import { ENTRADAS_PRACTICA, radialEspera, responderEntrada } from "../features/instructor/evaluadorEspera";
+import { pasosHsiDe } from "../features/instructor/pasosHsi";
 import { autorizacionEspera, PREGUNTA_ENTRADA } from "../features/instructor/textosEspera";
 import { useEscucha } from "../features/instructor/useEscucha";
 import { CLAVE_REANUDAR, leerReanudable, paraReanudar } from "../features/instructor/reanudar";
@@ -416,7 +416,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const [oidoEntrada, setOidoEntrada] = useState<{ texto: string; entrada: Entrada | null } | null>(null);
   const faseEv: string | undefined = ev?.fase;
   // La guía de Álvaro (/resumen-hsi) con los números de este ejercicio; solo en práctica.
-  const guiaHsi = def.id === "espera" && ev && muestra ? pasosHsi(ev as EvaluacionEspera, muestra, idioma) : null;
+  const guiaHsi = ev && muestra ? pasosHsiDe(def.id, ev, muestra, idioma) : null;
   useEffect(() => {
     if (faseEv === undefined || faseEv === "posicionando") setOidoEntrada(null);
   }, [faseEv]);
