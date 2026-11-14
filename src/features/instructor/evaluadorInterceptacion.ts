@@ -92,6 +92,8 @@ export interface EvaluacionInterceptacion {
   minDist: number | null;
   /** Antes de llegar: desde cuándo está dentro de `establecidoPuntos`. */
   cercaDesde: number | null;
+  /** La altitud de la lección; sin ella, el aviso usa la del inicio del tramo. */
+  altitudFt?: number;
 }
 
 const anular = (e: EvaluacionInterceptacion, m: Muestra, motivo: string): EvaluacionInterceptacion => ({ ...e, fase: "invalido", motivo, previo: m });
@@ -113,6 +115,7 @@ function vacia(m: Muestra, nivel: Nivel, tramo: Tramo, ctx: ContextoArmado): Eva
     fase: "esperando", nivel, tramo, ejercicio: null, vor: ctx.vor, estacion: ctx.estacion, examen: ctx.examen, inicio: m, previo: m, signo: 1, cruce: null,
     pasado: [], corto: { desde: null, tramos: [], max: 0 }, angulos: [], sinSenalDesde: null, muestras: [], preguntar: false, dicho: undefined,
     medirDesde: null, atraves: false, finNm: null, lado: false, minDist: null, cercaDesde: null,
+    altitudFt: ctx.altitudFt,
   };
 }
 

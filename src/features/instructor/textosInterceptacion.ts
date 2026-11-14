@@ -39,13 +39,14 @@ const CONSEJO: Record<Idioma, Record<"cerca" | "lejos", string>> = {
 };
 
 /** «Aléjate por el radial 310 de GDL.»: solo el sentido y el radial, sin curso ni tipo. */
-export function instruccionTramo(ej: Pick<Ejercicio, "radial" | "desde">, vor: string | undefined, idioma: Idioma, alDespegar: boolean): string {
+export function instruccionTramo(ej: Pick<Ejercicio, "radial" | "desde">, vor: string | undefined, idioma: Idioma, alDespegar: boolean, altitudFt?: number): string {
   const R = tres(ej.radial);
+  const alt = altitudFt?.toLocaleString("en-US");
   if (idioma === "en") {
     const de = vor ? ` of ${vor}` : "";
-    return `${alDespegar ? "After takeoff, proceed" : "Proceed"} ${ej.desde ? "outbound" : "inbound"} on the ${R} radial${de}.`;
+    return `${alDespegar ? "After takeoff, proceed" : "Proceed"} ${ej.desde ? "outbound" : "inbound"} on the ${R} radial${de}${alt ? ` and climb to ${alt} feet` : ""}.`;
   }
-  const de = vor ? ` de ${vor}` : "";
+  const de = `${vor ? ` de ${vor}` : ""}${alt ? ` y sube a ${alt} pies` : ""}`;
   const verbo = ej.desde ? "aléjate" : "acércate";
   return alDespegar ? `Después del despegue, ${verbo} por el radial ${R}${de}.` : `${verbo.charAt(0).toUpperCase()}${verbo.slice(1)} por el radial ${R}${de}.`;
 }
@@ -146,8 +147,12 @@ export function avisoInterceptacion(e: EvaluacionInterceptacion | null, m: Muest
   const curso = e.ejercicio.curso;
   if (e.dicho !== undefined && m.navObs !== undefined && Math.abs(norm180(m.navObs - curso)) > 5)
     return { clave: "obs", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Set course ${tres(curso)} on the OBS` : `Pon el curso ${tres(curso)} en el OBS` };
-  if (Math.abs(m.altitud - e.inicio.altitud) > 300) {
-    const alt = (Math.round(e.inicio.altitud / 100) * 100).toLocaleString("en-US");
+  // Con la altitud de la lección: mientras sube a ella no se le pide mantener otra (el primer tramo arma a 1,000 pies
+  // sobre el terreno, recién despegado). Sin ella, la del inicio del tramo.
+  const meta = e.altitudFt;
+  const llego = meta !== undefined && (m.altitud >= meta - 300 || e.muestras.some((x) => x.altitud >= meta - 300));
+  if (meta !== undefined ? llego && Math.abs(m.altitud - meta) > 300 : Math.abs(m.altitud - e.inicio.altitud) > 300) {
+    const alt = (Math.round((meta ?? e.inicio.altitud) / 100) * 100).toLocaleString("en-US");
     return { clave: "altitud", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Hold ${alt} feet` : `Mantén ${alt} pies` };
   }
   return null;

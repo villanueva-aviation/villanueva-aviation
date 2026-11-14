@@ -274,6 +274,8 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const vorsRef = useRef<VorSim[]>([]);
   const tramosRef = useRef<Tramo[] | undefined>(undefined);
   const primeroRef = useRef<Ejercicio | null>(null);
+  // Lecciones 1 y 2: la altitud de la lección, 3,000 pies sobre el aeropuerto (se fija una vez por vuelo).
+  const altitudRef = useRef<number | undefined>(undefined);
   // Lección 4: la espera (de la carta o inventada) y el radial de llegada. Una inventada vale para un solo intento.
   const [datosEspera, setDatosEspera] = useState<DatosEspera | null>(null);
   const [llegada, setLlegada] = useState<number | null>(null);
@@ -348,6 +350,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       return {
         intento: repasoRef.current?.actual ?? 0, examen: modo === "checkride", vor: repasoRef.current?.vor?.ident,
         tramos: tramosRef.current, primero: primeraUsada.current ? undefined : (primeroRef.current ?? undefined),
+        altitudFt: tramosRef.current ? (altitudRef.current ??= aeroRef.current ? altitudEspera(aeroRef.current.elevacionFt) : undefined) : undefined,
         estacion: repasoRef.current?.vor ?? undefined,
         // Con carta, la misma en cada intento; inventada, solo en el primero (después cada intento inventa la suya).
         espera: espera && (espera.carta || !primeraUsada.current) ? espera : undefined,
@@ -518,7 +521,8 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       // Lecciones 1 y 2: el primer tramo, desde la pista por la que va a despegar.
       const pista = aeroRef.current ? (pistaProbable(m, aeroRef.current) ?? undefined) : undefined;
       primeroRef.current = generarTramo(tramosRef.current[0], referenciaTramo(m, e.vor, pista));
-      extra = instruccionTramo(primeroRef.current, e.vor.ident, idioma, true);
+      altitudRef.current = altitudEspera(aeroRef.current?.elevacionFt ?? m.altitud - m.agl);
+      extra = instruccionTramo(primeroRef.current, e.vor.ident, idioma, true, altitudRef.current);
     }
     const r = instruirEnRampa(e, idioma, extra);
     poner(r.estado);
@@ -662,6 +666,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     setListo(false);
     tramosRef.current = leccion && (leccion.maniobra === "interceptar-radial" || leccion.maniobra === "ruta-pasada") ? tramosDe(leccion.numero as 1 | 2, modo === "checkride") : undefined;
     primeroRef.current = null;
+    altitudRef.current = undefined;
     primeraUsada.current = false;
     rutaPrimera.current = null;
     if (leccion) poner(crearRepaso(modo, maniobrasDe(leccion, Math.random, modo), nivel, programa));

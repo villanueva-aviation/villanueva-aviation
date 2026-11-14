@@ -286,6 +286,25 @@ test("el aviso del OBS espera a que conteste", () => {
   assert.equal(avisoInterceptacion(responderTipo(e, "pasada"), m, "practica", "es")?.clave, "obs");
 });
 
+test("altitud de la lección: 3,000 pies sobre el aeropuerto; mientras sube no se le dice que mantenga la del despegue", () => {
+  const alt = (a: number, t = 1) => ({ ...en(t, 90, 90), altitud: a });
+  // Arma recién despegado (5,900) con la altitud de la lección en 9,000.
+  let e = iniciarInterceptacion(alt(5900, 0), 2, EJ, { ...PRACTICA, altitudFt: 9000 });
+  assert.equal(avisoInterceptacion(e, alt(7000), "practica", "es"), null, "subiendo no hay aviso");
+  e = seguir(e, [[90, 90]]);
+  e = avanzarInterceptacion(e, alt(9000, e.previo.t + 1));
+  assert.equal(avisoInterceptacion(e, alt(8500), "practica", "es")?.texto, "Mantén 9,000 pies", "ya llegó: la de la lección");
+  assert.equal(avisoInterceptacion(e, alt(9200), "practica", "es"), null);
+  // Sin altitud de la lección (la página no la sabe): como antes, la del inicio del tramo.
+  assert.equal(avisoInterceptacion(iniciarInterceptacion(alt(5900, 0), 2, EJ, PRACTICA), alt(6500), "practica", "en")?.texto, "Hold 5,900 feet");
+});
+
+test("la primera instrucción en tierra dice a qué altitud subir", () => {
+  const ej = { tipo: "normal" as const, radial: 310, desde: true, curso: 310, referencia: 290 };
+  assert.equal(instruccionTramo(ej, "GDL", "es", true, 9000), "Después del despegue, aléjate por el radial 310 de GDL y sube a 9,000 pies.");
+  assert.equal(instruccionTramo(ej, "GDL", "en", true, 9000), "After takeoff, proceed outbound on the 310 radial of GDL and climb to 9,000 feet.");
+});
+
 test("explicar: identificación fallida, sin respuesta, y un resultado viejo sin tipo", () => {
   const dijo = volar(PERFECTA, 2, EJ, "pasada").resultado!;
   assert.ok(explicarInterceptacion(dijo, "es").some((l) => l.tipo === "mal" && l.texto === "Dijiste ruta pasada; era normal."));
