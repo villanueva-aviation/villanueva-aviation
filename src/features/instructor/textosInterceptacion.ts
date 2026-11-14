@@ -147,16 +147,23 @@ export function avisoInterceptacion(e: EvaluacionInterceptacion | null, m: Muest
   const curso = e.ejercicio.curso;
   if (e.dicho !== undefined && m.navObs !== undefined && Math.abs(norm180(m.navObs - curso)) > 5)
     return { clave: "obs", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Set course ${tres(curso)} on the OBS` : `Pon el curso ${tres(curso)} en el OBS` };
-  // Con la altitud de la lección: mientras sube a ella no se le pide mantener otra (el primer tramo arma a 1,000 pies
-  // sobre el terreno, recién despegado). Sin ella, la del inicio del tramo.
-  const meta = e.altitudFt;
-  const llego = meta !== undefined && (m.altitud >= meta - 300 || e.muestras.some((x) => x.altitud >= meta - 300));
-  if (meta !== undefined ? llego && Math.abs(m.altitud - meta) > 300 : Math.abs(m.altitud - e.inicio.altitud) > 300) {
-    const alt = (Math.round((meta ?? e.inicio.altitud) / 100) * 100).toLocaleString("en-US");
-    return { clave: "altitud", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Hold ${alt} feet` : `Mantén ${alt} pies` };
-  }
-  return null;
+  return avisoAltitud(e.altitudFt, e.inicio.altitud, e.muestras, m, idioma);
 }
+
+/**
+ * IFR 1 a 3: «Mantén X pies». Con la altitud de la lección, solo después de llegar a ella (el primer ejercicio arma a
+ * 1,000 pies sobre el terreno, recién despegado, y se va subiendo). Sin ella, la del inicio del ejercicio.
+ */
+export function avisoAltitud(meta: number | undefined, inicio: number, muestras: Muestra[], m: Muestra, idioma: Idioma): Aviso | null {
+  const llego = meta !== undefined && (m.altitud >= meta - 300 || muestras.some((x) => x.altitud >= meta - 300));
+  if (meta !== undefined ? !llego || Math.abs(m.altitud - meta) <= 300 : Math.abs(m.altitud - inicio) <= 300) return null;
+  const alt = (Math.round((meta ?? inicio) / 100) * 100).toLocaleString("en-US");
+  return { clave: "altitud", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: idioma === "en" ? `Hold ${alt} feet` : `Mantén ${alt} pies` };
+}
+
+/** Lección 3: en tierra, a qué altitud subir (el arco se dice al armarse). */
+export const subeA = (altitudFt: number, idioma: Idioma) =>
+  idioma === "en" ? `After takeoff, climb to ${altitudFt.toLocaleString("en-US")} feet.` : `Después del despegue, sube a ${altitudFt.toLocaleString("en-US")} pies.`;
 
 /** Lección 1: la teoría corta por voz (la página con dibujos va aparte). */
 export function briefingInterceptacion(idioma: Idioma, nivel: Nivel = 2): string[] {

@@ -19,7 +19,7 @@ import {
 } from "../features/instructor/navIfr";
 import { pistaProbable } from "../features/instructor/aeropuertoSim";
 import { responderTipo, type EvaluacionInterceptacion } from "../features/instructor/evaluadorInterceptacion";
-import { instruccionTramo, NOMBRE_TIPO, PREGUNTA_TIPO } from "../features/instructor/textosInterceptacion";
+import { instruccionTramo, NOMBRE_TIPO, PREGUNTA_TIPO, subeA } from "../features/instructor/textosInterceptacion";
 import { elegirVor, vorsCercanos, vorsParaLeccion, type VorSim } from "../features/instructor/vorSim";
 import type { Entrada } from "../features/entrenador/esperas";
 import { DatosEsperaForm } from "../features/instructor/DatosEsperaForm";
@@ -274,7 +274,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const vorsRef = useRef<VorSim[]>([]);
   const tramosRef = useRef<Tramo[] | undefined>(undefined);
   const primeroRef = useRef<Ejercicio | null>(null);
-  // Lecciones 1 y 2: la altitud de la lección, 3,000 pies sobre el aeropuerto (se fija una vez por vuelo).
+  // IFR: la altitud de la lección, 3,000 pies sobre el aeropuerto (se fija una vez por vuelo; la espera trae la suya).
   const altitudRef = useRef<number | undefined>(undefined);
   // Lección 4: la espera (de la carta o inventada) y el radial de llegada. Una inventada vale para un solo intento.
   const [datosEspera, setDatosEspera] = useState<DatosEspera | null>(null);
@@ -350,7 +350,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       return {
         intento: repasoRef.current?.actual ?? 0, examen: modo === "checkride", vor: repasoRef.current?.vor?.ident,
         tramos: tramosRef.current, primero: primeraUsada.current ? undefined : (primeroRef.current ?? undefined),
-        altitudFt: tramosRef.current ? (altitudRef.current ??= aeroRef.current ? altitudEspera(aeroRef.current.elevacionFt) : undefined) : undefined,
+        altitudFt: repasoRef.current?.programa === "ifr" ? (altitudRef.current ??= aeroRef.current ? altitudEspera(aeroRef.current.elevacionFt) : undefined) : undefined,
         estacion: repasoRef.current?.vor ?? undefined,
         // Con carta, la misma en cada intento; inventada, solo en el primero (después cada intento inventa la suya).
         espera: espera && (espera.carta || !primeraUsada.current) ? espera : undefined,
@@ -517,6 +517,9 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       esperaRef.current = espera;
       setDatosEspera(espera);
       extra = autorizacionEspera(rutaPrimera.current.salida, espera.altitudFt, idioma);
+    } else if (leccion?.maniobra === "arco-dme") {
+      altitudRef.current = altitudEspera(aeroRef.current?.elevacionFt ?? m.altitud - m.agl);
+      extra = subeA(altitudRef.current, idioma);
     } else if (tramosRef.current?.[0] && e.vor) {
       // Lecciones 1 y 2: el primer tramo, desde la pista por la que va a despegar.
       const pista = aeroRef.current ? (pistaProbable(m, aeroRef.current) ?? undefined) : undefined;

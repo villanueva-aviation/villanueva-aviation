@@ -4,7 +4,8 @@ import type { Muestra } from "./evaluador.ts";
 import { avanzarArco, iniciarArco, MOTIVO_SIN_DME, type EvaluacionArco } from "./evaluadorArco.ts";
 import { generarArco, type EjercicioArco } from "./navIfr.ts";
 import type { Nivel } from "./nivel.ts";
-import { briefingArco } from "./textosArco.ts";
+import { avisoArco, briefingArco } from "./textosArco.ts";
+import { subeA } from "./textosInterceptacion.ts";
 
 // Simulador local: solo importan el radial, el DME y el rumbo. Arco de 10 NM del radial 090 al 150, alejándose al entrar.
 const EJ: EjercicioArco = { radioNm: 10, desde: 90, hasta: 150, sentido: 1, alejandose: true };
@@ -88,4 +89,18 @@ test("el briefing del arco dice «1 milla», no «1 millas», en fácil", () => 
   assert.ok(briefingArco("es", 1).some((l) => l.includes("dentro de 1 milla.")));
   assert.ok(briefingArco("en", 1).some((l) => l.includes("within 1 mile.")));
   assert.ok(briefingArco("es", 2).some((l) => l.includes("dentro de 0.5 millas.")));
+});
+
+test("altitud de la lección: el arco no pide mantener la del despegue mientras sube a la de la lección", () => {
+  const alt = (t: number, a: number) => base(t, 90, 3, 90, { altitud: a });
+  let e = iniciarArco(alt(0, 5900), 2, EJ, { intento: 0, examen: false, altitudFt: 9000 });
+  assert.equal(avisoArco(e, alt(1, 7000), "practica", "es"), null, "subiendo no hay aviso");
+  e = avanzarArco(e, alt(1, 9000));
+  assert.equal(avisoArco(e, alt(2, 8500), "practica", "es")?.texto, "Mantén 9,000 pies");
+  assert.equal(avisoArco(iniciarArco(alt(0, 5900), 2, EJ, { intento: 0, examen: false }), alt(1, 6500), "practica", "en")?.texto, "Hold 5,900 feet");
+});
+
+test("en tierra, la lección de arcos dice a qué altitud subir", () => {
+  assert.equal(subeA(9000, "es"), "Después del despegue, sube a 9,000 pies.");
+  assert.equal(subeA(9000, "en"), "After takeoff, climb to 9,000 feet.");
 });

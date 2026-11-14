@@ -4,7 +4,7 @@ import type { Linea } from "./explicacion.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import { norm180, norm360, type EjercicioArco } from "./navIfr.ts";
 import { tolArco, type Nivel } from "./nivel.ts";
-import { explicarInterceptacion, semaforoInterceptacion } from "./textosInterceptacion.ts";
+import { avisoAltitud, explicarInterceptacion, semaforoInterceptacion } from "./textosInterceptacion.ts";
 import { ANULADO, luz, REPETIR_IFR_SEG, type Aviso, type Luz } from "./voz.ts";
 
 // Qué dice el instructor en los arcos DME (programa IFR, lección 3). Puro.
@@ -101,11 +101,8 @@ export function avisoArco(e: EvaluacionArco | null, m: Muestra | null, modo: "pr
     if (v > 0.2) return { clave: "arco-afuera", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? "Turn about 10 degrees toward the station." : "Corrige unos 10° hacia la estación." };
     if (v < -0.2) return { clave: "arco-adentro", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? "Open up about 10 degrees, you're cutting inside." : "Abre unos 10°, te estás metiendo." };
   }
-  if (e.fase !== "invalido" && e.fase !== "terminado" && Math.abs(m.altitud - e.inicio.altitud) > 300) {
-    const alt = (Math.round(e.inicio.altitud / 100) * 100).toLocaleString("en-US");
-    return { clave: "altitud", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Hold ${alt} feet` : `Mantén ${alt} pies` };
-  }
-  return null;
+  if (e.fase === "invalido" || e.fase === "terminado") return null;
+  return avisoAltitud(e.ctx.altitudFt, e.inicio.altitud, e.muestras, m, idioma);
 }
 
 export function briefingArco(idioma: Idioma, nivel: Nivel = 2): string[] {
