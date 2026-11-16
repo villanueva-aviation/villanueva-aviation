@@ -114,6 +114,41 @@ export function generarArcoRegreso(radial: number, dme: number, azar: () => numb
 /** El radial de acercamiento del regreso: 30° a un lado del radial del avión, para interceptarlo como en la lección 1. */
 export const radialRegreso = (radialAvion: number, azar: () => number = Math.random) => redondear10(radialAvion + (azar() < 0.5 ? 30 : -30));
 
+/** Lección 5 (spec 2026-11-16): la autorización de la llegada se da a esta distancia. */
+export const LLEGADA_NM = 15;
+/** Una llegada: interceptar `r1` acercándose, el arco hasta su `hasta` (R2), acercarse al VOR y la espera. */
+export type Llegada = { r1: number; arco: EjercicioArco; espera: DatosEspera; entrada: Entrada };
+/** El radial de alejamiento de la espera (donde está el patrón). */
+export const radialEsperaDe = (ll: Llegada) => norm360(ll.espera.acercamiento + 180);
+/** Antes de la siguiente llegada se aleja siguiendo de largo por R2 después del VOR. */
+export const alejamientoSiguiente = (anterior: Llegada) => norm360(anterior.arco.hasta + 180);
+
+const ENTRADAS: Entrada[] = ["directa", "paralela", "gota"];
+
+/** R1 a 20–40° del avión, arco de 8–10 NM hasta 30–60° más allá, y una espera lejos de R2 con otra entrada que la anterior. */
+export function generarLlegada(radialAvion: number, altitudFt: number, anterior?: Llegada, azar: () => number = Math.random): Llegada {
+  const signo = azar() < 0.5 ? 1 : -1;
+  const r1 = redondear10(radialAvion + signo * (20 + 10 * Math.floor(azar() * 3)));
+  const radioNm = 8 + Math.floor(azar() * 3);
+  const sentido: 1 | -1 = azar() < 0.5 ? 1 : -1;
+  const hasta = norm360(r1 + sentido * giroArco(azar));
+  const opciones = ENTRADAS.filter((x) => x !== anterior?.entrada);
+  const entrada = opciones[Math.floor(azar() * opciones.length)];
+  // Igual que rutaEspera: la entrada vale con ±10° de rumbo de llegada.
+  const candidatos = (["derecha", "izquierda"] as Giros[]).flatMap((giros) =>
+    Array.from({ length: 36 }, (_, k) => k * 10)
+      .filter((r) => Math.abs(norm180(r - hasta)) >= 30 && [-10, 0, 10].every((d) => entradaEspera(norm360(hasta + 180 + d), r, giros) === entrada))
+      .map((r) => ({ r, giros })),
+  );
+  const { r, giros } = candidatos[Math.floor(azar() * candidatos.length)];
+  return {
+    r1,
+    arco: { radioNm, desde: r1, hasta, sentido, alejandose: false, saleAlejandose: false },
+    espera: { acercamiento: norm360(r + 180), giros, tramoSeg: 60, carta: false, altitudFt },
+    entrada,
+  };
+}
+
 /** Lección 4 sin carta: la espera de las preguntas de esperas, con tramos de un minuto. */
 export function inventarEspera(azar: () => number = Math.random, elevacionFt?: number): DatosEspera {
   const s = generarSituacion(azar);
