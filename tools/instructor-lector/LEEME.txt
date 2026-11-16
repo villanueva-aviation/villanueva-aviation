@@ -1,6 +1,7 @@
 VILLANUEVA AVIATION - LECTOR DEL INSTRUCTOR VIRTUAL
 ====================================================
 
+v1.6.1: si al arrancar el simulador todavía no manda los VOR cercanos, el lector los vuelve a pedir cada 30 segundos (antes había que cerrarlo y abrirlo). Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.
 v1.6: lee el radio NAV1 (radial, barra, TO/FROM, DME) y los VOR cercanos para el programa IFR. Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.
 v1.5.1: le pide al simulador los aeropuertos cercanos solo al llegar o al moverte, ya no cada 30 segundos con el avión parado. Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.
 v1.5: para el checklist por voz lee el interruptor de aviónica, el selector y la válvula de combustible, la bomba auxiliar, el piloto automático y el trim. Si tienes una versión anterior, cierra el lector y reemplaza la carpeta.

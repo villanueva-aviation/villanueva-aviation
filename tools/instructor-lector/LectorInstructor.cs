@@ -178,6 +178,15 @@ static class LectorInstructor
 
     public static void PonerVors(string json) { lock (Candado) vors = json ?? "[]"; }
 
+    public static bool SinVors() { lock (Candado) return vors == "[]"; }
+
+    // v1.6.1: la lista de VOR se pide al arrancar y al moverse 3 NM, y tambien mientras llegue vacia: si MSFS
+    // contesto vacio (cargando), con el avion parado en la plataforma no se volvia a pedir (15/11: sin VOR en MMGL).
+    public static bool PedirVors(double[] pos, bool sinVors, double lat, double lon)
+    {
+        return sinVors || PedirLista(pos == null ? null : "", pos, lat, lon);
+    }
+
     public static Muestra Ultima() { lock (Candado) return ultima; }
 
     // SimConnect avisa de un pedido rechazado por OnRecvException y no manda DataEnd: a los 30 s se vuelve a pedir.
@@ -303,7 +312,12 @@ static class LectorInstructor
         var vorsOk = sinVors && Estado(double.NaN).Contains("\"vors\":[{\"ident\":\"GDL\"}]");
         PonerVors("[]");
         Console.WriteLine(vorsOk ? "Vors: OK" : "Vors: FALLA");
-        return ok && edge && banderas && puerto && json && json14 && aeropuerto && grabado && vencido && lista && json16 && vorsOk ? 0 : 1;
+
+        // v1.6.1: si la lista de VOR llego vacia (MSFS cargando) se vuelve a pedir aunque el avion no se mueva.
+        var vorsVacia = PedirVors(new[] { 20.52, -103.31 }, true, 20.52, -103.31) && !PedirVors(new[] { 20.52, -103.31 }, false, 20.52, -103.31)
+            && PedirVors(null, false, 20.52, -103.31) && PedirVors(new[] { 20.52, -103.31 }, false, 20.58, -103.31);
+        Console.WriteLine(vorsVacia ? "Vors vacia: OK" : "Vors vacia: FALLA");
+        return ok && edge && banderas && puerto && json && json14 && aeropuerto && grabado && vencido && lista && json16 && vorsOk && vorsVacia ? 0 : 1;
     }
 
     // Lo que pasaba: Edge heredaba el puerto del lector y, si el lector se cerraba, nadie podia volver a usarlo.
@@ -1017,8 +1031,8 @@ static class Sim
                     try { sim.RequestFacilitiesList(Microsoft.FlightSimulator.SimConnect.SIMCONNECT_FACILITY_LIST_TYPE.AIRPORT, Req.Aeropuertos); }
                     catch (Exception e) { Console.WriteLine("Lista de aeropuertos: " + e.Message); }
                 }
-                // Mismo criterio que los aeropuertos: al arrancar y al moverse mas de 3 NM (un nombre vacio = sin lista todavia).
-                if (u != null && LectorInstructor.Ahora() - ultimaVors > 30 && LectorInstructor.PedirLista(posVors == null ? null : "", posVors, u.Lat, u.Lon))
+                // Como los aeropuertos: al arrancar y al moverse mas de 3 NM; ademas, cada 30 s mientras la lista llegue vacia.
+                if (u != null && LectorInstructor.Ahora() - ultimaVors > 30 && LectorInstructor.PedirVors(posVors, LectorInstructor.SinVors(), u.Lat, u.Lon))
                 {
                     ultimaVors = LectorInstructor.Ahora();
                     posVors = new[] { u.Lat, u.Lon };
