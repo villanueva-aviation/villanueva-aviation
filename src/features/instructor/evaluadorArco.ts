@@ -111,6 +111,9 @@ export function iniciarArco(m: Muestra, nivel: Nivel, ejercicio: EjercicioArco, 
 const esSalida = (ctx: ContextoArmado) => ctx.intento % 2 === 0;
 
 export function armarArco(m: Muestra, nivel: Nivel = 2, ctx: ContextoArmado = { intento: 0, examen: false }): EvaluacionArco {
+  // Lección 5: el arco de la llegada autorizada, ya acercándose por R1.
+  const llegada = ctx.llegadas?.at(-1);
+  if (llegada) return iniciarArco(m, nivel, llegada.arco, ctx);
   const e = vacia(m, nivel, ctx);
   const motivo = motivoAlArmar(m);
   if (motivo) return anular(e, m, motivo);
@@ -198,6 +201,8 @@ export function avanzarArco(e: EvaluacionArco, m: Muestra): EvaluacionArco {
   if (m.t - desde > LIMITE_ARCO_SEG) return terminar(n, [{ inicio: desde, fin: m.t, peor: m.t - desde }]);
 
   if (n.fase === "hacia-arco") {
+    // Acercándose y ya adentro del arco, cada vez más: no entró (la llegada se lo comió la interceptación).
+    if (!ej.alejandose && v < -T.distanciaNm && dme < (e.previo.navDme ?? dme)) return terminar(n, [], [{ inicio: e.inicio.t, fin: m.t, peor: -v }]);
     if (Math.abs(v) <= T.distanciaNm) {
       n.fase = "entrando";
       n.tEntrada = m.t;

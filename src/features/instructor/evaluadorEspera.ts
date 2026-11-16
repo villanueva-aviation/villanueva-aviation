@@ -116,10 +116,13 @@ export const distanciaEspera = (e: Pick<EvaluacionEspera, "estacion">, m: Muestr
 export const radialEspera = (ej: DatosEspera) => norm(ej.acercamiento + 180);
 
 export function armarEspera(m: Muestra, nivel: Nivel = 2, ctx: ContextoArmado = { intento: 0, examen: false }): EvaluacionEspera {
-  const espera = ctx.espera ?? inventarEspera();
+  // Lección 5: la espera de la llegada, llegando por R2 (el radial donde termina el arco).
+  const llegada = ctx.llegadas?.at(-1);
+  const espera = llegada?.espera ?? ctx.espera ?? inventarEspera();
   const entrada = ENTRADAS_PRACTICA[ctx.examen ? Math.floor(Math.random() * ENTRADAS_PRACTICA.length) : ctx.intento % ENTRADAS_PRACTICA.length];
-  const ruta =
-    ctx.salida !== undefined && ctx.llegada !== undefined
+  const ruta = llegada
+    ? { salida: llegada.arco.hasta, llegada: llegada.arco.hasta }
+    : ctx.salida !== undefined && ctx.llegada !== undefined
       ? { salida: ctx.salida, llegada: ctx.llegada }
       : rutaEspera(radialEspera(espera), espera.giros, entrada, Math.random, ctx.llegada);
   const e: EvaluacionEspera = {
@@ -150,7 +153,9 @@ export function responderEntrada(e: EvaluacionEspera, dicha: Entrada | null, rum
 function empezarSiPuede(e: EvaluacionEspera, m: Muestra): EvaluacionEspera {
   const d = distanciaEspera(e, m);
   if (!m.navSenal || m.navRadial === undefined) return e;
-  if (d !== null && d < SALIDA_NM)
+  // Lección 5: la llegada ya viene acercándose por R2 (salida = llegada), no se aleja primero.
+  const deLlegada = e.ejercicio.salida === e.ejercicio.llegada;
+  if (!deLlegada && d !== null && d < SALIDA_NM)
     return { ...e, enRadial: e.enRadial || Math.abs(puntos(desvioGrados({ radial: e.ejercicio.salida, desde: true }, m.navRadial))) <= 2 };
   const llegada = e.ejercicio.llegada;
   // Si empieza del otro lado del radial de llegada, primero tiene que regresar a él.

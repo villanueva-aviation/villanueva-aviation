@@ -2,9 +2,12 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { entradaEspera } from "../entrenador/esperas.ts";
 import type { Muestra } from "./evaluador.ts";
+import { armarArco, avanzarArco } from "./evaluadorArco.ts";
+import { armarEspera, avanzarEspera } from "./evaluadorEspera.ts";
 import { armarInterceptacion, avanzarInterceptacion, type EvaluacionInterceptacion } from "./evaluadorInterceptacion.ts";
 import { alejamientoSiguiente, generarLlegada, norm180, norm360, radialEsperaDe, type Llegada } from "./navIfr.ts";
 import { pasoInterceptacion, textoInterceptacion, textoPasoInterceptacion } from "./textosInterceptacion.ts";
+import { pasoEspera } from "./textosEspera.ts";
 import { autorizacionLlegada } from "./textosLlegada.ts";
 
 // Lección IFR 5: la llegada (spec 2026-11-16).
@@ -120,4 +123,34 @@ test("autorizacionLlegada en español y en inglés", () => {
     autorizacionLlegada(ll, "GDL", "en"),
     "Cleared to GDL: intercept the 240 radial inbound, join the 8 mile arc to the 200 radial, proceed inbound to GDL and hold northeast on the 040 radial, right turns, maintain 9,000 feet.",
   );
+});
+
+// ── Tarea 3: el arco y la espera de la lección 5 ──
+const LL = generarLlegada(300, 9000, undefined, () => 0);
+/** Acercándose por `radial` (curso radial + 180) a `dme` NM. */
+const acercandose = (t: number, radial: number, dme: number) => muestraNav(t, radial, dme, norm360(radial + 180));
+
+test("lección 5: el arco arranca con el de la llegada, hacia el arco y con la pregunta del lado", () => {
+  const e = armarArco(acercandose(0, LL.r1, LL.arco.radioNm + 1), 2, { intento: 1, examen: false, llegadas: [LL] });
+  assert.equal(e.fase, "hacia-arco");
+  assert.deepEqual(e.ejercicio, LL.arco);
+  assert.equal(e.preguntar, true);
+});
+
+test("lección 5: el arco armado ya adentro del radio termina con error de entrada", () => {
+  let e = armarArco(acercandose(0, LL.r1, LL.arco.radioNm - 1.5), 2, { intento: 1, examen: false, llegadas: [LL] });
+  for (let t = 1; t <= 120 && e.fase !== "terminado"; t++) e = avanzarArco(e, acercandose(t, LL.r1, LL.arco.radioNm - 1.5 - t * 0.03));
+  assert.equal(e.fase, "terminado");
+  assert.ok(e.resultado!.fuera.entrada.length > 0);
+});
+
+test("lección 5: la espera llega por R2 con la espera de la llegada y pregunta la entrada", () => {
+  const r2 = LL.arco.hasta;
+  let e = armarEspera(acercandose(0, r2, 9), 2, { intento: 2, examen: false, llegadas: [LL], altitudFt: 9000 });
+  assert.equal(e.ejercicio.llegada, r2);
+  assert.equal(e.ejercicio.acercamiento, LL.espera.acercamiento);
+  assert.equal(e.ejercicio.giros, LL.espera.giros);
+  assert.equal(e.fase, "llegando");
+  for (let t = 1; t <= 200 && pasoEspera(e, null) !== "pregunta"; t++) e = avanzarEspera(e, acercandose(t, r2, 9 - t * 0.03));
+  assert.equal(pasoEspera(e, null), "pregunta");
 });
