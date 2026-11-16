@@ -1,5 +1,6 @@
 // Notas cortas hechas en el navegador: dos suben al abrir una sección del checklist y bajan al cerrarla;
-// una aguda confirma un punto hecho y una grave avisa uno que se venció sin hacerse.
+// una aguda confirma un punto hecho y una grave avisa uno que se venció sin hacerse. Las dos que bajan también dicen
+// «te escuché» al contestar una pregunta del instructor, sin decir si acertaste.
 const NOTAS = { abre: [660, 880], cierra: [880, 660], punto: [1320], falta: [220] } as const;
 const NOTA_SEG = 0.12;
 const PAUSA_SEG = 0.04;

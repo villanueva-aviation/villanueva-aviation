@@ -125,14 +125,14 @@ const T = {
     entradas: { directa: "Directa", paralela: "Paralela", gota: "Gota" } as Record<Entrada, string>,
     escuchandoEntrada: "🎤 Escuchando tu entrada…",
     escuche: (x: string, d: string | null) => (!x ? "No te escuché: toca un botón." : d ? `Escuché: «${x}» → ${d}` : `Escuché: «${x}»: no la entendí, toca un botón.`),
-    entradaDicha: (d: string) => `Tu entrada: ${d} ✓`,
+    entradaDicha: (d: string) => `Anotado: ${d}. Te califico al terminar.`,
     tuTipo: "¿Normal o ruta pasada?",
     tipos: { normal: "Normal", pasada: "Ruta pasada" } as Record<TipoTramo, string>,
     escuchandoTipo: "🎤 Escuchando: ¿normal o ruta pasada?",
     tuLado: "¿Hacia qué lado viras al arco?",
     lados: { derecha: "Derecha", izquierda: "Izquierda" } as Record<Lado, string>,
     escuchandoLado: "🎤 Escuchando: ¿derecha o izquierda?",
-    tipoDicho: (d: string) => `Dijiste: ${d} ✓`,
+    tipoDicho: (d: string) => `Anotado: ${d}. Te califico al terminar.`,
     pasosHsi: "Paso a paso en el HSI",
     aMedias: (de: string, min: number) => `Tienes esta lección a medias (${de}, hace ${min} min). Los ejercicios terminados ya están guardados; el que estabas volando empieza de nuevo.`,
     continuar: "Continuar la lección",
@@ -209,14 +209,14 @@ const T = {
     entradas: { directa: "Direct", paralela: "Parallel", gota: "Teardrop" } as Record<Entrada, string>,
     escuchandoEntrada: "🎤 Listening for your entry…",
     escuche: (x: string, d: string | null) => (!x ? "I didn't hear you: tap a button." : d ? `I heard: "${x}" → ${d}` : `I heard: "${x}": I didn't get it, tap a button.`),
-    entradaDicha: (d: string) => `Your entry: ${d} ✓`,
+    entradaDicha: (d: string) => `Noted: ${d}. Graded at the end.`,
     tuTipo: "Normal intercept or passed route?",
     tipos: { normal: "Normal intercept", pasada: "Passed route" } as Record<TipoTramo, string>,
     escuchandoTipo: "🎤 Listening: normal intercept or passed route?",
     tuLado: "Which way do you turn onto the arc?",
     lados: { derecha: "Right", izquierda: "Left" } as Record<Lado, string>,
     escuchandoLado: "🎤 Listening: right or left?",
-    tipoDicho: (d: string) => `You said: ${d} ✓`,
+    tipoDicho: (d: string) => `Noted: ${d}. Graded at the end.`,
     pasosHsi: "Step by step on the HSI",
     aMedias: (de: string, min: number) => `You have this lesson half done (${de}, ${min} min ago). Finished exercises are already saved; the one you were flying starts over.`,
     continuar: "Continue the lesson",
@@ -486,20 +486,20 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       if (esArco) {
         const d = ladoDicho(texto, idioma);
         setOidoEntrada({ texto, nombre: d && NOMBRE_LADO[idioma][d] });
-        sonarTonos([d ? "punto" : "falta"]);
+        sonarTonos([d ? "cierra" : "falta"]);
         if (d) responderArco(d);
         return;
       }
       if (esTramo) {
         const d = tipoDicho(texto, idioma);
         setOidoEntrada({ texto, nombre: d && NOMBRE_TIPO[idioma][d] });
-        sonarTonos([d ? "punto" : "falta"]);
+        sonarTonos([d ? "cierra" : "falta"]);
         if (d) responderTramo(d);
         return;
       }
       const d = entradaDicha(texto, idioma);
       setOidoEntrada({ texto, nombre: d && T[idioma].entradas[d] });
-      sonarTonos([d ? "punto" : "falta"]);
+      sonarTonos([d ? "cierra" : "falta"]);
       if (d) responder(d);
     });
   }, [preguntar, esTramo, esArco, micEntrada, escuchar, decir, idioma, responder, responderTramo, responderArco]);
@@ -878,8 +878,8 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
           {(def.id === "espera" || esTramo || esArco) && oidoEntrada && (
             <p className={oidoEntrada.nombre ? "text-white" : "text-gold-300"}>{t.escuche(oidoEntrada.texto, oidoEntrada.nombre)}</p>
           )}
-          {esTramo && ev?.dicho && <p className="text-emerald-300">{t.tipoDicho(NOMBRE_TIPO[idioma][ev.dicho as TipoTramo])}</p>}
-          {esArco && ev?.dicho && <p className="text-emerald-300">{t.tipoDicho(NOMBRE_LADO[idioma][ev.dicho as Lado])}</p>}
+          {esTramo && ev?.dicho && <p className="text-white">{t.tipoDicho(NOMBRE_TIPO[idioma][ev.dicho as TipoTramo])}</p>}
+          {esArco && ev?.dicho && <p className="text-white">{t.tipoDicho(NOMBRE_LADO[idioma][ev.dicho as Lado])}</p>}
           {esArco && ev?.preguntar && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-white/70">{t.tuLado}</span>
@@ -900,7 +900,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
               ))}
             </div>
           )}
-          {def.id === "espera" && ev?.dicha && <p className="text-emerald-300">{t.entradaDicha(t.entradas[ev.dicha as Entrada])}</p>}
+          {def.id === "espera" && ev?.dicha && <p className="text-white">{t.entradaDicha(t.entradas[ev.dicha as Entrada])}</p>}
           {guiaHsi && (
             <div className="rounded-lg border border-gold-500/30 p-3">
               <p className="mb-1 font-semibold text-gold-100">{t.pasosHsi}</p>
