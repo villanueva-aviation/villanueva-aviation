@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { LECTOR_INICIAL, recibir } from "./lector.ts";
+import { continuarLectura, LECTOR_INICIAL, recibir } from "./lector.ts";
 import { simularManiobra } from "./simular.ts";
 
 const [base] = simularManiobra();
@@ -48,4 +48,15 @@ test("simulador congelado: en el aire con velocidad y la posición igual 5 s →
     ultimo = r.lote[0].pausa;
   }
   assert.equal(ultimo, false);
+});
+
+test("al reanudar una lección, el tiempo sigue desde lo guardado aunque el lector se haya reiniciado (15/11: se perdió la ruta)", () => {
+  // Guardada en t = 12816 a los 1,000 ms; la página se recargó y el lector nuevo va en 60 s, 30 s después.
+  const e = continuarLectura(LECTOR_INICIAL, 12816, 1000);
+  const r = recibir(e, m(60), [], 31000);
+  casi(r.lote[0].t, 12846);
+  casi(recibir(r.estado, m(61), [m(61)], 32000).lote[0].t, 12847);
+  // Lector sin reiniciar (su reloj ya va adelante de lo guardado): no cambia nada.
+  const vivo = recibir(LECTOR_INICIAL, m(12900), [], 0).estado;
+  assert.equal(continuarLectura(vivo, 12816, 1000), vivo);
 });

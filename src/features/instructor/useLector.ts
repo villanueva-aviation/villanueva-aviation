@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Muestra } from "./evaluador.ts";
-import { LECTOR_INICIAL, recibir } from "./lector.ts";
+import { continuarLectura, LECTOR_INICIAL, recibir } from "./lector.ts";
 import { leerAeropuerto, type Aeropuerto } from "./aeropuertoSim.ts";
 import { leerVors, type VorSim } from "./vorSim.ts";
 
@@ -19,23 +19,25 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): {
   muestra: Muestra | null;
   aeropuerto: Aeropuerto | null;
   vors: VorSim[];
+  continuarDesde: (t: number, guardadoMs: number) => void;
 } {
   const [estado, setEstado] = useState<EstadoLector>("sin-lector");
   const [muestra, setMuestra] = useState<Muestra | null>(null);
   const [aeropuerto, setAeropuerto] = useState<Aeropuerto | null>(null);
   const [vors, setVors] = useState<VorSim[]>([]);
+  const lecturaRef = useRef(LECTOR_INICIAL);
   const callback = useRef(alRecibir);
   callback.current = alRecibir;
 
   useEffect(() => {
     let vivo = true;
     let timer: number | undefined;
-    let lectura = LECTOR_INICIAL;
     let aeropuertoCrudo = "null"; // para no volver a renderizar si no cambio
     let vorsCrudo = "[]";
 
     const leer = async () => {
       try {
+        const lectura = lecturaRef.current;
         const url = lectura.desde === null ? URL_LECTOR : `${URL_LECTOR}?desde=${lectura.desde}`;
         const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(2000) });
         const json = (await res.json()) as { conectado: boolean; muestra: Muestra | null; muestras?: Muestra[]; aeropuerto?: unknown; vors?: unknown };
@@ -52,8 +54,8 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): {
         }
         setEstado(json.conectado && json.muestra ? "conectado" : "sin-simulador");
         if (json.muestra) {
-          const r = recibir(lectura, json.muestra, json.muestras ?? [], Date.now());
-          lectura = r.estado;
+          const r = recibir(lecturaRef.current, json.muestra, json.muestras ?? [], Date.now());
+          lecturaRef.current = r.estado;
           if (r.lote.length) {
             callback.current?.(r.lote);
             setMuestra(r.lote[r.lote.length - 1]);
@@ -72,5 +74,8 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): {
     };
   }, []);
 
-  return { estado, muestra, aeropuerto, vors };
+  const continuarDesde = useCallback((t: number, guardadoMs: number) => {
+    lecturaRef.current = continuarLectura(lecturaRef.current, t, guardadoMs);
+  }, []);
+  return { estado, muestra, aeropuerto, vors, continuarDesde };
 }

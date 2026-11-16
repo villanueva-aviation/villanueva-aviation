@@ -37,7 +37,7 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
   const defRef = useRef(def);
   defRef.current = def;
   // Cada lote del lector entra a la evaluación; avanzar ignora las muestras repetidas.
-  const { estado, muestra, aeropuerto, vors } = useLector((lote) => {
+  const { estado, muestra, aeropuerto, vors, continuarDesde } = useLector((lote) => {
     setEv((e: unknown) => (e ? lote.reduce((x, m) => defRef.current.avanzar(x, m), e) : e));
     op.current.alLote?.(lote);
   });
@@ -152,5 +152,5 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
   // Dos prácticas aprobadas seguidas en el nivel de ahora: invitar a subir.
   const subir = modo === "practica" ? sugerirNivel(intentos, nivelSelector) : null;
 
-  return { estado, muestra, aeropuerto, vors, modo, cambiarModo, nivel, nivelSelector, cambiarNivel, subir, modoIntento, ev, resultado, anulado, enCurso, iniciar, reiniciar, ajustar, guardado, guardar, intento, numero, intentos, mandar, envio, aprobadoPorErik };
+  return { estado, muestra, aeropuerto, vors, continuarDesde, modo, cambiarModo, nivel, nivelSelector, cambiarNivel, subir, modoIntento, ev, resultado, anulado, enCurso, iniciar, reiniciar, ajustar, guardado, guardar, intento, numero, intentos, mandar, envio, aprobadoPorErik };
 }

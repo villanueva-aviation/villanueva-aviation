@@ -7,6 +7,15 @@ import type { Muestra } from "./evaluador.ts";
 export type EstadoLectura = { desde: number | null; ajuste: number; recibidaMs: number; quieta: { lat: number; lon: number; desde: number } | null };
 export const LECTOR_INICIAL: EstadoLectura = { desde: null, ajuste: 0, recibidaMs: 0, quieta: null };
 
+/**
+ * Al reanudar una lección guardada: el tiempo sigue desde su último instante (`t`, guardado a los `guardadoMs`).
+ * Si el lector se reinició, `recibir` ajusta su reloj como en cualquier reinicio; si no, nada cambia
+ * (15/11: lector reiniciado + página recargada → el tiempo volvió a cero y la ruta no se grabó).
+ */
+export function continuarLectura(e: EstadoLectura, t: number, guardadoMs: number): EstadoLectura {
+  return e.desde !== null && e.desde + e.ajuste >= t ? e : { ...LECTOR_INICIAL, desde: t, recibidaMs: guardadoMs };
+}
+
 /** En el aire, con velocidad y la posición exactamente igual tanto tiempo: MSFS congelado (pausa activa, carga). */
 const CONGELADO_SEG = 5;
 

@@ -369,7 +369,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     [modo],
   );
   const intento = useIntento(def, { sesionId, modoFijo: modo, arma: !!repaso && armaManiobra(repaso), alTerminar, alLote, contexto });
-  const { estado, muestra, aeropuerto, vors, ev, resultado, enCurso, reiniciar, nivel, cambiarNivel, ajustar } = intento;
+  const { estado, muestra, aeropuerto, vors, ev, resultado, enCurso, reiniciar, nivel, cambiarNivel, ajustar, continuarDesde } = intento;
   const muestraRef = useRef(muestra);
   muestraRef.current = muestra;
   aeroRef.current = aeropuerto;
@@ -654,6 +654,9 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     leido.current = false;
     setGuardado({ estado: "no" });
     grabador.current = g.grabador;
+    // El tiempo sigue desde lo guardado: si el lector se reinició, su reloj volvió a cero y no se grabaría nada.
+    const ultimoT = Math.max(g.grabador.puntos.at(-1)?.[0] ?? 0, g.grabador.fases.at(-1)?.fin ?? 0);
+    if (ultimoT > 0) continuarDesde(ultimoT, g.en);
     resultadosVuelo.current = g.resultados;
     setMapa({ estado: "no" });
     setFinEn(null);
