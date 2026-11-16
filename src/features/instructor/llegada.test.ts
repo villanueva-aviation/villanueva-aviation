@@ -17,7 +17,7 @@ import { armarInterceptacion, avanzarInterceptacion, type EvaluacionInterceptaci
 import { alejamientoSiguiente, generarLlegada, norm180, norm360, radialEsperaDe, type Llegada } from "./navIfr.ts";
 import { pasoInterceptacion, textoInterceptacion, textoPasoInterceptacion } from "./textosInterceptacion.ts";
 import { pasoEspera } from "./textosEspera.ts";
-import { autorizacionLlegada } from "./textosLlegada.ts";
+import { autorizacionLlegada, briefingLlegada, ordenDespegue, pideRepetir } from "./textosLlegada.ts";
 
 // Lección IFR 5: la llegada (spec 2026-11-16).
 
@@ -233,4 +233,25 @@ test("debriefing de la lección 5: cada llegada aprobada solo si sus tres partes
   const nav = debriefingRepaso({ ...e, etapa: "terminado" }, crearChecklist(CHECKLIST_VOZ_C172), "es").partes.find((p) => p.titulo === "Navegación")!;
   assert.ok(nav.bien.includes("Llegada 1: aprobada"));
   assert.ok(nav.repetir.includes("Llegada 2: no aprobada"));
+});
+
+// ── Tarea 5: textos de la llegada ──
+test("ordenDespegue: aléjate por el radial de la pista y a las 15 millas la llegada", () => {
+  assert.equal(ordenDespegue(290, "GDL", 9000, "es"), "Después del despegue, aléjate por el radial 290 de GDL y sube a 9,000 pies. A las 15 millas te doy la llegada.");
+  assert.equal(ordenDespegue(290, "GDL", 9000, "en"), "After takeoff, proceed outbound on the 290 radial of GDL and climb to 9,000 feet. At 15 miles I'll give you the arrival.");
+});
+
+test("pideRepetir: «repite» y sus variantes, no el checklist", () => {
+  for (const x of ["repite", "Repita por favor", "repítela", "otra vez la autorización", "repetir autorización"]) assert.equal(pideRepetir(x, "es"), true, x);
+  for (const x of ["say again", "Repeat the clearance"]) assert.equal(pideRepetir(x, "en"), true, x);
+  for (const x of ["checklist antes del despegue", "derecha", "flaps arriba"]) assert.equal(pideRepetir(x, "es"), false, x);
+});
+
+test("briefingLlegada: 4 líneas, el inglés sin acentos y sin palabras prohibidas", () => {
+  for (const idioma of ["es", "en"] as const) {
+    const b = briefingLlegada(idioma);
+    assert.equal(b.length, 4);
+    for (const l of b) assert.doesNotMatch(l, /oficial|certific|licencia|official|license/i);
+  }
+  for (const l of briefingLlegada("en")) assert.doesNotMatch(l, /[áéíóúñ¿¡]/);
 });

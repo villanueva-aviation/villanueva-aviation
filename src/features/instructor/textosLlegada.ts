@@ -1,5 +1,7 @@
 import type { Idioma } from "./idiomaInstructor.ts";
 import { norm360, radialEsperaDe, type Llegada } from "./navIfr.ts";
+import { normalizar } from "./preguntas.ts";
+import { instruccionTramo } from "./textosInterceptacion.ts";
 
 // Lo que dice el instructor en la lección IFR 5, la llegada (spec 2026-11-16). Puro.
 
@@ -24,4 +26,33 @@ export function autorizacionLlegada(ll: Llegada, vor: string | undefined, idioma
   }
   const v = vor ?? "el VOR";
   return `Autorizado a ${v}: intercepta el radial ${tres(ll.r1)} acercándote, únete al arco de ${ll.arco.radioNm} millas hasta el radial ${tres(ll.arco.hasta)}, acércate a ${v} y espera al ${sector(r, "es")} en el radial ${tres(r)}, virajes a la ${derecha ? "derecha" : "izquierda"}, mantén ${alt} pies.`;
+}
+
+/** En tierra: la salida por el radial de la pista y cuándo llega la autorización. */
+export function ordenDespegue(radial: number, vor: string | undefined, altitudFt: number, idioma: Idioma): string {
+  const orden = instruccionTramo({ radial, desde: true }, vor, idioma, true, altitudFt);
+  return idioma === "en" ? `${orden} At 15 miles I'll give you the arrival.` : `${orden} A las 15 millas te doy la llegada.`;
+}
+
+const REPETIR: Record<Idioma, RegExp> = {
+  es: /\b(repite|repita|repitela|repetir|repiteme|otra vez)\b/,
+  en: /\b(say again|repeat)\b/,
+};
+/** «Repite» por voz: la autorización otra vez. */
+export const pideRepetir = (texto: string, idioma: Idioma) => REPETIR[idioma].test(normalizar(texto, idioma));
+
+export function briefingLlegada(idioma: Idioma): string[] {
+  return idioma === "en"
+    ? [
+        "At 15 miles you get the whole arrival in one clearance, like from ATC: the radial to intercept, the arc, the inbound radial and the hold.",
+        "Copy it down or remember it. Say \"say again\" or tap the button to hear it again.",
+        "On the arc you say which way you turn onto it; before the VOR, which hold entry you'll fly.",
+        "The arrival passes only if all three parts pass: the intercept, the arc and the hold.",
+      ]
+    : [
+        "A las 15 millas te doy la llegada completa en una autorización, como de ATC: el radial a interceptar, el arco, el radial de acercamiento y la espera.",
+        "Cópiala o apréndetela. Di «repite» o toca el botón para oírla otra vez.",
+        "En el arco dices hacia qué lado viras para entrar; antes del VOR, qué entrada vas a hacer a la espera.",
+        "La llegada se aprueba solo si aprueban sus tres partes: la interceptación, el arco y la espera.",
+      ];
 }
