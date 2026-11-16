@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Muestra } from "./evaluador.ts";
 import { armarArco, avanzarArco, iniciarArco, MOTIVO_SIN_DME, responderLado, type EvaluacionArco } from "./evaluadorArco.ts";
-import { ladoDicho, REGRESO_NM, type EjercicioArco } from "./navIfr.ts";
+import { generarArcoRegreso, generarArcoSalida, ladoDicho, REGRESO_NM, type EjercicioArco } from "./navIfr.ts";
 import type { Nivel } from "./nivel.ts";
 import { avisoArco, briefingArco, explicarArco, textoPasoArco } from "./textosArco.ts";
 import { subeA } from "./textosInterceptacion.ts";
@@ -104,7 +104,7 @@ test("ejercicio 1, de salida: arma ya, con el arco 4 NM más allá, pregunta el 
   assert.equal(e.preguntar, true);
   const ej = e.ejercicio!;
   assert.equal(ej.desde, 290);
-  assert.equal(ej.radioNm, 6);
+  assert.ok(ej.radioNm >= 6 && ej.radioNm <= 9, String(ej.radioNm));
   assert.equal(ej.alejandose, true);
   assert.equal(ej.saleAlejandose, true);
   const giro = Math.abs(((ej.hasta - 290 + 540) % 360) - 180);
@@ -128,9 +128,18 @@ test("ejercicio 2, de regreso: espera las 10 NM, pide un radial de acercamiento 
   assert.equal(e.fase, "hacia-arco");
   assert.equal(e.preguntar, true);
   assert.equal(e.ejercicio!.desde, r);
-  assert.equal(e.ejercicio!.radioNm, 7);
+  assert.ok([6, 7].includes(e.ejercicio!.radioNm), String(e.ejercicio!.radioNm));
   assert.equal(e.ejercicio!.alejandose, false);
   assert.equal(e.ejercicio!.saleAlejandose, false);
+});
+
+test("el radio se sortea: de salida entre 6 y 9 NM cerca de la estación, de regreso 3 o 4 NM más acá", () => {
+  const radios = (gen: (a: () => number) => EjercicioArco) => [0, 0.3, 0.6, 0.99].map((x) => gen(() => x).radioNm);
+  assert.deepEqual(radios((a) => generarArcoSalida(290, 2, a)), [6, 7, 8, 9]);
+  // Ya lejos, sigue al menos 4 NM más allá del avión.
+  assert.equal(generarArcoSalida(290, 8, () => 0).radioNm, 12);
+  assert.deepEqual(radios((a) => generarArcoRegreso(30, 10.6, a)), [7, 7, 6, 6]);
+  assert.equal(generarArcoRegreso(30, 7, () => 0.99).radioNm, 4);
 });
 
 test("ejercicio 3, de salida tras un regreso: espera a pasar la estación y alejarse 2 NM", () => {
@@ -141,7 +150,7 @@ test("ejercicio 3, de salida tras un regreso: espera a pasar la estación y alej
   e = sigue(e, [[330, 2.1, 330]], 3);
   assert.equal(e.fase, "hacia-arco");
   assert.equal(e.ejercicio!.desde, 330);
-  assert.equal(e.ejercicio!.radioNm, 6);
+  assert.ok(e.ejercicio!.radioNm >= 6 && e.ejercicio!.radioNm <= 9, String(e.ejercicio!.radioNm));
   assert.equal(e.ejercicio!.saleAlejandose, true);
 });
 

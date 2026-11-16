@@ -95,17 +95,18 @@ const ARCO_MIN_NM = 4;
 
 const giroArco = (azar: () => number) => (3 + Math.floor(azar() * 4)) * 10;
 
-/** Arco de salida (Erik, 2026-11-16): alejándose por el radial del avión, el arco 4 NM más allá, y sale alejándose 30–60° después. */
+/** Arco de salida (Erik, 2026-11-16): alejándose por el radial del avión, el arco a 6–9 NM (sorteado, y al menos 4 NM más allá
+ * del avión), y sale alejándose 30–60° después. */
 export function generarArcoSalida(radialAvion: number, dme: number, azar: () => number = Math.random): EjercicioArco {
   const desde = redondear10(radialAvion);
-  const radioNm = Math.min(18, Math.max(6, Math.round(dme) + 4));
+  const radioNm = Math.min(18, Math.max(Math.round(dme) + 4, 6 + Math.floor(azar() * 4)));
   const sentido: 1 | -1 = azar() < 0.5 ? 1 : -1;
   return { radioNm, desde, hasta: norm360(desde + sentido * giroArco(azar)), sentido, alejandose: true, saleAlejandose: true };
 }
 
-/** Arco de regreso: ya establecido acercándose por `radial`, el arco 3 NM más acá, y se acerca por otro radial 30–60° después. */
+/** Arco de regreso: ya establecido acercándose por `radial`, el arco 3 o 4 NM más acá (sorteado), y se acerca por otro radial 30–60° después. */
 export function generarArcoRegreso(radial: number, dme: number, azar: () => number = Math.random): EjercicioArco {
-  const radioNm = Math.max(ARCO_MIN_NM, Math.floor(dme - REGRESO_ADENTRO_NM));
+  const radioNm = Math.max(ARCO_MIN_NM, Math.floor(dme - REGRESO_ADENTRO_NM - Math.floor(azar() * 2)));
   const sentido: 1 | -1 = azar() < 0.5 ? 1 : -1;
   return { radioNm, desde: norm360(radial), hasta: norm360(radial + sentido * giroArco(azar)), sentido, alejandose: false, saleAlejandose: false };
 }
