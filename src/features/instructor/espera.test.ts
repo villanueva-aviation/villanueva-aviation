@@ -354,3 +354,9 @@ test("los avisos de la espera se repiten cada 30 s, no cada 8", () => {
   const fuera = muestra(100, { x: 6 * Math.cos(10 * RAD), y: 6 * Math.sin(10 * RAD), rumbo: 270 }, 0);
   assert.equal(avisoEspera(b, fuera, "practica", "es")?.repetir, 30);
 });
+
+test("la altitud que eligió el cadete manda sobre la de la espera, también en los intentos que inventan la suya", () => {
+  const m = muestra(0, { x: 0.5, y: 0, rumbo: 90 }, 0);
+  assert.equal(armarEspera(m, 2, { intento: 0, examen: false, estacion: VOR, espera: { ...ESPERA, altitudFt: 9000 }, llegada: 90, altitudFt: 8000 }).ejercicio.altitudFt, 8000);
+  assert.equal(armarEspera(m, 2, { intento: 1, examen: false, estacion: VOR, altitudFt: 8000 }).ejercicio.altitudFt, 8000);
+});

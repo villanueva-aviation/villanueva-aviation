@@ -177,6 +177,8 @@ export interface EstadoRepaso {
   instruido?: boolean;
   /** El avión de la lección, del título del simulador al empezar. */
   avion?: Avion;
+  /** La altitud de vuelo (MSL, pies) que eligió el cadete antes de empezar. */
+  altitudFt?: number;
 }
 
 /** voz: su checklist por voz (null = no hay); c172: las velocidades del debriefing son del C172. */
@@ -209,7 +211,9 @@ const T = {
     espera: "Esperando el aeropuerto del simulador.",
     salto: "El avión se movió de golpe: la lección no se califica.",
     hueco: "Se perdió la conexión con el simulador en vuelo: la lección no se califica.",
-    salida: (z: string, bajo: boolean) => `Ve a la zona de trabajo: ${z}, ${bajo ? "entre 600 y 1,000 pies sobre el terreno" : "a 1,500 pies sobre el terreno o más"}.`,
+    salida: (z: string, bajo: boolean, altitudFt?: number) => altitudFt !== undefined
+      ? `Ve a la zona de trabajo: ${z}, sube a ${altitudFt.toLocaleString("en-US")} pies.`
+      : `Ve a la zona de trabajo: ${z}, ${bajo ? "entre 600 y 1,000 pies sobre el terreno" : "a 1,500 pies sobre el terreno o más"}.`,
     enZona: (m: string) => `Estás en la zona. Primera maniobra: ${m}.`,
     fuera: "Regresa a la zona de trabajo.",
     devuelta: (m: string) => `De vuelta en la zona. Maniobra: ${m}.`,
@@ -232,7 +236,9 @@ const T = {
     espera: "Waiting for the simulator's airport.",
     salto: "The aircraft jumped to another position: this lesson won't be graded.",
     hueco: "The connection to the simulator dropped in flight: this lesson won't be graded.",
-    salida: (z: string, bajo: boolean) => `Head to the practice area: ${z}, ${bajo ? "between 600 and 1,000 feet above the ground" : "at 1,500 feet above the ground or higher"}.`,
+    salida: (z: string, bajo: boolean, altitudFt?: number) => altitudFt !== undefined
+      ? `Head to the practice area: ${z}, climb to ${altitudFt.toLocaleString("en-US")} feet.`
+      : `Head to the practice area: ${z}, ${bajo ? "between 600 and 1,000 feet above the ground" : "at 1,500 feet above the ground or higher"}.`,
     enZona: (m: string) => `You're in the area. First maneuver: ${m}.`,
     fuera: "Head back to the practice area.",
     devuelta: (m: string) => `Back in the area. Maneuver: ${m}.`,
@@ -291,10 +297,10 @@ export function entradaDe(r: ResultadoComun | null | undefined): string | undefi
   return `${ej.tipo ?? "normal"}-${ej.desde ? "alejamiento" : "acercamiento"}`;
 }
 
-export const crearRepaso = (modo: Modo, sorteo: ManiobraId[], nivel: Nivel = 3, programa: "vfr" | "ifr" = "vfr"): EstadoRepaso => ({
+export const crearRepaso = (modo: Modo, sorteo: ManiobraId[], nivel: Nivel = 3, programa: "vfr" | "ifr" = "vfr", altitudFt?: number): EstadoRepaso => ({
   etapa: "rampa", modo, sorteo, actual: 0, hechas: sorteo.map((id) => ({ id, resultado: null, intentoId: null })), zona: null, vuelo: null, tomas: crearTomas(),
   nivel: modo !== "checkride" ? nivel : programa === "ifr" ? (Math.max(2, nivel) as Nivel) : 3,
-  programa, vor: null, sinSenalDesde: null,
+  programa, vor: null, sinSenalDesde: null, altitudFt,
 });
 
 /** IFR: hay señal del VOR de la lección en NAV1 (o está en el cono, encima de él) y la barra es del VOR, no del GPS. */
@@ -398,10 +404,11 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
       zona = zona ?? zonaSinAeropuerto(m);
       motivo = undefined;
       etapa = "salida";
-      if (zona) decir.push(t.salida(zona.nombre[idioma], piso < ALTURA_SEGURA_AGL));
+      if (zona) decir.push(t.salida(zona.nombre[idioma], piso < ALTURA_SEGURA_AGL, e.altitudFt));
     }
   } else if (etapa === "salida") {
-    if (zona && enZona(m, zona, piso)) {
+    // Con altitud elegida, la primera maniobra espera a que llegue a ella (300 pies, la tolerancia del aviso).
+    if (zona && enZona(m, zona, piso) && (e.altitudFt === undefined || m.altitud >= e.altitudFt - 300)) {
       etapa = "maniobra";
       decir.push(t.enZona(nombreManiobra(e.sorteo[e.actual], idioma)));
     }

@@ -117,7 +117,7 @@ export interface ContextoArmado {
   tramos?: Tramo[];
   /** IFR 1 y 2: el ejercicio del primer tramo, ya dicho en tierra (solo con `intento` 0). */
   primero?: Ejercicio;
-  /** IFR 1 y 2: la altitud de la lección, 3,000 pies sobre el aeropuerto o más (`altitudEspera`). */
+  /** IFR: la altitud de la lección, la que eligió el cadete (o 3,000 pies sobre el aeropuerto, `altitudEspera`). */
   altitudFt?: number;
   vor?: string;
   /** IFR: el VOR de la lección, para medir la distancia por lat/lon. */

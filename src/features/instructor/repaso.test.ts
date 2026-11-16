@@ -351,6 +351,19 @@ test("«S»: la zona va de 600 ft AGL hacia arriba y la salida lo dice", () => {
   assert.equal(pisoZona("recto-nivelado"), 1500);
 });
 
+test("la altitud elegida: queda en el repaso y la salida la dice", () => {
+  let x = crearRepaso("practica", [...SORTEO], 3, "vfr", 8000);
+  const decir: string[] = [];
+  for (const mm of simularVuelo()) {
+    const p = alMuestrearRepaso(x, mm, A, "es", () => 0);
+    x = p.estado;
+    decir.push(...p.decir);
+    if (x.etapa === "salida") break;
+  }
+  assert.equal(x.altitudFt, 8000);
+  assert.ok(decir.includes("Ve a la zona de trabajo: Cajititlán, sube a 8,000 pies."), decir.join(" | "));
+});
+
 // ── IFR: la misma lección de rampa a rampa, con el VOR en lugar de la zona ──
 
 const VOR = elegirVor({ ident: "GDL", region: "MM", lat: A.lat, lon: A.lon, mhz: 117.5, dme: true }, BASE);
@@ -470,4 +483,12 @@ test("cada tramo hecho dice su tipo y su sentido", () => {
 test("un mapa viejo de la lección 2 (ruta-vor, ya borrada) se nombra sin tronar", () => {
   assert.equal(nombreManiobra("ruta-vor" as never, "es"), "Rutas de acercamiento y alejamiento");
   assert.equal(nombreHecha("ruta-vor" as never, undefined, "en"), "Inbound and outbound courses");
+});
+
+test("VFR con altitud elegida: la primera maniobra no se arma mientras todavía sube a ella", () => {
+  const techo = Math.max(...simularVuelo().map((m) => m.altitud));
+  const alto = correr(crearRepaso("practica", [...SORTEO], 3, "vfr", techo + 1000), simularVuelo());
+  assert.ok(!alto.etapas.includes("maniobra"), alto.etapas.join(" "));
+  const llega = correr(crearRepaso("practica", [...SORTEO], 3, "vfr", techo), simularVuelo());
+  assert.ok(llega.etapas.includes("maniobra"), llega.etapas.join(" "));
 });

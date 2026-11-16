@@ -124,7 +124,7 @@ export function armarEspera(m: Muestra, nivel: Nivel = 2, ctx: ContextoArmado = 
       : rutaEspera(radialEspera(espera), espera.giros, entrada, Math.random, ctx.llegada);
   const e: EvaluacionEspera = {
     fase: "posicionando", nivel, examen: ctx.examen, vor: ctx.vor, estacion: ctx.estacion, enRadial: false,
-    ejercicio: { ...espera, ...ruta, altitudFt: espera.altitudFt ?? altitudEspera(m.altitud - m.agl) }, preguntar: false, preguntado: false, dicha: undefined,
+    ejercicio: { ...espera, ...ruta, altitudFt: ctx.altitudFt ?? espera.altitudFt ?? altitudEspera(m.altitud - m.agl) }, preguntar: false, preguntado: false, dicha: undefined,
     rumboPregunta: null, rumboCruce: null, cruces: [], kCruce: -1, volada: undefined, lado: false, inicio: m, previo: m, mhz: m.navMhz,
     sinSenalDesde: null, tramo: null, vistoTramo: false, giro: null, tNivel: null, tramos: [], fueraTramo: [], tasas: [], fueraVirajes: [],
     acerc: [], dist: [], alt: [], muestras: [m],

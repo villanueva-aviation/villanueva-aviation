@@ -23,6 +23,8 @@ import { instruccionTramo, NOMBRE_TIPO, PREGUNTA_TIPO, subeA } from "../features
 import { elegirVor, vorsCercanos, vorsParaLeccion, type VorSim } from "../features/instructor/vorSim";
 import type { Entrada } from "../features/entrenador/esperas";
 import { DatosEsperaForm } from "../features/instructor/DatosEsperaForm";
+import { AltitudVueloForm } from "../features/instructor/AltitudVueloForm";
+import { altitudValida, rangoAltitud } from "../features/instructor/altitudVuelo";
 import { ENTRADAS_PRACTICA, radialEspera, responderEntrada } from "../features/instructor/evaluadorEspera";
 import { pasosHsiDe } from "../features/instructor/pasosHsi";
 import { autorizacionEspera, PREGUNTA_ENTRADA } from "../features/instructor/textosEspera";
@@ -52,10 +54,12 @@ const SECCIONES = AVIONES_VOZ.c172.secciones;
 const T = {
   es: {
     titulo: (l: string, avion: string) => `${l} · ${avion}`,
-    briefing: (m: string | null, circuitos: string[] | null, bajo = false) => [
+    briefing: (m: string | null, circuitos: string[] | null, bajo = false, altitudFt?: number) => [
       "Vuelo completo en el C172, de la plataforma a la plataforma.",
       "Lee el checklist en voz alta, en español: el instructor revisa lo que se puede leer del simulador.",
-      ...(circuitos ?? [`Despega y ve a la zona de trabajo ${bajo ? "entre 600 y 1,000 pies" : "a 1,500 pies"} sobre el terreno${bajo ? "" : " o más"}.`,
+      ...(circuitos ?? [altitudFt !== undefined
+        ? `Despega y sube a ${altitudFt.toLocaleString("en-US")} pies; ve a la zona de trabajo.`
+        : `Despega y ve a la zona de trabajo ${bajo ? "entre 600 y 1,000 pies" : "a 1,500 pies"} sobre el terreno${bajo ? "" : " o más"}.`,
       m
         ? `En la zona vuelas ${m.toLowerCase()} 5 veces: la primera para practicar y 4 más. Entre una y otra, recto y nivelado en otro rumbo.`
         : "En la zona vuelas 4 maniobras sorteadas. Entre una y otra, recto y nivelado.",
@@ -131,10 +135,12 @@ const T = {
   },
   en: {
     titulo: (l: string, avion: string) => `${l} · ${avion}`,
-    briefing: (m: string | null, circuitos: string[] | null, bajo = false) => [
+    briefing: (m: string | null, circuitos: string[] | null, bajo = false, altitudFt?: number) => [
       "A full flight in the C172, from ramp to ramp.",
       "Read the checklist aloud, in Spanish: the instructor checks what the simulator can report.",
-      ...(circuitos ?? [`Take off and head to the practice area ${bajo ? "between 600 and 1,000 feet" : "at 1,500 feet"} above the ground${bajo ? "" : " or higher"}.`,
+      ...(circuitos ?? [altitudFt !== undefined
+        ? `Take off and climb to ${altitudFt.toLocaleString("en-US")} feet, then head to the practice area.`
+        : `Take off and head to the practice area ${bajo ? "between 600 and 1,000 feet" : "at 1,500 feet"} above the ground${bajo ? "" : " or higher"}.`,
       m
         ? `In the area you fly ${m.toLowerCase()} 5 times: the first one to practice and 4 more. Between them, straight and level on a new heading.`
         : "In the area you fly 4 drawn maneuvers. Between them, straight and level.",
@@ -244,6 +250,8 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const [idioma] = useState<Idioma>(leerIdioma);
   const t = T[idioma];
   const [modo, setModo] = useState<Modo>("practica");
+  // La altitud de vuelo (MSL) que elige el cadete antes de empezar: obligatoria en todas las lecciones.
+  const [altitud, setAltitud] = useState<number | null>(null);
   const [sesionId, setSesionId] = useState(() => crypto.randomUUID());
   const [repaso, setRepaso] = useState<EstadoRepaso | null>(null);
   const repasoRef = useRef(repaso);
@@ -350,7 +358,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       return {
         intento: repasoRef.current?.actual ?? 0, examen: modo === "checkride", vor: repasoRef.current?.vor?.ident,
         tramos: tramosRef.current, primero: primeraUsada.current ? undefined : (primeroRef.current ?? undefined),
-        altitudFt: repasoRef.current?.programa === "ifr" ? (altitudRef.current ??= aeroRef.current ? altitudEspera(aeroRef.current.elevacionFt) : undefined) : undefined,
+        altitudFt: repasoRef.current?.programa === "ifr" ? (repasoRef.current?.altitudFt ?? (altitudRef.current ??= aeroRef.current ? altitudEspera(aeroRef.current.elevacionFt) : undefined)) : undefined,
         estacion: repasoRef.current?.vor ?? undefined,
         // Con carta, la misma en cada intento; inventada, solo en el primero (después cada intento inventa la suya).
         espera: espera && (espera.carta || !primeraUsada.current) ? espera : undefined,
@@ -366,6 +374,10 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   muestraRef.current = muestra;
   aeroRef.current = aeropuerto;
   vorsRef.current = vors;
+  // La altitud que elige el cadete: obligatoria antes de empezar; el rango depende de la lección y del aeropuerto.
+  const rangoAlt = leccion ? rangoAltitud(leccion, aeropuerto?.elevacionFt) : null;
+  const altitudElegida = altitud ?? (rangoAlt?.fijo ? rangoAlt.minFt : null);
+  const altitudOk = altitudValida(altitudElegida, rangoAlt);
   // Solo una maniobra ya empezada sigue fuera de la zona; una armada sin empezar se desarma (abajo).
   const fase = ev ? def.fase(ev) : null;
   enCursoRef.current = enCurso && fase === "en-curso";
@@ -373,6 +385,10 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   useEffect(() => {
     if (repaso?.etapa === "fuera-de-zona" && fase === "armado") reiniciarRef.current();
   }, [repaso?.etapa, fase]);
+  // Al cambiar de lección, la altitud se elige otra vez (el rango puede ser distinto).
+  useEffect(() => {
+    setAltitud(null);
+  }, [leccion]);
 
   // Órdenes de la maniobra al cambiar de paso, y sus avisos sin repetir.
   const enManiobra = !!actualId;
@@ -509,23 +525,25 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       if (cerca) e = ponerVor(e, elegirVor(cerca, m));
     }
     let extra: string | undefined;
+    // La altitud de la lección: la que eligió el cadete, o la de siempre (3,000 pies sobre el aeropuerto).
+    const altitudDeLaLeccion = e.altitudFt ?? altitudEspera(aeroRef.current?.elevacionFt ?? m.altitud - m.agl);
     if (leccion?.maniobra === "espera" && e.vor) {
       const base = esperaRef.current ?? inventarEspera(Math.random, aeroRef.current?.elevacionFt);
-      const espera = { ...base, altitudFt: base.altitudFt ?? altitudEspera(aeroRef.current?.elevacionFt ?? m.altitud - m.agl) };
+      const espera = { ...base, altitudFt: e.altitudFt ?? base.altitudFt ?? altitudDeLaLeccion };
       const entrada = ENTRADAS_PRACTICA[e.modo === "checkride" ? Math.floor(Math.random() * ENTRADAS_PRACTICA.length) : 0];
       rutaPrimera.current = rutaEspera(radialEspera(espera), espera.giros, entrada, Math.random, llegadaRef.current ?? undefined);
       esperaRef.current = espera;
       setDatosEspera(espera);
       extra = autorizacionEspera(rutaPrimera.current.salida, espera.altitudFt, idioma);
     } else if (leccion?.maniobra === "arco-dme") {
-      altitudRef.current = altitudEspera(aeroRef.current?.elevacionFt ?? m.altitud - m.agl);
-      extra = subeA(altitudRef.current, idioma);
+      altitudRef.current = altitudDeLaLeccion;
+      extra = subeA(altitudDeLaLeccion, idioma);
     } else if (tramosRef.current?.[0] && e.vor) {
       // Lecciones 1 y 2: el primer tramo, desde la pista por la que va a despegar.
       const pista = aeroRef.current ? (pistaProbable(m, aeroRef.current) ?? undefined) : undefined;
       primeroRef.current = generarTramo(tramosRef.current[0], referenciaTramo(m, e.vor, pista));
-      altitudRef.current = altitudEspera(aeroRef.current?.elevacionFt ?? m.altitud - m.agl);
-      extra = instruccionTramo(primeroRef.current, e.vor.ident, idioma, true, altitudRef.current);
+      altitudRef.current = altitudDeLaLeccion;
+      extra = instruccionTramo(primeroRef.current, e.vor.ident, idioma, true, altitudDeLaLeccion);
     }
     const r = instruirEnRampa(e, idioma, extra);
     poner(r.estado);
@@ -672,7 +690,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     altitudRef.current = undefined;
     primeraUsada.current = false;
     rutaPrimera.current = null;
-    if (leccion) poner(crearRepaso(modo, maniobrasDe(leccion, Math.random, modo), nivel, programa));
+    if (leccion) poner(crearRepaso(modo, maniobrasDe(leccion, Math.random, modo), nivel, programa, altitudElegida ?? undefined));
   };
   const nueva = () => {
     olvidarReanudable();
@@ -724,6 +742,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
           ))}
         </div>
         <SelectorNivel nivel={nivel} cambiar={cambiarNivel} checkride={modo === "checkride"} idioma={idioma} />
+        {rangoAlt && <AltitudVueloForm valor={altitudElegida} cambiar={setAltitud} rango={rangoAlt} idioma={idioma} />}
         <ol className="list-decimal space-y-2 rounded-xl border border-white/10 bg-navy-950/60 p-5 pl-9 text-sm leading-relaxed text-white/85">
           {(ifr ? [
             ...t.briefingIfr(lineaEjercicios(leccion, modo === "checkride", idioma)).slice(0, 2),
@@ -735,6 +754,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
             // Los circuitos se vuelan en el aeropuerto: su briefing sin la primera línea («Hoy vas a practicar…»).
             leccion.maniobra === "toques-despegues" ? [...MANIOBRAS[leccion.maniobra].briefing(idioma, nivel).slice(1), idioma === "en" ? "Then shut down on the ramp." : "Luego apaga en la plataforma."] : null,
             pisoZona(leccion.maniobra) < 1500,
+            altitudElegida ?? undefined,
           )).map((l) => <li key={l}>{l}</li>)}
         </ol>
         <div className="space-y-1.5 text-sm">
@@ -762,7 +782,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
             <Button className="w-full" onClick={continuar}>{t.continuar}</Button>
           </section>
         )}
-        <Button className="w-full" variant={aMedias ? "secondary" : undefined} onClick={empezar}>{t.empezar}</Button>
+        <Button className="w-full" variant={aMedias ? "secondary" : undefined} onClick={empezar} disabled={!altitudOk}>{t.empezar}</Button>
         <Link to={menuRuta} className="block text-center text-sm text-white/60 underline">{ifr ? t.menuIfr : t.menu}</Link>
       </div>
     );
