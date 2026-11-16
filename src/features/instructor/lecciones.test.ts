@@ -54,14 +54,14 @@ test("cada lección se guarda con su clave; el repaso conserva la de antes", () 
   assert.equal(leccionDe("x"), null);
 });
 
-test("programa IFR: 6 lecciones, de la 1 a la 4 abiertas, con su propia clave", () => {
+test("programa IFR: 6 lecciones, de la 1 a la 5 abiertas, con su propia clave", () => {
   assert.equal(LECCIONES_IFR.length, 6);
-  assert.deepEqual(LECCIONES_IFR.map((l) => l.disponible), [true, true, true, true, false, false]);
+  assert.deepEqual(LECCIONES_IFR.map((l) => l.disponible), [true, true, true, true, true, false]);
   assert.equal(LECCIONES_IFR[0].maniobra, "interceptar-radial");
   assert.equal(LECCIONES_IFR[5].nombre.en, "IFR checkride");
   for (const l of LECCIONES_IFR) assert.doesNotMatch(l.nombre.en, /[áéíóúñ¿¡«»]/);
   assert.equal(claveLeccion(leccionIfrDe("1")!), "ifr-1");
-  assert.equal(leccionIfrDe("5"), null, "todavía no existe");
+  assert.equal(leccionIfrDe("6"), null, "todavía no existe");
   assert.equal(estadoLeccion(LECCIONES_IFR[5], { fundador: true, exclusivo: true }), "proximamente");
   assert.equal(leccionIfrDe(undefined), null);
   assert.ok(LECCIONES_GUARDADAS["ifr-1"]);

@@ -14,6 +14,7 @@ import type { Nivel } from "./nivel.ts";
 import type { Leccion } from "./lecciones.ts";
 import { conCono, type VorElegido } from "./vorSim.ts";
 import type { Entrada } from "../entrenador/esperas.ts";
+import { alejamientoSiguiente, type Llegada } from "./navIfr.ts";
 import { NOMBRE_ENTRADA } from "./textosEspera.ts";
 
 const RAD = Math.PI / 180;
@@ -40,9 +41,16 @@ const CIRCUITO: ManiobraId = "toques-despegues";
 /** La interceptación es del programa IFR. */
 const FUERA_DEL_SORTEO: ManiobraId[] = [CIRCUITO, "familiarizacion", "interceptar-radial", "ruta-pasada", "arco-dme", "espera"];
 
-/** Lección de maniobra: la primera de práctica y 4 más (Erik). Repaso: 4 sorteadas. IFR: los ejercicios de la lección. */
+/** IFR 5: las partes de una llegada, en el orden en que se vuelan. */
+export const PARTES_LLEGADA: ManiobraId[] = ["interceptar-radial", "arco-dme", "espera"];
+/** El sorteo es de la lección 5 (ninguna otra empieza con interceptación y arco). */
+export const esLlegada = (sorteo: ManiobraId[]) => sorteo[0] === "interceptar-radial" && sorteo[1] === "arco-dme";
+
+/** Lección de maniobra: la primera de práctica y 4 más (Erik). Repaso: 4 sorteadas. IFR: los ejercicios de la lección (IFR 5: llegadas). */
 export const maniobrasDe = (l: Leccion, azar = Math.random, modo?: Modo): ManiobraId[] =>
-  l.maniobra
+  l.llegada
+    ? Array.from({ length: (modo === "checkride" ? l.ejercicios?.examen : l.ejercicios?.practica) ?? 1 }, () => PARTES_LLEGADA).flat()
+    : l.maniobra
     ? Array(l.ejercicios ? (modo === "checkride" ? l.ejercicios.examen : l.ejercicios.practica) : 5).fill(l.maniobra)
     : sortear((Object.keys(MANIOBRAS) as ManiobraId[]).filter((id) => !FUERA_DEL_SORTEO.includes(id)), 4, azar);
 
@@ -237,6 +245,8 @@ const T = {
     faltaAlcance: (id: string) => `Todavía no recibo ${id} en NAV1: acércate al VOR.`,
     devueltaSenal: (id: string) => `Señal de ${id} de vuelta. Seguimos.`,
     siguienteIfr: "Siguiente ejercicio.",
+    finLlegada: (k: number, radial: string, id: string) => `Llegada ${k} terminada. Aléjate por el radial ${radial} de ${id}; a las 15 millas te doy la siguiente llegada.`,
+    llegadaAnulada: (motivo: string, id: string) => `Se anuló la llegada: ${motivo} Aléjate de ${id} por donde vas; a las 15 millas te doy otra.`,
   },
   en: {
     espera: "Waiting for the simulator's airport.",
@@ -266,6 +276,8 @@ const T = {
     faltaAlcance: (id: string) => `I'm not receiving ${id} on NAV1 yet: get closer to the VOR.`,
     devueltaSenal: (id: string) => `${id} is back. Let's continue.`,
     siguienteIfr: "Next exercise.",
+    finLlegada: (k: number, radial: string, id: string) => `Arrival ${k} complete. Fly outbound on the ${radial} radial of ${id}; at 15 miles I'll give you the next arrival.`,
+    llegadaAnulada: (motivo: string, id: string) => `The arrival was voided: ${motivo} Fly away from ${id} on your current radial; at 15 miles I'll give you another one.`,
   },
 };
 
@@ -460,12 +472,38 @@ function avanzarManiobra(e: EstadoRepaso, idioma: Idioma): Paso {
   if (actual >= e.sorteo.length) return { estado: { ...e, actual, etapa: "regreso" }, decir: [deCircuitos(e) ? t.finCircuitos : t.regreso] };
   if (deCircuitos(e)) return { estado: { ...e, actual }, decir: [t.circuito(actual + 1, e.sorteo.length, false)] };
   const id = e.sorteo[actual];
+  if (esLlegada(e.sorteo)) {
+    // Entre las partes de una llegada no se dice nada: la siguiente parte da su recordatorio.
+    if (actual % 3 !== 0) return { estado: { ...e, actual }, decir: [] };
+    const anterior = llegadasDe(e).at(-1);
+    const vor = e.vor?.ident ?? "VOR";
+    return { estado: { ...e, actual }, decir: anterior ? [t.finLlegada(actual / 3, tres(alejamientoSiguiente(anterior)), vor)] : [] };
+  }
   if (e.programa === "ifr") return { estado: { ...e, actual }, decir: [t.siguienteIfr] };
   return { estado: { ...e, actual }, decir: [T[idioma].siguiente(nombreManiobra(id, idioma), e.sorteo.slice(0, actual).includes(id))] };
 }
 
 const enManiobras = (e: EstadoRepaso) => e.etapa === "maniobra" || e.etapa === "fuera-de-zona";
-const encadenado = (e: EstadoRepaso) => e.sorteo[e.actual] === "interceptar-radial" || e.sorteo[e.actual] === "ruta-pasada";
+const encadenado = (e: EstadoRepaso) => esLlegada(e.sorteo) || e.sorteo[e.actual] === "interceptar-radial" || e.sorteo[e.actual] === "ruta-pasada";
+const tres = (r: number) => String(Math.round(r) || 360).padStart(3, "0");
+
+/** IFR 5: las llegadas ya sorteadas (las guarda la interceptación en su resultado), en orden. */
+export const llegadasDe = (e: EstadoRepaso): Llegada[] =>
+  e.hechas.flatMap((h) => {
+    const l = (h.resultado as { llegada?: Llegada } | null)?.llegada;
+    return l ? [l] : [];
+  });
+
+/** IFR 5: ya se dio la autorización (o ya pasó la interceptación): una parte anulada anula la llegada. */
+export const llegadaEmpezada = (e: EstadoRepaso, ev: { llegada?: Llegada } | null) => e.actual % 3 > 0 || !!ev?.llegada;
+
+/** IFR 5: se anuló una parte. Práctica: la llegada se vuelve a empezar con otra autorización; examen: se anula. */
+export function anularLlegada(e: EstadoRepaso, motivo: string, idioma: Idioma): Paso {
+  if (e.modo === "checkride") return anular(e, motivo, idioma);
+  const inicio = e.actual - (e.actual % 3);
+  const hechas = e.hechas.map((h, i) => (i >= inicio && i < inicio + 3 ? { ...h, resultado: null, intentoId: null } : h));
+  return { estado: { ...e, actual: inicio, hechas }, decir: [T[idioma].llegadaAnulada(traducirMotivo(motivo, idioma), e.vor?.ident ?? "VOR")] };
+}
 
 /** Un resultado calificado de la maniobra actual, ya guardado (id null si no se pudo). */
 export function alResultado(e: EstadoRepaso, r: ResultadoComun, intentoId: string | null, idioma: Idioma): Paso {

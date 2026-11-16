@@ -1,7 +1,16 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { entradaEspera } from "../entrenador/esperas.ts";
+import { CHECKLIST_VOZ_C172 } from "../../data/checklistVozC172.ts";
+import { crearChecklist } from "./checklistVoz.ts";
+import { debriefingRepaso } from "./debriefingRepaso.ts";
 import type { Muestra } from "./evaluador.ts";
+import { LECCIONES_IFR, leccionIfrDe, lineaEjercicios } from "./lecciones.ts";
+import type { ResultadoComun } from "./maniobras.ts";
+import {
+  alResultado, anularLlegada, crearRepaso, esLlegada, llegadaEmpezada, llegadasDe, maniobrasDe, PARTES_LLEGADA, type EstadoRepaso,
+} from "./repaso.ts";
+import type { VorElegido } from "./vorSim.ts";
 import { armarArco, avanzarArco } from "./evaluadorArco.ts";
 import { armarEspera, avanzarEspera } from "./evaluadorEspera.ts";
 import { armarInterceptacion, avanzarInterceptacion, type EvaluacionInterceptacion } from "./evaluadorInterceptacion.ts";
@@ -153,4 +162,75 @@ test("lección 5: la espera llega por R2 con la espera de la llegada y pregunta 
   assert.equal(e.fase, "llegando");
   for (let t = 1; t <= 200 && pasoEspera(e, null) !== "pregunta"; t++) e = avanzarEspera(e, acercandose(t, r2, 9 - t * 0.03));
   assert.equal(pasoEspera(e, null), "pregunta");
+});
+
+// ── Tarea 4: la lección y el encadenado ──
+const L5 = LECCIONES_IFR[4];
+const resL = (aprobado: boolean, llegada?: Llegada): ResultadoComun =>
+  ({ aprobado, calificacion: aprobado ? 100 : 65, elementos: {}, avisos: [], muestras: [], ...(llegada ? { llegada } : {}) }) as ResultadoComun;
+const enVuelo = (modo: "practica" | "checkride", actual: number): EstadoRepaso => ({
+  ...crearRepaso(modo, maniobrasDe(L5, Math.random, modo), 2, "ifr"),
+  etapa: "maniobra", actual, vor: { ident: "GDL" } as VorElegido,
+});
+
+test("lección 5: disponible, con DME, 2 llegadas en práctica y 1 en examen", () => {
+  assert.equal(L5.disponible, true);
+  assert.equal(L5.requiereDme, true);
+  assert.equal(L5.llegada, true);
+  assert.equal(leccionIfrDe("5"), L5);
+  assert.deepEqual(maniobrasDe(L5, Math.random, "practica"), [...PARTES_LLEGADA, ...PARTES_LLEGADA]);
+  assert.deepEqual(maniobrasDe(L5, Math.random, "checkride"), PARTES_LLEGADA);
+  assert.equal(lineaEjercicios(L5, false, "es"), "Son 2 llegadas seguidas, con recordatorios y consejos.");
+  assert.equal(lineaEjercicios(L5, false, "en"), "2 arrivals in a row, with reminders and tips.");
+  assert.equal(lineaEjercicios(L5, true, "es"), "Es 1 llegada calificada, sin consejos.");
+  assert.equal(lineaEjercicios(L5, true, "en"), "One graded arrival, no tips.");
+});
+
+test("esLlegada: solo el sorteo de la lección 5", () => {
+  assert.equal(esLlegada(maniobrasDe(L5)), true);
+  for (const n of [1, 3, 4]) assert.equal(esLlegada(maniobrasDe(LECCIONES_IFR[n - 1])), false);
+});
+
+test("lección 5: una parte no aprobada no se repite; entre partes no se dice nada", () => {
+  const r = alResultado(enVuelo("practica", 0), resL(false, LL), null, "es");
+  assert.equal(r.estado.actual, 1);
+  assert.deepEqual(r.decir, []);
+  assert.deepEqual(llegadasDe(r.estado), [LL]);
+});
+
+test("lección 5: al terminar la espera de la llegada 1 manda alejarse por el radial que sigue de largo", () => {
+  let e = enVuelo("practica", 0);
+  e = alResultado(e, resL(true, LL), null, "es").estado;
+  e = alResultado(e, resL(true), null, "es").estado;
+  const r = alResultado(e, resL(true), null, "es");
+  assert.equal(r.estado.actual, 3);
+  const x = String(alejamientoSiguiente(LL) || 360).padStart(3, "0");
+  assert.deepEqual(r.decir, [`Llegada 1 terminada. Aléjate por el radial ${x} de GDL; a las 15 millas te doy la siguiente llegada.`]);
+});
+
+test("anularLlegada: en práctica regresa al principio de la llegada; en examen anula", () => {
+  let e = enVuelo("practica", 3);
+  e = alResultado(e, resL(true, LL), null, "es").estado;
+  const r = anularLlegada(e, "Se perdió la señal del VOR por más de 10 segundos.", "es");
+  assert.equal(r.estado.actual, 3);
+  assert.equal(r.estado.hechas[3].resultado, null);
+  assert.deepEqual(r.decir, ["Se anuló la llegada: Se perdió la señal del VOR por más de 10 segundos. Aléjate de GDL por donde vas; a las 15 millas te doy otra."]);
+  const x = anularLlegada(enVuelo("checkride", 1), "Se perdió la señal del VOR por más de 10 segundos.", "es");
+  assert.equal(x.estado.etapa, "invalido");
+  assert.match(x.estado.motivo ?? "", /señal/);
+});
+
+test("llegadaEmpezada: con la autorización ya dada o después de la interceptación", () => {
+  assert.equal(llegadaEmpezada(enVuelo("practica", 0), null), false);
+  assert.equal(llegadaEmpezada(enVuelo("practica", 3), {}), false);
+  assert.equal(llegadaEmpezada(enVuelo("practica", 1), null), true);
+  assert.equal(llegadaEmpezada(enVuelo("practica", 0), { llegada: LL }), true);
+});
+
+test("debriefing de la lección 5: cada llegada aprobada solo si sus tres partes aprueban", () => {
+  let e = enVuelo("practica", 0);
+  for (const r of [resL(true, LL), resL(true), resL(true), resL(true, LL), resL(false), resL(true)]) e = alResultado(e, r, null, "es").estado;
+  const nav = debriefingRepaso({ ...e, etapa: "terminado" }, crearChecklist(CHECKLIST_VOZ_C172), "es").partes.find((p) => p.titulo === "Navegación")!;
+  assert.ok(nav.bien.includes("Llegada 1: aprobada"));
+  assert.ok(nav.repetir.includes("Llegada 2: no aprobada"));
 });

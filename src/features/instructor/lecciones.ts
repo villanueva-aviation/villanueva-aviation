@@ -15,6 +15,8 @@ export interface Leccion {
   ejercicios?: { practica: number; examen: number };
   /** IFR: solo con un VOR con DME (los arcos). */
   requiereDme?: true;
+  /** IFR 5: el vuelo son llegadas (interceptación, arco y espera); `ejercicios` cuenta llegadas. */
+  llegada?: true;
 }
 
 export const REPASO = 13;
@@ -43,14 +45,14 @@ export const LECCIONES: Leccion[] = [
 
 /** El programa IFR (spec 2026-11-11): de la 1 a la 4. */
 const ifr = (numero: number, es: string, en: string, maniobra?: ManiobraId, extra: Partial<Leccion> = {}): Leccion => ({
-  numero, nombre: { es, en }, disponible: !!maniobra, maniobra, programa: "ifr", ...extra,
+  numero, nombre: { es, en }, disponible: !!maniobra || !!extra.llegada, maniobra, programa: "ifr", ...extra,
 });
 export const LECCIONES_IFR: Leccion[] = [
   ifr(1, "Interceptación de radiales", "Radial interception", "interceptar-radial", { ejercicios: { practica: 4, examen: 2 } }),
   ifr(2, "Rutas pasadas", "Passed routes", "ruta-pasada", { ejercicios: { practica: 4, examen: 2 } }),
   ifr(3, "Arcos DME", "DME arcs", "arco-dme", { ejercicios: { practica: 4, examen: 2 }, requiereDme: true }),
   ifr(4, "Patrones de espera", "Holding patterns", "espera", { ejercicios: { practica: 3, examen: 1 } }),
-  ifr(5, "Vuelo mezclado", "Mixed flight"),
+  ifr(5, "Vuelo mezclado", "Mixed flight", undefined, { ejercicios: { practica: 2, examen: 1 }, requiereDme: true, llegada: true }),
   ifr(6, "Checkride IFR", "IFR checkride"),
 ];
 
@@ -88,6 +90,10 @@ export function lineaEjercicios(l: Leccion, checkride: boolean, idioma: Idioma):
         ? "2 graded legs: one normal intercept and one passed route, without telling you which. No tips."
         : "Son 2 tramos calificados: uno normal y una ruta pasada, sin decirte cuál. Sin consejos."
       : en ? "4 legs in a row of passed routes, outbound and inbound." : "Son 4 tramos seguidos de rutas pasadas, alejándote y acercándote.";
+  if (l.llegada)
+    return checkride
+      ? en ? "One graded arrival, no tips." : "Es 1 llegada calificada, sin consejos."
+      : en ? "2 arrivals in a row, with reminders and tips." : "Son 2 llegadas seguidas, con recordatorios y consejos.";
   const n = (checkride ? l.ejercicios?.examen : l.ejercicios?.practica) ?? 1;
   if (checkride)
     return n === 1 ? (en ? "One graded exercise, no tips." : "Es 1 ejercicio calificado, sin consejos.") : en ? `${n} graded exercises, no tips.` : `Son ${n} ejercicios calificados, sin consejos.`;

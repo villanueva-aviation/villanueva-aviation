@@ -1,7 +1,7 @@
 // Debriefing por fases del repaso general y el renglón que se guarda. Puro.
 import { resumenChecklist, type Checklist } from "./checklistVoz.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
-import { entradaDe, nombreHecha, type EstadoRepaso } from "./repaso.ts";
+import { entradaDe, esLlegada, nombreHecha, type EstadoRepaso } from "./repaso.ts";
 import { calificarTomas, VEL_C172 as V } from "./tomas.ts";
 import { tolFinal } from "./nivel.ts";
 
@@ -21,6 +21,7 @@ const T = {
   es: {
     titulos: { checklist: "Checklist", despegue: "Despegue", maniobras: "Maniobras", aterrizaje: "Aterrizaje" },
     navegacion: "Navegación",
+    llegada: (k: number, ok: boolean) => `Llegada ${k}: ${ok ? "aprobada" : "no aprobada"}`,
     enOrden: (n: number) => `${n} puntos en orden`,
     saltados: (l: string[]) => l.map((s) => `Saltaste: ${s}`),
     noHechos: (l: string[]) => l.map((s) => `Dijiste pero no hiciste: ${s}`),
@@ -35,6 +36,7 @@ const T = {
   en: {
     titulos: { checklist: "Checklist", despegue: "Takeoff", maniobras: "Maneuvers", aterrizaje: "Landing" },
     navegacion: "Navigation",
+    llegada: (k: number, ok: boolean) => `Arrival ${k}: ${ok ? "passed" : "not passed"}`,
     enOrden: (n: number) => `${n} items in order`,
     saltados: (l: string[]) => (l.length ? [`${l.length} items skipped`] : []),
     noHechos: (l: string[]) => (l.length ? [`${l.length} items called but not done`] : []),
@@ -79,6 +81,12 @@ export function debriefingRepaso(e: EstadoRepaso, cl: Checklist, idioma: Idioma)
     if (!h.resultado) maniobras.repetir.push(`${nombre}: ${t.noVolada}`);
     else (h.resultado.aprobado ? maniobras.bien : maniobras.repetir).push(`${nombre}: ${h.resultado.calificacion}/100`);
   }
+  // IFR 5: cada llegada se aprueba solo si sus tres partes aprueban.
+  if (esLlegada(e.sorteo))
+    for (let k = 0; k < e.hechas.length / 3; k++) {
+      const ok = e.hechas.slice(3 * k, 3 * k + 3).every((h) => h.resultado?.aprobado);
+      (ok ? maniobras.bien : maniobras.repetir).push(t.llegada(k + 1, ok));
+    }
 
   const aterrizaje = nueva("aterrizaje");
   if (velocidades) poner(aterrizaje, c.aterrizaje.final, t.final(!!c.aterrizaje.final, kt(e.tomas.final.min), kt(e.tomas.final.max), `-${tf.menos}/+${tf.mas}`));
