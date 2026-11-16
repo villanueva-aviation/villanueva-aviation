@@ -656,7 +656,11 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     grabador.current = g.grabador;
     // El tiempo sigue desde lo guardado: si el lector se reinició, su reloj volvió a cero y no se grabaría nada.
     const ultimoT = Math.max(g.grabador.puntos.at(-1)?.[0] ?? 0, g.grabador.fases.at(-1)?.fin ?? 0);
-    if (ultimoT > 0) continuarDesde(ultimoT, g.en);
+    if (ultimoT > 0) {
+      continuarDesde(ultimoT, g.en);
+      // «Seguimos…» se graba donde iba la lección, no en el segundo 0 de la página recargada.
+      ultimaT.current = ultimoT;
+    }
     resultadosVuelo.current = g.resultados;
     setMapa({ estado: "no" });
     setFinEn(null);
