@@ -8,7 +8,7 @@ import type { Muestra } from "./evaluador.ts";
 import { LECCIONES_IFR, leccionIfrDe, lineaEjercicios } from "./lecciones.ts";
 import type { ResultadoComun } from "./maniobras.ts";
 import {
-  alResultado, anularLlegada, crearRepaso, esLlegada, llegadaEmpezada, llegadasDe, maniobrasDe, PARTES_LLEGADA, type EstadoRepaso,
+  alResultado, anularLlegada, siguienteManiobra, crearRepaso, esLlegada, llegadaEmpezada, llegadasDe, maniobrasDe, PARTES_LLEGADA, type EstadoRepaso,
 } from "./repaso.ts";
 import type { VorElegido } from "./vorSim.ts";
 import { armarArco, avanzarArco } from "./evaluadorArco.ts";
@@ -254,4 +254,10 @@ test("briefingLlegada: 4 líneas, el inglés sin acentos y sin palabras prohibid
     for (const l of b) assert.doesNotMatch(l, /oficial|certific|licencia|official|license/i);
   }
   for (const l of briefingLlegada("en")) assert.doesNotMatch(l, /[áéíóúñ¿¡]/);
+});
+
+test("lección 5: «Siguiente» en práctica pasa la llegada completa, no una parte", () => {
+  assert.equal(siguienteManiobra(enVuelo("practica", 0), "es").estado.actual, 3);
+  assert.equal(siguienteManiobra(enVuelo("practica", 1), "es").estado.actual, 3);
+  assert.equal(siguienteManiobra(enVuelo("practica", 4), "es").estado.actual, 6);
 });

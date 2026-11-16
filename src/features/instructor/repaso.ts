@@ -518,6 +518,8 @@ export function alResultado(e: EstadoRepaso, r: ResultadoComun, intentoId: strin
 /** Solo en práctica: dejar la maniobra actual como está y pasar a la siguiente. */
 export function siguienteManiobra(e: EstadoRepaso, idioma: Idioma): Paso {
   if (e.modo !== "practica" || !enManiobras(e)) return { estado: e, decir: [] };
+  // IFR 5: se pasa la llegada completa; pasar una parte dejaría el arco y la espera sin su autorización.
+  if (esLlegada(e.sorteo)) return avanzarManiobra({ ...e, actual: e.actual - (e.actual % 3) + 2 }, idioma);
   return avanzarManiobra(e, idioma);
 }
 

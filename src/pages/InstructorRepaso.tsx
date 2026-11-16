@@ -908,7 +908,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
 
       {actualId && !resultado && (
         <section className="space-y-2 rounded-xl border border-white/10 p-4 text-sm text-white/85">
-          {autorizacion && actualId !== "interceptar-radial" && <p className="text-white/80">{autorizacion}</p>}
+          {autorizacion && paso !== "autorizada" && <p className="text-white/80">{autorizacion}</p>}
           <p className="font-semibold text-white">{def.textoPaso(paso, ev, idioma)}</p>
           {autorizacion && (
             <button type="button" onClick={repetirAutorizacion} className="rounded-full border border-gold-500 px-3 py-1 text-gold-100">
