@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Muestra } from "./evaluador.ts";
-import { avanzarArco, iniciarArco, MOTIVO_SIN_DME, type EvaluacionArco } from "./evaluadorArco.ts";
-import { generarArco, type EjercicioArco } from "./navIfr.ts";
+import { armarArco, avanzarArco, iniciarArco, MOTIVO_SIN_DME, responderLado, type EvaluacionArco } from "./evaluadorArco.ts";
+import { ladoDicho, REGRESO_NM, type EjercicioArco } from "./navIfr.ts";
 import type { Nivel } from "./nivel.ts";
-import { avisoArco, briefingArco } from "./textosArco.ts";
+import { avisoArco, briefingArco, explicarArco, textoPasoArco } from "./textosArco.ts";
 import { subeA } from "./textosInterceptacion.ts";
 
 // Simulador local: solo importan el radial, el DME y el rumbo. Arco de 10 NM del radial 090 al 150, alejándose al entrar.
@@ -27,8 +27,9 @@ function salida(pasa = 0): Paso[] {
   for (let k = pasa; k > 0; k--) out.push([150 + k, 9.5, 320]);
   return [...out, ...Array.from({ length: 35 }, (): Paso => [150, 9.3, 330])];
 }
-function volar(pasos: Paso[], nivel: Nivel = 2): EvaluacionArco {
+function volar(pasos: Paso[], nivel: Nivel = 2, lado: "derecha" | "izquierda" | null = "derecha"): EvaluacionArco {
   let e = iniciarArco(base(0, ...pasos[0]), nivel, EJ, { intento: 0, examen: false });
+  if (lado) e = responderLado(e, lado);
   pasos.slice(1).forEach((p, i) => (e = avanzarArco(e, base(i + 1, ...p))));
   return e;
 }
@@ -40,7 +41,7 @@ test("perfecto: radial, arco a ±0.3 NM y salida centrada → 100", () => {
   assert.equal(r.aprobado, true);
   assert.equal(r.calificacion, 100);
   assert.equal(r.salida?.aprobado, true);
-  assert.deepEqual(r.fuera, { entrada: [], distancia: [], salida: [] });
+  assert.deepEqual(r.fuera, { entrada: [], distancia: [], salida: [], identificar: [] });
 });
 
 test("un tramo del arco a 10.8 NM: error en medio con su extremo, no en fácil", () => {
@@ -70,17 +71,6 @@ test("pasarse 1.5 puntos al salir al radial: error de salida en medio", () => {
   assert.equal(r.aprobado, false);
 });
 
-test("generarArco: radio 4 NM más allá (o más acá, lejos) y salida a 60°", () => {
-  const cerca = generarArco(93, 3, () => 0.1);
-  assert.equal(cerca.desde, 90);
-  assert.equal(cerca.radioNm, 7);
-  assert.equal(cerca.alejandose, true);
-  assert.equal(Math.abs(((cerca.hasta - 90 + 540) % 360) - 180), 60);
-  const lejos = generarArco(93, 22);
-  assert.equal(lejos.radioNm, 18);
-  assert.equal(lejos.alejandose, false);
-});
-
 test("el briefing del arco en inglés no tiene caracteres del español", () => {
   for (const l of briefingArco("en")) assert.doesNotMatch(l, /[áéíóúñ¿¡]/i);
 });
@@ -103,4 +93,99 @@ test("altitud de la lección: el arco no pide mantener la del despegue mientras 
 test("en tierra, la lección de arcos dice a qué altitud subir", () => {
   assert.equal(subeA(9000, "es"), "Después del despegue, sube a 9,000 pies.");
   assert.equal(subeA(9000, "en"), "After takeoff, climb to 9,000 feet.");
+});
+
+// Lección 3 encadenada (Erik, 2026-11-16): salida, regreso, salida, regreso.
+const sigue = (e: EvaluacionArco, pasos: Paso[], t0: number) => pasos.reduce((x, p, i) => avanzarArco(x, base(t0 + i + 1, ...p)), e);
+
+test("ejercicio 1, de salida: arma ya, con el arco 4 NM más allá, pregunta el lado y sale alejándose", () => {
+  const e = armarArco(base(0, 293, 2, 290), 2, { intento: 0, examen: false });
+  assert.equal(e.fase, "hacia-arco");
+  assert.equal(e.preguntar, true);
+  const ej = e.ejercicio!;
+  assert.equal(ej.desde, 290);
+  assert.equal(ej.radioNm, 6);
+  assert.equal(ej.alejandose, true);
+  assert.equal(ej.saleAlejandose, true);
+  const giro = Math.abs(((ej.hasta - 290 + 540) % 360) - 180);
+  assert.ok([30, 40, 50, 60].includes(giro), String(giro));
+});
+
+test("ejercicio 2, de regreso: espera las 10 NM, pide un radial de acercamiento y, ya en él, da el arco 3 NM más acá", () => {
+  let e = armarArco(base(0, 300, 7, 300), 2, { intento: 1, examen: false });
+  assert.equal(e.fase, "esperando");
+  assert.equal(e.ejercicio, null);
+  assert.equal(e.preguntar, false);
+  e = sigue(e, [[300, 9, 300]], 0);
+  assert.equal(e.fase, "esperando");
+  e = sigue(e, [[300, REGRESO_NM, 300]], 1);
+  assert.equal(e.fase, "posicionando");
+  const r = e.posicion!.ejercicio!.radial;
+  assert.equal(Math.abs(((r - 300 + 540) % 360) - 180), 30);
+  assert.equal(e.posicion!.ejercicio!.desde, false);
+  // Ya sobre el radial, acercándose: el arco.
+  e = sigue(e, [[r, 10.6, (r + 180) % 360]], 2);
+  assert.equal(e.fase, "hacia-arco");
+  assert.equal(e.preguntar, true);
+  assert.equal(e.ejercicio!.desde, r);
+  assert.equal(e.ejercicio!.radioNm, 7);
+  assert.equal(e.ejercicio!.alejandose, false);
+  assert.equal(e.ejercicio!.saleAlejandose, false);
+});
+
+test("ejercicio 3, de salida tras un regreso: espera a pasar la estación y alejarse 2 NM", () => {
+  let e = armarArco(base(0, 150, 6, 330), 2, { intento: 2, examen: false });
+  assert.equal(e.fase, "esperando");
+  e = sigue(e, [[150, 3, 330], [150, 0.4, 330], [330, 1.2, 330]], 0);
+  assert.equal(e.fase, "esperando");
+  e = sigue(e, [[330, 2.1, 330]], 3);
+  assert.equal(e.fase, "hacia-arco");
+  assert.equal(e.ejercicio!.desde, 330);
+  assert.equal(e.ejercicio!.radioNm, 6);
+  assert.equal(e.ejercicio!.saleAlejandose, true);
+});
+
+test("arco de salida: la salida al radial final es alejándose por él", () => {
+  const ej: EjercicioArco = { ...EJ, saleAlejandose: true };
+  let e = responderLado(iniciarArco(base(0, ...hacia()[0]), 2, ej, { intento: 0, examen: false }), "derecha");
+  const fuera: Paso[] = [...Array.from({ length: 30 }, (_, k): Paso => [140 + (k * 10) / 29, 10, 120]), ...Array.from({ length: 35 }, (): Paso => [150, 10.3, 150])];
+  e = sigue(e, [...hacia(), ...arco(), ...fuera], 0);
+  assert.equal(e.fase, "terminado");
+  assert.equal(e.resultado!.salida!.ejercicio.desde, true);
+  assert.equal(e.resultado!.salida!.ejercicio.curso, 150);
+  assert.equal(e.resultado!.aprobado, true);
+});
+
+test("la pregunta del lado: la primera respuesta cuenta; mal o sin contestar es error de identificar", () => {
+  const vuelo = [...hacia(), ...arco(), ...salida()];
+  const mal = volar(vuelo, 2, "izquierda").resultado!;
+  assert.equal(mal.fuera.identificar.length, 1);
+  assert.equal(mal.calificacion, 65);
+  assert.equal(mal.aprobado, false);
+  assert.ok(explicarArco(mal, "es").some((l) => l.texto === "Dijiste que virabas a la izquierda; era a la derecha."));
+  const nada = volar(vuelo, 2, null).resultado!;
+  assert.equal(nada.fuera.identificar.length, 1);
+  assert.ok(explicarArco(nada, "en").some((l) => l.texto === "You didn't say which way you'd turn onto the arc."));
+  let e = iniciarArco(base(0, 90, 3, 90), 2, EJ, { intento: 0, examen: false });
+  e = responderLado(responderLado(e, "derecha"), "izquierda");
+  assert.equal(e.dicho, "derecha");
+  assert.equal(e.preguntar, false);
+});
+
+test("ladoDicho: derecha o izquierda, en los dos idiomas; las dos o ninguna, null", () => {
+  assert.equal(ladoDicho("a la derecha", "es"), "derecha");
+  assert.equal(ladoDicho("Izquierda", "es"), "izquierda");
+  assert.equal(ladoDicho("turn left", "en"), "izquierda");
+  assert.equal(ladoDicho("right", "en"), "derecha");
+  assert.equal(ladoDicho("derecha o izquierda", "es"), null);
+  assert.equal(ladoDicho("no sé", "es"), null);
+});
+
+test("la orden del arco no dice el lado: eso lo identifica el cadete", () => {
+  const salida = iniciarArco(base(0, 90, 3, 90), 2, { ...EJ, saleAlejandose: true }, { intento: 0, examen: false, vor: "GDL" });
+  assert.equal(textoPasoArco("radial", salida, "es"), "Aléjate por el radial 090 hasta el arco de 10 millas de GDL; síguelo hasta el radial 150 y aléjate por él: curso 150.");
+  const regreso = iniciarArco(base(0, 90, 12, 270), 2, { radioNm: 8, desde: 90, hasta: 150, sentido: 1, alejandose: false, saleAlejandose: false }, { intento: 1, examen: false });
+  const en = textoPasoArco("radial", regreso, "en");
+  assert.equal(en, "Fly inbound on the 090 radial to the 8 mile arc; follow it to the 150 radial and fly inbound on it: course 330.");
+  for (const x of [textoPasoArco("radial", salida, "es"), en]) assert.doesNotMatch(x, /derecha|izquierda|right|left/i);
 });

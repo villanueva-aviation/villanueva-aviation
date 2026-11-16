@@ -48,7 +48,7 @@ const ifr = (numero: number, es: string, en: string, maniobra?: ManiobraId, extr
 export const LECCIONES_IFR: Leccion[] = [
   ifr(1, "Interceptación de radiales", "Radial interception", "interceptar-radial", { ejercicios: { practica: 4, examen: 2 } }),
   ifr(2, "Rutas pasadas", "Passed routes", "ruta-pasada", { ejercicios: { practica: 4, examen: 2 } }),
-  ifr(3, "Arcos DME", "DME arcs", "arco-dme", { ejercicios: { practica: 3, examen: 1 }, requiereDme: true }),
+  ifr(3, "Arcos DME", "DME arcs", "arco-dme", { ejercicios: { practica: 4, examen: 2 }, requiereDme: true }),
   ifr(4, "Patrones de espera", "Holding patterns", "espera", { ejercicios: { practica: 3, examen: 1 } }),
   ifr(5, "Vuelo mezclado", "Mixed flight"),
   ifr(6, "Checkride IFR", "IFR checkride"),

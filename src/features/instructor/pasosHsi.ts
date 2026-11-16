@@ -6,7 +6,7 @@ import { radialEspera, type EvaluacionEspera } from "./evaluadorEspera.ts";
 import type { EvaluacionArco } from "./evaluadorArco.ts";
 import type { EvaluacionInterceptacion } from "./evaluadorInterceptacion.ts";
 import { desvioGrados, norm180, type Ejercicio } from "./navIfr.ts";
-import { viraALaDerecha } from "./textosArco.ts";
+import { viraALaDerecha } from "./navIfr.ts";
 
 export type EstadoPaso = "hecho" | "actual" | "pendiente";
 export interface PasoHsi { texto: string; estado: EstadoPaso }
@@ -160,13 +160,16 @@ function pasosPasada(e: EvaluacionInterceptacion, ej: Ejercicio, m: Muestra, en:
 
 /** Lección 3: media milla antes del arco y del radial; la cabeza de la flecha marca el viraje al salir. */
 export function pasosArco(e: EvaluacionArco, m: Muestra, idioma: "es" | "en"): PasoHsi[] | null {
-  if (e.examen || e.fase === "invalido") return null;
-  const en = idioma === "en";
   const ej = e.ejercicio;
+  if (e.examen || e.fase === "invalido" || !ej) return null;
+  const en = idioma === "en";
   const derecha = viraALaDerecha(ej);
   const rumbo = (ej.alejandose ? ej.desde : ej.desde + 180) + (derecha ? 90 : -90);
   const dme = (ej.radioNm + (ej.alejandose ? -0.5 : 0.5)).toFixed(1);
-  const curso = ej.hasta + 180;
+  const fuera = !!ej.saleAlejandose;
+  const curso = ej.hasta + (fuera ? 0 : 180);
+  // Al salir: acercándose se vira hacia la estación (a la derecha si los radiales crecen); alejándose, al revés.
+  const salDerecha = (ej.sentido > 0) !== fuera;
   const [C, H] = [tres(curso), tres(ej.hasta)];
   const f = e.fase;
   const enArco = f !== "hacia-arco";
@@ -179,14 +182,19 @@ export function pasosArco(e: EvaluacionArco, m: Muestra, idioma: "es" | "en"): P
         ? `On the arc hold ${ej.radioNm} miles: if they grow, turn 10° toward the station; if they shrink, open up 10°.`
         : `En el arco mantén ${ej.radioNm} millas: si crecen, vira 10° hacia la estación; si bajan, abre 10°.`,
     ],
-    [saliendo || crsEn(m, curso), en ? `CRS on ${C} (inbound course).` : `CRS en ${C} (curso de acercamiento).`],
+    [
+      saliendo || crsEn(m, curso),
+      fuera ? (en ? `CRS on ${C} (outbound course).` : `CRS en ${C} (curso de alejamiento).`) : en ? `CRS on ${C} (inbound course).` : `CRS en ${C} (curso de acercamiento).`,
+    ],
     [
       saliendo,
-      en
-        ? `Half a mile before the ${H} radial, turn 90° ${lado(ej.sentido > 0, true)}, where the head of the VOR arrow points.`
-        : `Media milla antes del radial ${H}, vira 90° a la ${lado(ej.sentido > 0, false)}, hacia donde apunta la cabeza de la flecha VOR.`,
+      fuera
+        ? en ? `Half a mile before the ${H} radial, turn 90° ${lado(salDerecha, true)}, away from the station.` : `Media milla antes del radial ${H}, vira 90° a la ${lado(salDerecha, false)}, alejándote de la estación.`
+        : en
+          ? `Half a mile before the ${H} radial, turn 90° ${lado(salDerecha, true)}, where the head of the VOR arrow points.`
+          : `Media milla antes del radial ${H}, vira 90° a la ${lado(salDerecha, false)}, hacia donde apunta la cabeza de la flecha VOR.`,
     ],
-    [f === "terminado", en ? `CDI alive: turn toward the station, to ${C}.` : `CDI vivo: vira hacia la estación, al ${C}.`],
+    [f === "terminado", fuera ? (en ? `CDI alive: turn onto ${C}.` : `CDI vivo: vira al ${C}.`) : en ? `CDI alive: turn toward the station, to ${C}.` : `CDI vivo: vira hacia la estación, al ${C}.`],
   ]);
 }
 

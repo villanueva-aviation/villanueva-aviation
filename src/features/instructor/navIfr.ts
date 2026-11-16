@@ -75,18 +75,43 @@ export function referenciaTramo(m: Muestra, vor: VorElegido | undefined, rumboPi
 }
 
 /**
- * Lección 3: vuela el radial `desde` hasta el arco de `radioNm`, lo sigue 60° hasta `hasta` y se acerca por él.
+ * Lección 3: vuela el radial `desde` hasta el arco de `radioNm`, lo sigue hasta `hasta` y sale por él.
  * `sentido` +1 = radiales crecientes. `alejandose`: llega al arco desde adentro.
+ * `saleAlejandose`: sale del arco alejándose por `hasta` (arco de salida); si falta, acercándose (los de antes del 16/11).
  */
-export type EjercicioArco = { radioNm: number; desde: number; hasta: number; sentido: 1 | -1; alejandose: boolean };
+export type EjercicioArco = { radioNm: number; desde: number; hasta: number; sentido: 1 | -1; alejandose: boolean; saleAlejandose?: boolean };
 
-/** El arco queda 4 NM más allá del avión (o más acá si ya está lejos), entre 6 y 18 NM. */
-export function generarArco(radialAvion: number, dme: number, azar: () => number = Math.random): EjercicioArco {
+/** Hacia dónde vira el cadete para entrar al arco: la pregunta del ejercicio. */
+export type Lado = "derecha" | "izquierda";
+
+/** Hacia dónde vira al llegar al arco: depende del sentido y de si llega alejándose o acercándose. */
+export const viraALaDerecha = (ej: EjercicioArco) => (ej.sentido > 0) === ej.alejandose;
+
+/** Lección 3 encadenada: el regreso se anuncia a esta distancia (o donde vaya, si ya está más lejos). */
+export const REGRESO_NM = 10;
+/** El arco del regreso queda tantas millas más acá de donde se establece en el radial de acercamiento. */
+const REGRESO_ADENTRO_NM = 3;
+const ARCO_MIN_NM = 4;
+
+const giroArco = (azar: () => number) => (3 + Math.floor(azar() * 4)) * 10;
+
+/** Arco de salida (Erik, 2026-11-16): alejándose por el radial del avión, el arco 4 NM más allá, y sale alejándose 30–60° después. */
+export function generarArcoSalida(radialAvion: number, dme: number, azar: () => number = Math.random): EjercicioArco {
   const desde = redondear10(radialAvion);
-  const radioNm = dme <= 14 ? Math.min(18, Math.max(6, Math.round(dme) + 4)) : Math.round(dme) - 4;
+  const radioNm = Math.min(18, Math.max(6, Math.round(dme) + 4));
   const sentido: 1 | -1 = azar() < 0.5 ? 1 : -1;
-  return { radioNm, desde, hasta: norm360(desde + sentido * 60), sentido, alejandose: dme < radioNm };
+  return { radioNm, desde, hasta: norm360(desde + sentido * giroArco(azar)), sentido, alejandose: true, saleAlejandose: true };
 }
+
+/** Arco de regreso: ya establecido acercándose por `radial`, el arco 3 NM más acá, y se acerca por otro radial 30–60° después. */
+export function generarArcoRegreso(radial: number, dme: number, azar: () => number = Math.random): EjercicioArco {
+  const radioNm = Math.max(ARCO_MIN_NM, Math.floor(dme - REGRESO_ADENTRO_NM));
+  const sentido: 1 | -1 = azar() < 0.5 ? 1 : -1;
+  return { radioNm, desde: norm360(radial), hasta: norm360(radial + sentido * giroArco(azar)), sentido, alejandose: false, saleAlejandose: false };
+}
+
+/** El radial de acercamiento del regreso: 30° a un lado del radial del avión, para interceptarlo como en la lección 1. */
+export const radialRegreso = (radialAvion: number, azar: () => number = Math.random) => redondear10(radialAvion + (azar() < 0.5 ? 30 : -30));
 
 /** Lección 4 sin carta: la espera de las preguntas de esperas, con tramos de un minuto. */
 export function inventarEspera(azar: () => number = Math.random, elevacionFt?: number): DatosEspera {
@@ -122,6 +147,18 @@ const PALABRAS_TIPO: [TipoTramo, string[]][] = [
   ["normal", ["normal"]],
   ["pasada", ["pasada", "pasado", "passed", "behind"]],
 ];
+
+const PALABRAS_LADO: [Lado, string[]][] = [
+  ["derecha", ["derecha", "right"]],
+  ["izquierda", ["izquierda", "left"]],
+];
+
+/** Hacia dónde dijo el cadete que vira al arco; si dijo los dos o ninguno, null. */
+export function ladoDicho(texto: string, idioma: Idioma): Lado | null {
+  const t = ` ${normalizar(texto, idioma)} `;
+  const dichos = PALABRAS_LADO.filter(([, ps]) => ps.some((p) => t.includes(` ${p} `))).map(([x]) => x);
+  return dichos.length === 1 ? dichos[0] : null;
+}
 
 /** Lo que contestó el cadete a «¿normal o ruta pasada?»; si dijo las dos o ninguna, null. */
 export function tipoDicho(texto: string, idioma: Idioma): TipoTramo | null {

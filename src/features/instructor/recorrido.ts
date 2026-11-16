@@ -124,7 +124,7 @@ export const TOLERANCIAS: Record<ManiobraId, (n: Nivel) => Record<string, number
   familiarizacion: () => ({}),
   "interceptar-radial": (n) => toleranciaTramo(n),
   "ruta-pasada": (n) => toleranciaTramo(n),
-  "arco-dme": (n) => ({ entrada: tolArco(n).distanciaNm, distancia: tolArco(n).distanciaNm, salida: tolInterceptacion(n).sobrepasoPuntos }),
+  "arco-dme": (n) => ({ entrada: tolArco(n).distanciaNm, distancia: tolArco(n).distanciaNm, salida: tolInterceptacion(n).sobrepasoPuntos, identificar: 0 }),
   espera: (n) => ({ dicha: 0, volada: 0, tramo: tolEspera(n).tramoSeg, acercamiento: tolEspera(n).puntos, virajes: tolEspera(n).tasaGrados, distancia: tolEspera(n).maxNm, altitud: tolEspera(n).altitudFt }),
 };
 

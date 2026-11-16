@@ -1,8 +1,8 @@
-import type { ResultadoArco } from "./evaluadorArco.ts";
+import { ladoArco, type ResultadoArco } from "./evaluadorArco.ts";
 import type { Idioma } from "./idiomaInstructor.ts";
 import { tolArco, tolInterceptacion } from "./nivel.ts";
 
-type R = Pick<ResultadoArco, "aprobado" | "fuera" | "ejercicio" | "vor" | "peorDistancia" | "sobrepasoEntrada" | "salida" | "nivel">;
+type R = Pick<ResultadoArco, "aprobado" | "fuera" | "ejercicio" | "vor" | "peorDistancia" | "sobrepasoEntrada" | "salida" | "nivel" | "dicho">;
 
 const tres = (r: number) => String(Math.round(((r % 360) + 360) % 360) || 360).padStart(3, "0");
 const uno = (x: number) => String(Math.round(x * 10) / 10);
@@ -18,7 +18,17 @@ export function HojaArco({ resultado, idioma = "es" }: { resultado: R; idioma?: 
   const en = idioma === "en";
   const Tol = tolArco(resultado.nivel);
   const ej = resultado.ejercicio;
+  const lado = (x: string) => (en ? (x === "derecha" ? "right" : "left") : x);
+  // La pregunta del lado existe desde el 16/11: los intentos de antes no la tienen.
+  const identificar = resultado.fuera.identificar
+    ? [{
+        campo: "identificar" as const,
+        nombre: en ? `Turn onto the arc: ${lado(ladoArco(ej))}` : `Viraje al arco: ${ladoArco(ej)}`,
+        valor: resultado.dicho ? lado(resultado.dicho) : "—",
+      }]
+    : [];
   const filas = [
+    ...identificar,
     { campo: "entrada" as const, nombre: en ? `Arc entry: overshoot ≤ ${Tol.distanciaNm} NM` : `Entrada al arco: pasarse ≤ ${Tol.distanciaNm} NM`, valor: `${uno(resultado.sobrepasoEntrada)} NM` },
     { campo: "distancia" as const, nombre: en ? `Arc distance ±${Tol.distanciaNm} NM` : `Distancia del arco ±${Tol.distanciaNm} NM`, valor: `${uno(resultado.peorDistancia)} NM` },
     {

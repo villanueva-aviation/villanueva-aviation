@@ -26,9 +26,9 @@ test("la lección 2 es «Rutas pasadas», con la regla de los 45° y la de 1 min
   assert.ok(!r.secciones.some((s) => /Acercarse con TO|Alejarse con FROM/.test(s.titulo.es)));
 });
 
-test("rutas, arcos y esperas: 5, 5 y 6 secciones", () => {
+test("rutas, arcos y esperas: 5, 6 y 6 secciones", () => {
   assert.equal(TEORIA_IFR.rutas.secciones.length, 5);
-  assert.equal(TEORIA_IFR.arcos.secciones.length, 5);
+  assert.equal(TEORIA_IFR.arcos.secciones.length, 6);
   assert.equal(TEORIA_IFR.esperas.secciones.length, 6);
 });
 

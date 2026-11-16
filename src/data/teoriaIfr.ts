@@ -151,16 +151,23 @@ export const TEORIA_IFR: Record<TemaIfr, { titulo: Texto; secciones: SeccionTeor
       {
         titulo: { es: "El radial de salida", en: "The exit radial" },
         texto: {
-          es: "Antes de llegar al radial final, pon en el OBS su curso de acercamiento (el radial más 180) y mira la barra: empieza en el tope. Cuando empiece a moverse hacia el centro, vira al curso sin pasarte, como en una interceptación.",
-          en: "Before you reach the final radial, set its inbound course (the radial plus 180) on the OBS and watch the needle: it starts pegged. When it starts moving toward center, turn onto the course without overshooting, like an interception.",
+          es: "Antes de llegar al radial final, pon su curso en el OBS: si sales acercándote, el radial más 180; si sales alejándote, el radial mismo. Mira la barra: empieza en el tope. Cuando empiece a moverse hacia el centro, vira al curso sin pasarte, como en una interceptación.",
+          en: "Before you reach the final radial, set its course on the OBS: inbound, the radial plus 180; outbound, the radial itself. Watch the needle: it starts pegged. When it starts moving toward center, turn onto the course without overshooting, like an interception.",
         },
         hsi: { rumbo: 230, curso: 330, desviacion: -5 },
       },
       {
         titulo: { es: "Paso a paso", en: "Step by step" },
         texto: {
-          es: "1. Sintoniza un VOR con DME e identifícalo. 2. Vuela el radial hacia el arco y empieza a virar medio millas antes. 3. En el arco, corrige con 10 grados hacia la estación o hacia afuera según el DME. 4. Cerca del radial final, pon su curso de acercamiento en el OBS. 5. Vira al curso cuando la barra se mueva y acércate centrado.",
-          en: "1. Tune and identify a VOR with DME. 2. Fly the radial toward the arc and start turning half a mile early. 3. On the arc, correct 10 degrees toward the station or away from it based on the DME. 4. Near the final radial, set its inbound course on the OBS. 5. Turn onto the course when the needle moves and fly inbound centered.",
+          es: "1. Sintoniza un VOR con DME e identifícalo. 2. Vuela el radial hacia el arco y empieza a virar medio millas antes. 3. En el arco, corrige con 10 grados hacia la estación o hacia afuera según el DME. 4. Cerca del radial final, pon su curso en el OBS. 5. Vira al curso cuando la barra se mueva y síguelo centrado.",
+          en: "1. Tune and identify a VOR with DME. 2. Fly the radial toward the arc and start turning half a mile early. 3. On the arc, correct 10 degrees toward the station or away from it based on the DME. 4. Near the final radial, set its course on the OBS. 5. Turn onto the course when the needle moves and track it centered.",
+        },
+      },
+      {
+        titulo: { es: "En la lección y en el examen", en: "In the lesson and the checkride" },
+        texto: {
+          es: "La práctica son 4 arcos en un vuelo: de salida, de regreso, de salida y de regreso. El de salida empieza alejándote por un radial y termina alejándote por otro. Para el regreso, a las 10 millas te piden interceptar un radial de acercamiento y, ya en él, te dan el arco: 3 millas más acá, hasta otro radial por el que te acercas. Después de pasar la estación viene el siguiente de salida. En cada arco el instructor no te dice el lado: tú dices hacia dónde viras para entrar. El examen son 2: uno de salida y uno de regreso.",
+          en: "Practice is 4 arcs in one flight: outbound, back to the station, outbound and back. The outbound one starts flying away on one radial and ends flying away on another. For the way back, at 10 miles you're asked to intercept an inbound radial and, once on it, you get the arc: 3 miles closer in, to another radial you fly inbound on. After you pass the station comes the next outbound arc. On each arc the instructor doesn't tell you the side: you say which way you turn onto it. The checkride is 2: one outbound and one back.",
         },
       },
     ],

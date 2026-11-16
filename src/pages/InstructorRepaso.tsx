@@ -15,7 +15,7 @@ import { DebriefingMapa } from "../features/instructor/DebriefingMapa";
 import type { ManiobraId, ResultadoComun } from "../features/instructor/maniobras";
 import { claveLeccion, estadoLeccion, leccionDe, leccionIfrDe, lineaEjercicios } from "../features/instructor/lecciones";
 import {
-  altitudEspera, entradaDicha, generarTramo, inventarEspera, referenciaTramo, rutaEspera, tipoDicho, tramosDe, type DatosEspera, type Ejercicio, type TipoTramo, type Tramo,
+  altitudEspera, entradaDicha, generarTramo, inventarEspera, ladoDicho, referenciaTramo, rutaEspera, tipoDicho, tramosDe, type DatosEspera, type Ejercicio, type Lado, type TipoTramo, type Tramo,
 } from "../features/instructor/navIfr";
 import { pistaProbable } from "../features/instructor/aeropuertoSim";
 import { responderTipo, type EvaluacionInterceptacion } from "../features/instructor/evaluadorInterceptacion";
@@ -28,6 +28,8 @@ import { altitudValida, rangoAltitud } from "../features/instructor/altitudVuelo
 import { ENTRADAS_PRACTICA, radialEspera, responderEntrada } from "../features/instructor/evaluadorEspera";
 import { pasosHsiDe } from "../features/instructor/pasosHsi";
 import { autorizacionEspera, PREGUNTA_ENTRADA } from "../features/instructor/textosEspera";
+import { responderLado, type EvaluacionArco } from "../features/instructor/evaluadorArco";
+import { NOMBRE_LADO, PREGUNTA_LADO } from "../features/instructor/textosArco";
 import { useEscucha } from "../features/instructor/useEscucha";
 import { CLAVE_REANUDAR, leerReanudable, paraReanudar } from "../features/instructor/reanudar";
 import { lecturaFinalDe, MANIOBRAS } from "../features/instructor/maniobras";
@@ -127,6 +129,9 @@ const T = {
     tuTipo: "¿Normal o ruta pasada?",
     tipos: { normal: "Normal", pasada: "Ruta pasada" } as Record<TipoTramo, string>,
     escuchandoTipo: "🎤 Escuchando: ¿normal o ruta pasada?",
+    tuLado: "¿Hacia qué lado viras al arco?",
+    lados: { derecha: "Derecha", izquierda: "Izquierda" } as Record<Lado, string>,
+    escuchandoLado: "🎤 Escuchando: ¿derecha o izquierda?",
     tipoDicho: (d: string) => `Dijiste: ${d} ✓`,
     pasosHsi: "Paso a paso en el HSI",
     aMedias: (de: string, min: number) => `Tienes esta lección a medias (${de}, hace ${min} min). Los ejercicios terminados ya están guardados; el que estabas volando empieza de nuevo.`,
@@ -208,6 +213,9 @@ const T = {
     tuTipo: "Normal intercept or passed route?",
     tipos: { normal: "Normal intercept", pasada: "Passed route" } as Record<TipoTramo, string>,
     escuchandoTipo: "🎤 Listening: normal intercept or passed route?",
+    tuLado: "Which way do you turn onto the arc?",
+    lados: { derecha: "Right", izquierda: "Left" } as Record<Lado, string>,
+    escuchandoLado: "🎤 Listening: right or left?",
     tipoDicho: (d: string) => `You said: ${d} ✓`,
     pasosHsi: "Step by step on the HSI",
     aMedias: (de: string, min: number) => `You have this lesson half done (${de}, ${min} min ago). Finished exercises are already saved; the one you were flying starts over.`,
@@ -442,13 +450,15 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     return () => window.clearTimeout(id);
   }, [terminado, finEn, listo, cl, conChecklist]);
 
-  // Lección 4: «¿Qué entrada vas a hacer?»; lecciones 1 y 2: «¿Interceptación normal o ruta pasada?». Con el micrófono
-  // y también con botones. El checklist calla mientras.
+  // Lección 4: «¿Qué entrada vas a hacer?»; lecciones 1 y 2: «¿Interceptación normal o ruta pasada?»; lección 3:
+  // «¿Hacia qué lado viras para entrar al arco?». Con el micrófono y también con botones. El checklist calla mientras.
   const escuchaEntrada = useEscucha(idioma, voz);
   const responder = useCallback((d: Entrada) => ajustar((e) => responderEntrada(e, d, muestraRef.current?.rumbo ?? 0)), [ajustar]);
   const responderTramo = useCallback((d: TipoTramo) => ajustar((e: EvaluacionInterceptacion) => responderTipo(e, d)), [ajustar]);
+  const responderArco = useCallback((d: Lado) => ajustar((e: EvaluacionArco) => responderLado(e, d)), [ajustar]);
   const esTramo = def.id === "interceptar-radial" || def.id === "ruta-pasada";
-  const preguntar = (def.id === "espera" || esTramo) && !!ev?.preguntar;
+  const esArco = def.id === "arco-dme";
+  const preguntar = (def.id === "espera" || esTramo || esArco) && !!ev?.preguntar;
   const preguntaHecha = useRef(false);
   const { escuchar, supported: micEntrada } = escuchaEntrada;
   // Lo que oyó el micrófono (y cómo lo entendió), en pantalla hasta el siguiente ejercicio.
@@ -466,13 +476,20 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     }
     if (preguntaHecha.current) return;
     preguntaHecha.current = true;
-    const pregunta = paraVoz((esTramo ? PREGUNTA_TIPO : PREGUNTA_ENTRADA)[idioma], idioma);
+    const pregunta = paraVoz((esTramo ? PREGUNTA_TIPO : esArco ? PREGUNTA_LADO : PREGUNTA_ENTRADA)[idioma], idioma);
     if (!micEntrada) {
       decir(pregunta, "orden", "pregunta");
       return;
     }
     // Si no se entiende, la respuesta queda pendiente para los botones.
     escuchar(pregunta, "orden", "pregunta", (texto) => {
+      if (esArco) {
+        const d = ladoDicho(texto, idioma);
+        setOidoEntrada({ texto, nombre: d && NOMBRE_LADO[idioma][d] });
+        sonarTonos([d ? "punto" : "falta"]);
+        if (d) responderArco(d);
+        return;
+      }
       if (esTramo) {
         const d = tipoDicho(texto, idioma);
         setOidoEntrada({ texto, nombre: d && NOMBRE_TIPO[idioma][d] });
@@ -485,7 +502,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       sonarTonos([d ? "punto" : "falta"]);
       if (d) responder(d);
     });
-  }, [preguntar, esTramo, micEntrada, escuchar, decir, idioma, responder, responderTramo]);
+  }, [preguntar, esTramo, esArco, micEntrada, escuchar, decir, idioma, responder, responderTramo, responderArco]);
 
   // Checklist por voz, en español, mientras dura la lección. Al cerrar una sección el instructor dice qué faltó.
   const enVuelo = !!repaso && repaso.etapa !== "terminado" && repaso.etapa !== "invalido";
@@ -857,10 +874,22 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
             <p className="text-emerald-300">{t.escuchandoEntrada}</p>
           )}
           {esTramo && ev?.preguntar && escuchaEntrada.fase === "escuchando" && <p className="text-emerald-300">{t.escuchandoTipo}</p>}
-          {(def.id === "espera" || esTramo) && oidoEntrada && (
+          {esArco && ev?.preguntar && escuchaEntrada.fase === "escuchando" && <p className="text-emerald-300">{t.escuchandoLado}</p>}
+          {(def.id === "espera" || esTramo || esArco) && oidoEntrada && (
             <p className={oidoEntrada.nombre ? "text-white" : "text-gold-300"}>{t.escuche(oidoEntrada.texto, oidoEntrada.nombre)}</p>
           )}
           {esTramo && ev?.dicho && <p className="text-emerald-300">{t.tipoDicho(NOMBRE_TIPO[idioma][ev.dicho as TipoTramo])}</p>}
+          {esArco && ev?.dicho && <p className="text-emerald-300">{t.tipoDicho(NOMBRE_LADO[idioma][ev.dicho as Lado])}</p>}
+          {esArco && ev?.preguntar && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-white/70">{t.tuLado}</span>
+              {(["izquierda", "derecha"] as const).map((d) => (
+                <button key={d} type="button" onClick={() => responderArco(d)} className="rounded-full border border-gold-500 px-3 py-1 text-gold-100">
+                  {t.lados[d]}
+                </button>
+              ))}
+            </div>
+          )}
           {esTramo && ev?.preguntar && (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-white/70">{t.tuTipo}</span>

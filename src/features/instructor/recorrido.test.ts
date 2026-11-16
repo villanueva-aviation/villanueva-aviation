@@ -300,7 +300,7 @@ test("IFR: un arco deja su figura y su radial de salida; una espera, la suya y e
   const x = cerrarGrabacion(grabadorConFases(), { leccion: 3, e, cl: checklistLeido(), resultados: [{ maniobra: "arco-dme", resultado: arco }, { maniobra: "espera", resultado: espera }] });
   assert.deepEqual(x.arcos, [{ intento: 1, radioNm: 10, desde: 90, hasta: 150, sentido: 1 }]);
   assert.deepEqual(x.esperas, [{ intento: 2, acercamiento: 270, giros: "derecha", tramoSeg: 60 }]);
-  assert.deepEqual(x.radiales, [{ intento: 1, radial: 150, desde: false }, { intento: 2, radial: 40, desde: false }]);
+  assert.deepEqual(x.radiales, [{ intento: 1, radial: 90, desde: true }, { intento: 1, radial: 150, desde: false }, { intento: 2, radial: 40, desde: false }]);
 });
 
 test("VFR: la grabación no gana vor ni radiales", () => {

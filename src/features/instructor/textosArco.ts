@@ -1,51 +1,70 @@
 import type { Muestra } from "./evaluador.ts";
-import { CAMPOS_ARCO, type CampoArco, type EvaluacionArco, type ResultadoArco } from "./evaluadorArco.ts";
+import { CAMPOS_ARCO, ladoArco, type CampoArco, type EvaluacionArco, type ResultadoArco } from "./evaluadorArco.ts";
 import type { Linea } from "./explicacion.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
-import { norm180, norm360, type EjercicioArco } from "./navIfr.ts";
+import { norm180, norm360, REGRESO_NM, type Lado } from "./navIfr.ts";
 import { tolArco, type Nivel } from "./nivel.ts";
 import { avisoAltitud, explicarInterceptacion, semaforoInterceptacion } from "./textosInterceptacion.ts";
 import { ANULADO, luz, REPETIR_IFR_SEG, type Aviso, type Luz } from "./voz.ts";
 
 // Qué dice el instructor en los arcos DME (programa IFR, lección 3). Puro.
 
-export type PasoArco = "radial" | "entra" | "arco" | "sal" | "terminado" | "invalido";
+export type PasoArco = "espera" | "regresa" | "radial" | "entra" | "arco" | "sal" | "terminado" | "invalido";
 
 export function pasoArco(e: EvaluacionArco | null, _m: Muestra | null): PasoArco | null {
   if (!e) return null;
   if (e.fase === "terminado" || e.fase === "invalido") return e.fase;
+  if (e.fase === "esperando") return "espera";
+  if (e.fase === "posicionando") return "regresa";
   return e.fase === "hacia-arco" ? "radial" : e.fase === "entrando" ? "entra" : e.fase === "en-arco" ? "arco" : "sal";
 }
+
+/** La pregunta de cada arco (Erik, 2026-11-16: «para que lo pueda ir identificando»). */
+export const PREGUNTA_LADO: Record<Idioma, string> = { es: "¿Hacia qué lado viras para entrar al arco?", en: "Which way do you turn onto the arc?" };
+export const NOMBRE_LADO: Record<Idioma, Record<Lado, string>> = { es: { derecha: "derecha", izquierda: "izquierda" }, en: { derecha: "right", izquierda: "left" } };
 
 const tres = (r: number) => String(Math.round(norm360(r)) || 360).padStart(3, "0");
 const uno = (x: number) => String(Math.round(x * 10) / 10);
 const millas = (x: number, en: boolean) => (x === 1 ? (en ? "1 mile" : "1 milla") : `${uno(x)} ${en ? "miles" : "millas"}`);
 
-/** Hacia dónde vira al llegar al arco: depende del sentido y de si llega alejándose o acercándose. */
-export const viraALaDerecha = (ej: EjercicioArco) => (ej.sentido > 0) === ej.alejandose;
+
+/** El curso al salir del arco: alejándose, el radial; acercándose, el radial + 180. */
+const cursoSalida = (ej: { hasta: number; saleAlejandose?: boolean }) => ej.hasta + (ej.saleAlejandose ? 0 : 180);
 
 function texto(paso: PasoArco, e: EvaluacionArco | null, idioma: Idioma): string {
   const en = idioma === "en";
   if (!e) return "";
+  const de = e.vor ? ` ${en ? "from" : "de"} ${e.vor}` : "";
+  if (paso === "espera")
+    return e.ctx.intento % 2 === 0
+      ? en ? "Keep going to the station; once past it I'll give you the next arc." : "Sigue hacia la estación; al pasarla te doy el siguiente arco."
+      : en ? `Keep going outbound; at ${REGRESO_NM} miles I'll give you the way back.` : `Sigue alejándote; a las ${REGRESO_NM} millas te doy el regreso.`;
+  if (paso === "regresa") {
+    const r = e.posicion?.ejercicio?.radial ?? 0;
+    return en
+      ? `Head back to the station: intercept the ${tres(r)} radial${de} inbound, course ${tres(r + 180)}.`
+      : `Regresa a la estación: intercepta el radial ${tres(r)}${de} acercándote, curso ${tres(r + 180)}.`;
+  }
+  if (paso === "invalido") return `${ANULADO[idioma]} ${traducirMotivo(e.motivo ?? "", idioma)}`.trim();
   const ej = e.ejercicio;
-  const derecha = viraALaDerecha(ej);
+  if (!ej) return "";
+  const C = tres(cursoSalida(ej));
   switch (paso) {
     case "radial": {
-      const de = e.vor ? ` ${en ? "from" : "de"} ${e.vor}` : "";
+      // Sin el lado: eso lo identifica el cadete.
+      const [ida, vuelta] = [ej.alejandose, !!ej.saleAlejandose];
       return en
-        ? `Fly the ${tres(ej.desde)} radial to the ${ej.radioNm} mile arc${de}; turn ${derecha ? "right" : "left"} onto the arc, follow it to the ${tres(ej.hasta)} radial and fly inbound on it: course ${tres(ej.hasta + 180)}.`
-        : `Vuela el radial ${tres(ej.desde)} hasta el arco de ${ej.radioNm} millas${de}; vira a la ${derecha ? "derecha" : "izquierda"} al arco, síguelo hasta el radial ${tres(ej.hasta)} y acércate por él: curso ${tres(ej.hasta + 180)}.`;
+        ? `Fly ${ida ? "outbound" : "inbound"} on the ${tres(ej.desde)} radial to the ${ej.radioNm} mile arc${de}; follow it to the ${tres(ej.hasta)} radial and fly ${vuelta ? "outbound" : "inbound"} on it: course ${C}.`
+        : `${ida ? "Aléjate" : "Acércate"} por el radial ${tres(ej.desde)} hasta el arco de ${ej.radioNm} millas${de}; síguelo hasta el radial ${tres(ej.hasta)} y ${vuelta ? "aléjate" : "acércate"} por él: curso ${C}.`;
     }
     case "entra":
       return en ? `On the arc: ${ej.radioNm} miles.` : `En el arco: ${ej.radioNm} millas.`;
     case "arco":
       return en ? `Hold ${ej.radioNm} miles to the ${tres(ej.hasta)} radial.` : `Mantén ${ej.radioNm} millas hasta el radial ${tres(ej.hasta)}.`;
     case "sal":
-      return en ? `${tres(ej.hasta)} radial: turn to course ${tres(ej.hasta + 180)}.` : `Radial ${tres(ej.hasta)}: vira al curso ${tres(ej.hasta + 180)}.`;
+      return en ? `${tres(ej.hasta)} radial: turn to course ${C}.` : `Radial ${tres(ej.hasta)}: vira al curso ${C}.`;
     case "terminado":
       return en ? "Maneuver complete." : "Maniobra terminada.";
-    case "invalido":
-      return `${ANULADO[idioma]} ${traducirMotivo(e.motivo ?? "", idioma)}`.trim();
   }
 }
 
@@ -71,16 +90,17 @@ export function listaPasosArco(paso: PasoArco | null, idioma: Idioma): { nombre:
 
 export function queHacerArco(paso: PasoArco | null, idioma: Idioma): string {
   const en = idioma === "en";
+  if (paso === "regresa") return en ? "Intercept it like in lesson 1: about 30 degrees toward the course." : "Intercéptalo como en la lección 1: unos 30° hacia el curso.";
   if (paso === "radial") return en ? "Start the turn onto the arc about half a mile before it." : "Empieza a virar al arco como medio millas antes de llegar.";
   if (paso === "entra" || paso === "arco")
     return en ? "If the distance grows, turn about 10 degrees toward the station; if it shrinks, open up 10 degrees." : "Si la distancia crece, vira unos 10° hacia la estación; si baja, abre unos 10°.";
-  if (paso === "sal") return en ? "Set the inbound course on the OBS and center the needle without overshooting." : "Pon el curso de acercamiento en el OBS y centra la barra sin pasarte.";
+  if (paso === "sal") return en ? "Set the exit course on the OBS and center the needle without overshooting." : "Pon el curso de salida en el OBS y centra la barra sin pasarte.";
   return "";
 }
 
 export function semaforoArco(e: EvaluacionArco | null, m: Muestra | null): Record<CampoArco, Luz> {
-  const gris: Record<CampoArco, Luz> = { entrada: "gris", distancia: "gris", salida: "gris" };
-  if (!e || !m || m.navDme === undefined) return gris;
+  const gris: Record<CampoArco, Luz> = { entrada: "gris", distancia: "gris", salida: "gris", identificar: "gris" };
+  if (!e || !e.ejercicio || !m || m.navDme === undefined) return gris;
   const T = tolArco(e.nivel);
   const v = m.navDme - e.ejercicio.radioNm;
   if (e.fase === "entrando") return { ...gris, entrada: luz(Math.max(0, e.ejercicio.alejandose ? v : -v), T.distanciaNm) };
@@ -94,9 +114,10 @@ export function avisoArco(e: EvaluacionArco | null, m: Muestra | null, modo: "pr
   if (!e || !m) return null;
   const en = idioma === "en";
   const ej = e.ejercicio;
-  if (e.fase === "saliendo" && m.navObs !== undefined && Math.abs(norm180(m.navObs - (ej.hasta + 180))) > 5)
-    return { clave: "obs", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Set course ${tres(ej.hasta + 180)} on the OBS` : `Pon el curso ${tres(ej.hasta + 180)} en el OBS` };
-  if (modo === "practica" && e.fase === "en-arco" && m.navDme !== undefined) {
+  const curso = ej ? cursoSalida(ej) : 0;
+  if (ej && e.fase === "saliendo" && m.navObs !== undefined && Math.abs(norm180(m.navObs - curso)) > 5)
+    return { clave: "obs", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? `Set course ${tres(curso)} on the OBS` : `Pon el curso ${tres(curso)} en el OBS` };
+  if (ej && modo === "practica" && e.fase === "en-arco" && m.navDme !== undefined) {
     const v = m.navDme - ej.radioNm;
     if (v > 0.2) return { clave: "arco-afuera", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? "Turn about 10 degrees toward the station." : "Corrige unos 10° hacia la estación." };
     if (v < -0.2) return { clave: "arco-adentro", nivel: "ambar", repetir: REPETIR_IFR_SEG, texto: en ? "Open up about 10 degrees, you're cutting inside." : "Abre unos 10°, te estás metiendo." };
@@ -110,17 +131,19 @@ export function briefingArco(idioma: Idioma, nivel: Nivel = 2): string[] {
   if (idioma === "en") {
     return [
       "Today you'll fly DME arcs: a circle around the VOR at a fixed distance.",
+      "Four arcs in one flight: outbound, back to the station, outbound and back. For each one I'll ask which way you turn onto the arc.",
       "Fly the radial toward the arc and start your turn about half a mile before reaching it.",
       `On the arc, keep the distance within ${millas(T.distanciaNm, true)}. If it grows, turn about 10 degrees toward the station; if it shrinks, open up 10 degrees.`,
-      "Near the final radial, set the inbound course on the OBS and turn onto it without overshooting.",
+      "Near the final radial, set its course on the OBS and turn onto it without overshooting.",
       "When you're ready, press «Ready, let's start».",
     ];
   }
   return [
     "Hoy vas a volar arcos DME: un círculo alrededor del VOR a una distancia fija.",
+    "Son cuatro arcos en un vuelo: de salida, de regreso a la estación, de salida y de regreso. En cada uno te pregunto hacia qué lado viras para entrar al arco.",
     "Vuela el radial hacia el arco y empieza a virar como medio millas antes de llegar.",
     `En el arco, mantén la distancia dentro de ${millas(T.distanciaNm, false)}. Si crece, vira unos 10° hacia la estación; si baja, abre unos 10°.`,
-    "Cerca del radial final, pon el curso de acercamiento en el OBS y vira a él sin pasarte.",
+    "Cerca del radial final, pon su curso en el OBS y vira a él sin pasarte.",
     "Cuando estés listo, presiona «Listo, empiezo».",
   ];
 }
@@ -129,7 +152,17 @@ export function explicarArco(r: ResultadoArco, idioma: Idioma): Linea[] {
   const en = idioma === "en";
   const lineas: Linea[] = [];
   const mal = (texto: string) => lineas.push({ tipo: "mal", texto });
-  if (r.fuera.entrada.length)
+  // El campo falta en los intentos de antes del 16/11.
+  if (r.fuera.identificar?.length) {
+    const era = NOMBRE_LADO[idioma][ladoArco(r.ejercicio)];
+    mal(r.dicho
+      ? en ? `You said you'd turn ${NOMBRE_LADO.en[r.dicho]}; it was ${era}.` : `Dijiste que virabas a la ${r.dicho}; era a la ${era}.`
+      : en ? "You didn't say which way you'd turn onto the arc." : "No dijiste hacia qué lado virabas al arco.");
+  }
+  // Error de entrada sin haberse pasado: no llegó al radial del regreso.
+  if (r.fuera.entrada.length && r.sobrepasoEntrada === 0)
+    mal(en ? "You didn't reach the inbound radial in time." : "No llegaste al radial de acercamiento a tiempo.");
+  else if (r.fuera.entrada.length)
     mal(en
       ? `Turning onto the arc you went ${uno(r.sobrepasoEntrada)} miles past it: start the turn about half a mile earlier.`
       : `Al entrar al arco te pasaste ${uno(r.sobrepasoEntrada)} millas: empieza a virar como medio millas antes.`);
@@ -150,15 +183,15 @@ export function repetirArco(r: ResultadoArco, idioma: Idioma): string | null {
 }
 
 const ETIQUETA: Record<Idioma, Record<CampoArco, string>> = {
-  es: { entrada: "la entrada al arco", distancia: "mantener la distancia del arco", salida: "la salida al radial" },
-  en: { entrada: "turning onto the arc", distancia: "holding the arc distance", salida: "turning onto the final radial" },
+  es: { entrada: "la entrada al arco", distancia: "mantener la distancia del arco", salida: "la salida al radial", identificar: "decir hacia qué lado virabas al arco" },
+  en: { entrada: "turning onto the arc", distancia: "holding the arc distance", salida: "turning onto the final radial", identificar: "calling which way you'd turn onto the arc" },
 };
 
 export function masFalladoArco(rs: ResultadoArco[], idioma: Idioma): string | null {
   let peor: CampoArco | null = null;
   let max = 0;
   for (const c of CAMPOS_ARCO) {
-    const n = rs.filter((r) => r.fuera[c].length).length;
+    const n = rs.filter((r) => r.fuera[c]?.length).length;
     if (n > max) [peor, max] = [c, n];
   }
   if (!peor) return null;

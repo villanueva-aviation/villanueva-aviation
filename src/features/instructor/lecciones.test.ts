@@ -74,7 +74,7 @@ test("IFR 2 a 4: su maniobra, sus ejercicios y su clave; los arcos piden DME", (
   assert.deepEqual(ruta.nombre, { es: "Rutas pasadas", en: "Passed routes" });
   assert.deepEqual(ruta.ejercicios, { practica: 4, examen: 2 });
   assert.equal(arco.maniobra, "arco-dme");
-  assert.deepEqual(arco.ejercicios, { practica: 3, examen: 1 });
+  assert.deepEqual(arco.ejercicios, { practica: 4, examen: 2 });
   assert.equal(arco.requiereDme, true);
   assert.equal(espera.maniobra, "espera");
   assert.deepEqual(espera.ejercicios, { practica: 3, examen: 1 });

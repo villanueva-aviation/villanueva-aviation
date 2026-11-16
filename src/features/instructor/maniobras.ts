@@ -753,15 +753,19 @@ const defArco: DefManiobra<EvaluacionArco, ResultadoArco> = {
       { codigo: "1", texto: `Entra al arco sin pasarse más de ${T.distanciaNm} NM`, textoEn: `Turns onto the arc without overshooting more than ${T.distanciaNm} NM` },
       { codigo: "2", texto: `Mantiene la distancia del arco ±${T.distanciaNm} NM`, textoEn: `Holds the arc distance ±${T.distanciaNm} NM` },
       { codigo: "3", texto: `Sale al radial con las reglas de interceptación`, textoEn: `Turns onto the radial within interception rules` },
+      { codigo: "4", texto: "Identifica hacia qué lado vira al arco", textoEn: "Calls which way to turn onto the arc" },
     ];
   },
-  celdas: [celda("entrada", "Entrada", "Entry"), celda("distancia", "Distancia", "Distance"), celda("salida", "Salida al radial", "Radial exit")],
+  celdas: [
+    celda("identificar", "Identificar", "Identify"), celda("entrada", "Entrada", "Entry"), celda("distancia", "Distancia", "Distance"),
+    celda("salida", "Salida al radial", "Radial exit"),
+  ],
   temas: ["c172"],
   armar: armarArco,
   nivelExamen: (n) => (Math.max(2, n) as Nivel),
   avanzar: avanzarArco,
   armarSolo: armarSoloArco,
-  fase: (e) => (e.fase === "terminado" || e.fase === "invalido" ? e.fase : "en-curso"),
+  fase: (e) => (e.fase === "esperando" ? "armado" : e.fase === "terminado" || e.fase === "invalido" ? e.fase : "en-curso"),
   motivo: (e) => e.motivo,
   resultado: (e) => e.resultado ?? null,
   paso: pasoArco,
@@ -776,7 +780,10 @@ const defArco: DefManiobra<EvaluacionArco, ResultadoArco> = {
   repetir: repetirArco,
   masFallado: masFalladoArco,
   paraGuardar: paraGuardarArco,
-  figuras: ({ ejercicio: { radioNm, desde, hasta, sentido } }) => ({ arco: { radioNm, desde, hasta, sentido }, radiales: [{ radial: hasta, desde: false }] }),
+  figuras: ({ ejercicio: { radioNm, desde, hasta, sentido, alejandose, saleAlejandose } }) => ({
+    arco: { radioNm, desde, hasta, sentido },
+    radiales: [{ radial: desde, desde: alejandose }, { radial: hasta, desde: !!saleAlejandose }],
+  }),
 };
 
 const defEspera: DefManiobra<EvaluacionEspera, ResultadoEspera> = {
