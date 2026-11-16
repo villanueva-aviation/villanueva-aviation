@@ -1,6 +1,9 @@
 import { analizar, invalidez, lectorViejoNav, type Muestra, type Tramo as TramoFuera } from "./evaluador.ts";
 import type { ContextoArmado, ResultadoComun } from "./maniobras.ts";
-import { desvioGrados, generarTramo, norm180, pasoEstacion, puntos, referenciaTramo, tipoDe, type Ejercicio, type TipoTramo, type Tramo } from "./navIfr.ts";
+import {
+  desvioGrados, generarLlegada, generarTramo, LLEGADA_NM, norm180, norm360, pasoEstacion, puntos, referenciaTramo, tipoDe, type Ejercicio, type Llegada,
+  type TipoTramo, type Tramo,
+} from "./navIfr.ts";
 import { tolInterceptacion, type Nivel } from "./nivel.ts";
 import { CONO_NM, conCono, distanciaVor, type VorElegido } from "./vorSim.ts";
 
@@ -45,6 +48,8 @@ export interface ResultadoInterceptacion extends ResultadoComun {
   dmeFin?: number | null;
   /** Lo que contestó: null si no contestó (falta en los intentos de antes del vuelo encadenado). */
   dicho?: TipoTramo | null;
+  /** Lección 5: la llegada que se sorteó y se autorizó en este tramo; el arco y la espera la leen de aquí. */
+  llegada?: Llegada;
   /** Lo más que se pasó al otro lado después del cruce, en puntos. */
   sobrepaso: number;
   /** El tramo más largo quedándose corto, s. */
@@ -94,6 +99,12 @@ export interface EvaluacionInterceptacion {
   cercaDesde: number | null;
   /** La altitud de la lección; sin ella, el aviso usa la del inicio del tramo. */
   altitudFt?: number;
+  /** Lección 5: el tramo es la interceptación de una llegada (sin pregunta, termina antes del arco). */
+  paraLlegada: boolean;
+  /** Lección 5: la llegada anterior, para no repetir la entrada de la espera. */
+  anterior?: Llegada;
+  /** Lección 5: la llegada sorteada a las 15 NM. */
+  llegada?: Llegada;
 }
 
 const anular = (e: EvaluacionInterceptacion, m: Muestra, motivo: string): EvaluacionInterceptacion => ({ ...e, fase: "invalido", motivo, previo: m });
@@ -115,8 +126,18 @@ function vacia(m: Muestra, nivel: Nivel, tramo: Tramo, ctx: ContextoArmado): Eva
     fase: "esperando", nivel, tramo, ejercicio: null, vor: ctx.vor, estacion: ctx.estacion, examen: ctx.examen, inicio: m, previo: m, signo: 1, cruce: null,
     pasado: [], corto: { desde: null, tramos: [], max: 0 }, angulos: [], sinSenalDesde: null, muestras: [], preguntar: false, dicho: undefined,
     medirDesde: null, atraves: false, finNm: null, lado: false, minDist: null, cercaDesde: null,
-    altitudFt: ctx.altitudFt,
+    altitudFt: ctx.altitudFt, paraLlegada: ctx.llegadas !== undefined, anterior: ctx.llegadas?.at(-1),
   };
+}
+
+/** A la distancia del anuncio: el tramo normal, o en la lección 5 la llegada entera y su R1 acercándose. */
+function arrancar(e: EvaluacionInterceptacion, m: Muestra): EvaluacionInterceptacion {
+  const referencia = referenciaTramo(m, e.estacion);
+  if (!e.paraLlegada) return empezar(e, m, generarTramo(e.tramo, referencia));
+  const llegada = generarLlegada(referencia, e.altitudFt ?? Math.round(m.altitud / 100) * 100, e.anterior);
+  const r1 = llegada.r1;
+  const n = empezar({ ...e, llegada }, m, { tipo: "normal", radial: r1, desde: false, curso: norm360(r1 + 180), referencia });
+  return { ...n, preguntar: false };
 }
 
 /** Empieza el tramo con su ejercicio: la pregunta queda pendiente. */
@@ -139,18 +160,18 @@ export function iniciarInterceptacion(m0: Muestra, nivel: Nivel, ejercicio: Ejer
 }
 
 export function armarInterceptacion(m0: Muestra, nivel: Nivel = 2, ctx: ContextoArmado = { intento: 0, examen: false }): EvaluacionInterceptacion {
-  const tramo = ctx.tramos?.[ctx.intento] ?? { desde: true, tipo: "normal" };
+  const tramo: Tramo = ctx.llegadas !== undefined ? { desde: false, tipo: "normal", esperarNm: LLEGADA_NM } : (ctx.tramos?.[ctx.intento] ?? { desde: true, tipo: "normal" });
   const m = conCono(m0, ctx.estacion);
   // El primero se dijo en tierra; si desde donde va ya no es del tipo que toca (VOR lejos de la pista, despegue por
   // otra cabecera), se sortea otro y la orden de armado lo dice.
-  const p = ctx.intento === 0 ? ctx.primero : undefined;
+  const p = ctx.intento === 0 && ctx.llegadas === undefined ? ctx.primero : undefined;
   if (p && tipoDe(p.radial, referenciaTramo(m, ctx.estacion)) === p.tipo) return iniciarInterceptacion(m0, nivel, p, ctx);
   const e = vacia(m, nivel, tramo, ctx);
   const motivo = motivoAlArmar(m);
   if (motivo) return anular(e, m, motivo);
   const dist = distanciaTramo(e, m);
-  if (tramo.esperarNm !== undefined && dist !== null && dist < tramo.esperarNm) return e;
-  return empezar(e, m, generarTramo(tramo, referenciaTramo(m, ctx.estacion)));
+  if (tramo.esperarNm !== undefined && (dist === null || dist < tramo.esperarNm)) return e;
+  return arrancar(e, m);
 }
 
 export function armarSoloInterceptacion(e: EvaluacionInterceptacion | null, m: Muestra): boolean {
@@ -178,7 +199,7 @@ export function avanzarInterceptacion(e: EvaluacionInterceptacion, crudo: Muestr
   if (e.fase === "esperando") {
     const dist = distanciaTramo(e, m);
     if (!m.navSenal || dist === null || dist < (e.tramo.esperarNm ?? 0)) return { ...e, previo: m };
-    return empezar(e, m, generarTramo(e.tramo, referenciaTramo(m, e.estacion)));
+    return arrancar(e, m);
   }
 
   const muestras = [...e.muestras, m];
@@ -201,7 +222,8 @@ export function avanzarInterceptacion(e: EvaluacionInterceptacion, crudo: Muestr
   }
   const midiendo = n.medirDesde !== null && m.t >= n.medirDesde;
 
-  // El fin del tramo.
+  // El fin del tramo. Lección 5: una milla antes del arco, establecido o no.
+  if (e.llegada && dist !== null && dist <= e.llegada.arco.radioNm + 1) return terminar({ ...n, corto: cerrarCorto(n.corto) }, dist);
   if (ej.desde) {
     if (dist !== null && n.finNm !== null && dist >= n.finNm) return terminar(n, dist);
   } else if (midiendo) {
@@ -278,7 +300,7 @@ function terminar(e: EvaluacionInterceptacion, dist: number | null): EvaluacionI
   const angulo = e.angulos.length >= 10 ? e.angulos.reduce((a, b) => a + b, 0) / e.angulos.length : null;
   const dicho = e.dicho ?? null;
   const fuera: Record<CampoInterceptacion, TramoFuera[]> = {
-    identificar: dicho === ej.tipo ? [] : [{ inicio: e.inicio.t, fin, peor: 1 }],
+    identificar: e.llegada || dicho === ej.tipo ? [] : [{ inicio: e.inicio.t, fin, peor: 1 }],
     interceptar: e.cruce ? [] : [{ inicio: e.inicio.t, fin, peor: fin - e.inicio.t }],
     sobrepaso: pasado.tramos,
     corto: e.corto.tramos,
@@ -304,6 +326,7 @@ function terminar(e: EvaluacionInterceptacion, dist: number | null): EvaluacionI
     dmeCruce: e.cruce?.navDme ?? null,
     dmeFin: dist,
     dicho,
+    ...(e.llegada ? { llegada: e.llegada } : {}),
     sobrepaso,
     cortoSeg: e.corto.max,
     angulo,

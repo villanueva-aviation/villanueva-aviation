@@ -69,7 +69,7 @@ import {
   type PasoFamiliarizacion,
 } from "./textosFamiliarizacion.ts";
 import { tolInterceptacion } from "./nivel.ts";
-import type { DatosEspera, Ejercicio, Tramo } from "./navIfr.ts";
+import type { DatosEspera, Ejercicio, Llegada, Tramo } from "./navIfr.ts";
 import type { Giros } from "../entrenador/esperas.ts";
 import type { VorElegido } from "./vorSim.ts";
 import {
@@ -127,6 +127,8 @@ export interface ContextoArmado {
   llegada?: number;
   /** Lección 4: el radial de salida del primer ejercicio, ya dicho en tierra (con `llegada`). */
   salida?: number;
+  /** Lección 5: las llegadas ya sorteadas, en orden; presente, aunque esté vacío, solo en la 5. */
+  llegadas?: Llegada[];
 }
 
 /** IFR: lo que el mapa del debriefing dibuja de cada intento (rumbos magnéticos). */

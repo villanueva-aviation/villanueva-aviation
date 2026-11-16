@@ -5,20 +5,22 @@ import {
 import type { Linea } from "./explicacion.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
 import { distanciaConsejo, norm180, type Ejercicio, type TipoTramo } from "./navIfr.ts";
+import { autorizacionLlegada } from "./textosLlegada.ts";
 import { tolInterceptacion, type Nivel } from "./nivel.ts";
 import { ANULADO, luz, REPETIR_IFR_SEG, type Aviso, type Luz } from "./voz.ts";
 
 // Qué dice el instructor en un tramo de las lecciones IFR 1 y 2 (spec 2026-11-13). Puro.
 // La instrucción nunca dice si es normal o ruta pasada: eso lo contesta el cadete.
 
-/** `intercepta`: todavía no contesta; `respondida`: ya contestó y no ha cruzado el radial. */
-export type PasoInterceptacion = "espera" | "intercepta" | "respondida" | "manten" | "terminado" | "invalido";
+/** `intercepta`: todavía no contesta; `respondida`: ya contestó y no ha cruzado el radial; `autorizada`: lección 5, sin pregunta. */
+export type PasoInterceptacion = "espera" | "intercepta" | "autorizada" | "respondida" | "manten" | "terminado" | "invalido";
 
 export function pasoInterceptacion(e: EvaluacionInterceptacion | null, _m: Muestra | null): PasoInterceptacion | null {
   if (!e) return null;
   if (e.fase === "terminado" || e.fase === "invalido") return e.fase;
   if (e.fase === "esperando") return "espera";
   if (e.fase === "establecido") return "manten";
+  if (e.llegada) return "autorizada";
   return e.dicho === undefined ? "intercepta" : "respondida";
 }
 
@@ -63,24 +65,28 @@ function respuesta(e: EvaluacionInterceptacion, idioma: Idioma): string | null {
   return en ? `It's a normal intercept: the ${R} is ${g} degrees away, ahead of you.` : `Es normal: el ${R} queda a ${g}°, adelante de ti.`;
 }
 
-function texto(paso: PasoInterceptacion, e: EvaluacionInterceptacion | null, idioma: Idioma): string {
+export function textoInterceptacion(paso: PasoInterceptacion, e: EvaluacionInterceptacion | null, idioma: Idioma): string {
   const en = idioma === "en";
   if (!e) return "";
   const ej = e.ejercicio;
   switch (paso) {
     case "espera": {
       const nm = e.tramo.esperarNm ?? 3;
+      if (e.paraLlegada) return en ? `Keep flying outbound; at ${nm} miles I'll give you the arrival.` : `Sigue alejándote; a las ${nm} millas te doy la llegada.`;
       return en ? `Keep going outbound; at ${nm} miles I'll give you the next radial.` : `Sigue alejándote; a las ${nm} millas te doy el siguiente radial.`;
     }
     case "intercepta":
+    case "autorizada":
     case "respondida": {
       if (!ej) return "";
+      if (e.llegada) return autorizacionLlegada(e.llegada, e.vor, idioma);
       const orden = instruccionTramo(ej, e.vor, idioma, false);
       // El examen va sin consejos (spec).
       const lugar = !e.examen && e.inicio.navTieneDme ? distanciaConsejo(e.inicio.navDme ?? 10) : null;
       return lugar ? `${orden} ${CONSEJO[idioma][lugar]}` : orden;
     }
     case "manten": {
+      if (e.llegada) return en ? "Needle centered: hold it there until the arc." : "Barra centrada: mantenla así hasta el arco.";
       if (ej && !ej.desde) return en ? "Needle centered: hold it there until you pass the VOR." : "Barra centrada: mantenla así hasta pasar el VOR.";
       const nm = Math.round(e.finNm ?? 8);
       return en ? `Needle centered: hold it there until ${nm} miles.` : `Barra centrada: mantenla hasta las ${nm} millas.`;
@@ -96,13 +102,13 @@ function texto(paso: PasoInterceptacion, e: EvaluacionInterceptacion | null, idi
 export function ordenInterceptacion(antes: PasoInterceptacion | null, ahora: PasoInterceptacion | null, e: EvaluacionInterceptacion | null, idioma: Idioma): string | null {
   if (!ahora || ahora === antes || ahora === "terminado") return null;
   if (ahora === "respondida") return e ? respuesta(e, idioma) : null;
-  return texto(ahora, e, idioma) || null;
+  return textoInterceptacion(ahora, e, idioma) || null;
 }
 
 /** En pantalla la pregunta se queda mientras no conteste. */
 export function textoPasoInterceptacion(paso: PasoInterceptacion | null, e: EvaluacionInterceptacion | null, idioma: Idioma): string {
   if (!paso || paso === "invalido") return "";
-  const t = texto(paso, e, idioma);
+  const t = textoInterceptacion(paso, e, idioma);
   return paso === "intercepta" ? `${t} ${PREGUNTA_TIPO[idioma]}` : t;
 }
 
@@ -110,7 +116,7 @@ const PASOS: PasoInterceptacion[] = ["intercepta", "manten"];
 const NOMBRE_PASO: Record<Idioma, string[]> = { es: ["Intercepta el radial", "Mantén la barra centrada"], en: ["Intercept the radial", "Keep the needle centered"] };
 
 export function listaPasosInterceptacion(paso: PasoInterceptacion | null, idioma: Idioma): { nombre: string; estado: "hecho" | "actual" | "pendiente" }[] {
-  const actual = paso === "terminado" ? PASOS.length : paso === "respondida" ? 0 : paso ? PASOS.indexOf(paso) : -1;
+  const actual = paso === "terminado" ? PASOS.length : paso === "respondida" || paso === "autorizada" ? 0 : paso ? PASOS.indexOf(paso) : -1;
   return PASOS.map((_, k) => ({ nombre: NOMBRE_PASO[idioma][k], estado: actual < 0 ? "pendiente" : k < actual ? "hecho" : k === actual ? "actual" : "pendiente" }));
 }
 
@@ -121,6 +127,8 @@ export function queHacerInterceptacion(paso: PasoInterceptacion | null, idioma: 
     return en
       ? "Compare the radial with yours: within 90 degrees it's a normal intercept, beyond 90 a passed route. Say which one."
       : "Compara el radial con el tuyo: a menos de 90° es normal, a más es ruta pasada. Dilo en voz alta.";
+  if (paso === "autorizada")
+    return en ? "Fly the clearance: intercept the inbound radial before the arc." : "Vuela la autorización: intercepta el radial de acercamiento antes del arco.";
   if (paso === "respondida") return en ? "Follow the steps of the HSI guide." : "Sigue los pasos de la guía del HSI.";
   if (paso === "manten") return en ? "Small heading corrections to keep the needle centered." : "Correcciones pequeñas de rumbo para mantener la barra centrada.";
   return "";
