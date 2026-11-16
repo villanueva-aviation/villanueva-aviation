@@ -173,6 +173,8 @@ export interface EstadoRepaso {
   vor: VorElegido | null;
   /** IFR: desde cuándo no hay señal del VOR en maniobra. */
   sinSenalDesde: number | null;
+  /** IFR: cuándo se dijo por última vez qué falta para recibir el VOR. */
+  avisoSenalT?: number;
   /** IFR: ya se dijo en tierra qué sintonizar; al despegar solo se recuerda. */
   instruido?: boolean;
   /** El avión de la lección, del título del simulador al empezar. */
@@ -229,6 +231,9 @@ const T = {
     recuerda: (mhz: string, id: string) => `Recuerda: ${id} en NAV1, ${mhz}. Arriba de 1,000 pies sobre el terreno empezamos.`,
     conSenal: (id: string) => `Tenemos señal de ${id}. Primer ejercicio.`,
     sinSenal: (id: string) => `Perdí la señal de ${id}: revisa NAV1 o acércate al VOR.`,
+    faltaFrecuencia: (mhz: string, id: string) => `Todavía no recibo ${id}: sintoniza ${mhz} en NAV1.`,
+    faltaNav: (id: string) => `La barra está en GPS: pásala a NAV para recibir ${id}.`,
+    faltaAlcance: (id: string) => `Todavía no recibo ${id} en NAV1: acércate al VOR.`,
     devueltaSenal: (id: string) => `Señal de ${id} de vuelta. Seguimos.`,
     siguienteIfr: "Siguiente ejercicio.",
   },
@@ -254,6 +259,9 @@ const T = {
     recuerda: (mhz: string, id: string) => `Remember: ${id} on NAV1, ${mhz}. We start above 1,000 feet above the ground.`,
     conSenal: (id: string) => `We have ${id}. First exercise.`,
     sinSenal: (id: string) => `I lost ${id}: check NAV1 or get closer to the VOR.`,
+    faltaFrecuencia: (mhz: string, id: string) => `I'm not receiving ${id} yet: tune ${mhz} on NAV1.`,
+    faltaNav: (id: string) => `The needle is on GPS: switch it to NAV to get ${id}.`,
+    faltaAlcance: (id: string) => `I'm not receiving ${id} on NAV1 yet: get closer to the VOR.`,
     devueltaSenal: (id: string) => `${id} is back. Let's continue.`,
     siguienteIfr: "Next exercise.",
   },
@@ -306,6 +314,13 @@ export const crearRepaso = (modo: Modo, sorteo: ManiobraId[], nivel: Nivel = 3, 
 /** IFR: hay señal del VOR de la lección en NAV1 (o está en el cono, encima de él) y la barra es del VOR, no del GPS. */
 export const conSenal = (m: Muestra, vor: VorElegido) => !!conCono(m, vor).navSenal && !m.gpsNav && m.navMhz !== undefined && Math.abs(m.navMhz - vor.mhz) < 0.03;
 
+/** IFR sin señal en el aire: qué falta, cada `AVISO_SENAL_SEG` (14/11: 3 min de ascenso sin saber por qué no empezaba). */
+const AVISO_SENAL_SEG = 30;
+const faltaSenal = (t: (typeof T)["es"], m: Muestra, vor: VorElegido) =>
+  m.navMhz === undefined || Math.abs(m.navMhz - vor.mhz) >= 0.03
+    ? t.faltaFrecuencia(vor.mhz.toFixed(2), vor.ident)
+    : m.gpsNav ? t.faltaNav(vor.ident) : t.faltaAlcance(vor.ident);
+
 /** IFR: el VOR se elige en la rampa o, a más tardar, en la salida. */
 export function ponerVor(e: EstadoRepaso, v: VorElegido): EstadoRepaso {
   if (e.etapa !== "rampa" && e.etapa !== "salida") return e;
@@ -356,7 +371,7 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
   if (aterrizo) tomas = { ...tomas, tocoEnPista: vuelo.aeropuerto ? aterrizo.pista != null : null };
 
   let etapa: EtapaRepaso = e.etapa;
-  let { zona, motivo, sinSenalDesde } = e;
+  let { zona, motivo, sinSenalDesde, avisoSenalT } = e;
   const decir: string[] = [];
   const circuitos = deCircuitos(e);
   const piso = pisoZona(e.sorteo[e.actual]);
@@ -375,6 +390,9 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
         motivo = undefined;
         sinSenalDesde = null;
         decir.push(t.conSenal(vor.ident));
+      } else if (m.agl >= PISO_IFR_AGL && !m.enTierra && m.t - (avisoSenalT ?? -Infinity) >= AVISO_SENAL_SEG) {
+        decir.push(faltaSenal(t, m, vor));
+        avisoSenalT = m.t;
       }
     } else if (etapa === "maniobra" && vor) {
       if (senal) sinSenalDesde = null;
@@ -383,12 +401,16 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
         if (m.t - sinSenalDesde > SIN_SENAL_SEG) {
           etapa = "fuera-de-zona";
           decir.push(t.sinSenal(vor.ident));
+          avisoSenalT = m.t;
         }
       }
     } else if (etapa === "fuera-de-zona" && vor && senal) {
       etapa = "maniobra";
       sinSenalDesde = null;
       decir.push(t.devueltaSenal(vor.ident));
+    } else if (etapa === "fuera-de-zona" && vor && !m.enTierra && m.t - (avisoSenalT ?? -Infinity) >= AVISO_SENAL_SEG) {
+      decir.push(faltaSenal(t, m, vor));
+      avisoSenalT = m.t;
     }
   } else if (etapa === "rampa" && circuitos) {
     // Se arma en la carrera para medir la rotación.
@@ -426,7 +448,7 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
   // En los circuitos cada toque es parte de la maniobra; detenerse en la pista sí termina.
   if (etapa !== "regreso" && (circuitos ? vuelo.fase === "rodaje-regreso" : aterrizo)) etapa = "regreso";
   if (vuelo.fase === "terminado") etapa = "terminado";
-  return { estado: { ...e, etapa, zona, motivo, vuelo, tomas, sinSenalDesde }, decir };
+  return { estado: { ...e, etapa, zona, motivo, vuelo, tomas, sinSenalDesde, avisoSenalT }, decir };
 }
 
 function avanzarManiobra(e: EstadoRepaso, idioma: Idioma): Paso {

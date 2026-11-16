@@ -492,3 +492,23 @@ test("VFR con altitud elegida: la primera maniobra no se arma mientras todavía 
   const llega = correr(crearRepaso("practica", [...SORTEO], 3, "vfr", techo), simularVuelo());
   assert.ok(llega.etapas.includes("maniobra"), llega.etapas.join(" "));
 });
+
+test("IFR: arriba de 1,000 ft sin señal, cada 30 s dice qué falta: la frecuencia o la barra en GPS", () => {
+  const otra = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr"), VOR), vueloIfr(113.1).slice(0, 2600));
+  const freq = otra.decir.filter((d) => d === "Todavía no recibo GDL: sintoniza 117.50 en NAV1.");
+  assert.ok(freq.length >= 2, otra.decir.join(" | "));
+  const ms = vueloIfr(113.1);
+  const t1 = ms.find((m) => !m.enTierra && m.agl >= 1000)!.t;
+  // Ni antes de los 1,000 pies ni más de una vez cada 30 s.
+  let e = ponerVor(crearRepaso("practica", IFR, 2, "ifr"), VOR);
+  const tiempos: number[] = [];
+  for (const m of ms.slice(0, 2600)) {
+    const p = alMuestrearRepaso(e, m, A, "es", () => 0);
+    e = p.estado;
+    if (p.decir.some((d) => d.startsWith("Todavía no recibo"))) tiempos.push(m.t);
+  }
+  assert.ok(tiempos[0] >= t1, `${tiempos[0]} < ${t1}`);
+  for (let i = 1; i < tiempos.length; i++) assert.ok(tiempos[i] - tiempos[i - 1] >= 30, tiempos.join(", "));
+  const gps = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr"), VOR), vueloIfr().map((m) => ({ ...m, gpsNav: true })).slice(0, 2600), { idioma: "en" });
+  assert.ok(gps.decir.includes("The needle is on GPS: switch it to NAV to get GDL."), gps.decir.join(" | "));
+});

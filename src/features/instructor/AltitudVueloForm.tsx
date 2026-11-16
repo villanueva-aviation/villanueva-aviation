@@ -46,9 +46,14 @@ export function AltitudVueloForm({
           {t.sugerida}
         </button>
       </div>
-      <p className={fuera ? "text-red-300" : "text-white/60"}>{fuera ? t.fuera(rangoTexto) : rangoTexto}</p>
-      {rango.sinAeropuerto && <p className="text-white/60">{t.sinAeropuerto}</p>}
-      {valor === null && <p className="text-gold-300">{t.obligatoria}</p>}
+      {rango.sinAeropuerto ? (
+        <p className="text-gold-300">{t.sinAeropuerto}</p>
+      ) : (
+        <>
+          <p className={fuera ? "text-red-300" : "text-white/60"}>{fuera ? t.fuera(rangoTexto) : rangoTexto}</p>
+          {valor === null && <p className="text-gold-300">{t.obligatoria}</p>}
+        </>
+      )}
     </section>
   );
 }
