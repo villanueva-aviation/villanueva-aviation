@@ -226,7 +226,8 @@ const T = {
       inicio ? `Circuito ${k} de ${n}.` : `Circuito ${k} de ${n}: potencia completa y despega${k === n ? "; este termina con aterrizaje completo" : ""}.`,
     finCircuitos: "Terminamos los circuitos. Sal de la pista y rueda a la plataforma.",
     eligeVor: "Elige un VOR.",
-    sintoniza: (mhz: string, id: string) => `Sintoniza ${mhz} en NAV1, ${id}. Arriba de 1,000 pies sobre el terreno empezamos.`,
+    sintoniza: (mhz: string, id: string, altitudFt?: number) =>
+      `Sintoniza ${mhz} en NAV1, ${id}${altitudFt !== undefined ? `, y sube a ${altitudFt.toLocaleString("en-US")} pies` : ""}. Arriba de 1,000 pies sobre el terreno empezamos.`,
     sintonizaRampa: (mhz: string, id: string) => `Sintoniza ${id}, ${mhz}, en NAV1, con la barra en NAV.`,
     recuerda: (mhz: string, id: string) => `Recuerda: ${id} en NAV1, ${mhz}. Arriba de 1,000 pies sobre el terreno empezamos.`,
     conSenal: (id: string) => `Tenemos señal de ${id}. Primer ejercicio.`,
@@ -254,7 +255,8 @@ const T = {
       inicio ? `Pattern ${k} of ${n}.` : `Pattern ${k} of ${n}: full power and take off${k === n ? "; this one ends with a full-stop landing" : ""}.`,
     finCircuitos: "We're done with the patterns. Exit the runway and taxi to the ramp.",
     eligeVor: "Pick a VOR.",
-    sintoniza: (mhz: string, id: string) => `Tune ${mhz} on NAV1, ${id}. We start above 1,000 feet above the ground.`,
+    sintoniza: (mhz: string, id: string, altitudFt?: number) =>
+      `Tune ${mhz} on NAV1, ${id}${altitudFt !== undefined ? `, and climb to ${altitudFt.toLocaleString("en-US")} feet` : ""}. We start above 1,000 feet above the ground.`,
     sintonizaRampa: (mhz: string, id: string) => `Tune ${id}, ${mhz}, on NAV1, with the needle on NAV.`,
     recuerda: (mhz: string, id: string) => `Remember: ${id} on NAV1, ${mhz}. We start above 1,000 feet above the ground.`,
     conSenal: (id: string) => `We have ${id}. First exercise.`,
@@ -381,7 +383,8 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
     const senal = !!vor && conSenal(m, vor);
     if (etapa === "rampa" && nuevos.some((x) => x.tipo === "despegue")) {
       etapa = "salida";
-      if (vor) decir.push((e.instruido ? t.recuerda : t.sintoniza)(vor.mhz.toFixed(2), vor.ident));
+      // Sin instrucción en tierra (sin checklist de «Antes del despegue»), la altitud se dice aquí (15/11: nunca se dijo).
+      if (vor) decir.push(e.instruido ? t.recuerda(vor.mhz.toFixed(2), vor.ident) : t.sintoniza(vor.mhz.toFixed(2), vor.ident, e.altitudFt));
       else motivo = t.eligeVor;
     } else if (etapa === "salida") {
       if (!vor) motivo = t.eligeVor;

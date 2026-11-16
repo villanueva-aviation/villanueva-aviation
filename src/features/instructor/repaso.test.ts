@@ -512,3 +512,10 @@ test("IFR: arriba de 1,000 ft sin señal, cada 30 s dice qué falta: la frecuenc
   const gps = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr"), VOR), vueloIfr().map((m) => ({ ...m, gpsNav: true })).slice(0, 2600), { idioma: "en" });
   assert.ok(gps.decir.includes("The needle is on GPS: switch it to NAV to get GDL."), gps.decir.join(" | "));
 });
+
+test("IFR sin instrucción en tierra: al despegar, «Sintoniza…» también dice la altitud elegida", () => {
+  const es = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr", 9000), VOR), vueloIfr().slice(0, 2600));
+  assert.ok(es.decir.includes("Sintoniza 117.50 en NAV1, GDL, y sube a 9,000 pies. Arriba de 1,000 pies sobre el terreno empezamos."), es.decir.join(" | "));
+  const en = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr", 9000), VOR), vueloIfr().slice(0, 2600), { idioma: "en" });
+  assert.ok(en.decir.includes("Tune 117.50 on NAV1, GDL, and climb to 9,000 feet. We start above 1,000 feet above the ground."), en.decir.join(" | "));
+});
