@@ -335,7 +335,7 @@ const n180 = (g: number) => ((((g + 180) % 360) + 360) % 360) - 180;
 const enXY = (t: number, x: number, y: number, rumbo: number, kt: number): Muestra => ({ ...en(t, radialDe(x, y), rumbo, Math.hypot(x, y)), velocidad: kt });
 
 /** Ruta pasada de acercamiento volada como dice la tarjeta (regla de 1 minuto), desde 8 NM en el R-290. */
-function unMinuto(radial: number, kt: number): EvaluacionInterceptacion {
+function unMinuto(radial: number, kt: number, seguido = false): EvaluacionInterceptacion {
   const gs = kt / 3600;
   let [x, y, rumbo, t] = [8 * Math.sin((290 * Math.PI) / 180), 8 * Math.cos((290 * Math.PI) / 180), 290, 0];
   const ej: Ejercicio = { tipo: "pasada", radial, desde: false, curso: (radial + 180) % 360, referencia: 290 };
@@ -344,6 +344,7 @@ function unMinuto(radial: number, kt: number): EvaluacionInterceptacion {
   while (e.fase !== "terminado" && e.fase !== "invalido" && t < 2000) {
     const r = radialDe(x, y);
     if (fase === "vira" && Math.abs(n180(r - (radial + 180))) >= 90) [fase, reloj] = ["minuto", t];
+    else if (fase === "minuto" && t - reloj >= 60 && seguido) fase = "adentro";
     else if (fase === "minuto" && t - reloj >= 60) [fase, meta] = ["corta", (radial - 90 * Math.sign(n180(r - radial)) + 360) % 360];
     else if (fase === "corta" && Math.abs(n180(r - radial)) <= 10) [fase, meta] = ["adentro", (radial + 180) % 360];
     else if (fase === "adentro") meta = (radial + 180 + Math.max(-30, Math.min(30, 3 * n180(r - radial))) + 360) % 360;
@@ -402,4 +403,12 @@ test("el ángulo ideal depende del tramo: 30° normal, 45° ruta pasada alejánd
   const pasada = { ...r, ejercicio: { ...r.ejercicio, tipo: "pasada" as const }, notas: ["angulo" as const], angulo: 60 };
   assert.ok(explicarInterceptacion(pasada, "es").some((l) => l.texto === "Interceptaste con unos 60°: lo ideal es 45°."));
   assert.ok(explicarInterceptacion(pasada, "en").some((l) => l.texto === "You intercepted at about 60 degrees: 45 is the target."));
+});
+
+test("ruta pasada de acercamiento: volver con un viraje seguido se vale, no es nota de ángulo (Erik, 2026-11-15)", () => {
+  for (const radial of [130, 150, 170]) {
+    const e = unMinuto(radial, 90, true);
+    assert.equal(e.fase, "terminado", `R-${radial}: ${e.motivo}`);
+    assert.ok(!e.resultado!.notas.includes("angulo"), `R-${radial}: ${e.resultado!.angulo}`);
+  }
 });

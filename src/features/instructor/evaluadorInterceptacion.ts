@@ -285,7 +285,9 @@ function terminar(e: EvaluacionInterceptacion, dist: number | null): EvaluacionI
   };
   const notas: Nota[] = [];
   if (!fuera.sobrepaso.length && sobrepaso > T.sobrepasoPuntos / 2) notas.push("sobrepaso");
-  if (angulo !== null && Math.abs(angulo - anguloIdeal(ej)) > T.anguloTol) notas.push("angulo");
+  // Ruta pasada acercándose: volver al curso con un viraje seguido se vale, así que el ángulo no es nota (Erik, 2026-11-15).
+  const midoAngulo = ej.tipo !== "pasada" || ej.desde;
+  if (midoAngulo && angulo !== null && Math.abs(angulo - anguloIdeal(ej)) > T.anguloTol) notas.push("angulo");
   const elementos = Object.fromEntries(CAMPOS_INTERCEPTACION.map((c) => [CODIGO[c], fuera[c].length ? "NS" : "S"])) as Record<string, "S" | "NS">;
   const errores = CAMPOS_INTERCEPTACION.filter((c) => fuera[c].length).length;
   const resultado: ResultadoInterceptacion = {
