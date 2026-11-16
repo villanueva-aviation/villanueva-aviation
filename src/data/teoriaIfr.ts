@@ -3,7 +3,7 @@ import type { Idioma } from "../features/instructor/idiomaInstructor.ts";
 
 // La teoría del programa IFR, la misma que el instructor resume por voz. Erik la revisa antes de publicar.
 
-export type TemaIfr = "interceptacion" | "rutas" | "arcos" | "esperas";
+export type TemaIfr = "interceptacion" | "rutas" | "arcos" | "esperas" | "llegada";
 type Texto = Record<Idioma, string>;
 export interface SeccionTeoria {
   titulo: Texto;
@@ -218,6 +218,39 @@ export const TEORIA_IFR: Record<TemaIfr, { titulo: Texto; secciones: SeccionTeor
         texto: {
           es: "1. Con la instrucción, dibuja la espera: el curso de acercamiento, el sentido de los virajes y el lado de la espera. 2. Antes del fijo, compara tu rumbo con el curso de alejamiento y decide la entrada. 3. En el fijo, vuela la entrada. 4. En cada vuelta: viraje de tasa estándar, un minuto de alejamiento, viraje y acercamiento centrado hasta el fijo.",
           en: "1. From the instruction, picture the hold: the inbound course, the direction of the turns and the holding side. 2. Before the fix, compare your heading with the outbound course and pick the entry. 3. At the fix, fly the entry. 4. On each lap: a standard-rate turn, one minute outbound, a turn and a centered inbound course to the fix.",
+        },
+      },
+    ],
+  },
+  llegada: {
+    titulo: { es: "Llegadas", en: "Arrivals" },
+    secciones: [
+      {
+        titulo: { es: "Qué es una autorización de llegada", en: "What an arrival clearance is" },
+        texto: {
+          es: "Es la ruta completa hasta el VOR en una sola instrucción, como te la daría ATC, y viene en el orden en que se vuela: el radial que interceptas acercándote, el arco DME que tomas y hasta qué radial lo sigues, el acercamiento al VOR y la espera, con su radial, el sentido de los virajes y la altitud.",
+          en: "It is the whole route to the VOR in a single instruction, the way ATC would give it, and it comes in the order you fly it: the radial you intercept inbound, the DME arc you join and the radial you follow it to, the inbound course to the VOR and the hold, with its radial, the direction of the turns and the altitude.",
+        },
+      },
+      {
+        titulo: { es: "Cópiala antes de volarla", en: "Copy it before you fly it" },
+        texto: {
+          es: "Anótala en cuanto la oigas: radial, arco, radial final, espera, virajes y altitud. Si se te fue una parte, pídela otra vez: di «repite» o toca el botón. Es mejor pedirla que volar algo que no te dieron.",
+          en: "Write it down as soon as you hear it: radial, arc, final radial, hold, turns and altitude. If you missed a part, ask for it again: say \"say again\" or tap the button. Asking beats flying something you weren't given.",
+        },
+      },
+      {
+        titulo: { es: "Del arco a la espera", en: "From the arc to the hold" },
+        texto: {
+          es: "Al salir del arco quedas acercándote al VOR por el radial final. Pon su curso en el OBS antes de virar y, ya centrado, compara tu rumbo con el curso de alejamiento de la espera para decidir la entrada. Tienes que tenerla decidida antes de llegar al VOR.",
+          en: "When you leave the arc you are flying inbound to the VOR on the final radial. Set its course on the OBS before the turn and, once centered, compare your heading with the outbound course of the hold to pick the entry. Have it decided before you reach the VOR.",
+        },
+      },
+      {
+        titulo: { es: "En la lección y en el examen", en: "In the lesson and the checkride" },
+        texto: {
+          es: "La práctica son 2 llegadas seguidas: despegas, te alejas y a las 15 millas te doy la primera; al terminar, te alejas otra vez y viene la segunda. El examen es 1 llegada, sin consejos. Cada llegada se aprueba solo si aprueban sus tres partes: la interceptación, el arco y la espera.",
+          en: "Practice is 2 arrivals in a row: you take off, fly outbound and at 15 miles you get the first one; when it ends, you fly outbound again and the second one comes. The checkride is 1 arrival, with no tips. Each arrival passes only if all three parts pass: the intercept, the arc and the hold.",
         },
       },
     ],

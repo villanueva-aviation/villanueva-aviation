@@ -52,3 +52,11 @@ test("el inglés no lleva caracteres del español", () => {
 test("cada dibujo del HSI tiene la barra dentro de la escala", () => {
   for (const t of temas) for (const s of t.secciones) if (s.hsi) assert.ok(s.hsi.desviacion >= -10 && s.hsi.desviacion <= 10, s.titulo.es);
 });
+
+test("la lección 5, la llegada: 4 secciones en español y en inglés", () => {
+  const l = TEORIA_IFR.llegada;
+  assert.equal(l.secciones.length, 4);
+  for (const s of l.secciones) for (const i of ["es", "en"] as const) assert.ok(s.titulo[i] && s.texto[i], s.titulo.es);
+  const todo = l.secciones.map((s) => `${s.titulo.es} ${s.texto.es}`).join(" ");
+  for (const x of ["repite", "2 llegadas", "tres partes", "entrada"]) assert.ok(todo.includes(x), x);
+});
