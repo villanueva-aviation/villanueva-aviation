@@ -135,9 +135,8 @@ export const tolInterceptacion = (n: Nivel = 2) => ({
   cortoSeg: por(n, 60, 30, 20),
   /** Dentro de esto por 30 s: establecido en el radial. */
   establecidoPuntos: por(n, 2, 1, 0.5),
-  /** Ángulo de interceptación: 30° ±10 (fuera es nota, no error). */
-  anguloMin: 20,
-  anguloMax: 40,
+  /** Ángulo de interceptación: el ideal del tramo (`anguloIdeal`) ±10 (fuera es nota, no error). */
+  anguloTol: 10,
 });
 
 /** Velocidad en final del repaso, kt bajo y sobre la de aproximación. */

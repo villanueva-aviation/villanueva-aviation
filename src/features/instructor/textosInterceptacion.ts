@@ -1,6 +1,6 @@
 import type { Muestra } from "./evaluador.ts";
 import {
-  CAMPOS_INTERCEPTACION, desvioPuntos, LIMITE_SEG, type CampoInterceptacion, type EvaluacionInterceptacion, type ResultadoInterceptacion,
+  anguloIdeal, CAMPOS_INTERCEPTACION, desvioPuntos, LIMITE_SEG, type CampoInterceptacion, type EvaluacionInterceptacion, type ResultadoInterceptacion,
 } from "./evaluadorInterceptacion.ts";
 import type { Linea } from "./explicacion.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
@@ -242,7 +242,7 @@ export function explicarInterceptacion(r: ResultadoInterceptacion, idioma: Idiom
       ? `You stopped short: ${Math.round(r.cortoSeg)} s on the course heading with the needle more than one dot off. Keep your intercept heading until the needle comes in.`
       : `Te quedaste corto: ${Math.round(r.cortoSeg)} s con el rumbo del curso y la barra a más de un punto. Mantén el rumbo de interceptación hasta que la barra llegue.`);
   if (r.notas.includes("angulo") && r.angulo !== null)
-    mal(en ? `You intercepted at about ${Math.round(r.angulo)} degrees: 30 is the target.` : `Interceptaste con unos ${Math.round(r.angulo)}°: lo ideal es 30°.`);
+    mal(en ? `You intercepted at about ${Math.round(r.angulo)} degrees: ${anguloIdeal(r.ejercicio)} is the target.` : `Interceptaste con unos ${Math.round(r.angulo)}°: lo ideal es ${anguloIdeal(r.ejercicio)}°.`);
   if (!lineas.length) lineas.push({ tipo: "bien", texto: en ? "Clean intercept: you settled on the radial without overshooting." : "Interceptación limpia: quedaste en el radial sin pasarte." });
   return lineas;
 }

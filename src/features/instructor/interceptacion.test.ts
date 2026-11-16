@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Muestra } from "./evaluador.ts";
 import {
-  armarInterceptacion, avanzarInterceptacion, iniciarInterceptacion, responderTipo, type EvaluacionInterceptacion,
+  anguloIdeal, armarInterceptacion, avanzarInterceptacion, iniciarInterceptacion, responderTipo, type EvaluacionInterceptacion,
 } from "./evaluadorInterceptacion.ts";
 import { tramosDe, type Ejercicio, type TipoTramo } from "./navIfr.ts";
 import type { Nivel } from "./nivel.ts";
@@ -389,4 +389,17 @@ test("el primer tramo dicho en tierra se cambia en el aire si ya no es del tipo 
   // Si sigue siendo normal desde donde va, se queda el que oyó en tierra.
   const igual = armarInterceptacion(en(0, 300, 300), 2, { intento: 0, examen: false, tramos, primero });
   assert.equal(igual.ejercicio!.radial, 330);
+});
+
+test("el ángulo ideal depende del tramo: 30° normal, 45° ruta pasada alejándose, 90° acercándose", () => {
+  const ej = (tipo: TipoTramo, desde: boolean): Ejercicio => ({ tipo, radial: 90, desde, curso: desde ? 90 : 270, referencia: 60 });
+  assert.equal(anguloIdeal(ej("normal", true)), 30);
+  assert.equal(anguloIdeal(ej("normal", false)), 30);
+  assert.equal(anguloIdeal(ej("pasada", true)), 45);
+  assert.equal(anguloIdeal(ej("pasada", false)), 90);
+  // La nota y su texto usan el del tramo: 45° alejándose en una ruta pasada no es nota.
+  const r = volar([...rampa(60, 0, 30), ...quieto(0, 90, 35), FIN]).resultado!;
+  const pasada = { ...r, ejercicio: { ...r.ejercicio, tipo: "pasada" as const }, notas: ["angulo" as const], angulo: 60 };
+  assert.ok(explicarInterceptacion(pasada, "es").some((l) => l.texto === "Interceptaste con unos 60°: lo ideal es 45°."));
+  assert.ok(explicarInterceptacion(pasada, "en").some((l) => l.texto === "You intercepted at about 60 degrees: 45 is the target."));
 });

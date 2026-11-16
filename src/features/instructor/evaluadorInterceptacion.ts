@@ -259,6 +259,12 @@ export function avanzarInterceptacion(e: EvaluacionInterceptacion, crudo: Muestr
 
 const cerrarCorto = (c: EvaluacionInterceptacion["corto"]) => ({ ...c, desde: null });
 
+/**
+ * El ángulo con que se intercepta, según la técnica del tramo: normal, 30° (Deseada, Cabeza y me paso 30);
+ * ruta pasada alejándose, la regla de 45; acercándose, la de 1 minuto y 90° (Erik, 2026-11-15).
+ */
+export const anguloIdeal = (ej: Pick<Ejercicio, "tipo" | "desde">): number => (ej.tipo !== "pasada" ? 30 : ej.desde ? 45 : 90);
+
 /** La salida del arco DME (lección 3) termina establecida, no al pasar el VOR: el arco la cierra con esto. */
 export const cerrarInterceptacion = (e: EvaluacionInterceptacion, m: Muestra): EvaluacionInterceptacion =>
   terminar({ ...e, corto: cerrarCorto(e.corto) }, distanciaTramo(e, m));
@@ -279,7 +285,7 @@ function terminar(e: EvaluacionInterceptacion, dist: number | null): EvaluacionI
   };
   const notas: Nota[] = [];
   if (!fuera.sobrepaso.length && sobrepaso > T.sobrepasoPuntos / 2) notas.push("sobrepaso");
-  if (angulo !== null && (angulo < T.anguloMin || angulo > T.anguloMax)) notas.push("angulo");
+  if (angulo !== null && Math.abs(angulo - anguloIdeal(ej)) > T.anguloTol) notas.push("angulo");
   const elementos = Object.fromEntries(CAMPOS_INTERCEPTACION.map((c) => [CODIGO[c], fuera[c].length ? "NS" : "S"])) as Record<string, "S" | "NS">;
   const errores = CAMPOS_INTERCEPTACION.filter((c) => fuera[c].length).length;
   const resultado: ResultadoInterceptacion = {
