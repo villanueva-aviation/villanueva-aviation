@@ -155,7 +155,8 @@ function Programa({ fundador }: { fundador: boolean }) {
       const sig = c.siguiente;
       if (sig && (!c.sonando || offsetLoop(Date.now(), c.atis!.inicioMs, duracion(c.buffer!)) >= duracion(c.buffer!))) {
         Object.assign(c, sig, { siguiente: null });
-        if (c.sonando) c.radio.reproducir(c.buffer!, offsetLoop(Date.now(), c.atis!.inicioMs, duracion(c.buffer!)));
+        // Cambio de letra en la pausa: la nueva empieza desde el principio, no a media palabra.
+        if (c.sonando) c.radio.reproducir(c.buffer!, 0);
       }
       if (silenciado) apagar(c);
       else if (c.atis?.icao === s.ap.icao) {
