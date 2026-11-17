@@ -3,16 +3,18 @@
 import type { AeropuertoAtis } from "./datos.ts";
 import { textoDePieza, type Pieza } from "./frases.ts";
 import type { Atis } from "./generado.ts";
-import type { Mezcla } from "./radio.ts";
+import { PAUSA_LOOP_SEG, type Mezcla } from "./radio.ts";
 
 const PAUSA_ENTRE_IDIOMAS_SEG = 1.2;
-const COLA_SEG = 2; // silencio al final: la pausa entre repeticiones del loop
 const FUNDIDO_SEG = 0.005; // 5 ms de fundido lineal en cada unión
 const UMBRAL_RECORTE = 10 ** (-45 / 20); // −45 dBFS
 const TREMOLO_HZ = 0.4;
 const RAMPA_SEG = 0.2;
 const CLIC_SEG = 0.03;
-const MAKEUP = 6; // lineal, como makeup=6 de ffmpeg en la muestra 07; ajustar al oído en Task 7
+// El DynamicsCompressorNode ya sube solo (1/fullRangeGain)^0.6: con −24 dB, 8:1 y knee 0 son ~+12.6 dB (×4.3).
+// DRIVE completa el resto hasta el makeup=6 de ffmpeg de la muestra 07 (6 / 4.3 ≈ 1.4) dentro de la curva tanh,
+// sin pasar del rango [−1, 1] del WaveShaper. Afinar al oído de Erik.
+export const DRIVE = 1.4;
 const VOLUMEN_CLIC = 0.25; // ponytail: a ojo, ajustar al oído en Task 7
 
 // Pausa tras una pieza según la puntuación final de su texto hablado.
@@ -81,7 +83,7 @@ export async function cargarAudio(ctx: AudioContext, atis: Atis, aeropuertos: Ae
   // La última pieza no lleva pausa: entre vueltas quedan exactamente los 2 s de cola.
   if (tramos.length) tramos[tramos.length - 1].pausa = 0;
 
-  const total = tramos.reduce((s, t) => s + t.muestras.length + Math.round(t.pausa * sr), 0) + Math.round(COLA_SEG * sr);
+  const total = tramos.reduce((s, t) => s + t.muestras.length + Math.round(t.pausa * sr), 0) + Math.round(PAUSA_LOOP_SEG * sr);
   const buffer = ctx.createBuffer(1, total, sr);
   const salida = buffer.getChannelData(0);
   const nFundido = Math.round(FUNDIDO_SEG * sr);
@@ -141,16 +143,16 @@ export class RadioAtis {
 
   constructor(ctx: AudioContext) {
     this.ctx = ctx;
-    // Voz: 2× pasa-altos 300, 2× pasa-bajos 3000, compresor, makeup, tanh, voz, trémolo.
+    // Voz: 2× pasa-altos 300, 2× pasa-bajos 3000, compresor (con su makeup automático), tanh con DRIVE, voz, trémolo.
     this.entrada = filtro(ctx, "highpass", 300);
     const compresor = new DynamicsCompressorNode(ctx, { threshold: -24, ratio: 8, attack: 0.003, release: 0.06, knee: 0 });
     const tanh = new WaveShaperNode(ctx, {
-      curve: Float32Array.from({ length: 1024 }, (_, i) => Math.tanh((i / 1023) * 2 - 1)),
+      curve: Float32Array.from({ length: 1024 }, (_, i) => Math.tanh(DRIVE * ((i / 1023) * 2 - 1))),
     });
     this.voz = new GainNode(ctx, { gain: 0 });
     this.tremolo = new GainNode(ctx, { gain: 1 });
     const voz = [this.entrada, filtro(ctx, "highpass", 300), filtro(ctx, "lowpass", 3000), filtro(ctx, "lowpass", 3000),
-      compresor, new GainNode(ctx, { gain: MAKEUP }), tanh, this.voz, this.tremolo];
+      compresor, tanh, this.voz, this.tremolo];
     cadena(...voz, ctx.destination);
 
     // LFO de 0.4 Hz sumado a la ganancia base del trémolo.

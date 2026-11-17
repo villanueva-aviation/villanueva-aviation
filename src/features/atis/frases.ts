@@ -48,6 +48,7 @@ const FIJAS: Record<string, [string, string | null]> = {
   "f-y": ["y", "and"],
   "f-visibilidad": ["Visibilidad,", "Visibility,"],
   "f-millas": ["millas.", "miles."],
+  "f-milla": ["una milla.", "one mile."], // 1 SM: lleva el número, como f-medio
   "f-o-mas": ["millas o más.", "miles or more."],
   "f-cuarto": ["un cuarto de milla.", "one quarter mile."],
   "f-medio": ["media milla.", "one half mile."],

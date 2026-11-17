@@ -10,7 +10,7 @@ REQUISITOS
 - Windows 10 u 11 de 64 bits.
 - Microsoft Flight Simulator 2020.
 - Las librerías de SimConnect en tu PC. Si ya usas SimHub o MobiFlight,
-  ya las tienes. Si no, instala el SDK de MSFS (gratis, oficial):
+  ya las tienes. Si no, instala el SDK de MSFS (gratis, de Microsoft):
     1. En MSFS: Opciones > General > Desarrolladores > Modo desarrollador: Activado.
     2. Arriba aparece una barra. Abre Help > SDK Installer (Core) y descárgalo.
     3. Instálalo con las opciones de siempre (queda en C:\MSFS SDK).

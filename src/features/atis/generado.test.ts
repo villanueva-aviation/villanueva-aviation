@@ -151,6 +151,23 @@ test("cielo despejado y visibilidad en fracción", () => {
   assert.equal(parte(a, "visibilidad", "en")?.texto, "Visibility, one half mile.");
 });
 
+test("visibilidad en texto con fracción: igual que el número", () => {
+  const vis = (visib: Metar["visib"]) => parte(armarAtisMx({ ...metar, visib }, ap), "visibilidad");
+  assert.deepEqual(vis("1/2"), vis(0.5));
+  assert.equal(vis("1/2")?.texto, "Visibilidad, media milla.");
+  assert.equal(vis("3/4")?.texto, "Visibilidad, tres cuartos de milla.");
+  assert.deepEqual([vis("1 1/2")?.texto, vis("1 1/2")?.soloTexto], ["1 1/2 SM", true]);
+});
+
+test("una milla, en singular", () => {
+  const a = armarAtisMx({ ...metar, visib: 1 }, ap);
+  assert.equal(parte(a, "visibilidad")?.texto, "Visibilidad, una milla.");
+  assert.equal(parte(a, "visibilidad", "en")?.texto, "Visibility, one mile.");
+  assert.deepEqual(claves(parte(a, "visibilidad")), ["f-visibilidad", "f-milla"]);
+  assert.deepEqual(parte(armarAtisMx({ ...metar, visib: "1" }, ap), "visibilidad"), parte(a, "visibilidad"));
+  assert.ok(todasLasPiezas([ap]).some((p) => p.idioma === "en" && p.clave === "f-milla"));
+});
+
 test("letraDe: misma hora, misma letra; Z vuelve a A", () => {
   assert.equal(letraDe(obsD), "D");
   assert.equal(letraDe(obsD + 59 * 60), "D");

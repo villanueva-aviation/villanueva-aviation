@@ -7,13 +7,12 @@ import type { AeropuertoAtis } from "../features/atis/datos";
 import { LETRAS } from "../features/atis/frases";
 import { armarAtisMx, type Atis } from "../features/atis/generado";
 import { cargarAudio, RadioAtis } from "../features/atis/motorAudio";
-import { alcanceNm, debeCambiar, mezclaPorDistancia, offsetLoop, sintonizado, type Mezcla } from "../features/atis/radio";
+import { alcanceNm, debeCambiar, entraSiguiente, mezclaPorDistancia, offsetLoop, PAUSA_LOOP_SEG, sintonizado, type Mezcla } from "../features/atis/radio";
 import { useLectorAtis } from "../features/atis/useLectorAtis";
 import { consultarMetar, type Metar } from "../lib/clima";
 import { FOUNDER_EMAIL } from "../lib/constants";
 
 const METAR_CADA_MS = 60_000;
-const COLA_SEG = 2; // cargarAudio deja 2 s de silencio al final del buffer
 
 type Senal = "buena" | "débil" | "fuera de alcance";
 // Mismo corte que mezclaPorDistancia: sin trémolo es señal limpia.
@@ -31,13 +30,14 @@ type Canal = Partial<Cargado> & {
   radio: RadioAtis;
   cargando: string | null; // clave del ATIS que se está cargando
   siguiente: Cargado | null; // ATIS nuevo esperando el fin del loop
+  faseMs: number; // hora de la fase 0 del loop que suena
   sonando: boolean;
 };
-type Vista = { icao: string; distNm: number; senal: Senal; atis: Atis | null; faltantes: string[]; metarViejo: boolean };
+type Vista = { icao: string; distNm: number; senal: Senal; atis: Atis | null; faltantes: string[]; avisoMetar: string | null };
 type EntradaMetar = { metar: Metar | null; pedidoMs: number; viejo: boolean };
 
 const clave = (a: Atis) => `${a.icao}-${a.letra}`;
-const duracion = (b: AudioBuffer) => b.duration - COLA_SEG;
+const duracion = (b: AudioBuffer) => b.duration - PAUSA_LOOP_SEG;
 const horaMetar = (a: Atis) => new Date(a.inicioMs).toISOString().slice(11, 16).replace(":", "");
 
 function apagar(c: Canal) {
@@ -46,10 +46,11 @@ function apagar(c: Canal) {
   c.sonando = false;
 }
 
-// Sintonía nueva: clic, el loop donde va según la hora del METAR, y la mezcla (detener() dejó la voz en 0).
-function tocar(c: Canal, offsetSeg: number, mezcla: Mezcla) {
+// Sintonía nueva: clic, el loop donde va según faseMs (la hora del METAR), y la mezcla (detener() dejó la voz en 0).
+function tocar(c: Canal, faseMs: number, mezcla: Mezcla) {
+  c.faseMs = faseMs;
   c.radio.clic();
-  c.radio.reproducir(c.buffer!, offsetSeg);
+  c.radio.reproducir(c.buffer!, offsetLoop(Date.now(), faseMs, duracion(c.buffer!)));
   c.radio.ajustar(mezcla);
   c.sonando = true;
 }
@@ -143,7 +144,7 @@ function Programa({ fundador }: { fundador: boolean }) {
       const actual = c.atis?.icao === s.ap.icao ? c.atis : null;
       if (!mezcla) {
         apagar(c);
-        return { ...base, atis: actual, faltantes: actual ? c.faltantes! : [], metarViejo: false };
+        return { ...base, atis: actual, faltantes: actual ? c.faltantes! : [], avisoMetar: null };
       }
 
       const e = metarDe(s.ap.icao);
@@ -152,19 +153,25 @@ function Programa({ fundador }: { fundador: boolean }) {
         if (debeCambiar(c.atis ?? null, nuevo)) cargar(ctx, aeropuertos, c, nuevo);
       }
       // El ATIS nuevo entra al momento si no suena nada, o en la pausa del final del loop si ya suena otro.
+      // Uno que llegó tarde de otro aeropuerto (A→B→A rápido) no entra.
+      if (c.siguiente && c.siguiente.atis.icao !== s.ap.icao) c.siguiente = null;
       const sig = c.siguiente;
-      if (sig && (!c.sonando || offsetLoop(Date.now(), c.atis!.inicioMs, duracion(c.buffer!)) >= duracion(c.buffer!))) {
+      if (sig && entraSiguiente(c.sonando, Date.now(), c.faseMs, duracion(c.buffer ?? sig.buffer))) {
         Object.assign(c, sig, { siguiente: null });
-        // Cambio de letra en la pausa: la nueva empieza desde el principio, no a media palabra.
-        if (c.sonando) c.radio.reproducir(c.buffer!, 0);
+        // Cambio de letra en la pausa: la nueva empieza desde el principio, no a media palabra, y su fase 0 es ahora.
+        if (c.sonando) {
+          c.faseMs = Date.now();
+          c.radio.reproducir(c.buffer!, 0);
+        }
       }
       if (silenciado) apagar(c);
       else if (c.atis?.icao === s.ap.icao) {
         if (c.sonando) c.radio.ajustar(mezcla);
-        else tocar(c, offsetLoop(Date.now(), c.atis.inicioMs, duracion(c.buffer!)), mezcla);
+        else tocar(c, c.atis.inicioMs, mezcla);
       }
       const atis = c.atis?.icao === s.ap.icao ? c.atis : null;
-      return { ...base, atis, faltantes: atis ? c.faltantes! : [], metarViejo: e.viejo && !!e.metar };
+      const avisoMetar = !e.viejo ? null : e.metar ? "METAR sin actualizar" : "Sin METAR";
+      return { ...base, atis, faltantes: atis ? c.faltantes! : [], avisoMetar };
     }));
     // metarDe y cargar solo tocan refs; la muestra llega cada segundo.
   }, [muestra, iniciado, aeropuertos, prueba, silenciado]);
@@ -173,7 +180,7 @@ function Programa({ fundador }: { fundador: boolean }) {
     if (ctxRef.current) return ctxRef.current;
     const ctx = new AudioContext();
     ctxRef.current = ctx;
-    canales.current = [0, 1].map(() => ({ radio: new RadioAtis(ctx), cargando: null, siguiente: null, sonando: false }));
+    canales.current = [0, 1].map(() => ({ radio: new RadioAtis(ctx), cargando: null, siguiente: null, faseMs: 0, sonando: false }));
     setIniciado(true);
     return ctx;
   };
@@ -189,8 +196,8 @@ function Programa({ fundador }: { fundador: boolean }) {
     for (const x of canales.current) apagar(x);
     Object.assign(c, { atis, ...r, cargando: null, siguiente: null });
     const mezcla = mezclaPorDistancia(10, 100, null)!;
-    if (!silenciado) tocar(c, 0, mezcla);
-    setVistas([{ icao: "MMGL", distNm: 10, senal: senalDe(mezcla), atis, faltantes: r.faltantes, metarViejo: false }, null]);
+    if (!silenciado) tocar(c, Date.now(), mezcla);
+    setVistas([{ icao: "MMGL", distNm: 10, senal: senalDe(mezcla), atis, faltantes: r.faltantes, avisoMetar: null }, null]);
   };
 
   const terminarPrueba = () => {
@@ -205,7 +212,7 @@ function Programa({ fundador }: { fundador: boolean }) {
   const alternarSilencio = () => {
     const c = canales.current[0];
     if (prueba && c.buffer) {
-      if (silenciado) tocar(c, 0, mezclaPorDistancia(10, 100, null)!);
+      if (silenciado) tocar(c, Date.now(), mezclaPorDistancia(10, 100, null)!);
       else apagar(c);
     }
     setSilenciado(!silenciado);
@@ -231,7 +238,7 @@ function Programa({ fundador }: { fundador: boolean }) {
           <p className="text-white/70">
             {v.distNm.toFixed(1)} NM · Señal: <span className={COLOR_SENAL[v.senal]}>{v.senal}</span>
           </p>
-          {v.metarViejo && <p className="text-gold-300">METAR sin actualizar</p>}
+          {v.avisoMetar && <p className="text-gold-300">{v.avisoMetar}</p>}
           {v.atis && (["es", "en"] as const).map((idioma) => (
             <div key={idioma} className="space-y-1 rounded border border-white/10 p-2">
               {v.atis!.partes.filter((p) => p.idioma === idioma).map((p, j) => (

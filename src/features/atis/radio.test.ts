@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import type { AeropuertoAtis } from "./datos.ts";
 import type { Atis } from "./generado.ts";
 import { pausaTras } from "./motorAudio.ts";
-import { alcanceNm, debeCambiar, distanciaNm, mezclaPorDistancia, offsetLoop, sintonizado } from "./radio.ts";
+import { alcanceNm, debeCambiar, distanciaNm, entraSiguiente, mezclaPorDistancia, offsetLoop, sintonizado } from "./radio.ts";
 
 const cerca = (a: number, b: number, tol: number) => assert.ok(Math.abs(a - b) <= tol, `${a} vs ${b}`);
 const ap = (icao: string, lat: number, lon: number, atisMhz = [127.9]): AeropuertoAtis =>
@@ -51,6 +51,16 @@ test("sintonizado: gana el más cercano dentro de alcance", () => {
 
 test("offsetLoop", () => {
   assert.equal(offsetLoop(1_000_000 + 100_000, 1_000_000, 30), 4);
+});
+
+test("entraSiguiente: el segundo cambio de letra también cae en la pausa", () => {
+  // Loop de 10 s + 2 s de pausa, fase 0 en la hora del METAR (0).
+  assert.equal(entraSiguiente(false, 5_000, 0, 10), true); // nada suena: entra ya
+  assert.equal(entraSiguiente(true, 5_000, 0, 10), false); // a media voz
+  assert.equal(entraSiguiente(true, 10_500, 0, 10), true); // primer cambio, en la pausa
+  // Tras el cambio la fase 0 es 10 500. A los 22 500 la nueva va a 12 s = inicio: no hay pausa.
+  assert.equal(entraSiguiente(true, 22_500, 10_500, 10), false);
+  assert.equal(entraSiguiente(true, 21_000, 10_500, 10), true); // segundo cambio, en su pausa
 });
 
 test("debeCambiar", () => {

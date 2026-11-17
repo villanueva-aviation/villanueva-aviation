@@ -1,5 +1,5 @@
 // Arma el ATIS bilingüe de México (texto en pantalla + piezas de audio) a partir de un METAR.
-import type { Metar } from "../../lib/clima.ts";
+import { visibilidadSM, type Metar } from "../../lib/clima.ts";
 import type { AeropuertoAtis, ExtremoPista } from "./datos.ts";
 import { FRASES, palabraDigito, type Idioma, type Pieza } from "./frases.ts";
 
@@ -107,8 +107,9 @@ export function armarAtisMx(metar: Metar, ap: AeropuertoAtis): Atis {
 
     if (metar.visib != null) {
       const s = String(metar.visib);
-      const n = parseFloat(s);
+      const n = visibilidadSM(metar.visib)!; // "1/2" → 0.5, "1 1/2" → 1.5
       if (FRACCION[n]) p("visibilidad", j("f-visibilidad", FRACCION[n]));
+      else if (n === 1 && !s.endsWith("+")) p("visibilidad", j("f-visibilidad", "f-milla"));
       else if (Number.isInteger(n)) p("visibilidad", j("f-visibilidad", D(String(n)), s.endsWith("+") ? "f-o-mas" : "f-millas"));
       else solo("visibilidad", `${s} SM`);
     }

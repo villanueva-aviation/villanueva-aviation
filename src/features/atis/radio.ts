@@ -8,7 +8,7 @@ export type Mezcla = { voz: number; ruido: number; tremolo: number }; // gananci
 
 const RADIO_TIERRA_NM = 3440.065;
 const TOLERANCIA_MHZ = 0.005; // 5 kHz
-const PAUSA_LOOP_SEG = 2;
+export const PAUSA_LOOP_SEG = 2; // silencio al final de cada vuelta del loop (cargarAudio lo deja en el buffer)
 const rad = (g: number) => (g * Math.PI) / 180;
 
 // Haversine.
@@ -51,6 +51,12 @@ export function sintonizado(com: Com, pos: Posicion, aeropuertos: AeropuertoAtis
 export function offsetLoop(ahoraMs: number, inicioMs: number, duracionSeg: number): number {
   const periodo = duracionSeg + PAUSA_LOOP_SEG;
   return (((ahoraMs - inicioMs) / 1000) % periodo + periodo) % periodo;
+}
+
+// El ATIS que espera entra si no suena nada, o en la pausa del final del loop que suena.
+// faseMs: hora de la fase 0 de ese loop (la del METAR al sintonizar; la del cambio tras un cambio de letra).
+export function entraSiguiente(sonando: boolean, ahoraMs: number, faseMs: number, duracionSeg: number): boolean {
+  return !sonando || offsetLoop(ahoraMs, faseMs, duracionSeg) >= duracionSeg;
 }
 
 export function debeCambiar(actual: Atis | null, nuevo: Atis): boolean {
