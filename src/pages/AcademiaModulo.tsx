@@ -6,21 +6,20 @@ import { Container } from "../components/ui/Container";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 import { ACADEMIA_MODULOS, type ActividadTipo } from "../data/academia";
-import { checkpointsDeModulo, flattenTemas, MODULE_PRACTICA, MODULE_EVALUACION } from "../data/moduleContent";
+import { MODULE_PRACTICA, MODULE_EVALUACION } from "../data/moduleContent";
 import { ROUTES } from "../lib/routes";
 import { CONTENIDO_EXCLUSIVO } from "../data/exclusivo";
 import { useAuth } from "../features/auth/AuthContext";
 import { usePremiumAccess } from "../features/payments/usePremiumAccess";
 import { useProgress } from "../features/progress/ProgressContext";
 import { ModuleStepper, type StepperStage } from "../features/academia/ModuleStepper";
-import { InteractividadWidget, INTERACTIVIDAD_INTRO } from "../features/academia/InteractividadWidget";
-import { LessonFlow } from "../features/academia/LessonFlow";
 import { Quiz } from "../features/academia/Quiz";
 import { ProyectoFinal } from "../features/academia/ProyectoFinal";
 import { ModuloFeedback } from "../features/academia/ModuloFeedback";
 import { Reveal } from "../components/ui/Reveal";
-import { MisionesModulo } from "../features/academia/MisionesModulo";
-import { MISIONES } from "../data/misiones";
+import { LeccionRise } from "../features/academia/rise/LeccionRise";
+import { armarCapitulos } from "../features/academia/rise/motor";
+import { etapaInicial } from "../features/academia/rise/reglas";
 
 // Sugerencia de Contenido Exclusivo más relacionada con cada módulo, mostrada al completarlo.
 const MODULO_EXCLUSIVO_SUGERIDO: Record<string, string> = {
@@ -65,11 +64,10 @@ function ModuloCompletadoBanner({ slug }: { slug: string }) {
   );
 }
 
-const STAGE_LABELS: Record<ActividadTipo | "introduccion" | "misiones", string> = {
+// «Interactividad» ya no es etapa: los ejercicios van dentro de la lección.
+const STAGE_LABELS: Record<Exclude<ActividadTipo, "interactividad"> | "introduccion", string> = {
   introduccion: "Introducción",
-  misiones: "Misiones",
   leccion: "Lección",
-  interactividad: "Interactividad",
   practica: "Práctica",
   evaluacion: "Evaluación",
   proyecto: "Proyecto final",
@@ -80,23 +78,18 @@ export function AcademiaModulo() {
   const modulo = ACADEMIA_MODULOS.find((m) => m.slug === slug);
   const { isActividadCompletada, completarActividad, registrarExamen, moduloProgreso, loading: progresoLoading } = useProgress();
 
-  // Los módulos con misiones juntan lección e interactividad en una sola etapa.
-  const misiones = slug ? MISIONES[slug] : undefined;
+  // Lección e interactividad son una sola etapa: los ejercicios van dentro de la lectura.
   const stageKeys = useMemo(() => {
     if (!modulo) return [];
     const tipos = new Set<ActividadTipo>(modulo.actividades.map((a) => a.tipo));
-    const order: ActividadTipo[] = ["leccion", "interactividad", "practica", "evaluacion", "proyecto"];
-    const etapas = order.filter((t) => tipos.has(t));
-    return ["introduccion", ...(misiones ? ["misiones", ...etapas.filter((t) => t !== "leccion" && t !== "interactividad")] : etapas)];
-  }, [modulo, misiones]);
+    const leccion = tipos.has("leccion") || tipos.has("interactividad") ? ["leccion"] : [];
+    return ["introduccion", ...leccion, ...(["practica", "evaluacion", "proyecto"] as const).filter((t) => tipos.has(t))];
+  }, [modulo]);
+  const numCapitulos = useMemo(() => (slug ? armarCapitulos(slug).length : 0), [slug]);
 
   const [searchParams] = useSearchParams();
-  const etapaPedida = searchParams.get("etapa");
-  // Los enlaces viejos (?etapa=leccion, como el de la bienvenida) llevan a las misiones.
-  const etapaInicial = misiones && (etapaPedida === "leccion" || etapaPedida === "interactividad") ? "misiones" : etapaPedida;
-  const [activeStage, setActiveStage] = useState<string>(
-    etapaInicial && stageKeys.includes(etapaInicial) ? etapaInicial : "introduccion",
-  );
+  // Los enlaces viejos (?etapa=interactividad o misiones) llevan a la lección.
+  const [activeStage, setActiveStage] = useState<string>(() => etapaInicial(searchParams.get("etapa"), stageKeys));
   const { user } = useAuth();
   const esBienvenida = searchParams.get("bienvenida") === "1";
 
@@ -110,7 +103,6 @@ export function AcademiaModulo() {
   const evaluacionActividad = modulo.actividades.find((a) => a.tipo === "evaluacion");
   const proyectoActividad = modulo.actividades.find((a) => a.tipo === "proyecto");
 
-  const temas = flattenTemas(modulo.slug);
   const practicaPreguntas = MODULE_PRACTICA[modulo.slug];
   const evaluacionPreguntas = MODULE_EVALUACION[modulo.slug];
 
@@ -120,16 +112,14 @@ export function AcademiaModulo() {
 
   const stages: StepperStage[] = stageKeys.map((key) => {
     let done = false;
-    if (key === "misiones") done = leccionDone && interactividadDone;
-    else if (key === "leccion") done = leccionActividades.every((a) => isActividadCompletada(modulo.slug, a.id));
-    else if (key === "interactividad") done = interactividadActividades.every((a) => isActividadCompletada(modulo.slug, a.id));
+    if (key === "leccion") done = leccionDone && interactividadDone;
     else if (key === "practica" && practicaActividad) done = isActividadCompletada(modulo.slug, practicaActividad.id);
     else if (key === "evaluacion" && evaluacionActividad) done = isActividadCompletada(modulo.slug, evaluacionActividad.id);
     else if (key === "proyecto" && proyectoActividad) done = isActividadCompletada(modulo.slug, proyectoActividad.id);
     else if (key === "introduccion") done = true;
     return {
       key,
-      label: STAGE_LABELS[key as ActividadTipo | "introduccion" | "misiones"],
+      label: STAGE_LABELS[key as keyof typeof STAGE_LABELS],
       done,
     };
   });
@@ -159,9 +149,8 @@ export function AcademiaModulo() {
               Bienvenido a Villanueva Aviation{user?.nombre ? `, ${user.nombre}` : ""}
             </p>
             <p className="mt-1 text-sm leading-relaxed text-white/70">
-              {misiones
-                ? `Empieza aquí: ${misiones.length} misiones cortas de unos 10 minutos. En cada una lees lo esencial, practicas con un ejercicio y lo pruebas en tu simulador.`
-                : "Esta es tu primera lección. Léela a tu ritmo: cada tema trae la idea clave y los puntos esenciales, y puedes abrir la explicación completa cuando quieras."}
+              Empieza aquí: {numCapitulos} {numCapitulos === 1 ? "capítulo" : "capítulos"} que lees bajando, con imágenes, ejercicios y
+              preguntas rápidas entre la lectura.
             </p>
           </div>
         )}
@@ -180,126 +169,24 @@ export function AcademiaModulo() {
             <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
               <h2 className="font-display text-xl font-semibold text-white">Bienvenido al módulo</h2>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/65">{modulo.resumen}</p>
-              {misiones ? (
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50">
-                  Son {misiones.length} misiones cortas de unos 10 minutos. Cada una junta lo esencial de la teoría, un ejercicio
-                  interactivo y pasos para hacer en tu simulador. Al final vienen la práctica, la evaluación
-                  {proyectoActividad ? " y un proyecto final que el fundador revisa en persona" : ""}.
-                </p>
-              ) : (
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50">
-                  Esta sección te guiará a través de una experiencia estructurada: lección teórica
-                  {interactividadActividades.length > 0 ? ", ejercicios interactivos" : ""}, práctica y evaluación final
-                  {proyectoActividad ? ", más un proyecto final que debes enviar a revisión para marcar el módulo como completado" : ""}.
-                </p>
-              )}
-              <Button className="mt-6" onClick={() => setActiveStage(misiones ? "misiones" : "leccion")}>
-                {misiones ? "Empezar la misión 1" : "Comenzar lección"}
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50">
+                {numCapitulos === 1 ? "Es un capítulo" : `Son ${numCapitulos} capítulos`} que recorres bajando: las imágenes cambian contigo
+                y entre la lectura hay ejercicios y preguntas rápidas. Al final vienen la práctica, la evaluación
+                {proyectoActividad ? " y un proyecto final que el fundador revisa en persona" : ""}.
+              </p>
+              <Button className="mt-6" onClick={() => setActiveStage("leccion")}>
+                Empezar la lección
               </Button>
             </div>
           )}
 
-          {activeStage === "misiones" && misiones && (
-            <MisionesModulo modulo={modulo} misiones={misiones} onTerminar={() => setActiveStage(practicaActividad ? "practica" : "evaluacion")} />
-          )}
-
           {activeStage === "leccion" && (
-            <div className="flex flex-col gap-5">
-              {temas ? (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-                  <LessonFlow
-                    temas={temas}
-                    checkpoints={checkpointsDeModulo(modulo.slug)}
-                    isCompleted={(id) => isActividadCompletada(modulo.slug, id)}
-                    onAdvance={(id) => completarActividad(modulo.slug, id)}
-                  />
-                </div>
-              ) : (
-                leccionActividades.map((actividad) => {
-                  const completada = isActividadCompletada(modulo.slug, actividad.id);
-                  return (
-                    <div key={actividad.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-                      <div className="flex items-start justify-between gap-4">
-                        <h3 className="font-display text-lg font-semibold text-white">{actividad.titulo}</h3>
-                        {completada && <CheckCircle2 size={20} className="shrink-0 text-gold-400" />}
-                      </div>
-                      {modulo.imagenLeccion ? (
-                        <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
-                          <img src={modulo.imagenLeccion} alt={actividad.titulo} className="w-full" />
-                        </div>
-                      ) : (
-                        <p className="mt-4 flex items-center gap-2 text-sm text-white/45">
-                          <Lock size={14} /> Contenido en preparación — se publicará próximamente.
-                        </p>
-                      )}
-                      {!completada && (
-                        <Button
-                          variant="secondary"
-                          className="mt-5"
-                          onClick={() => completarActividad(modulo.slug, actividad.id)}
-                        >
-                          Marcar como completada
-                        </Button>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-              <div className="flex items-center justify-end gap-3">
-                {!leccionDone && (
-                  <p className="text-xs text-white/45">Completa todas las lecciones para continuar.</p>
-                )}
-                <Button
-                  disabled={!leccionDone}
-                  onClick={() =>
-                    setActiveStage(interactividadActividades.length > 0 ? "interactividad" : practicaActividad ? "practica" : "evaluacion")
-                  }
-                >
-                  Continuar
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {activeStage === "interactividad" && interactividadActividades.length > 0 && (
-            <div className="flex flex-col gap-6">
-              {interactividadActividades.map((actividad) => {
-                const completada = isActividadCompletada(modulo.slug, actividad.id);
-                return (
-                  <div key={actividad.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8">
-                    <div className="flex items-start justify-between gap-4">
-                      <h3 className="font-display text-lg font-semibold text-white">{actividad.titulo}</h3>
-                      {completada && <CheckCircle2 size={20} className="shrink-0 text-gold-400" />}
-                    </div>
-                    <p className="mt-2 text-sm text-white/60">{INTERACTIVIDAD_INTRO[actividad.widget ?? "diagrama"]}</p>
-                    <div className="mt-6">
-                      <InteractividadWidget
-                        modulo={modulo}
-                        actividad={actividad}
-                        onComplete={() => completarActividad(modulo.slug, actividad.id)}
-                      />
-                    </div>
-                    {!completada && (
-                      <Button
-                        variant="secondary"
-                        className="mt-5"
-                        onClick={() => completarActividad(modulo.slug, actividad.id)}
-                      >
-                        Marcar como completada
-                      </Button>
-                    )}
-                  </div>
-                );
-              })}
-              <div className="flex items-center justify-end gap-3">
-                {!interactividadDone && (
-                  <p className="text-xs text-white/45">Completa el ejercicio interactivo para continuar.</p>
-                )}
-                <Button disabled={!interactividadDone} onClick={() => setActiveStage("practica")}>
-                  Continuar a práctica
-                </Button>
-              </div>
-            </div>
+            <LeccionRise
+              modulo={modulo}
+              isCompleted={(id) => isActividadCompletada(modulo.slug, id)}
+              onComplete={(id) => completarActividad(modulo.slug, id)}
+              onTerminar={() => setActiveStage(practicaActividad ? "practica" : "evaluacion")}
+            />
           )}
 
           {activeStage === "practica" && practicaActividad && (

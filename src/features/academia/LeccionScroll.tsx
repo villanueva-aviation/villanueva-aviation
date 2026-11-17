@@ -40,7 +40,7 @@ export function LeccionScroll({
   // Las funciones de props cambian en cada render; el listener lee siempre las últimas.
   const props = useRef({ temas, isCompleted, onAdvance });
   props.current = { temas, isCompleted, onAdvance };
-  // MisionesModulo arma `temas` en cada render; solo importa cuando cambian los ids.
+  // Quien la usa puede armar `temas` en cada render; solo importa cuando cambian los ids.
   const ids = temas.map((t) => t.id).join("|");
 
   useEffect(() => {

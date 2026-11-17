@@ -1,5 +1,5 @@
 // Escenas de la lectura con scroll: un visual por paso de cada tema (ver pasosDeTema en
-// features/academia/lecturaScroll.ts). Un tema con escena se lee con scroll; uno sin escena, como siempre.
+// features/academia/lecturaScroll.ts). Un tema sin escena usa sus imágenes (visualesDeTema en features/academia/rise/motor.ts).
 // Provisional: usan las imágenes que ya existen; se cambian por las tomas de Erik en MSFS
 // (lista en docs/superpowers/specs/2026-11-16-academia-inmersiva-design.md).
 
@@ -59,7 +59,3 @@ export const ESCENAS: Record<string, Visual[]> = {
   ],
   "fundamentos-tema8": repetir(5, foto("/images/temas/six-pack.svg", "Los seis instrumentos básicos del panel")),
 };
-
-export function tieneEscena(temaId: string): boolean {
-  return temaId in ESCENAS;
-}
