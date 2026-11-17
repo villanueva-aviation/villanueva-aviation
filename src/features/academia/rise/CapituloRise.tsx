@@ -67,7 +67,8 @@ export function CapituloRise({
 
   const caja = useRef<HTMLDivElement>(null);
   const secciones = useRef<(HTMLElement | null)[]>([]);
-  const [avance, setAvance] = useState(0);
+  // La barra se mueve tocando su estilo, no con estado: así el scroll no vuelve a pintar todo el capítulo.
+  const barra = useRef<HTMLDivElement>(null);
   const [activa, setActiva] = useState(0);
 
   useEffect(() => {
@@ -76,7 +77,7 @@ export function CapituloRise({
       cuadro = 0;
       const mitad = window.innerHeight / 2;
       const r = caja.current?.getBoundingClientRect();
-      if (r && r.height > 0) setAvance(Math.min(1, Math.max(0, (mitad - r.top) / r.height)));
+      if (r && r.height > 0 && barra.current) barra.current.style.width = `${Math.min(1, Math.max(0, (mitad - r.top) / r.height)) * 100}%`;
       const tops = secciones.current.slice(0, visibles.length).map((e) => e?.getBoundingClientRect().top ?? Infinity);
       if (tops.length) setActiva(pasoActivo(tops, mitad));
     }
@@ -173,7 +174,7 @@ export function CapituloRise({
           Capítulo {numero} de {total}
         </p>
         <div className="absolute inset-x-0 bottom-0 h-1 bg-white/10">
-          <div className="h-full bg-gradient-to-r from-gold-500 to-gold-300" style={{ width: `${avance * 100}%` }} />
+          <div ref={barra} className="h-full w-0 bg-gradient-to-r from-gold-500 to-gold-300" />
         </div>
       </div>
 
