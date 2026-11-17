@@ -60,3 +60,11 @@ test("armarAeropuertos: filtra país y exige ATIS", () => {
   assert.equal(r[0].pistas.length, 4);
   assert.equal(r[0].elevFt, 5016);
 });
+
+test("armarAeropuertos: MMMX usa el nombre fijo", () => {
+  const apt = { ident: "MMMX", name: "Licenciado Benito Juarez International Airport", municipality: "Mexico City",
+    latitude_deg: "19.44", longitude_deg: "-99.07", elevation_ft: "7316", iso_country: "MX" };
+  const r = armarAeropuertos([apt], [], [{ airport_ident: "MMMX", type: "ATIS", frequency_mhz: "127.0" }], "MX");
+  assert.equal(r[0].nombreEs, "Aeropuerto Internacional de la Ciudad de México");
+  assert.equal(r[0].nombreEn, "Mexico City International Airport");
+});

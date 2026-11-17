@@ -15,6 +15,14 @@ export function nombres(nombreOurAirports: string, municipio: string): { es: str
   return { es: `Aeropuerto de ${municipio}`, en: `${municipio} Airport` };
 }
 
+// Nombres que la regla de nombres() no acierta (ciudad distinta o ambigua en OurAirports).
+const NOMBRES_FIJOS: Record<string, { es: string; en: string }> = {
+  MMMX: { es: "Aeropuerto Internacional de la Ciudad de México", en: "Mexico City International Airport" },
+  MMAN: { es: "Aeropuerto Internacional del Norte", en: "Del Norte International Airport" },
+  MMMZ: { es: "Aeropuerto Internacional de Mazatlán", en: "Mazatlán International Airport" },
+  MMLO: { es: "Aeropuerto Internacional de Guanajuato", en: "Guanajuato International Airport" },
+};
+
 // Rumbo inicial de círculo máximo, entero 0–359.
 function rumbo(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const r = Math.PI / 180;
@@ -53,7 +61,7 @@ export function armarAeropuertos(aeropuertos: Fila[], pistas: Fila[], frecuencia
       .map((f) => Number(f.frequency_mhz))
       .filter((n) => Number.isFinite(n) && n > 0);
     if (atisMhz.length === 0) continue;
-    const n = nombres(a.name, a.municipality || a.name);
+    const n = NOMBRES_FIJOS[a.ident] ?? nombres(a.name, a.municipality || a.name);
     salida.push({
       icao: a.ident, nombreEs: n.es, nombreEn: n.en,
       lat: Number(a.latitude_deg), lon: Number(a.longitude_deg), elevFt: Number(a.elevation_ft) || 0,
