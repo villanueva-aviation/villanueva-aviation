@@ -34,3 +34,6 @@ __pycache__/
 # Espacio de trabajo local de los agentes (no se versiona)
 .superpowers/
 tools/instructor-lector/out/
+
+# Piezas provisionales de edge-tts: no deben publicarse (se quita en la Tarea 8)
+public/atis/piezas/
