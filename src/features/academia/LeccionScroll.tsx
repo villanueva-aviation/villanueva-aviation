@@ -94,7 +94,7 @@ export function LeccionScroll({
   return (
     <div className="relative lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-10">
       {/* Visual fijo: arriba en celular, a la derecha en escritorio. */}
-      <div className="sticky top-[5.75rem] z-10 -mx-6 mb-6 flex h-[45vh] items-center justify-center bg-navy-950/90 px-4 py-3 backdrop-blur [--alto:calc(45vh-1.5rem)] md:-mx-8 lg:order-2 lg:top-28 lg:mx-0 lg:mb-0 lg:h-[70vh] lg:bg-transparent lg:p-0 lg:backdrop-blur-none lg:[--alto:70vh]">
+      <div className="sticky top-[calc(var(--alto-menu)+1.75rem)] z-10 -mx-6 mb-6 flex h-[45vh] items-center justify-center bg-navy-950/90 px-4 py-3 backdrop-blur [--alto:calc(45vh-1.5rem)] md:-mx-8 lg:order-2 lg:top-[calc(var(--alto-menu)+0.75rem)] lg:mx-0 lg:mb-0 lg:h-[calc(100vh-var(--alto-menu)-3rem)] lg:bg-transparent lg:p-0 lg:backdrop-blur-none lg:[--alto:calc(100vh-var(--alto-menu)-3rem)]">
         {visual ? (
           <VisualEscena visual={visual} quieto={quieto} />
         ) : (

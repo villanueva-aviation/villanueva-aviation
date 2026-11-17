@@ -168,7 +168,7 @@ export function CapituloRise({
   return (
     <div ref={caja} className="relative">
       {/* Barra de avance justo debajo del menú del sitio; en celular dice en qué capítulo vas. */}
-      <div className="sticky top-16 z-20 -mx-6 h-7 bg-navy-950/90 backdrop-blur md:-mx-10 lg:mx-0 lg:h-1 lg:bg-transparent lg:backdrop-blur-none">
+      <div className="sticky top-[var(--alto-menu)] z-20 -mx-6 h-7 bg-navy-950/90 backdrop-blur md:-mx-10 lg:mx-0 lg:h-1 lg:bg-transparent lg:backdrop-blur-none">
         <p className="px-6 pt-1 font-display text-[11px] font-semibold uppercase tracking-[0.15em] text-gold-400 lg:hidden">
           Capítulo {numero} de {total}
         </p>
@@ -205,7 +205,7 @@ export function CapituloRise({
             ref={(el) => {
               secciones.current[i] = el;
             }}
-            className="scroll-mt-28"
+            className="scroll-mt-[calc(var(--alto-menu)+1.5rem)]"
           >
             {pintar(b, i)}
           </section>

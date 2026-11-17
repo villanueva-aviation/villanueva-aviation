@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import type { AcademiaModulo } from "../../../data/academia";
@@ -44,13 +44,15 @@ export function LeccionRise({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Al cambiar de capítulo, vuelve a su portada (no al cargar la página).
-  useEffect(() => {
+  // Al cambiar de capítulo, salta a su inicio (no al cargar la página). Va de golpe y en layout effect,
+  // antes de que la lectura nueva mida: si no, se montaría con la página aún abajo (o pasaría por ella
+  // al subir suave) y marcaría como leídos temas que no se vieron.
+  useLayoutEffect(() => {
     if (primeraVez.current) {
       primeraVez.current = false;
       return;
     }
-    inicio.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    inicio.current?.scrollIntoView({ behavior: "instant", block: "start" }); // "instant": el html tiene scroll-behavior: smooth
   }, [activo]);
 
   const cap = caps[activo];
@@ -59,7 +61,7 @@ export function LeccionRise({
   const todoCompleto = caps.every((c) => capituloCompleto(c, isCompleted));
 
   return (
-    <div ref={inicio} className="flex scroll-mt-28 flex-col gap-6">
+    <div ref={inicio} className="flex scroll-mt-[calc(var(--alto-menu)+1rem)] flex-col gap-6">
       {caps.length > 1 && (
         <ol className="-mx-6 flex snap-x gap-2 overflow-x-auto px-6 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:grid-cols-6">
           {caps.map((c, i) => {
