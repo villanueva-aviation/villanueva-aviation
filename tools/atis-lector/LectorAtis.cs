@@ -108,7 +108,7 @@ static class LectorAtis
         var o = Opciones.Leer(new[] { "--simulado", "--url", "http://localhost:5180/atis", "--sin-ventana" });
         var d = Opciones.Leer(new string[0]);
         var banderas = o.Simulado && o.Url == "http://localhost:5180/atis" && o.SinVentana
-            && !d.Simulado && d.Url == UrlPrograma && !d.SinVentana;
+            && !d.Simulado && d.Url == "https://villanueva-aviation.pages.dev/atis/programa" && !d.SinVentana;
         Console.WriteLine(banderas ? "Banderas: OK" : "Banderas: FALLA");
 
         var puerto = PuertoLibreTrasHijo();
@@ -177,7 +177,7 @@ static class LectorAtis
         return new ProcessStartInfo(exe, argumentos) { UseShellExecute = true };
     }
 
-    public const string UrlPrograma = "https://villanueva-aviation.pages.dev/atis";
+    public const string UrlPrograma = "https://villanueva-aviation.pages.dev/atis/programa";
 
     public static string ArgumentosEdge(string url, string perfil)
     {
