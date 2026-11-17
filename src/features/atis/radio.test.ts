@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { AeropuertoAtis } from "./datos.ts";
 import type { Atis } from "./generado.ts";
+import { pausaTras } from "./motorAudio.ts";
 import { alcanceNm, debeCambiar, distanciaNm, mezclaPorDistancia, offsetLoop, sintonizado } from "./radio.ts";
 
 const cerca = (a: number, b: number, tol: number) => assert.ok(Math.abs(a - b) <= tol, `${a} vs ${b}`);
@@ -58,4 +59,9 @@ test("debeCambiar", () => {
   assert.equal(debeCambiar(a, { ...a, inicioMs: 5 }), false);
   assert.equal(debeCambiar(a, { ...a, letra: "B" }), true);
   assert.equal(debeCambiar(a, { ...a, icao: "MMMX" }), true);
+});
+
+test("pausaTras", () => {
+  assert.equal(pausaTras("dos,"), 0.22);
+  assert.equal(pausaTras("Delta."), 0.45);
 });
