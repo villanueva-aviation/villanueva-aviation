@@ -63,7 +63,7 @@ vuelve un recorrido con scroll:
 - **Dibujos encima:** SVG animado con framer-motion (ya instalado) sobre la foto o el clip:
   flechas de fuerzas, etiquetas que aparecen, resaltados. Se mueven según el avance del scroll.
 
-### Avión 3D (toque de B)
+### Avión 3D (toque de B) — reemplazado por la vuelta de 360° (ver lista de tomas)
 
 - Solo en los temas 5 (superficies de control) y 6 (ejes de movimiento).
 - El alumno lo gira con el dedo o el ratón. Al pasar cada paso del texto, se mueve la superficie
@@ -84,16 +84,28 @@ vuelve un recorrido con scroll:
 
 ## Lista de tomas para Fundamentos (la captura Erik en MSFS)
 
-| Tema | Toma | Tipo |
-|---|---|---|
-| 1. ¿Qué es un avión? | C172 XB-VNA en vuelo, de lado, buena luz | Foto + clip |
-| 4. Partes de un avión | C172 en plataforma, vista 3/4 de frente; luego de lado y de atrás | 3 fotos |
-| 2. Las 4 fuerzas | C172 en vuelo recto y nivelado, de lado, cielo limpio | Clip |
-| 3. Bernoulli y Newton | Ala de cerca en vuelo; despegue visto de lado (rotación) | Foto + clip |
-| 5. Superficies | Alerón, elevador, timón y flaps moviéndose, cada uno de cerca | 4 clips |
-| 6. Ejes | Alabeo, cabeceo y guiñada vistos desde afuera, uno por uno | 3 clips |
-| 7. Controles | Cabina: yoke girando y jalando; pedales; acelerador y mezcla de cerca | 3 clips |
-| 8. Six Pack | Panel del C172 de frente, nítido, en vuelo estable y en viraje | Foto + clip |
+Actualizada 2026-11-16: el avión 3D se cambió por el plan B (vuelta de 360° en MSFS), elegido por
+Erik por ser gratis y más realista. Exteriores en el C172 XB-VNA; cabina en el C152 XB-CDT, porque
+el C172 tiene G1000 (sin six pack y con marca visible). Las fotos de partes salen de la vuelta de 360°.
+
+| Archivo | Tema | Avión | Toma |
+|---|---|---|---|
+| `vuelo-lado.mp4` | 1 y 2 | C172 | En vuelo recto y nivelado, cámara fija de lado, cielo limpio, 10 s |
+| `giro-360.mp4` | 4, 5 y 6 | C172 | En plataforma, motor apagado, controles al centro; vuelta completa a velocidad constante, cámara a la altura del ala, 20–30 s |
+| `t3-ala.png` | 3 | C172 | En vuelo, el ala de cerca desde atrás de la cabina |
+| `t3-rotacion.mp4` | 3 | C172 | Despegue visto de lado, del carreteo a la rotación, 10 s |
+| `t5-alerones.mp4` | 5 | C172 | En tierra, de cerca: yoke a un lado y al otro, 2 veces |
+| `t5-elevador.mp4` | 5 | C172 | En tierra, de cerca: yoke atrás y adelante, 2 veces |
+| `t5-timon.mp4` | 5 | C172 | En tierra, de cerca: pedal izquierdo y derecho, 2 veces |
+| `t5-flaps.mp4` | 5 | C172 | En tierra, de cerca: flaps de 0 a todo abajo y de regreso |
+| `t6-alabeo.mp4` | 6 | C172 | En vuelo, cámara desde atrás: alabeo suave a un lado y al otro |
+| `t6-cabeceo.mp4` | 6 | C172 | En vuelo, cámara de lado: nariz arriba y abajo, suave |
+| `t6-guinada.mp4` | 6 | C172 | En vuelo, cámara desde arriba y atrás: pedal a un lado y al otro |
+| `t7-yoke.mp4` | 7 | C152 | Cabina: yoke girando y luego jalando y empujando |
+| `t7-pedales.mp4` | 7 | C152 | Cabina, vista a los pies: pedal izquierdo y derecho |
+| `t7-potencia-mezcla.mp4` | 7 | C152 | Cabina, de cerca: acelerador y luego mezcla |
+| `t8-panel.png` | 8 | C152 | Panel de frente, nítido, en vuelo recto y estable |
+| `t8-panel-viraje.mp4` | 8 | C152 | El mismo encuadre, entrando en un viraje suave, 8 s |
 
 ## Medición
 
