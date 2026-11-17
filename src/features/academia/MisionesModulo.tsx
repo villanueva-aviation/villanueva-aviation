@@ -8,6 +8,8 @@ import { useProgress } from "../progress/ProgressContext";
 import { Button } from "../../components/ui/Button";
 import { VideoYouTube } from "../../components/ui/VideoYouTube";
 import { LessonFlow } from "./LessonFlow";
+import { LeccionScroll } from "./LeccionScroll";
+import { tieneEscena } from "../../data/escenas";
 import { Quiz } from "./Quiz";
 import { InteractividadWidget, INTERACTIVIDAD_INTRO } from "./InteractividadWidget";
 
@@ -151,12 +153,16 @@ export function MisionesModulo({
       <div className={CARD}>
         <Rotulo icono={Target}>Lo esencial</Rotulo>
         <div className="mt-4">
-          <LessonFlow
-            key={mision.id}
-            temas={temas}
-            isCompleted={hecha}
-            onAdvance={(id) => completarActividad(modulo.slug, id)}
-          />
+          {temas.every((t) => tieneEscena(t.id)) ? (
+            <LeccionScroll key={mision.id} temas={temas} isCompleted={hecha} onAdvance={(id) => completarActividad(modulo.slug, id)} />
+          ) : (
+            <LessonFlow
+              key={mision.id}
+              temas={temas}
+              isCompleted={hecha}
+              onAdvance={(id) => completarActividad(modulo.slug, id)}
+            />
+          )}
         </div>
       </div>
 
