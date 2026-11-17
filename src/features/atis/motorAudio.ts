@@ -12,6 +12,7 @@ const UMBRAL_RECORTE = 10 ** (-45 / 20); // −45 dBFS
 const TREMOLO_HZ = 0.4;
 const RAMPA_SEG = 0.2;
 const CLIC_SEG = 0.03;
+const MAKEUP = 6; // lineal, como makeup=6 de ffmpeg en la muestra 07; ajustar al oído en Task 7
 const VOLUMEN_CLIC = 0.25; // ponytail: a ojo, ajustar al oído en Task 7
 
 // Pausa tras una pieza según la puntuación final de su texto hablado.
@@ -77,6 +78,8 @@ export async function cargarAudio(ctx: AudioContext, atis: Atis, aeropuertos: Ae
     const pausa = sig && sig.idioma !== p.idioma ? PAUSA_ENTRE_IDIOMAS_SEG : pausaTras(textoDePieza(p, aeropuertos) ?? "");
     tramos.push({ muestras: m, pausa });
   });
+  // La última pieza no lleva pausa: entre vueltas quedan exactamente los 2 s de cola.
+  if (tramos.length) tramos[tramos.length - 1].pausa = 0;
 
   const total = tramos.reduce((s, t) => s + t.muestras.length + Math.round(t.pausa * sr), 0) + Math.round(COLA_SEG * sr);
   const buffer = ctx.createBuffer(1, total, sr);
@@ -126,6 +129,9 @@ function cadena(...nodos: AudioNode[]): AudioNode {
 
 export class RadioAtis {
   private ctx: AudioContext;
+  private nodos: AudioNode[]; // toda la cadena, para cerrar()
+  private lfo: OscillatorNode;
+  private estatica: AudioBufferSourceNode;
   private entrada: AudioNode;
   private voz: GainNode;
   private tremolo: GainNode;
@@ -135,7 +141,7 @@ export class RadioAtis {
 
   constructor(ctx: AudioContext) {
     this.ctx = ctx;
-    // Voz: 2× pasa-altos 300, 2× pasa-bajos 3000, compresor, makeup ×2, tanh, voz, trémolo.
+    // Voz: 2× pasa-altos 300, 2× pasa-bajos 3000, compresor, makeup, tanh, voz, trémolo.
     this.entrada = filtro(ctx, "highpass", 300);
     const compresor = new DynamicsCompressorNode(ctx, { threshold: -24, ratio: 8, attack: 0.003, release: 0.06, knee: 0 });
     const tanh = new WaveShaperNode(ctx, {
@@ -143,27 +149,36 @@ export class RadioAtis {
     });
     this.voz = new GainNode(ctx, { gain: 0 });
     this.tremolo = new GainNode(ctx, { gain: 1 });
-    cadena(this.entrada, filtro(ctx, "highpass", 300), filtro(ctx, "lowpass", 3000), filtro(ctx, "lowpass", 3000),
-      compresor, new GainNode(ctx, { gain: 2 }), tanh, this.voz, this.tremolo, ctx.destination);
+    const voz = [this.entrada, filtro(ctx, "highpass", 300), filtro(ctx, "lowpass", 3000), filtro(ctx, "lowpass", 3000),
+      compresor, new GainNode(ctx, { gain: MAKEUP }), tanh, this.voz, this.tremolo];
+    cadena(...voz, ctx.destination);
 
     // LFO de 0.4 Hz sumado a la ganancia base del trémolo.
     this.profundidad = new GainNode(ctx, { gain: 0 });
-    const lfo = new OscillatorNode(ctx, { frequency: TREMOLO_HZ });
-    cadena(lfo, this.profundidad).connect(this.tremolo.gain);
-    lfo.start();
+    this.lfo = new OscillatorNode(ctx, { frequency: TREMOLO_HZ });
+    cadena(this.lfo, this.profundidad).connect(this.tremolo.gain);
+    this.lfo.start();
 
     // Estática: ruido rosa en loop, pasa-altos 400, pasa-bajos 4000.
     this.ruido = new GainNode(ctx, { gain: 0 });
-    const estatica = new AudioBufferSourceNode(ctx, { buffer: ruidoRosa(ctx), loop: true });
-    cadena(estatica, filtro(ctx, "highpass", 400), filtro(ctx, "lowpass", 4000), this.ruido, ctx.destination);
-    estatica.start();
+    this.estatica = new AudioBufferSourceNode(ctx, { buffer: ruidoRosa(ctx), loop: true });
+    const estatica = [filtro(ctx, "highpass", 400), filtro(ctx, "lowpass", 4000), this.ruido];
+    cadena(this.estatica, ...estatica, ctx.destination);
+    this.estatica.start();
+    this.nodos = [...voz, this.profundidad, ...estatica];
   }
 
-  // El buffer ya trae los 2 s de cola, así que el loop simple deja la pausa entre repeticiones.
+  /**
+   * Toca el buffer en loop desde offsetSeg. El buffer ya trae los 2 s de cola, así que el loop simple deja la pausa.
+   * Al resintonizar, la fuente anterior se corta en seco (a propósito, como un radio real).
+   * Después de detener() la voz queda en 0: hay que llamar ajustar(mezcla) para que vuelva a sonar.
+   */
   reproducir(buffer: AudioBuffer, offsetSeg: number): void {
     this.fuente?.stop();
-    this.fuente = new AudioBufferSourceNode(this.ctx, { buffer, loop: true });
-    this.fuente.connect(this.entrada);
+    const f = new AudioBufferSourceNode(this.ctx, { buffer, loop: true });
+    f.onended = () => f.disconnect();
+    f.connect(this.entrada);
+    this.fuente = f;
     this.fuente.start(0, offsetSeg % buffer.duration);
   }
 
@@ -188,6 +203,7 @@ export class RadioAtis {
     const d = buf.getChannelData(0);
     for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * VOLUMEN_CLIC * (1 - i / n);
     const s = new AudioBufferSourceNode(this.ctx, { buffer: buf });
+    s.onended = () => s.disconnect();
     s.connect(this.ctx.destination);
     s.start();
   }
@@ -197,5 +213,17 @@ export class RadioAtis {
     this.rampa(this.ruido.gain, 0);
     this.fuente?.stop(this.ctx.currentTime + RAMPA_SEG);
     this.fuente = null;
+  }
+
+  // Apaga y desconecta todo. La instancia no se puede usar después.
+  cerrar(): void {
+    this.fuente?.stop();
+    this.fuente?.disconnect();
+    this.fuente = null;
+    this.lfo.stop();
+    this.lfo.disconnect();
+    this.estatica.stop();
+    this.estatica.disconnect();
+    for (const n of this.nodos) n.disconnect();
   }
 }
