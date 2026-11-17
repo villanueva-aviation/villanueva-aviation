@@ -193,3 +193,9 @@ test("todas las piezas usadas están en el banco, sin duplicados", () => {
     }
   }
 });
+
+test("OVC se dice «Cielo cubierto a», sin «Nubes» delante", () => {
+  const a = armarAtisMx({ ...metar, clouds: [{ cover: "OVC", base: 2000 }] }, ap);
+  const nubes = a.partes.filter((p) => p.tipo === "nubes").map((p) => p.texto);
+  assert.deepEqual(nubes, ["Cielo cubierto a dos mil pies.", "Overcast at two thousand."]);
+});

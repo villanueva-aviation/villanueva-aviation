@@ -126,7 +126,7 @@ export function armarAtisMx(metar: Metar, ap: AeropuertoAtis): Atis {
       const cubierta = c.cover === "OVX" ? "VV" : c.cover;
       if (!alt || (cubierta !== "VV" && !CAPAS.includes(cubierta))) return solo("nubes", `${c.cover} ${c.base ?? ""}`.trim());
       const inicio = cubierta === "VV" ? ["f-vv"]
-        : n === 0 ? [...(idioma === "es" ? ["f-nubes"] : []), `f-${cubierta.toLowerCase()}`]
+        : n === 0 ? [...(idioma === "es" && cubierta !== "OVC" ? ["f-nubes"] : []), `f-${cubierta.toLowerCase()}`]
         : [`f-${cubierta.toLowerCase()}2`];
       const tipo = c.type === "CB" || c.type === "TCU" ? `f-${c.type.toLowerCase()}` : null;
       p("nubes", tipo ? j(...inicio, coma(alt), tipo) : j(...inicio, alt));
