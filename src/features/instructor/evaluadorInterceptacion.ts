@@ -222,7 +222,7 @@ export function avanzarInterceptacion(e: EvaluacionInterceptacion, crudo: Muestr
   }
   const midiendo = n.medirDesde !== null && m.t >= n.medirDesde;
 
-  // El fin del tramo. Lección 5: una milla antes del arco, establecido o no.
+  // El fin del tramo. Lección 5: si no se ha establecido antes (abajo), una milla antes del arco.
   if (e.llegada && dist !== null && dist <= e.llegada.arco.radioNm + 1) return terminar({ ...n, corto: cerrarCorto(n.corto) }, dist);
   if (ej.desde) {
     if (dist !== null && n.finNm !== null && dist >= n.finNm) return terminar(n, dist);
@@ -276,6 +276,9 @@ export function avanzarInterceptacion(e: EvaluacionInterceptacion, crudo: Muestr
     }
   }
   if (n.cruce) n.pasado = [...n.pasado, { t: m.t, v: Math.max(0, -d) }];
+  // Lección 5: establecido 30 s en R1 ya está; así el arco (y su pregunta) llegan con tiempo (Erik, 2026-11-16).
+  if (e.llegada && n.cruce && n.cercaDesde !== null && m.t - Math.max(n.cercaDesde, n.cruce.t) >= ESTABLECIDO_SEG)
+    return terminar({ ...n, corto: cerrarCorto(n.corto) }, dist);
   return n;
 }
 

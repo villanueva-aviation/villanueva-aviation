@@ -125,11 +125,20 @@ export const alejamientoSiguiente = (anterior: Llegada) => norm360(anterior.arco
 
 const ENTRADAS: Entrada[] = ["directa", "paralela", "gota"];
 
-/** R1 a 20–40° del avión, arco de 8–10 NM hasta 30–60° más allá, y una espera lejos de R2 con otra entrada que la anterior. */
+/** Interceptando R1 a 30° se establece al menos esto antes del arco (Erik, 2026-11-16: a 20–40° llegaba encima del arco). */
+const MARGEN_ARCO_NM = 3;
+
+/**
+ * R1 a 5–15° del avión (el radial de 10 en 10 de al lado), arco de 8–10 NM (más chico si con 30° no cabe) hasta 30–60° más
+ * allá, y una espera lejos de R2 con otra entrada que la anterior.
+ */
 export function generarLlegada(radialAvion: number, altitudFt: number, anterior?: Llegada, azar: () => number = Math.random): Llegada {
   const signo = azar() < 0.5 ? 1 : -1;
-  const r1 = redondear10(radialAvion + signo * (20 + 10 * Math.floor(azar() * 3)));
-  const radioNm = 8 + Math.floor(azar() * 3);
+  const r1 = redondear10(radialAvion + signo * 10);
+  // A 30° desde las 15 NM (16 con el viraje) llega a R1 a 2·D·sen(30° − Δ) del VOR.
+  const delta = (Math.abs(norm180(r1 - radialAvion)) * Math.PI) / 180;
+  const llega = 2 * (LLEGADA_NM + 1) * Math.sin(Math.PI / 6 - delta);
+  const radioNm = Math.max(ARCO_MIN_NM, Math.min(8 + Math.floor(azar() * 3), Math.floor(llega - MARGEN_ARCO_NM)));
   const sentido: 1 | -1 = azar() < 0.5 ? 1 : -1;
   const hasta = norm360(r1 + sentido * giroArco(azar));
   const opciones = ENTRADAS.filter((x) => x !== anterior?.entrada);

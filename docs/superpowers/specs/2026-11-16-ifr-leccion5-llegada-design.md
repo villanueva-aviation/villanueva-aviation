@@ -53,12 +53,14 @@ sale al radial final, sabe qué entrada le toca y vuela la espera, todo dentro d
    aléjate por el radial X; a las 15 millas te doy la llegada.» X es el radial de la pista, como el primer arco de la
    IFR 3.
 2. **A las 15 millas: la autorización completa** (voz y texto en pantalla, en el idioma del cadete).
-3. **Interceptación** del radial de acercamiento R1. R1 se sortea en ese momento a 20–40° del radial por el que va el
-   avión (como `radialRegreso` de la IFR 3), acercándose. En los vuelos de Erik de la IFR 3, al interceptar así el
-   radial de regreso se estableció más o menos a la distancia donde empezó: desde 15 millas, a unas 13–15, con margen
-   antes de un arco de 8 a 10.
-4. **Arco** de radio 8 a 10 millas desde R1 hasta R2, 30 a 60° más allá (el sentido se sortea). Arranca cuando el
-   cadete está establecido en R1: entra directo en «hacia el arco», sin la espera de las 10 millas ni el «regresa a la
+3. **Interceptación** del radial de acercamiento R1. R1 es el radial de 10 en 10 de al lado del avión (a 5–15°),
+   acercándose. Termina cuando el cadete lleva 30 s establecido en R1 (o, si no se establece, a 1 milla del arco).
+   *Cambio tras el vuelo de Erik del 2026-11-16:* con R1 a 20–40° e interceptando a 30° desde 15 millas se llegaba a R1
+   encima del arco o adentro (con 20°, a unas 5.6 millas); Erik se estableció 0.2 millas antes y el «aprobado» y la
+   pregunta del arco llegaron ya en el arco.
+4. **Arco** de radio 8 a 10 millas desde R1 hasta R2, 30 a 60° más allá (el sentido se sortea); más chico (mínimo 4) si
+   interceptando a 30° no quedan 3 millas entre donde se establece y el arco. Arranca cuando la interceptación termina
+   (y ahí pregunta hacia qué lado vira): entra directo en «hacia el arco», sin la espera de las 10 millas ni el «regresa a la
    estación» de la IFR 3. La salida al radial final es acercándose (`saleAlejandose: false`).
 5. **Espera** en el VOR, llegando por R2 (`llegada` = R2, ya establecido; la fase «posicionando» se resuelve sola). La
    espera (radial de alejamiento, virajes) se sortea **sin ponerla sobre R2** para que la entrada no sea siempre directa;
