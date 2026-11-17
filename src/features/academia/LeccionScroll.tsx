@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import type { Tema } from "../../data/moduleContent";
-import { ESCENAS } from "../../data/escenas";
 import { leidosAhora, pasoActivo, pasosDeTema, type MedidaTema } from "./lecturaScroll";
 import { VisualEscena } from "./VisualEscena";
+import { visualesDeTema } from "./rise/motor";
 
-function usarQuieto(): boolean {
+export function usarQuieto(): boolean {
   const [quieto, setQuieto] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -89,13 +89,20 @@ export function LeccionScroll({
   }, [ids]);
 
   const [ta, pa] = activo;
-  const visual = ESCENAS[temas[ta]?.id]?.[pa];
+  const visual = temas[ta] ? visualesDeTema(temas[ta])[pa] : undefined;
 
   return (
     <div className="relative lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-10">
       {/* Visual fijo: arriba en celular, a la derecha en escritorio. */}
-      <div className="sticky top-16 z-10 -mx-6 mb-6 flex h-[45vh] items-center justify-center bg-navy-950/90 px-4 py-3 backdrop-blur [--alto:calc(45vh-1.5rem)] md:-mx-8 lg:order-2 lg:top-28 lg:mx-0 lg:mb-0 lg:h-[70vh] lg:bg-transparent lg:p-0 lg:backdrop-blur-none lg:[--alto:70vh]">
-        {visual && <VisualEscena visual={visual} quieto={quieto} />}
+      <div className="sticky top-[5.75rem] z-10 -mx-6 mb-6 flex h-[45vh] items-center justify-center bg-navy-950/90 px-4 py-3 backdrop-blur [--alto:calc(45vh-1.5rem)] md:-mx-8 lg:order-2 lg:top-28 lg:mx-0 lg:mb-0 lg:h-[70vh] lg:bg-transparent lg:p-0 lg:backdrop-blur-none lg:[--alto:70vh]">
+        {visual ? (
+          <VisualEscena visual={visual} quieto={quieto} />
+        ) : (
+          // Tema sin imagen: su título en grande, nunca un hueco ni la imagen de otro tema.
+          <div className="flex h-full w-full items-center justify-center rounded-xl bg-gradient-to-br from-navy-800 to-navy-950 p-6 text-center">
+            <p className="max-w-md font-display text-2xl font-bold leading-tight text-gold-300 sm:text-3xl">{temas[ta]?.titulo}</p>
+          </div>
+        )}
       </div>
 
       <div className="lg:order-1">
@@ -132,7 +139,7 @@ export function LeccionScroll({
                   onClick={() => setAmpliado((v) => (v === tema.id ? null : tema.id))}
                   className="inline-flex items-center gap-1.5 text-xs font-medium text-gold-400/90 transition-colors hover:text-gold-400"
                 >
-                  {ampliado === tema.id ? "Ocultar explicación completa" : "Ver explicación completa"}
+                  {ampliado === tema.id ? "Ocultar la explicación completa" : "Leer la explicación completa"}
                   <ChevronDown size={14} className={ampliado === tema.id ? "rotate-180 transition-transform" : "transition-transform"} />
                 </button>
                 {ampliado === tema.id && <p className="mt-3 text-sm leading-relaxed text-white/60">{tema.texto}</p>}
