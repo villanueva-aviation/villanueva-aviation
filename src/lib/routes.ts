@@ -70,6 +70,7 @@ export const ROUTES = {
   resumenHsi: "/resumen-hsi",
   instructorVirajeEscarpado: "/instructor/viraje-escarpado",
   instructorPrograma: "/instructor/programa",
+  atisPrograma: "/atis/programa",
   instructorRepaso: "/instructor/repaso",
   /** Las demás lecciones del programa; el repaso se queda en su ruta. */
   instructorLeccion: (numero: number | string) => `/instructor/leccion/${numero}`,
@@ -82,6 +83,9 @@ export const ROUTES = {
   instructorVuelo: (id: string) => `/instructor/vuelo/${id}`,
   adminAventura: "/admin/aventura",
 } as const;
+
+/** Páginas que abre un lector local en su ventana de Edge: sin barra ni pie, y con código en vez de enlace al ingresar. */
+export const esVentanaLector = (ruta: string | null): boolean => ruta === ROUTES.instructorPrograma || ruta === ROUTES.atisPrograma;
 
 export const NAV_LINKS = [
   { label: "Inicio", to: ROUTES.home, icon: Home },

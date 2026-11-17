@@ -5,7 +5,7 @@ import { Container } from "../components/ui/Container";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "../features/auth/AuthContext";
 import { Reveal } from "../components/ui/Reveal";
-import { ROUTES } from "../lib/routes";
+import { ROUTES, esVentanaLector } from "../lib/routes";
 import { RUTAS_EN, esIngles } from "../lib/idioma";
 
 function GoogleIcon() {
@@ -59,8 +59,8 @@ export function Ingresar() {
   const { sendMagicLink, verifyEmailCode, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  // La ventana del instructor: el enlace del correo abriría el navegador normal, así que ahí se escribe el código.
-  const desdePrograma = params.get("from") === ROUTES.instructorPrograma;
+  // La ventana del instructor o del ATIS: el enlace del correo abriría el navegador normal, así que ahí se escribe el código.
+  const desdePrograma = esVentanaLector(params.get("from"));
   const [codigo, setCodigo] = useState("");
   const [errorCodigo, setErrorCodigo] = useState<string | null>(null);
   const { pathname } = useLocation();
@@ -90,7 +90,7 @@ export function Ingresar() {
     setErrorCodigo(null);
     const { error: codeError } = await verifyEmailCode(email, codigo.trim());
     if (codeError) setErrorCodigo(codeError);
-    else navigate(ROUTES.instructorPrograma, { replace: true });
+    else navigate(params.get("from")!, { replace: true });
   }
 
   async function handleGoogle() {

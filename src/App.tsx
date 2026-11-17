@@ -10,7 +10,7 @@ import { AuthProvider } from "./features/auth/AuthContext";
 import { ProtectedRoute } from "./features/auth/ProtectedRoute";
 import { PremiumRoute } from "./features/payments/PremiumRoute";
 import { ProgressProvider } from "./features/progress/ProgressContext";
-import { ROUTES } from "./lib/routes";
+import { ROUTES, esVentanaLector } from "./lib/routes";
 import { Home } from "./pages/Home";
 
 const Academia = lazy(() => import("./pages/Academia").then((m) => ({ default: m.Academia })));
@@ -63,6 +63,7 @@ const GimnasioAutorizaciones = lazy(() =>
 );
 const ResumenHsi = lazy(() => import("./pages/ResumenHsi").then((m) => ({ default: m.ResumenHsi })));
 const InstructorPrograma = lazy(() => import("./pages/InstructorPrograma").then((m) => ({ default: m.InstructorPrograma })));
+const AtisPrograma = lazy(() => import("./pages/AtisPrograma").then((m) => ({ default: m.AtisPrograma })));
 const InstructorRepaso = lazy(() => import("./pages/InstructorRepaso").then((m) => ({ default: m.InstructorRepaso })));
 const InstructorIfr = lazy(() => import("./pages/InstructorIfr").then((m) => ({ default: m.InstructorIfr })));
 const TeoriaIfr = lazy(() => import("./pages/TeoriaIfr").then((m) => ({ default: m.TeoriaIfr })));
@@ -114,6 +115,7 @@ const TITULOS: Record<string, string> = {
   [ROUTES.eventos]: "Eventos de IVAO y VATSIM en español, en grupo — Villanueva Aviation",
   [ROUTES.instructorVirajeEscarpado]: "Instructor virtual: viraje escarpado del C172 — Villanueva Aviation",
   [ROUTES.instructorPrograma]: "Instructor virtual — Villanueva Aviation",
+  [ROUTES.atisPrograma]: "ATIS — Villanueva Aviation",
   [ROUTES.instructorRepaso]: "Repaso general — Villanueva Aviation",
   [ROUTES.instructorIfr]: "Instructor virtual IFR — Villanueva Aviation",
   [ROUTES.hojasInstructor]: "Briefings y checklists por voz (PDF gratis) — Villanueva Aviation",
@@ -337,6 +339,14 @@ function RoutedContent() {
             }
           />
           <Route
+            path={ROUTES.atisPrograma}
+            element={
+              <ProtectedRoute>
+                <AtisPrograma />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path={ROUTES.instructorRepaso}
             element={
               <ProtectedRoute>
@@ -529,10 +539,11 @@ function App() {
   const aterrizaje =
     pathname === ROUTES.empieza ||
     pathname === ROUTES.instructorPrograma ||
+    pathname === ROUTES.atisPrograma ||
     pathname === ROUTES.instructorRepaso ||
     pathname.startsWith(ROUTES.instructorLeccion("")) ||
     pathname.startsWith(ROUTES.instructorIfr) ||
-    (pathname === ROUTES.ingresar && new URLSearchParams(search).get("from") === ROUTES.instructorPrograma);
+    (pathname === ROUTES.ingresar && esVentanaLector(new URLSearchParams(search).get("from")));
   const ingles = esIngles(pathname);
   return (
     <AuthProvider>
