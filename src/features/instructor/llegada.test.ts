@@ -21,12 +21,12 @@ import { autorizacionLlegada, briefingLlegada, ordenDespegue, pideRepetir } from
 
 // Lección IFR 5: la llegada (spec 2026-11-16).
 
-test("generarLlegada: R1 a 20–40° del avión, arco de 8–10 NM acercándose hasta 30–60° más allá", () => {
-  for (const x of [0, 0.2, 0.5, 0.8, 0.99]) {
-    const ll = generarLlegada(300, 9000, undefined, () => x);
-    const d1 = Math.abs(norm180(ll.r1 - 300));
-    assert.ok([20, 30, 40].includes(d1), String(d1));
-    assert.ok(ll.arco.radioNm >= 8 && ll.arco.radioNm <= 10);
+test("generarLlegada: R1 a 5–15° del avión, arco acercándose hasta 30–60° más allá", () => {
+  for (const radial of [300, 303, 305, 307]) for (const x of [0, 0.2, 0.5, 0.8, 0.99]) {
+    const ll = generarLlegada(radial, 9000, undefined, () => x);
+    const d1 = Math.abs(norm180(ll.r1 - radial));
+    assert.ok(d1 >= 5 && d1 <= 15 && ll.r1 % 10 === 0, String(d1));
+    assert.ok(ll.arco.radioNm >= 4 && ll.arco.radioNm <= 10);
     assert.equal(ll.arco.desde, ll.r1);
     assert.equal(ll.arco.alejandose, false);
     assert.equal(ll.arco.saleAlejandose, false);
@@ -35,6 +35,21 @@ test("generarLlegada: R1 a 20–40° del avión, arco de 8–10 NM acercándose 
     assert.equal(ll.espera.carta, false);
     assert.equal(ll.espera.tramoSeg, 60);
   }
+});
+
+test("generarLlegada: interceptando R1 a 30° desde las 15 NM queda establecido 3 NM o más antes del arco (Erik, 2026-11-16)", () => {
+  for (let radial = 0; radial < 360; radial += 1) for (const x of [0, 0.5, 0.99]) {
+    const ll = generarLlegada(radial, 9000, undefined, () => x);
+    const d1 = (Math.abs(norm180(ll.r1 - radial)) * Math.PI) / 180;
+    // Triángulo VOR–avión–punto de llegada a R1: llega a 2·D·sen(30° − Δ), con D = 16 (15 NM más el viraje).
+    const llega = 2 * 16 * Math.sin(Math.PI / 6 - d1);
+    assert.ok(llega - ll.arco.radioNm >= 3, `${radial}: ${llega.toFixed(1)} vs ${ll.arco.radioNm}`);
+  }
+});
+
+test("generarLlegada: con espacio, el arco sigue siendo de 8 a 10 NM", () => {
+  const radios = new Set([0, 0.5, 0.99].map((x) => generarLlegada(305, 9000, undefined, () => x)).filter((ll) => Math.abs(norm180(ll.r1 - 305)) === 5).map((ll) => ll.arco.radioNm));
+  for (const r of radios) assert.ok(r >= 8 && r <= 10, String(r));
 });
 
 test("generarLlegada: la espera da la entrada sorteada llegando por R2, nunca sobre R2, y cambia de entrada", () => {
@@ -98,7 +113,7 @@ test("lección 5: a las 15 NM sortea la llegada e intercepta R1 acercándose, si
   assert.doesNotMatch(textoPasoInterceptacion(pasoInterceptacion(e, null), e, "es"), /ruta pasada/);
 });
 
-test("lección 5: termina a radio + 1 NM; establecido = aprobado sin error de identificar", () => {
+test("lección 5: establecido 30 s en R1 termina aprobado ya, antes del arco (Erik, 2026-11-16)", () => {
   const e0 = conLlegada();
   const e = aLaLlegada(e0, 0);
   assert.equal(e.fase, "terminado");
@@ -107,7 +122,8 @@ test("lección 5: termina a radio + 1 NM; establecido = aprobado sin error de id
   assert.deepEqual(r.fuera.interceptar, []);
   assert.equal(r.aprobado, true, JSON.stringify(r.fuera));
   assert.deepEqual(r.llegada, e0.llegada);
-  assert.ok(r.dmeFin! <= e0.llegada!.arco.radioNm + 1 && r.dmeFin! > e0.llegada!.arco.radioNm + 0.9);
+  // Cruza R1 a las 13 NM y termina unos 30 s después: lejos de radio + 1.
+  assert.ok(r.dmeFin! > 11.5 && r.dmeFin! > e0.llegada!.arco.radioNm + 2, String(r.dmeFin));
 });
 
 test("lección 5: llegar a radio + 1 NM sin cruzar R1 es error de interceptar", () => {
