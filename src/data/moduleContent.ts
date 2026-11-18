@@ -577,7 +577,7 @@ export const MODULE_TERMS: Record<string, TermPair[]> = {
     { id: "aer-2", term: "Pérdida (Stall)", definition: "Colapso de la sustentación cuando se supera el ángulo crítico de ataque." },
     { id: "aer-3", term: "Resistencia inducida", definition: "Subproducto de generar sustentación; mayor a baja velocidad y ángulos de ataque altos." },
     { id: "aer-4", term: "Factor de carga", definition: "Relación entre la sustentación total generada y el peso del avión, medida en G." },
-    { id: "aer-5", term: "Adverse yaw", definition: "Guiñada hacia el lado contrario al viraje, porque el ala que sube, con su alerón abajo, tiene más resistencia inducida que la otra." },
+    { id: "aer-5", term: "Guiñada adversa (adverse yaw)", definition: "Guiñada hacia el lado contrario al viraje, porque el ala que sube, con su alerón abajo, tiene más resistencia inducida que la otra." },
     { id: "aer-6", term: "Trim", definition: "Ajuste del punto de equilibrio del elevador para mantener una actitud sin sostener presión en el yoke." },
     { id: "aer-7", term: "Efecto suelo", definition: "Reducción de la resistencia inducida al volar muy cerca del suelo." },
     { id: "aer-8", term: "P-factor", definition: "Carga asimétrica de la hélice: con ángulo de ataque alto, la pala que baja da más empuje y el morro se va a la izquierda." },
