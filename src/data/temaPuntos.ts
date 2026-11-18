@@ -222,16 +222,16 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "Qué es el ángulo de ataque", texto: "el ángulo entre la cuerda del ala y el viento relativo, no la actitud respecto al horizonte." },
       { titulo: "El ángulo crítico", texto: "típicamente entre 16 y 20 grados: ahí el flujo se separa y la sustentación colapsa." },
-      { titulo: "Siempre el mismo ángulo", texto: "sin importar velocidad, actitud ni peso del avión." },
-      { titulo: "Lo que sorprende", texto: "se puede entrar en pérdida con el morro abajo y a alta velocidad, en un tirón brusco." },
+      { titulo: "Siempre el mismo ángulo", texto: "sin importar velocidad, actitud ni peso, con la misma configuración: los flaps, el hielo o la escarcha lo cambian." },
+      { titulo: "Lo que sorprende", texto: "se puede entrar en pérdida con el morro abajo y a cualquier velocidad, en un tirón brusco; por encima de la velocidad de maniobra, ese tirón puede dañar la estructura antes." },
     ],
   },
   "aerodinamica-tema3": {
     clave: "Dos resistencias con comportamiento opuesto, y una curva en U entre las dos.",
     puntos: [
       { titulo: "Inducida", texto: "subproducto de generar sustentación; mayor a baja velocidad y ángulos de ataque altos." },
-      { titulo: "Por qué se siente pesado", texto: "cerca de la pérdida la inducida domina y el avión cuesta de controlar." },
-      { titulo: "Parásita", texto: "la fricción del aire contra fuselaje, tren y antenas; crece con el cuadrado de la velocidad." },
+      { titulo: "Cerca de la pérdida", texto: "domina la inducida y necesitas más potencia para sostener la altitud; además los controles se sienten blandos." },
+      { titulo: "Parásita", texto: "la que produce el avión al moverse por el aire: su forma, la interferencia entre sus piezas y la fricción; crece con el cuadrado de la velocidad." },
       { titulo: "La curva en U", texto: "la suma de ambas tiene un mínimo: la velocidad de L/D máximo." },
       { titulo: "Para qué la usas", texto: "es la del mejor planeo si se te para el motor." },
     ],
@@ -262,7 +262,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
       { titulo: "Qué hace el elevador", texto: "cambia el ángulo de ataque: al tirar del yoke sube, empuja la cola hacia abajo y el morro sube." },
       { titulo: "Qué es el trim", texto: "una superficie secundaria y más pequeña, parte del elevador." },
       { titulo: "Para qué sirve", texto: "fija el punto de equilibrio para mantener una actitud sin sostener presión en el yoke." },
-      { titulo: "No es control primario", texto: "es un ajuste que reduce la fatiga en vuelos largos o en cambios sostenidos de velocidad." },
+      { titulo: "No es control primario", texto: "es un ajuste que se hace después de cada cambio de potencia, actitud o flaps: así no sostienes presión y vuelas más preciso." },
     ],
   },
   "aerodinamica-tema7": {
@@ -277,12 +277,12 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     ],
   },
   "aerodinamica-tema8": {
-    clave: "Cerca del suelo el avión flota, y eso explica el bote y el despegue que no asciende.",
+    clave: "Cerca del suelo el avión flota, y eso explica la flotación larga y el despegue que no asciende.",
     puntos: [
       { titulo: "Cuándo ocurre", texto: "a una altura menor que la envergadura del ala." },
       { titulo: "Qué pasa", texto: "el suelo interfiere con los vórtices de punta de ala y reduce la resistencia inducida." },
-      { titulo: "Qué se siente", texto: "el avión flota y se resiste a tocar, o acelera de más justo después de despegar." },
-      { titulo: "El bote largo", texto: "reducir potencia demasiado tarde en el aterrizaje produce ese float." },
+      { titulo: "Qué se siente", texto: "el avión flota y se resiste a tocar, o puede despegar antes de la velocidad recomendada." },
+      { titulo: "La flotación larga", texto: "llegar con velocidad de más, o reducir potencia tarde, te deja flotando sobre la pista (float)." },
       { titulo: "El riesgo al despegar", texto: "puede parecer exitoso a baja altura y no seguir ascendiendo al salir del efecto suelo sin velocidad suficiente." },
     ],
   },

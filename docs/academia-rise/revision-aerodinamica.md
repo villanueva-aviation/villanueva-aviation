@@ -1,6 +1,6 @@
 # Revisión de Aerodinámica — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-17 · Estado: **auditoría lista, correcciones pendientes del visto bueno de Erik**.
+Fecha: 2026-11-17 · Estado: **correcciones aplicadas; tema 9 en borrador para que Erik lo revise**.
 
 Qué se revisó:
 - los 8 temas (texto, idea clave y puntos);
@@ -73,4 +73,19 @@ Opciones:
 
 ## Cambios aplicados
 
-_(pendiente del visto bueno de Erik)_
+Erik aprobó todas las correcciones y la opción B (2026-11-17).
+
+- **E1–E5, P1–P5:** textos de los temas 2, 3, 6 y 8, sus puntos, los términos «Adverse yaw» y «Trim», la q7 y el
+  control deslizante (misma potencia: 110 → 75 kt y 8.6 → 12.7 gal por cada 100 NM, ilustrativo, tren retráctil).
+- **E6, P3, P4 y E2, E4 en los clips:** se volvieron a sacar 2-4 (90 kt), 3-2 («Cerca de la pérdida»), 6-4
+  (potencia, actitud, flaps → trim), 8-0, 8-3 (se levanta antes de tiempo, 44 → 50 kt) y 8-4 («La flotación larga»).
+- **E7:** el primer candado ahora es aero-q6.
+- **E8:** los 47 clips (uno por paso) van en `public/videos/academia/aerodinamica-temaN-n.*`, con su escena en
+  `src/data/escenas.ts`; la imagen de cada tema es el póster de su primer clip. Las 8 infografías viejas ya no se usan.
+- **P6:** el capítulo 1 se llama «Sustentación, pérdida y resistencia».
+- **P7:** ejercicios en orden términos, viraje base-final (capítulo 1), configuración y superficies (capítulo 2).
+- **Opción B, primera parte:** q10, q11, q13 y q16 (centro de presión, slots y alargamiento) se cambiaron por
+  preguntas de flaps, efecto suelo al despegar, guiñada adversa y factor de carga en viraje. Misma posición de la
+  respuesta correcta.
+- **Opción B, pendiente:** el tema 9 «Tendencias a la izquierda, barrena y Va» (cubre q7, q8, q9, q12, q14 y q17),
+  sus clips y un tercer candado. Borrador del texto enviado a Erik para revisión.

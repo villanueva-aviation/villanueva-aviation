@@ -70,6 +70,9 @@ const clip = (tema: string, n: number, alt: string): Visual => {
   return { tipo: "clip", mp4: `${base}.mp4`, webm: `${base}.webm`, poster: `${base}.jpg`, alt };
 };
 
+/** Un clip por paso del tema, en orden (paso 0 = la idea clave). */
+const clips = (tema: string, alts: string[]): Visual[] => alts.map((alt, n) => clip(tema, n, `Animación: ${alt}`));
+
 export const ESCENAS: Record<string, Visual[]> = {
   "fundamentos-tema1": repetir(5, foto(C172, "Cessna 172 en vuelo, sostenido por la sustentación de sus alas")),
   "fundamentos-tema4": [
@@ -129,4 +132,69 @@ export const ESCENAS: Record<string, Visual[]> = {
     clip("fundamentos-tema8", 3, "Animación: el scan recorre los instrumentos y siempre regresa al horizonte artificial"),
     clip("fundamentos-tema8", 4, "Animación: sin mirar afuera, los instrumentos muestran que el avión sube y vira a la derecha"),
   ],
+
+  // ---------- Aerodinámica (clips de Remotion, revisados en docs/academia-rise/revision-aerodinamica.md) ----------
+  "aerodinamica-tema1": clips("aerodinamica-tema1", [
+    "la flecha de sustentación del ala crece y se achica: la ajustas en tiempo real",
+    "al subir el ángulo de ataque crece la sustentación, hasta el punto crítico",
+    "al doble de velocidad, la sustentación crece cuatro veces",
+    "con aire menos denso, el ala genera menos sustentación",
+    "el perfil y la superficie del ala, que vienen dados por tu avión",
+    "el yoke cambia el ángulo de ataque; la potencia y la actitud, la velocidad",
+  ]),
+  "aerodinamica-tema2": clips("aerodinamica-tema2", [
+    "el flujo se separa del ala: la pérdida es el ángulo, no la velocidad",
+    "el ángulo de ataque se mide entre la cuerda y el viento relativo, no contra el horizonte",
+    "la curva de sustentación sube hasta el ángulo crítico, entre 16 y 20 grados, y se desploma",
+    "lento, rápido, pesado o ligero: la pérdida llega al mismo ángulo",
+    "a 90 nudos y con el morro abajo, un tirón brusco lleva el ala al ángulo crítico",
+  ]),
+  "aerodinamica-tema3": clips("aerodinamica-tema3", [
+    "la resistencia inducida y la parásita se suman en una curva en U",
+    "los vórtices de punta de ala: la inducida es mayor a baja velocidad",
+    "a baja velocidad domina la inducida y necesitas más potencia",
+    "la parásita crece con el cuadrado de la velocidad: al doble, cuatro veces más",
+    "el punto más bajo de la curva en U es la L/D máxima",
+    "con el motor parado, el mejor planeo está en la L/D máxima",
+  ]),
+  "aerodinamica-tema4": clips("aerodinamica-tema4", [
+    "al inclinar las alas sube el factor de carga, y con él la velocidad de pérdida",
+    "el factor de carga es la sustentación dividida entre el peso",
+    "en vuelo recto y nivelado la sustentación iguala al peso: 1 G",
+    "en viraje, el ala genera más sustentación para no perder altura",
+    "a 60 grados de inclinación el factor de carga es 2 G",
+    "un viraje brusco y lento en el circuito sube la velocidad de pérdida",
+  ]),
+  "aerodinamica-tema5": clips("aerodinamica-tema5", [
+    "al alabear, el morro se va al lado contrario y el pedal lo corrige",
+    "un alerón sube y el otro baja: la diferencia de sustentación alabea el avión",
+    "el ala con el alerón abajo tiene más resistencia y jala el morro",
+    "el morro se va un momento al lado contrario y luego sigue el viraje",
+    "pedal hacia el mismo lado del viraje, al iniciar el alabeo",
+    "con la bola centrada, el vuelo va coordinado",
+  ]),
+  "aerodinamica-tema6": clips("aerodinamica-tema6", [
+    "el elevador mueve el morro y el trim te quita la presión del yoke",
+    "al tirar del yoke el elevador sube y el morro sube",
+    "el trim, una superficie secundaria en el elevador",
+    "con el trim ajustado, el avión mantiene la actitud sin presión en el yoke",
+    "después de cambiar potencia, actitud o flaps, ajustas el trim",
+  ]),
+  "aerodinamica-tema7": clips("aerodinamica-tema7", [
+    "los flaps bajan y el avión vuela más lento sin entrar en pérdida",
+    "el flap curva el perfil del ala, y a veces le agrega área",
+    "el flap simple, que solo pivota hacia abajo",
+    "el flap ranurado: el aire pasa por la ranura sobre el flap",
+    "el flap Fowler baja y se desliza hacia atrás, con más área alar",
+    "con flaps, más sustentación y más resistencia a la misma velocidad",
+    "flaps parciales para despegar y completos para aterrizar",
+  ]),
+  "aerodinamica-tema8": clips("aerodinamica-tema8", [
+    "cerca de la pista el avión flota: la flotación larga y el despegue que no asciende",
+    "el efecto suelo empieza a menos de una envergadura de altura",
+    "el suelo achica los vórtices de punta de ala y baja la resistencia inducida",
+    "al aterrizar se resiste a tocar; al despegar se levanta antes de tiempo",
+    "con velocidad o potencia de más, el avión flota sobre la pista",
+    "al salir del efecto suelo sin velocidad suficiente, el avión no sigue ascendiendo",
+  ]),
 };

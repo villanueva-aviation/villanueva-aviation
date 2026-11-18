@@ -12,6 +12,14 @@ test("cada tema de Fundamentos tiene un visual por paso", () => {
   }
 });
 
+test("cada tema de Aerodinámica tiene un clip por paso", () => {
+  for (const tema of flattenTemas("aerodinamica")!) {
+    const visuales = ESCENAS[tema.id] ?? [];
+    assert.equal(visuales.length, pasosDeTema(tema).length, tema.id);
+    assert.ok(visuales.every((v) => v.tipo === "clip"), tema.id);
+  }
+});
+
 test("cada archivo de las escenas existe en public/", () => {
   for (const [id, visuales] of Object.entries(ESCENAS))
     for (const v of visuales) {
