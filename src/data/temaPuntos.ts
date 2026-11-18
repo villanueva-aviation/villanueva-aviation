@@ -1184,7 +1184,8 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
       { titulo: "Qué es", texto: "una radioayuda terrestre que transmite información de rumbo en VHF, de 108.00 a 117.95 MHz." },
       { titulo: "Qué te dice", texto: "tu posición angular, el radial, respecto a la estación." },
       { titulo: "Cuántos cursos", texto: "360 posibles, uno por cada grado." },
-      { titulo: "Sobre qué se construye todo", texto: "radiales, tracking, intercepción y fixes cruzados salen de aquí." },
+      { titulo: "Cuánto alcanza", texto: "la señal viaja en línea de vista: a más altura, más alcance." },
+      { titulo: "Antes de usarlo", texto: "sintonízalo e identifícalo por su código Morse." },
     ],
   },
   "navegacion-tema2": {
@@ -1220,10 +1221,11 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "Vuelas HACIA la aguja para interceptar, nunca te alejas de ella.",
     puntos: [
       { titulo: "Qué muestra", texto: "qué tan lejos estás del curso seleccionado en el OBS." },
-      { titulo: "Cada punto", texto: "unos 2 grados de error angular respecto al VOR." },
-      { titulo: "La escala", texto: "5 puntos a cada lado, es decir 10 grados a escala completa." },
-      { titulo: "Cómo se lee", texto: "aguja a la izquierda significa que el curso está a tu izquierda." },
+      { titulo: "Cada punto", texto: "unos 2 grados de error; con 5 puntos a cada lado, la escala completa es de 10 grados." },
+      { titulo: "Cómo se lee", texto: "con un rumbo parecido al curso seleccionado, aguja a la izquierda significa que el curso está a tu izquierda." },
+      { titulo: "Con el curso recíproco", texto: "si seleccionas el recíproco de tu rumbo, la aguja indica al revés." },
       { titulo: "Aguja centrada", texto: "estás exactamente sobre el curso seleccionado." },
+      { titulo: "Cerca de la estación", texto: "la misma desviación es menos distancia lateral: la aguja se vuelve más sensible." },
     ],
   },
   "navegacion-tema6": {
@@ -1239,37 +1241,37 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "Cuatro pasos: selecciona, observa, gira e intercepta.",
     puntos: [
       { titulo: "1. Selecciona", texto: "el radial deseado en el OBS." },
-      { titulo: "2. Observa", texto: "hacia qué lado apunta la aguja del CDI: eso te dice de qué lado del radial estás." },
+      { titulo: "2. Observa", texto: "con un rumbo parecido al curso, hacia qué lado apunta la aguja del CDI: eso te dice hacia qué lado queda el radial." },
       { titulo: "3. Gira", texto: "a un rumbo que combine tu curso deseado con un ángulo extra hacia el lado de la aguja." },
       { titulo: "4. Mantén y alinea", texto: "ese rumbo hasta que la aguja se acerque al centro, y entonces giras al curso final." },
     ],
   },
   "navegacion-tema8": {
-    clave: "Treinta grados es el equilibrio entre interceptar rápido y no pasarte.",
+    clave: "Treinta grados es un buen punto de partida: rápido sin pasarte.",
     puntos: [
       { titulo: "Con menos de 30", texto: "tardas mucho en cerrar la distancia al radial: intercepción lenta y gradual." },
-      { titulo: "Con más de 30 o 45", texto: "te arriesgas a pasarte del curso, porque la aguja se mueve muy rápido cerca del centro." },
+      { titulo: "Con ángulos grandes", texto: "y más cerca de la estación, la aguja se centra de golpe y es fácil pasarte." },
       { titulo: "Lo que te dan 30 grados", texto: "tiempo suficiente para anticipar el giro al curso final sin overshoot." },
-      { titulo: "Y además", texto: "es el ángulo que se enseña y se evalúa en la mayoría de los programas de entrenamiento." },
+      { titulo: "Lejos de la estación", texto: "puedes usar 45 grados; nunca más de 90." },
     ],
   },
   "navegacion-tema9": {
-    clave: "Vuela hacia donde apunta la aguja: esa es toda la regla.",
+    clave: "Vuela hacia donde apunta la aguja, con un rumbo parecido al curso seleccionado.",
     puntos: [
       { titulo: "La fórmula", texto: "rumbo de intercepción es el curso deseado más o menos el ángulo de intercepción." },
       { titulo: "Aguja a la derecha", texto: "estás al oeste del curso: sumas. Con curso 360, interceptas con 030." },
       { titulo: "Aguja a la izquierda", texto: "estás al este del curso: restas. Con curso 360, interceptas con 330." },
-      { titulo: "La regla práctica", texto: "aguja a la derecha, rumbo mayor que el curso; aguja a la izquierda, menor." },
+      { titulo: "La regla práctica", texto: "aguja a la derecha, rumbo mayor que el curso; aguja a la izquierda, menor. Con el recíproco seleccionado, la aguja indica al revés." },
     ],
   },
   "navegacion-tema10": {
     clave: "Tu rumbo real de tracking no es tu curso deseado: lleva la corrección por viento.",
     puntos: [
-      { titulo: "Qué es", texto: "mantener el avión exactamente sobre el radial o curso durante todo el trayecto." },
-      { titulo: "En qué se diferencia", texto: "no es apuntar la nariz a la estación: es corregir constantemente por el viento." },
+      { titulo: "Qué es", texto: "mantener el avión sobre el radial todo el trayecto, corrigiendo por el viento; no es solo apuntar la nariz a la estación." },
       { titulo: "El WCA", texto: "un pequeño desvío del rumbo respecto al curso, hacia el lado de donde viene el viento." },
       { titulo: "Cómo se aplica", texto: "si el viento te empuja a la derecha, vuelas unos grados a la izquierda del curso." },
       { titulo: "Cómo sabes que funciona", texto: "la aguja se mantiene centrada." },
+      { titulo: "Al pasar sobre la estación", texto: "entras al cono de confusión: la aguja oscila y la bandera cambia de TO a FROM; mantén el rumbo hasta que se estabilice." },
     ],
   },
   "navegacion-tema11": {
@@ -1287,8 +1289,8 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "Qué necesitas", texto: "sintonizar dos VOR distintos y determinar en qué radial de cada uno estás." },
       { titulo: "Cómo se llama", texto: "fijación cruzada, o cross-fix." },
-      { titulo: "Cómo se hace", texto: "trazas cada radial desde su VOR en la carta." },
-      { titulo: "El resultado", texto: "la intersección de ambas líneas es tu ubicación real en ese momento." },
+      { titulo: "Cómo se hace", texto: "trazas cada radial desde su VOR en la carta; donde se cruzan está tu ubicación en ese momento." },
+      { titulo: "Qué tan precisa", texto: "más cuando los radiales se cruzan cerca de 90 grados; en ángulo cerrado, un error chico mueve mucho el punto." },
       { titulo: "Por qué importa", texto: "es de las formas más confiables de confirmar posición, y se espera que la ejecutes a mano." },
     ],
   },

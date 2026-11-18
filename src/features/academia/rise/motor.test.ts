@@ -176,3 +176,11 @@ test("Meteorología: tres capítulos, cada ejercicio con su tema y un candado po
   const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
   assert.deepEqual(candados, [["met-q3"], ["met-q6"], ["met-q9"]]);
 });
+
+test("Navegación I: cuatro capítulos, los ejercicios donde van y un candado por capítulo", () => {
+  const caps = armarCapitulos("navegacion");
+  assert.deepEqual(caps.map((c) => c.titulo), ["El VOR y sus radiales", "TO/FROM, CDI y OBS", "Interceptar un radial", "Tracking y fijación cruzada"]);
+  assert.deepEqual(caps.map((c) => c.interactivos), [[], ["interactividad-1"], [], ["interactividad-2", "interactividad-3"]]);
+  const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
+  assert.deepEqual(candados, [["nav-q1"], ["nav-q3"], ["nav-q14"], ["nav-q9"]]);
+});

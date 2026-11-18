@@ -1,6 +1,6 @@
 # Revisión de Navegación I — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-18 · Estado: **auditoría lista, esperando la decisión de Erik**.
+Fecha: 2026-11-18 · Estado: **correcciones aplicadas (aprobadas por Erik el 2026-11-18)**.
 
 Qué se revisó:
 - los 12 temas (texto, idea clave y puntos);
@@ -58,3 +58,21 @@ preguntas nav-q1 a nav-q5, nav-q9, nav-q13 y nav-q20 a nav-q25.
   Los capítulos 1 y 3 quedan solo con lectura y candado.
 
 Efecto en el avance: ninguno. Siguen 12 lecturas y los mismos 3 ejercicios con los mismos ids.
+
+## Cambios aplicados
+
+Erik aprobó todas las correcciones y D1–D4 (2026-11-18).
+
+- **E1, P1–P7:** textos, ideas clave y puntos de los temas 1, 5, 7, 8, 9, 10 y 12; término nav2-6 (homing);
+  preguntas nav-q14 («más usado», mismo índice) y nav-q16 (mismo índice correcto); primera decisión del
+  escenario.
+- **E2 / D1:** 68 clips de Remotion, uno por paso (`remotion-video/src/Academia/Navegacion/`), en
+  `public/videos/academia/navegacion-temaN-n.*`, con su escena en `src/data/escenas.ts`. En los mapas el norte
+  va arriba; el CDI calcula aguja y bandera desde la posición del avión, y el homing es una trayectoria simulada
+  con viento. La imagen de cada tema es el póster de su primer clip; las 11 infografías y el SVG ya no se usan.
+- **D2:** 4 capítulos: «El VOR y sus radiales» (temas 1–3, candado nav-q1), «TO/FROM, CDI y OBS» (4–6, nav-q3),
+  «Interceptar un radial» (7–9, nav-q14) y «Tracking y fijación cruzada» (10–12, nav-q9).
+- **D3:** la lección ahora explica línea de vista y Morse (tema 1), curso recíproco y sensibilidad cerca de la
+  estación (tema 5), cono de confusión (tema 10) y precisión del cruce cerca de 90° (tema 12).
+- **D4:** ejercicios por capítulo: términos (2); términos y escenario de deriva (4).
+- **Efecto en el avance:** ninguno. Siguen 12 lecturas y los mismos 3 ejercicios con los mismos ids.
