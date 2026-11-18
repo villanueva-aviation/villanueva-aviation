@@ -21,6 +21,8 @@ export type Bloque =
   | { tipo: "candado"; pregunta: QuizPregunta }
   | { tipo: "tarjetas"; tarjetas: Tarjeta[] }
   | { tipo: "interactivo"; actividad: ModuloActividad }
+  | { tipo: "clasificar"; id: string }
+  | { tipo: "puntos"; setId: string }
   | { tipo: "simulador"; pasos: string[] }
   | { tipo: "cierre" };
 
@@ -92,6 +94,8 @@ export function armarCapitulos(slug: string): Capitulo[] {
           const a = actividad(id);
           return a ? [interactivo(a)] : [];
         }),
+        ...(m.clasificar ? [{ tipo: "clasificar", id: m.clasificar } as const] : []),
+        ...(m.puntos ? [{ tipo: "puntos", setId: m.puntos } as const] : []),
         { tipo: "simulador", pasos: m.enSimulador },
         ...m.preguntas.map((pregunta) => ({ tipo: "candado", pregunta }) as const),
         { tipo: "cierre" },

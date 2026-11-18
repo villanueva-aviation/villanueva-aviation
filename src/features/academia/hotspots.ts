@@ -99,7 +99,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
     id: "velocimetro",
     label: "Indicador de velocidad",
     description:
-      "Mide la diferencia entre la presión dinámica del tubo pitot y la presión estática. Sus arcos de color marcan el rango de flaps (blanco), el de operación normal (verde), la zona de precaución (amarillo) y la Vne (línea roja). Sistema pitot-estático.",
+      "Compara la presión total del tubo pitot con la presión estática: la diferencia (presión dinámica) es tu velocidad. Sus arcos de color marcan el rango de flaps (blanco), el de operación normal (verde), la zona de precaución (amarillo) y la Vne (línea roja). Sistema pitot-estático.",
     xPct: 20.0,
     yPct: 40.8,
   },
@@ -107,7 +107,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
     id: "horizonte",
     label: "Horizonte artificial",
     description:
-      "Tu referencia primaria de actitud: muestra inclinación y cabeceo mediante un giroscopio que mantiene su orientación en el espacio. En IMC es la única referencia confiable sin visibilidad exterior. Accionado por vacío (o eléctrico en cabinas modernas).",
+      "Tu referencia primaria de actitud: muestra inclinación y cabeceo mediante un giroscopio que mantiene su orientación en el espacio. En IMC es el centro de tu scan: los demás instrumentos lo confirman. Accionado por vacío (o eléctrico en cabinas modernas).",
     xPct: 50.0,
     yPct: 40.8,
   },

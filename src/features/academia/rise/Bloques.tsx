@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, CheckCircle2, Clock, Lock, Plane, RotateCcw, Target, X } from "lucide-react";
+import { Check, CheckCircle2, Clock, Columns3, Lock, Plane, RotateCcw, Target, X } from "lucide-react";
+import type { Clasificacion } from "../../../data/clasificar";
 import type { QuizPregunta } from "../quizData";
 import { usarQuieto } from "../LeccionScroll";
 import type { Tarjeta } from "./motor";
@@ -199,6 +200,78 @@ export function EnTuSimulador({ pasos }: { pasos: string[] }) {
           </li>
         ))}
       </ol>
+    </div>
+  );
+}
+
+/**
+ * Clasificar: se toca una tarjeta y luego su columna (sirve igual con dedo, mouse o teclado).
+ * Si no va ahí, regresa a la fila. Solo para practicar: no cuenta para el avance.
+ */
+export function Clasificar({ datos }: { datos: Clasificacion }) {
+  const [elegida, setElegida] = useState<number | null>(null);
+  const [puestas, setPuestas] = useState<Set<number>>(new Set());
+  const [mensaje, setMensaje] = useState("");
+  const pendientes = datos.tarjetas.flatMap((t, i) => (puestas.has(i) ? [] : [{ ...t, i }]));
+  const listo = pendientes.length === 0;
+
+  function poner(columna: number) {
+    if (elegida === null) return setMensaje("Primero toca una tarjeta.");
+    const t = datos.tarjetas[elegida];
+    if (t.columna === columna) {
+      setPuestas((p) => new Set(p).add(elegida));
+      setMensaje(pendientes.length === 1 ? `¡Listo! Las ${datos.tarjetas.length} quedaron en su lugar.` : "¡Bien!");
+    } else {
+      setMensaje(`«${t.texto}» no va en ${datos.columnas[columna].split(" · ")[0]}. Inténtalo otra vez.`);
+    }
+    setElegida(null);
+  }
+
+  return (
+    <div className={CARD}>
+      <Rotulo icono={listo ? CheckCircle2 : Columns3}>Clasifica</Rotulo>
+      <p className="mt-3 text-sm text-white/70">{datos.instruccion}</p>
+      {!listo && (
+        <div className="mt-5 flex flex-wrap gap-2">
+          {pendientes.map((t) => (
+            <button
+              key={t.i}
+              onClick={() => setElegida(elegida === t.i ? null : t.i)}
+              aria-pressed={elegida === t.i}
+              className={`rounded-full border px-4 py-2 text-sm transition-colors ${
+                elegida === t.i ? "border-gold-400 bg-gold-400 text-navy-950" : "border-white/15 bg-white/[0.04] text-white/85 hover:border-gold-500/40"
+              }`}
+            >
+              {t.texto}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        {datos.columnas.map((col, k) => (
+          <button
+            key={col}
+            onClick={() => poner(k)}
+            disabled={listo}
+            aria-label={`Poner en ${col}`}
+            className={`flex min-h-20 flex-col items-stretch gap-2 rounded-xl sm:min-h-32 border border-dashed p-3 text-left transition-colors disabled:cursor-default ${
+              elegida !== null ? "border-gold-500/50 bg-gold-500/[0.06] hover:bg-gold-500/10" : "border-white/15 bg-white/[0.02]"
+            }`}
+          >
+            <span className="font-display text-xs font-semibold uppercase tracking-wider text-gold-400">{col}</span>
+            {datos.tarjetas.map((t, i) =>
+              puestas.has(i) && t.columna === k ? (
+                <span key={i} className="rounded-lg bg-white/[0.06] px-3 py-1.5 text-sm text-white/85">
+                  {t.texto}
+                </span>
+              ) : null,
+            )}
+          </button>
+        ))}
+      </div>
+      <p className="mt-4 min-h-5 text-sm text-white/70" aria-live="polite">
+        {mensaje}
+      </p>
     </div>
   );
 }

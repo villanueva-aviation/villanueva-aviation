@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, CheckCircle2, Lock } from "lucide-react";
+import { ArrowRight, CheckCircle2, Lock, MousePointerClick } from "lucide-react";
 import type { AcademiaModulo } from "../../../data/academia";
 import { Button } from "../../../components/ui/Button";
 import { VideoYouTube } from "../../../components/ui/VideoYouTube";
 import { InteractividadWidget, INTERACTIVIDAD_INTRO } from "../InteractividadWidget";
+import { HotspotDiagram } from "../HotspotDiagram";
+import { CLASIFICAR } from "../../../data/clasificar";
 import { LeccionScroll } from "../LeccionScroll";
 import { pasoActivo } from "../lecturaScroll";
-import { Candado, CARD, EnTuSimulador, Portada, Tarjetas } from "./Bloques";
+import { Candado, CARD, Clasificar, EnTuSimulador, Portada, Rotulo, Tarjetas } from "./Bloques";
 import { capituloCompleto, type Bloque, type Capitulo } from "./motor";
 import { candadoAbiertoDeInicio } from "./reglas";
 
@@ -24,6 +26,10 @@ function rotulo(b: Bloque): string {
       return "Comprueba";
     case "interactivo":
       return b.actividad.titulo;
+    case "clasificar":
+      return "Clasifica";
+    case "puntos":
+      return "Explora";
     case "simulador":
       return "En tu simulador";
     case "cierre":
@@ -134,6 +140,20 @@ export function CapituloRise({
           </div>
         );
       }
+      case "clasificar": {
+        const datos = CLASIFICAR[b.id];
+        return datos ? <Clasificar datos={datos} /> : null;
+      }
+      case "puntos":
+        return (
+          <div className={CARD}>
+            <Rotulo icono={MousePointerClick}>Explora</Rotulo>
+            <p className="mt-3 text-sm text-white/70">{INTERACTIVIDAD_INTRO.diagrama}</p>
+            <div className="mt-6">
+              <HotspotDiagram setId={b.setId} />
+            </div>
+          </div>
+        );
       case "simulador":
         return <EnTuSimulador pasos={b.pasos} />;
       case "cierre":

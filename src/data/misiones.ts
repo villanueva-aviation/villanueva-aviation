@@ -16,6 +16,10 @@ export interface Mision {
   temas: string[];
   /** Ids de las actividades "interactividad" del módulo que van en esta misión. */
   interactivos: string[];
+  /** Ejercicio de clasificar (id en data/clasificar.ts); no cuenta para el avance. */
+  clasificar?: string;
+  /** Diagrama con puntos para tocar (id en HOTSPOT_SETS); no cuenta para el avance. */
+  puntos?: string;
   /** Pasos concretos para hacer en el simulador. */
   enSimulador: string[];
   /** Comprobación rápida: no cuenta para el avance, solo para repasar. */
@@ -92,6 +96,7 @@ const FUNDAMENTOS: Mision[] = [
     videoId: null,
     temas: ["fundamentos-tema5", "fundamentos-tema6"],
     interactivos: ["interactividad-3"],
+    clasificar: "fundamentos-ejes",
     enSimulador: [
       "En tierra y con el motor apagado, cambia a la vista exterior.",
       "Gira el yugo a un lado: un alerón sube y el otro baja. Eso es el alabeo.",
@@ -133,6 +138,7 @@ const FUNDAMENTOS: Mision[] = [
     videoId: null,
     temas: ["fundamentos-tema8"],
     interactivos: [],
+    puntos: "six-pack",
     enSimulador: [
       "Carga un Cessna 172 con instrumentos analógicos. Si el tuyo trae pantallas digitales, busca los mismos datos en la pantalla principal.",
       "En la fila de arriba, ubica la velocidad, el horizonte artificial y el altímetro.",

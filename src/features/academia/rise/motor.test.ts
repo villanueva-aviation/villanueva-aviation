@@ -146,3 +146,16 @@ test("minutos de cada capítulo: al menos 3; módulo inexistente sin capítulos"
   for (const m of ACADEMIA_MODULOS) for (const c of armarCapitulos(m.slug)) assert.ok(c.minutos >= 3, c.id);
   assert.deepEqual(armarCapitulos("no-existe"), []);
 });
+
+test("Fundamentos: el capítulo de ejes trae el ejercicio de clasificar y el de instrumentos el diagrama del six pack", () => {
+  const caps = armarCapitulos("fundamentos");
+  const ejes = caps.find((c) => c.id === "superficies-y-ejes")!;
+  const tipos = ejes.bloques.map((b) => b.tipo);
+  assert.ok(tipos.includes("clasificar"));
+  assert.ok(tipos.indexOf("clasificar") < tipos.indexOf("simulador"));
+  const seis = caps.find((c) => c.id === "seis-instrumentos")!;
+  const puntos = seis.bloques.find((b) => b.tipo === "puntos");
+  assert.deepEqual(puntos, { tipo: "puntos", setId: "six-pack" });
+  // No cuentan para el avance: el capítulo se completa igual que antes.
+  assert.deepEqual(seis.interactivos, []);
+});
