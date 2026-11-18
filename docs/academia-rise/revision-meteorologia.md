@@ -1,6 +1,6 @@
 # Revisión de Meteorología — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-18 · Estado: **auditoría lista, esperando la decisión de Erik**.
+Fecha: 2026-11-18 · Estado: **correcciones aplicadas (aprobadas por Erik el 2026-11-18)**.
 
 Qué se revisó:
 - los 10 temas (texto, idea clave y puntos);
@@ -70,3 +70,21 @@ un CB, y la reserva de combustible del escenario de la tormenta (25 min es menos
 - **D5 · Toluca:** confirmar la frase de P11.
 
 Efecto en el avance: ninguno. Siguen 10 lecturas y los mismos 4 ejercicios con los mismos ids.
+
+## Cambios aplicados
+
+Erik aprobó todas las correcciones y D1–D5 (2026-11-18), con Toluca como «el aeropuerto internacional más alto de
+México».
+
+- **E1–E4, P1–P11:** textos, ideas clave y puntos de los temas 1, 2, 3, 5, 7, 8, 9 y 10; términos met2-1 (SKC/CLR)
+  y met-5 (estela); preguntas met-q12, met-q15 y met-q16 (mismo índice correcto); primera decisión del escenario
+  de engelamiento.
+- **E5 / D1:** 69 clips de Remotion, uno por paso (`remotion-video/src/Academia/Meteorologia/`), en
+  `public/videos/academia/meteorologia-temaN-n.*`, con su escena en `src/data/escenas.ts`. La imagen de cada tema
+  es el póster de su primer clip; las 8 infografías viejas ya no se usan. La portada del módulo se queda.
+- **D2:** 3 capítulos: «Leer METAR y TAF» (temas 1–5, candado met-q3), «Lo que mueve el aire» (6–8, met-q6) y
+  «Hielo y altitud de densidad» (9–10, met-q9).
+- **D3:** juegos de términos acomodados por capítulo; la lección ahora explica punto de rocío y QNH (tema 2),
+  inversión térmica y virga (tema 8).
+- **D4:** ejercicios por capítulo: términos (1); tormenta en ruta (2); engelamiento y términos (3).
+- **Efecto en el avance:** ninguno. Siguen 10 lecturas y los mismos 4 ejercicios con los mismos ids.

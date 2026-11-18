@@ -91,10 +91,11 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
       "Consigue el METAR y TAF reales de un aeropuerto de hoy y escribe el briefing de 'go/no-go' que darías antes de un vuelo real: decodifica el reporte, identifica cualquier riesgo (viento, nubes, visibilidad, fenómenos) y justifica tu decisión de volar o no. Envíalo para revisión.",
     actividades: [
       ...leccionesDeTemas("meteorologia"),
+      // En el orden de los capítulos (MODULE_LECCIONES los asigna): términos; tormenta; engelamiento y más términos.
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: tormenta en ruta", widget: "escenario" },
-      { id: "interactividad-3", tipo: "interactividad", titulo: "Relaciona más términos clave", widget: "terminos", termSetId: "meteorologia-2" },
       { id: "interactividad-4", tipo: "interactividad", titulo: "Simulador de decisión: engelamiento en vuelo", widget: "escenario", scenarioId: "meteorologia-2" },
+      { id: "interactividad-3", tipo: "interactividad", titulo: "Relaciona más términos clave", widget: "terminos", termSetId: "meteorologia-2" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: interpretar reportes" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Meteorología" },
       { id: "proyecto-1", tipo: "proyecto", titulo: "Proyecto final: tu propio briefing go/no-go" },

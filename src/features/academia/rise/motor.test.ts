@@ -168,3 +168,11 @@ test("Aerodinámica: tres capítulos, cada ejercicio con su tema y un candado tr
   const candados = caps[2].bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : []));
   assert.deepEqual(candados, ["aero-q8"]);
 });
+
+test("Meteorología: tres capítulos, cada ejercicio con su tema y un candado por capítulo", () => {
+  const caps = armarCapitulos("meteorologia");
+  assert.deepEqual(caps.map((c) => c.titulo), ["Leer METAR y TAF", "Lo que mueve el aire", "Hielo y altitud de densidad"]);
+  assert.deepEqual(caps.map((c) => c.interactivos), [["interactividad-1"], ["interactividad-2"], ["interactividad-4", "interactividad-3"]]);
+  const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
+  assert.deepEqual(candados, [["met-q3"], ["met-q6"], ["met-q9"]]);
+});
