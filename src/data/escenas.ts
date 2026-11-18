@@ -46,9 +46,27 @@ const TIMON = et([81.7, 10.3], "Timón de dirección");
 const FLAPS = et([41.7, 32.2], "Flaps");
 const superficies = (marcas: Marca[], alt: string) => foto(VISTA_SUPERIOR, alt, marcas);
 
-// Clips de Remotion de Bernoulli y Newton: uno por paso, se reproducen una vez y quedan en su último cuadro.
-const clipTema3 = (n: number, alt: string): Visual => {
-  const base = `/videos/academia/fundamentos-tema3-${n}`;
+// Los 3 ejes, como flechas que salen del centro de gravedad hacia los dos lados (el eje no tiene sentido).
+// Vista superior: nariz abajo a la izquierda, cola arriba a la derecha; se cruzan en la raíz del ala, cerca de [49, 48].
+const CG: Punto = [49, 48];
+const eje = (a: Punto, b: Punto): Marca[] => [
+  { tipo: "flecha", desde: CG, hasta: a },
+  { tipo: "flecha", desde: CG, hasta: b },
+];
+const LONGITUDINAL = [...eje([11, 76], [86, 21]), et([14, 88], "Eje longitudinal")];
+const LATERAL = [...eje([8, 9], [92, 86]), et([24, 4], "Eje lateral")];
+const VERTICAL_CG = et(CG, "Eje vertical");
+// Vista de lado (foto de las fuerzas): perpendicular al fuselaje, que en la foto baja hacia la cola.
+const CG_LADO: Punto = [46, 45];
+const VERTICAL: Marca[] = [
+  { tipo: "flecha", desde: CG_LADO, hasta: [50, 6] },
+  { tipo: "flecha", desde: CG_LADO, hasta: [41, 92] },
+  et([34, 8], "Eje vertical"),
+];
+
+// Clips de Remotion (Bernoulli y Newton, six pack): uno por paso, se reproducen una vez y quedan en su último cuadro.
+const clip = (tema: string, n: number, alt: string): Visual => {
+  const base = `/videos/academia/${tema}-${n}`;
   return { tipo: "clip", mp4: `${base}.mp4`, webm: `${base}.webm`, poster: `${base}.jpg`, alt };
 };
 
@@ -72,11 +90,11 @@ export const ESCENAS: Record<string, Visual[]> = {
     fuerzas([SUSTENTACION, PESO, EMPUJE, RESISTENCIA], "Las cuatro fuerzas en equilibrio en vuelo recto y nivelado"),
   ],
   "fundamentos-tema3": [
-    clipTema3(0, "Animación: la sustentación vista por Bernoulli y por Newton"),
-    clipTema3(1, "Animación: el aire más rápido sobre el ala tiene menor presión"),
-    clipTema3(2, "Animación: el ala desvía aire hacia abajo y el aire empuja el ala hacia arriba"),
-    clipTema3(3, "Animación: Bernoulli y Newton describen la misma sustentación"),
-    clipTema3(4, "Animación: el ángulo de ataque y la velocidad controlan la sustentación"),
+    clip("fundamentos-tema3", 0, "Animación: la sustentación vista por Bernoulli y por Newton"),
+    clip("fundamentos-tema3", 1, "Animación: el aire más rápido sobre el ala tiene menor presión"),
+    clip("fundamentos-tema3", 2, "Animación: el ala desvía aire hacia abajo y el aire empuja el ala hacia arriba"),
+    clip("fundamentos-tema3", 3, "Animación: Bernoulli y Newton describen la misma sustentación"),
+    clip("fundamentos-tema3", 4, "Animación: el ángulo de ataque y la velocidad controlan la sustentación"),
   ],
   "fundamentos-tema5": [
     superficies([], "Cessna 172 visto desde arriba"),
@@ -86,7 +104,13 @@ export const ESCENAS: Record<string, Visual[]> = {
     superficies([FLAPS], "Los flaps, en el borde de salida del ala cerca del fuselaje"),
     superficies([ALERON, ELEVADOR, TIMON, FLAPS], "Las superficies de control del Cessna 172 rotuladas"),
   ],
-  "fundamentos-tema6": repetir(5, foto("/images/temas/fundamentos-tema6.jpg", "Los tres ejes del avión: longitudinal, lateral y vertical")),
+  "fundamentos-tema6": [
+    superficies([...LONGITUDINAL, ...LATERAL, VERTICAL_CG], "Los tres ejes del avión se cruzan en su centro de gravedad"),
+    superficies(LONGITUDINAL, "El eje longitudinal va de la nariz a la cola; el alabeo es el giro alrededor de él"),
+    superficies(LATERAL, "El eje lateral va de punta a punta de ala; el cabeceo es el giro alrededor de él"),
+    foto(C172, "El eje vertical atraviesa el avión de arriba abajo; la guiñada es el giro alrededor de él", VERTICAL),
+    superficies([...LONGITUDINAL, ...LATERAL, VERTICAL_CG], "Los tres ejes rotulados sobre el Cessna 172"),
+  ],
   "fundamentos-tema7": [
     foto(TEMA7("1-yoke"), "Yoke del avión, el control de las manos"),
     foto(TEMA7("1-yoke"), "El yoke mueve el elevador y los alerones"),
@@ -98,5 +122,11 @@ export const ESCENAS: Record<string, Visual[]> = {
     ]),
     foto(TEMA7("7-palancas-foto"), "Acelerador, hélice y mezcla en la consola de un avión con hélice de paso variable"),
   ],
-  "fundamentos-tema8": repetir(5, foto("/images/temas/six-pack.svg", "Los seis instrumentos básicos del panel")),
+  "fundamentos-tema8": [
+    clip("fundamentos-tema8", 0, "Animación: los seis instrumentos básicos del panel, en dos filas de tres"),
+    clip("fundamentos-tema8", 1, "Animación: fila superior: velocidad, horizonte artificial y altímetro"),
+    clip("fundamentos-tema8", 2, "Animación: fila inferior: coordinador de viraje, rumbo y variómetro"),
+    clip("fundamentos-tema8", 3, "Animación: el scan recorre los instrumentos y siempre regresa al horizonte artificial"),
+    clip("fundamentos-tema8", 4, "Animación: sin mirar afuera, los instrumentos muestran que el avión sube y vira a la derecha"),
+  ],
 };
