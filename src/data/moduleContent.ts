@@ -18,6 +18,8 @@ export interface Tema {
 export interface LeccionContenido {
   titulo: string;
   temas: Tema[];
+  /** Ids de los ejercicios de este capítulo; si falta, se reparten en orden entre los capítulos. */
+  interactivos?: string[];
 }
 
 // ---------- Lecciones ----------
@@ -81,6 +83,7 @@ export const MODULE_LECCIONES: Record<string, LeccionContenido[]> = {
   "aerodinamica": [
     {
       titulo: "Sustentación, pérdida y resistencia",
+      interactivos: ["interactividad-4"],
       temas: [
       { id: "aerodinamica-tema1", titulo: "Sustentación en profundidad", texto: "La sustentación no es un valor fijo: depende de cuatro variables que el piloto controla o debe considerar en cada vuelo — el ángulo de ataque (a mayor ángulo, más sustentación, hasta el punto crítico), la velocidad del aire sobre el ala (la sustentación crece con el cuadrado de la velocidad, así que volar al doble de rápido genera cuatro veces más sustentación con el mismo ángulo), la densidad del aire (menos densidad en altitud o calor significa menos sustentación con los mismos parámetros) y el área y forma del ala (perfil aerodinámico y superficie alar). En Fundamentos aprendiste que sustentación se opone a peso; aquí el punto clave es que esa sustentación es ajustable en tiempo real, y el piloto la controla principalmente con dos palancas: el ángulo de ataque (yoke) y la velocidad (potencia y actitud)." , imagenes: ["/videos/academia/aerodinamica-tema1-0.jpg"]},
       { id: "aerodinamica-tema2", titulo: "Ángulo de ataque y pérdida (stall)", texto: "El ángulo de ataque es el ángulo entre la cuerda del ala y el viento relativo — no es lo mismo que la actitud del avión respecto al horizonte. Cada perfil de ala tiene un ángulo crítico de ataque, típicamente entre 16° y 20°, en el que el flujo de aire se separa de la superficie superior y la sustentación colapsa: eso es la pérdida (stall). El dato que más sorprende a un cadete nuevo: la pérdida ocurre siempre al mismo ángulo crítico, sin importar la velocidad, la actitud o el peso del avión, siempre que la configuración sea la misma (los flaps, el hielo o la escarcha lo cambian) — un avión puede entrar en pérdida en actitud de morro abajo y a cualquier velocidad si el ángulo de ataque supera el crítico (por ejemplo, en un tirón brusco); por encima de la velocidad de maniobra, un tirón así puede dañar la estructura antes de llegar a la pérdida. Por eso el entrenamiento insiste en que la pérdida es un problema de ángulo de ataque, no de velocidad baja." , imagenes: ["/videos/academia/aerodinamica-tema2-0.jpg"]},
@@ -90,11 +93,19 @@ export const MODULE_LECCIONES: Record<string, LeccionContenido[]> = {
     },
     {
       titulo: "Superficies de control",
+      interactivos: ["interactividad-1", "interactividad-3"],
       temas: [
       { id: "aerodinamica-tema5", titulo: "Alerones y el adverse yaw", texto: "Los alerones se mueven en direcciones opuestas entre sí: cuando uno sube (reduciendo sustentación de esa ala), el otro baja (aumentándola), generando el alabeo (roll). Pero el ala que baja el alerón también genera más resistencia inducida que la que lo sube — este desbalance produce el adverse yaw (guiñada adversa): el morro del avión tiende a moverse momentáneamente hacia el lado contrario al viraje que se está iniciando. Por eso todo piloto aprende a aplicar pedal de timón en la misma dirección del viraje al iniciar un alabeo, coordinando el movimiento y evitando que la bola del coordinador de viraje se salga del centro." , imagenes: ["/videos/academia/aerodinamica-tema5-0.jpg"]},
       { id: "aerodinamica-tema6", titulo: "Elevador y trim", texto: "El elevador, en el estabilizador horizontal, controla el cabeceo (pitch) cambiando el ángulo de ataque del avión: al tirar del yoke, el elevador sube y genera una fuerza hacia abajo en la cola, haciendo que el morro suba. El trim (compensador) es una superficie secundaria y más pequeña, parte del elevador, que ajusta la fuerza aerodinámica neutral necesaria para mantener una actitud sin que el piloto tenga que sostener presión constante en el yoke — no es un control de vuelo primario, es un ajuste de \"punto de equilibrio\" que se ajusta después de cada cambio de potencia, actitud o flaps: así no sostienes presión en el yoke y vuelas más preciso." , imagenes: ["/videos/academia/aerodinamica-tema6-0.jpg"]},
       { id: "aerodinamica-tema7", titulo: "Flaps: tipos y efecto", texto: "Los flaps son superficies del borde de salida del ala que se extienden para aumentar la curvatura (y a veces el área) del perfil alar. Los tipos más comunes en aviación general son el flap simple (plain flap, el más básico, solo pivota hacia abajo), el flap ranurado (slotted flap, con una ranura que dirige aire de alta energía sobre la superficie superior, más eficiente) y el flap Fowler (que además de bajar se desliza hacia atrás, aumentando el área alar). El efecto común a todos: más sustentación y más resistencia a la misma velocidad, lo que permite volar más lento sin entrar en pérdida — por eso se usan en despegue (configuración parcial, prioriza sustentación) y aterrizaje (configuración completa, prioriza también la resistencia para descender más pronunciado y lento)." , imagenes: ["/videos/academia/aerodinamica-tema7-0.jpg"]},
       { id: "aerodinamica-tema8", titulo: "Efecto suelo (ground effect)", texto: "El efecto suelo ocurre cuando el avión vuela muy cerca del suelo (aproximadamente a una altura menor a la envergadura del ala) y la superficie interfiere con la formación normal de los vórtices de punta de ala, reduciendo la resistencia inducida. El resultado práctico que todo cadete experimenta: el avión parece \"flotar\" y resistirse a tocar tierra durante el aterrizaje, o se levanta antes de la velocidad recomendada al despegar. Entender el efecto suelo explica por qué llegar con velocidad de más, o reducir potencia demasiado tarde, te deja flotando largo sobre la pista (float), y por qué un despegue con poca pista puede parecer exitoso a baja altura pero el avión no logra seguir ascendiendo al salir del efecto suelo si no lleva suficiente velocidad." , imagenes: ["/videos/academia/aerodinamica-tema8-0.jpg"]},
+      ],
+    },
+    {
+      titulo: "Tendencias, barrena y Va",
+      interactivos: ["interactividad-2"],
+      temas: [
+      { id: "aerodinamica-tema9", titulo: "Tendencias a la izquierda, barrena y Va", texto: "En un avión cuya hélice gira a la derecha vista desde la cabina, como el C172, cuatro efectos llevan el morro a la izquierda: el torque (la reacción al giro de la hélice), el flujo espiral (el aire que sale de la hélice gira alrededor del fuselaje y empuja la cola), la precesión giroscópica y el P-factor (carga asimétrica de la hélice: con ángulo de ataque alto, la pala que baja, del lado derecho, muerde más aire que la que sube, y el empuje se carga a la derecha). Se notan sobre todo con potencia alta, velocidad baja y ángulo de ataque alto, como al despegar y ascender, y se corrigen con pedal derecho. En tierra, el viento cruzado empuja la cola y el avión tiende a girar hacia el viento, como una veleta; también se corrige con los pedales. Si el ala está en pérdida y además el avión guiña, un ala queda más en pérdida que la otra y el avión puede entrar en barrena: una rotación que se sostiene sola. Se evita volando coordinado cerca de la pérdida. En la mayoría de los aviones ligeros se recupera con potencia a ralentí, alerones neutrales, pedal contrario a la rotación y yoke adelante hasta romper la pérdida; al parar la rotación, pedales al centro y sales de la picada con suavidad (lo que manda es el POH de tu avión). Por último, la velocidad de maniobra (Va) es la máxima a la que puedes usar todo el recorrido de un control de golpe: por debajo de ella, el ala entra en pérdida antes de pasar su límite de carga. Va baja cuando el avión pesa menos: en el C172S, unos 105 nudos al peso máximo y unos 90 con poco peso.", imagenes: ["/videos/academia/aerodinamica-tema9-0.jpg"]},
       ],
     },
   ],
@@ -569,6 +580,9 @@ export const MODULE_TERMS: Record<string, TermPair[]> = {
     { id: "aer-5", term: "Adverse yaw", definition: "Guiñada hacia el lado contrario al viraje, porque el ala que sube, con su alerón abajo, tiene más resistencia inducida que la otra." },
     { id: "aer-6", term: "Trim", definition: "Ajuste del punto de equilibrio del elevador para mantener una actitud sin sostener presión en el yoke." },
     { id: "aer-7", term: "Efecto suelo", definition: "Reducción de la resistencia inducida al volar muy cerca del suelo." },
+    { id: "aer-8", term: "P-factor", definition: "Carga asimétrica de la hélice: con ángulo de ataque alto, la pala que baja da más empuje y el morro se va a la izquierda." },
+    { id: "aer-9", term: "Barrena (spin)", definition: "Pérdida en la que un ala queda más en pérdida que la otra y el avión entra en una rotación que se sostiene sola." },
+    { id: "aer-10", term: "Velocidad de maniobra (Va)", definition: "La máxima a la que puedes usar todo el recorrido de un control de golpe sin pasar el límite de carga." },
   ],
   vfr: [
     { id: "vfrt-1", term: "Special VFR", definition: "Autorización del ATC para operar en espacio controlado por debajo de los mínimos VFR normales." },
@@ -909,7 +923,7 @@ export const MODULE_EVALUACION: Record<string, QuizPregunta[]> = {
 export const MODULE_CHECKPOINTS: Record<string, string[]> = {
   fundamentos: ["fun-q2", "fun-q11"],
   meteorologia: ["met-q3", "met-q6", "met-q9"],
-  aerodinamica: ["aero-q6", "aero-q15"],
+  aerodinamica: ["aero-q6", "aero-q15", "aero-q8"],
   navegacion: ["nav-q1", "nav-q3", "nav-q14", "nav-q9"],
   "navegacion-2": ["nav-q6", "nav-q8", "nav-q15", "nav-q12"],
   cartografia: ["cart-q17", "cart-q13"],

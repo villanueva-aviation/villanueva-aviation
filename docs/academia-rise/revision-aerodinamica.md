@@ -1,6 +1,6 @@
 # Revisión de Aerodinámica — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-17 · Estado: **correcciones aplicadas; tema 9 en borrador para que Erik lo revise**.
+Fecha: 2026-11-17 · Estado: **correcciones aplicadas, tema 9 agregado (texto aprobado por Erik el 2026-11-18)**.
 
 Qué se revisó:
 - los 8 temas (texto, idea clave y puntos);
@@ -87,5 +87,12 @@ Erik aprobó todas las correcciones y la opción B (2026-11-17).
 - **Opción B, primera parte:** q10, q11, q13 y q16 (centro de presión, slots y alargamiento) se cambiaron por
   preguntas de flaps, efecto suelo al despegar, guiñada adversa y factor de carga en viraje. Misma posición de la
   respuesta correcta.
-- **Opción B, pendiente:** el tema 9 «Tendencias a la izquierda, barrena y Va» (cubre q7, q8, q9, q12, q14 y q17),
-  sus clips y un tercer candado. Borrador del texto enviado a Erik para revisión.
+- **Opción B, tema 9:** «Tendencias a la izquierda, barrena y Va» (cubre q7, q8, q9, q12, q14 y q17), como capítulo 3
+  «Tendencias, barrena y Va», con 8 clips nuevos (`remotion-video/src/Academia/Aerodinamica/TendenciasBarrena.tsx`),
+  un tercer candado (aero-q8) y 3 términos nuevos (P-factor, barrena, Va). Fuentes: PHAK cap. 5 (*Left Turning
+  Tendencies*, *Spins*, *Maneuvering speed*), AFH cap. 5 (recuperación de barrena) y POH C172S (Va 105 / 98 / 90 KIAS
+  a 2,550 / 2,200 / 1,900 lb).
+- **Ejercicios por capítulo:** cada capítulo indica los suyos (`interactivos` en `MODULE_LECCIONES`): viraje base-final
+  en el 1; configuración y superficies en el 2; términos en el 3.
+- **Efecto en el avance:** el módulo pasa de 8 a 9 lecturas; quien ya lo había terminado verá una pendiente. La
+  graduación de teoría ya registrada no cambia.

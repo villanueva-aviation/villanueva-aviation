@@ -197,4 +197,14 @@ export const ESCENAS: Record<string, Visual[]> = {
     "con velocidad o potencia de más, el avión flota sobre la pista",
     "al salir del efecto suelo sin velocidad suficiente, el avión no sigue ascendiendo",
   ]),
+  "aerodinamica-tema9": clips("aerodinamica-tema9", [
+    "con mucha potencia el morro se va a la izquierda y el pedal derecho lo corrige",
+    "torque, flujo espiral, precesión giroscópica y P-factor llevan el morro a la izquierda",
+    "la pala que baja, del lado derecho, da más empuje que la que sube",
+    "al despegar, el avión se va a la izquierda y el pedal derecho mantiene la línea",
+    "el viento cruzado empuja la cola y el morro gira hacia el viento, como una veleta",
+    "con un ala más en pérdida que la otra, el avión entra en barrena",
+    "los cinco pasos para salir de la barrena, mientras la rotación se detiene",
+    "debajo de Va el ala entra en pérdida antes de llegar al límite de 3.8 G",
+  ]),
 };

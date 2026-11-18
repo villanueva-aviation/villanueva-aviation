@@ -159,3 +159,12 @@ test("Fundamentos: el capítulo de ejes trae el ejercicio de clasificar y el de 
   // No cuentan para el avance: el capítulo se completa igual que antes.
   assert.deepEqual(seis.interactivos, []);
 });
+
+test("Aerodinámica: tres capítulos, cada ejercicio con su tema y un candado tras el tema 9", () => {
+  const caps = armarCapitulos("aerodinamica");
+  assert.deepEqual(caps.map((c) => c.titulo), ["Sustentación, pérdida y resistencia", "Superficies de control", "Tendencias, barrena y Va"]);
+  assert.deepEqual(caps.map((c) => c.interactivos), [["interactividad-4"], ["interactividad-1", "interactividad-3"], ["interactividad-2"]]);
+  assert.deepEqual(caps[2].temas, ["aerodinamica-tema9"]);
+  const candados = caps[2].bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : []));
+  assert.deepEqual(candados, ["aero-q8"]);
+});

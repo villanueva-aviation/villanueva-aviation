@@ -110,11 +110,11 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
       "Elige una maniobra (viraje pronunciado, despegue con viento cruzado, o recuperación de pérdida) y explica, con tus propias palabras, qué fuerzas y tendencias aerodinámicas actúan durante esa maniobra y cómo las compensarías con los controles. Envíalo para revisión.",
     actividades: [
       ...leccionesDeTemas("aerodinamica"),
-      // Orden por capítulo: términos y viraje base-final con el 1; configuración y superficies con el 2.
-      { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
+      // En el orden de los capítulos (MODULE_LECCIONES los asigna): viraje base-final; configuración y superficies; términos.
       { id: "interactividad-4", tipo: "interactividad", titulo: "Simulador de decisión: viraje base-final", widget: "escenario" },
       { id: "interactividad-1", tipo: "interactividad", titulo: "Simulador de configuración vs. resistencia", widget: "slider" },
       { id: "interactividad-3", tipo: "interactividad", titulo: "Arrastra las superficies de control", widget: "dragdrop", hotspotSetId: "superficies" },
+      { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: efectos de control" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Aerodinámica" },
       { id: "proyecto-1", tipo: "proyecto", titulo: "Proyecto final: analiza tu propia maniobra" },

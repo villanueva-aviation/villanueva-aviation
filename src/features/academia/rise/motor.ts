@@ -112,7 +112,9 @@ export function armarCapitulos(slug: string): Capitulo[] {
     const propios = temas.slice(inicio, inicio + g.temas.length);
     const desde = inicio;
     inicio += g.temas.length;
-    const suyos = inter.slice(Math.floor((i * inter.length) / grupos.length), Math.floor(((i + 1) * inter.length) / grupos.length));
+    const suyos = g.interactivos
+      ? g.interactivos.flatMap((id) => inter.filter((a) => a.id === id))
+      : inter.slice(Math.floor((i * inter.length) / grupos.length), Math.floor(((i + 1) * inter.length) / grupos.length));
 
     // Tramos de lectura cortados por un candado justo después del tema de cada comprobación.
     const lectura: Bloque[] = [];

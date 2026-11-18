@@ -286,6 +286,18 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
       { titulo: "El riesgo al despegar", texto: "puede parecer exitoso a baja altura y no seguir ascendiendo al salir del efecto suelo sin velocidad suficiente." },
     ],
   },
+  "aerodinamica-tema9": {
+    clave: "Con mucha potencia y poca velocidad, el morro se va a la izquierda; con vuelo coordinado y debajo de Va, vuelas con margen.",
+    puntos: [
+      { titulo: "Las cuatro tendencias", texto: "torque, flujo espiral, precesión giroscópica y P-factor. Si la hélice gira a la derecha vista desde la cabina, como en el C172, todas llevan el morro a la izquierda." },
+      { titulo: "El P-factor", texto: "con ángulo de ataque alto, la pala que baja, del lado derecho, muerde más aire que la que sube: el empuje se carga a la derecha y el morro se va a la izquierda." },
+      { titulo: "Cuándo se nota y cómo se corrige", texto: "con potencia alta, velocidad baja y ángulo de ataque alto, como al despegar y ascender: pedal derecho para mantener la línea." },
+      { titulo: "Con viento cruzado", texto: "en tierra, el viento empuja la cola y el avión tiende a girar hacia el viento, como una veleta; también lo corriges con los pedales." },
+      { titulo: "La barrena", texto: "si el ala está en pérdida y además el avión guiña, un ala queda más en pérdida que la otra y el avión entra en una rotación que se sostiene sola. Se evita volando coordinado cerca de la pérdida." },
+      { titulo: "Cómo se recupera", texto: "en la mayoría de los aviones ligeros: potencia a ralentí, alerones neutrales, pedal contrario a la rotación y yoke adelante hasta romper la pérdida; al parar la rotación, pedales al centro y sales de la picada con suavidad. Lo que manda es el POH de tu avión." },
+      { titulo: "La velocidad de maniobra (Va)", texto: "la máxima a la que puedes usar todo el recorrido de un control de golpe: debajo de ella, el ala entra en pérdida antes de pasar su límite de carga. Baja cuando el avión pesa menos: en el C172S, unos 105 nudos al peso máximo y unos 90 con poco peso." },
+    ],
+  },
 
   // ---------- Cartografía ----------
   "cartografia-tema1": {
