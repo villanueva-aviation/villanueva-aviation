@@ -32,7 +32,7 @@ export const CESSNA_HOTSPOTS: Hotspot[] = [
   {
     id: "fuselaje",
     label: "Fuselaje",
-    description: "Estructura principal que conecta la cabina con el empenaje y aloja la carga.",
+    description: "Estructura central: aloja la cabina y la carga, y une las alas con el empenaje.",
     xPct: 43.9,
     yPct: 65.6,
   },
@@ -121,7 +121,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
   },
   {
     id: "coordinador",
-    label: "Coordinador de giro",
+    label: "Coordinador de viraje",
     description:
       "Muestra la tasa de giro, no el ángulo de inclinación: el viraje estándar son 3° por segundo, 360° en dos minutos. La bola del inclinómetro indica si el viraje está coordinado, derrapando o resbalando. Alimentación eléctrica — por eso sobrevive a una falla de vacío.",
     xPct: 20.0,

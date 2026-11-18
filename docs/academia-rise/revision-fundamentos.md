@@ -1,6 +1,6 @@
 # Revisión de Fundamentos — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-17 · Estado: **auditoría lista, correcciones pendientes del visto bueno de Erik**.
+Fecha: 2026-11-17 · Estado: **correcciones aplicadas**.
 
 Qué se revisó: los 8 temas (texto, idea clave y puntos), las 6 misiones (gancho, pasos en el simulador y
 preguntas), la práctica y la evaluación (fun-q1 a fun-q17), los términos, el escenario «reduces potencia»,
@@ -47,4 +47,20 @@ resistencia hacia atrás, sustentación y peso opuestos); las capturas reales de
 
 ## Cambios aplicados
 
-_(pendiente del visto bueno de Erik)_
+Erik aprobó todas las correcciones (2026-11-17). Se aplicaron así:
+
+- **Texto** (E1–E4, E6, P1–P8): `moduleContent.ts`, `temaPuntos.ts`, `misiones.ts`, `hotspots.ts` y
+  `six-pack.svg`, con la redacción propuesta en las tablas de arriba.
+- **Imágenes** (E5, E7, E8, E9, P9): sin imágenes nuevas generadas.
+  - Tema 1: foto real del C172 (`/images/flota/c172-1600.webp`).
+  - Tema 3: los 5 clips de Remotion `fundamentos-tema3-0..4` (mp4 + webm + póster en `public/videos/academia/`),
+    uno por paso; se reproducen una vez, sin repetir.
+  - Tema 4: la misma foto con rótulos dibujados encima (fuselaje, alas, empenaje, tren, motor y hélice), uno por paso.
+  - Tema 5: `cessna-topview.png` con rótulos de alerón, elevador, timón de dirección y flaps.
+  - Tema 7: capturas recortadas sin los rótulos viejos (`-mezcla-foto.jpg`, `-palancas-foto.jpg`); la mezcla
+    lleva los rótulos «Hacia afuera: pobre → corte» y «Adentro: rica».
+- Revisado en el navegador (escritorio y 375 px): rótulos en su lugar, clips cambian con cada paso, sin scroll lateral.
+
+Queda pendiente: la imagen de los ejes del tema 6 también parece hecha con IA y usa «balance / transversal /
+direccional», que no coincide con el texto; se propone cambiarla en la siguiente ronda. Los archivos de las
+imágenes viejas siguen en `public/` sin usarse.

@@ -85,9 +85,10 @@ function Medio({ visual, quieto }: { visual: Visual; quieto: boolean }) {
   const clase = "block max-h-[var(--alto,60vh)] w-auto max-w-full rounded-xl";
   if (visual.tipo === "clip" && !quieto) {
     return (
-      <video className={clase} autoPlay muted loop playsInline preload="none" poster={visual.poster} aria-label={visual.alt}>
-        <source src={visual.webm} type="video/webm" />
+      // Se reproduce una vez y queda en su último cuadro (el spec lo pide así, sin bucle). El mp4 va primero: pesa menos.
+      <video className={clase} autoPlay muted playsInline preload="none" poster={visual.poster} aria-label={visual.alt}>
         <source src={visual.mp4} type="video/mp4" />
+        <source src={visual.webm} type="video/webm" />
       </video>
     );
   }

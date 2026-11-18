@@ -191,7 +191,7 @@
 <circle cx="320.0" cy="823.48" r="7.5" fill="#0a0c10" stroke="#3a4250" stroke-width="1.4"/>
 <line x1="305" y1="810.48" x2="304" y2="828.48" stroke="#9aa4b2" stroke-width="2" stroke-linecap="round" />
 <line x1="335" y1="810.48" x2="336" y2="828.48" stroke="#9aa4b2" stroke-width="2" stroke-linecap="round" />
-<text x="320" y="844.48" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="12" font-weight="500" fill="#9aa4b2" text-anchor="middle" letter-spacing="1.6" >2 MIN</text><text x="320" y="940.48" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#F6F4EF" text-anchor="middle" letter-spacing="1.6" >COORDINADOR DE GIRO</text>
+<text x="320" y="844.48" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="12" font-weight="500" fill="#9aa4b2" text-anchor="middle" letter-spacing="1.6" >2 MIN</text><text x="320" y="940.48" font-family="'Segoe UI', Arial, Helvetica, sans-serif" font-size="16" font-weight="600" fill="#F6F4EF" text-anchor="middle" letter-spacing="1.6" >COORDINADOR DE VIRAJE</text>
   <g>
     <rect x="656.0" y="616.48" width="288" height="288"
           rx="34" fill="#1b2027" stroke="#2c333d" stroke-width="2"/>
