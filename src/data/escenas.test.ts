@@ -20,6 +20,14 @@ test("cada tema de Aerodinámica tiene un clip por paso", () => {
   }
 });
 
+test("cada tema de Navegación II tiene un clip por paso", () => {
+  for (const tema of flattenTemas("navegacion-2")!) {
+    const visuales = ESCENAS[tema.id] ?? [];
+    assert.equal(visuales.length, pasosDeTema(tema).length, tema.id);
+    assert.ok(visuales.every((v) => v.tipo === "clip"), tema.id);
+  }
+});
+
 test("cada tema de Meteorología tiene un clip por paso", () => {
   for (const tema of flattenTemas("meteorologia")!) {
     const visuales = ESCENAS[tema.id] ?? [];

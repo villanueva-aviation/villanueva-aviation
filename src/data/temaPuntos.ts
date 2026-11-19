@@ -1295,13 +1295,14 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     ],
   },
   "navegacion-tema13": {
-    clave: "Cerca de la estación y bajo, la distancia que marca no es tu distancia horizontal.",
+    clave: "Alto y cerca de la estación, la distancia que marca no es tu distancia horizontal.",
     puntos: [
       { titulo: "Qué mide", texto: "la distancia real en línea recta, el slant range, en millas náuticas." },
       { titulo: "Cómo la mide", texto: "por el tiempo que tarda una señal en ir y regresar." },
       { titulo: "Dónde vive", texto: "muchas veces integrado con el VOR, o con el ILS." },
-      { titulo: "Qué más te da", texto: "groundspeed de acercamiento y tiempo estimado a la estación." },
-      { titulo: "El detalle a cuidar", texto: "a baja altura y muy cerca, el slant range difiere de la distancia horizontal por tu propia altura." },
+      { titulo: "Qué más te da", texto: "groundspeed y tiempo estimado a la estación, exactos solo si vuelas directo hacia ella o alejándote." },
+      { titulo: "El detalle a cuidar", texto: "cuanto más alto y más cerca estés, más se separa el slant range de tu distancia horizontal." },
+      { titulo: "Cuándo no importa", texto: "a 1 NM o más de la estación por cada 1,000 ft de altura sobre ella, la diferencia es despreciable." },
     ],
   },
   "navegacion-tema14": {
@@ -1341,6 +1342,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
       { titulo: "Su ventaja", texto: "es más simple." },
       { titulo: "Sus desventajas", texto: "menos preciso y más susceptible a tormentas eléctricas, terreno y hora del día." },
       { titulo: "Dónde sigue vivo", texto: "en regiones donde la infraestructura VOR es limitada." },
+      { titulo: "La cuenta", texto: "rumbo magnético + rumbo relativo = rumbo magnético a la estación; si pasa de 360, réstale 360." },
     ],
   },
   "navegacion-tema18": {
@@ -1348,7 +1350,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "Qué transmite", texto: "una señal en frecuencia baja o media, igual en todas direcciones." },
       { titulo: "Lo que no codifica", texto: "ninguna información de radial, a diferencia del VOR." },
-      { titulo: "Qué hace el receptor", texto: "detecta de qué dirección relativa viene la señal más fuerte y apunta la aguja hacia allá." },
+      { titulo: "Qué hace el receptor", texto: "detecta de qué dirección llega la señal y apunta la aguja hacia allá." },
       { titulo: "Para saber dónde estás", texto: "hay que combinarlo con tu rumbo y, de preferencia, otra referencia cruzada." },
     ],
   },
@@ -1359,6 +1361,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
       { titulo: "La diferencia con el ADF simple", texto: "la rosa gira con tu avión, así que la aguja da el rumbo magnético real, no el relativo." },
       { titulo: "Qué te ahorra", texto: "sumar rumbo relativo más rumbo magnético de cabeza." },
       { titulo: "Qué permite", texto: "interpretar tu posición respecto a la estación de un vistazo." },
+      { titulo: "La cola de la aguja", texto: "con un VOR, la punta marca el rumbo a la estación y la cola el radial en el que estás." },
     ],
   },
   "navegacion-tema20": {
@@ -1376,15 +1379,16 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "Lo estándar", texto: "la escala gráfica impresa en el margen, o un plotter de navegación." },
       { titulo: "El truco confiable", texto: "un minuto de latitud equivale a una milla náutica." },
-      { titulo: "Dónde se mide", texto: "verticalmente, en los bordes izquierdo y derecho de la carta." },
+      { titulo: "Dónde se mide", texto: "verticalmente, sobre un meridiano o en los bordes izquierdo y derecho de la carta." },
       { titulo: "Dónde nunca", texto: "en los bordes horizontales de longitud." },
     ],
   },
   "navegacion-tema22": {
     clave: "Debes poder calcularla a mano, sin depender de la electrónica.",
     puntos: [
-      { titulo: "Con DME o VOR/DME", texto: "el instrumento te da la distancia directa en millas náuticas." },
-      { titulo: "Sin DME", texto: "navegación por estima: mides en la carta y divides entre tu groundspeed para saber el tiempo." },
+      { titulo: "Con DME", texto: "te da la distancia a la estación; si está en el aeropuerto, es casi tu distancia al aeropuerto." },
+      { titulo: "Sin DME", texto: "te ubicas con dos VOR o por estima: rumbo, velocidad y tiempo desde el último punto conocido." },
+      { titulo: "Lo que falta", texto: "lo mides en la carta y lo divides entre tu groundspeed para saber el tiempo." },
       { titulo: "Con GPS", texto: "distancia y tiempo estimado aparecen directamente en pantalla." },
       { titulo: "Por qué a mano", texto: "como piloto en entrenamiento tienes que poder hacerlo sin ayuda del equipo." },
     ],
@@ -1393,7 +1397,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "Un plan bien hecho es la diferencia entre un vuelo tranquilo y estrés innecesario en el aire.",
     puntos: [
       { titulo: "Checkpoints", texto: "puntos de referencia visuales claramente identificables desde el aire." },
-      { titulo: "Rumbo y distancia", texto: "magnéticos, entre cada par de checkpoints." },
+      { titulo: "Rumbo y distancia", texto: "en la carta mides el curso verdadero y la distancia; con el viento sacas el rumbo y con la variación lo pasas a magnético." },
       { titulo: "Tiempo y combustible", texto: "por tramo, considerando el viento pronosticado." },
       { titulo: "Espacio aéreo", texto: "cuál cruzarás y si necesitas autorización o comunicación con algún control." },
       { titulo: "La meteorología", texto: "NOTAMs y METAR/TAF de salida, ruta y destino." },
@@ -1401,7 +1405,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     ],
   },
   "navegacion-tema24": {
-    clave: "Este tipo de ejercicio sobre una ruta real es exactamente lo que se evalúa en un checkride.",
+    clave: "Junta todo el módulo en una ruta real: radiales, distancias, tiempo y alterno.",
     puntos: [
       { titulo: "La ruta", texto: "Guadalajara (MMGL) a Manzanillo (MMZO), como ejercicio integrador." },
       { titulo: "Los VOR", texto: "identificas los disponibles para usarlos como checkpoints o para tracking directo." },
@@ -1417,7 +1421,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
       { titulo: "Qué es", texto: "una trayectoria curva a distancia constante de la estación; por ejemplo, el arco de 12 millas náuticas de un VOR/DME." },
       { titulo: "Para qué sirve", texto: "conectar una aerovía o un radial con el tramo inicial de una aproximación sin sobrevolar la estación." },
       { titulo: "La posición base", texto: "vuelas perpendicular a la estación: 90 grados respecto al radial en el que estás." },
-      { titulo: "Girar y torcer", texto: "dejas que la distancia se desvíe un poco, giras unos 10 grados y mueves el OBS otros 10 para el siguiente segmento." },
+      { titulo: "Las correcciones", texto: "cuando el radial avanza unos 10 grados, giras unos 10 hacia la estación y adelantas el OBS otros 10; si te acercas de más, giras hacia afuera." },
       { titulo: "La entrada al arco", texto: "se anticipa un poco antes de alcanzar la distancia objetivo." },
       { titulo: "Cuánto anticipar", texto: "como referencia, alrededor de media milla náutica a velocidades de aviación general; ajústalo según tu groundspeed." },
     ],
@@ -1428,7 +1432,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
       { titulo: "Qué es", texto: "un circuito en forma de hipódromo alrededor de un fix, para retrasar tu llegada de forma ordenada." },
       { titulo: "Cuándo lo vuelas", texto: "porque control te lo asigna por congestión, o porque viene publicado en un procedimiento." },
       { titulo: "El lado de virajes", texto: "a la derecha por convención estándar, salvo que se publique lo contrario." },
-      { titulo: "Los tramos", texto: "de referencia: un minuto a 14,000 pies o menos, minuto y medio por encima, con virajes de tasa estándar de 3 grados por segundo." },
+      { titulo: "Los tramos", texto: "el de acercamiento dura un minuto a 14,000 pies MSL o menos y minuto y medio por encima, con virajes de tasa estándar de 3 grados por segundo." },
       { titulo: "Las tres entradas", texto: "directa, paralela y en gota; cuál te toca lo decide el ángulo entre tu rumbo de llegada y el curso de entrada." },
       { titulo: "La corrección por viento", texto: "en el tramo de alejamiento se aplica cerca del triple del ángulo usado al acercarte, y se ajusta el tiempo para que el acercamiento dure lo previsto." },
     ],

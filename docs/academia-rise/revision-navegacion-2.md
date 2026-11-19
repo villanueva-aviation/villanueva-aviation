@@ -1,6 +1,6 @@
 # Revisión de Navegación II — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-18 · Estado: **auditoría lista, esperando la decisión de Erik**.
+Fecha: 2026-11-18 · Estado: **correcciones aplicadas (aprobadas por Erik el 2026-11-18)**.
 
 Qué se revisó:
 - los 14 temas (13 a 26: texto, idea clave y puntos);
@@ -68,3 +68,24 @@ nav-q10 a nav-q12, nav-q15, nav-q17 a nav-q19, nav-q26 a nav-q28 y nav-q30.
   código y así el ejercicio no enseña una cuenta que no cuadra.
 
 Efecto en el avance: ninguno. Siguen 14 lecturas y los mismos 4 ejercicios con los mismos ids.
+
+## Cambios aplicados
+
+Erik aprobó todas las correcciones y D1–D5 (2026-11-18).
+
+- **E1, P1–P9:** textos, ideas clave y puntos de los temas 13, 18, 21, 22, 24, 25 y 26; términos «rumbo
+  magnético», «patrón de espera» y «entrada de gota»; pregunta nav-q29 («tramo de acercamiento de un minuto»,
+  mismo índice correcto).
+- **E2 / D5:** el slider usa la ruta real (unas 109 NM, 110 kt y 40 L/h, sin reserva): de 59 a 93 min y de 39 a
+  62 L. Ahora calcula tiempo = distancia ÷ velocidad (`sliderValor.ts`), así que con 20 kt de viento marca 72 min.
+- **E3 / D1:** 87 clips de Remotion, uno por paso (`remotion-video/src/Academia/Navegacion2/`), en
+  `public/videos/academia/navegacion-temaN-n.*`, con su escena en `src/data/escenas.ts`. El DME va a escala
+  real de lado; el HSI, el ADF y el RMI calculan sus agujas desde el mapa; la ruta MMGL → MMZO y el alterno
+  MMIA están en sus posiciones reales; la espera usa curso de entrada 360 con virajes a la derecha. La imagen de
+  cada tema es el póster de su primer clip; las infografías generadas por IA ya no se usan en este módulo.
+- **D2:** 4 capítulos: «DME y HSI» (temas 13–16, candado nav-q6), «ADF, NDB y RMI» (17–19, nav-q8), «Cartas y
+  planificación de ruta» (20–24, nav-q15 y nav-q12) y «Arco DME y patrón de espera» (25–26, sin candado).
+- **D3:** la lección ahora explica rumbo magnético + rumbo relativo (tema 17), la cola de la aguja de VOR en el
+  RMI (tema 19) y el paso de curso verdadero a rumbo magnético (tema 23).
+- **D4:** ejercicios por capítulo: términos con NDB (2); slider (3); términos con arco DME y escenario del arco (4).
+- **Efecto en el avance:** ninguno. Siguen 14 lecturas y los mismos 4 ejercicios con los mismos ids.

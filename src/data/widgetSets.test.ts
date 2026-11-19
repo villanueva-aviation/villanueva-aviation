@@ -13,6 +13,7 @@ import {
   MODULE_TERMS,
   checkpointsDeModulo,
 } from "./moduleContent.ts";
+import { valorMetrica } from "../features/academia/sliderValor.ts";
 
 const interactividades = ACADEMIA_MODULOS.flatMap((m) =>
   m.actividades.filter((a) => a.tipo === "interactividad").map((a) => ({ modulo: m.slug, ...a })),
@@ -220,4 +221,13 @@ test("ningún módulo se dispara en número de temas", () => {
   for (const c of cuentas) {
     assert.ok(c.temas <= 16, `${c.slug} tiene ${c.temas} temas: conviene partirlo`);
   }
+});
+
+test("el slider de Navegación II calcula el tiempo con distancia ÷ velocidad, no en línea recta", () => {
+  const [gs, tiempo, litros] = MODULE_SLIDERS["navegacion-2"].metrics;
+  assert.deepEqual([valorMetrica(gs, 0), valorMetrica(gs, 0.5), valorMetrica(gs, 1)], [110, 90, 70]);
+  assert.equal(Math.round(valorMetrica(tiempo, 0)), 59);
+  assert.equal(Math.round(valorMetrica(tiempo, 0.5)), 72); // 108.6 NM a 90 kt
+  assert.equal(Math.round(valorMetrica(tiempo, 1)), 93);
+  assert.equal(Math.round(valorMetrica(litros, 0.5)), 48); // 72 min a 40 L/h
 });

@@ -1,8 +1,5 @@
 import { useState } from "react";
-
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
-}
+import { valorMetrica } from "./sliderValor";
 
 export interface SliderMetric {
   label: string;
@@ -11,6 +8,8 @@ export interface SliderMetric {
   to: number;
   decimals?: number;
   warnAbove?: number;
+  /** Va como 1/velocidad (tiempo, combustible): se interpola el inverso. */
+  inversa?: boolean;
 }
 
 export interface SliderConfig {
@@ -48,7 +47,7 @@ export function DragSlider({ config }: { config: SliderConfig }) {
 
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {config.metrics.map((m) => {
-          const raw = lerp(m.from, m.to, t);
+          const raw = valorMetrica(m, t);
           const display = m.decimals !== undefined ? raw.toFixed(m.decimals) : Math.round(raw);
           const isDrag = m.warnAbove !== undefined;
           return (
