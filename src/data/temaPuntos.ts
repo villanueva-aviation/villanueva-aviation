@@ -1057,7 +1057,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "La fraseología existe para eliminar ambigüedad, no para sonar profesional.",
     puntos: [
       { titulo: "Alfabeto fonético", texto: "Alfa, Bravo, Charlie, Delta: así se deletrean matrículas y letras sin confusión." },
-      { titulo: "Números", texto: "dígito por dígito: tres cinco cero, no trescientos cincuenta." },
+      { titulo: "Números", texto: "dígito por dígito en rumbos, pistas, frecuencias y códigos (tres cinco cero); las altitudes en miles y cientos (seis mil quinientos)." },
       { titulo: "Afirmativo y negativo", texto: "sí y no, sin lugar a interpretación." },
       { titulo: "Roger", texto: "recibido y entendido; no promete que vayas a cumplir nada." },
       { titulo: "Wilco", texto: "recibido y voy a cumplir la instrucción." },
@@ -1069,28 +1069,29 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "La estructura", texto: "es fija para cualquier estación y cualquier llamada." },
       { titulo: "Un ejemplo", texto: "Guadalajara Torre, Cessna XB-VLA, en plataforma, solicito rodaje para salida local con información Bravo." },
-      { titulo: "Matrícula completa", texto: "nunca la omitas en el primer contacto; después torre puede autorizarte a abreviarla." },
-      { titulo: "La letra del ATIS", texto: "confirma que ya tienes los datos meteorológicos y evita que te los repitan." },
+      { titulo: "A quién pides el rodaje", texto: "a la torre, o a la frecuencia de rodaje si el aeropuerto tiene una: la carta del aeropuerto dice cuál." },
+      { titulo: "Matrícula completa", texto: "siempre en el primer contacto; la abreviada (X-LA) solo después de que la estación la use." },
+      { titulo: "La letra del ATIS", texto: "confirma que ya escuchaste los datos meteorológicos y evita que te los repitan." },
     ],
   },
   "comunicaciones-tema3": {
     clave: "Todo mantenga corto de pista se lee de vuelta, sin excepción.",
     puntos: [
       { titulo: "Qué te dan", texto: "la ruta exacta y los puntos donde debes detenerte y esperar." },
-      { titulo: "Un ejemplo", texto: "XB-VLA, ruede a pista 20 por calle Alfa, mantenga corto de pista 02." },
-      { titulo: "El readback obligatorio", texto: "es de las pocas instrucciones donde siempre se exige." },
+      { titulo: "Un ejemplo", texto: "XB-VLA, ruede a punto de espera pista 20 por calle Alfa, mantenga corto de pista 20." },
+      { titulo: "El readback obligatorio", texto: "mantenga corto y cualquier instrucción para entrar, cruzar, despegar o aterrizar en una pista." },
       { titulo: "Por qué", texto: "un error ahí puede causar una incursión de pista." },
       { titulo: "Si dudas", texto: "pides que repitan la ruta antes de moverte." },
     ],
   },
   "comunicaciones-tema4": {
-    clave: "Nunca cruzas el umbral sin autorización explícita, aunque la pista se vea despejada.",
+    clave: "Nunca cruzas el punto de espera sin autorización explícita, aunque la pista se vea despejada.",
     puntos: [
-      { titulo: "Primero las listas", texto: "run-up y checklist previa, en la plataforma o el punto de espera designado." },
-      { titulo: "La llamada", texto: "Torre, XB-VLA, listo para despegue, pista 20." },
-      { titulo: "Salida o despegue", texto: "la OACI reserva despegue para la autorización y recomienda decir listo para salida; en la práctica se oyen las dos." },
-      { titulo: "Lo que usan nuestras guías", texto: "las de Comunicaciones VFR e IFR de Descargas dicen listo para salida." },
-      { titulo: "Instrucciones de espera", texto: "mantenga posición, o line up and wait, si hay tráfico en pista o en corta final." },
+      { titulo: "Primero las listas", texto: "run-up y checklist previa, en el punto de espera o la zona designada." },
+      { titulo: "La llamada", texto: "Torre, XB-VLA, listo para salida, pista 20." },
+      { titulo: "Salida o despegue", texto: "la OACI reserva despegue para la autorización; también se oye listo para despegue." },
+      { titulo: "Mantenga posición", texto: "te quedas donde estás, sin entrar a la pista." },
+      { titulo: "Line up and wait", texto: "entras a la pista, te alineas y esperas ahí la autorización de despegue." },
     ],
   },
   "comunicaciones-tema5": {
@@ -1115,7 +1116,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "Quién eres, dónde estás, a qué altitud y qué piensas hacer.",
     puntos: [
       { titulo: "Dónde estás", texto: "normalmente sobre un punto VFR o un radial de VOR." },
-      { titulo: "Un ejemplo", texto: "XB-VLA, sobre el punto Vista Hermosa, seis mil quinientos pies, en tránsito hacia Guadalajara." },
+      { titulo: "Un ejemplo", texto: "XB-VLA, sobre la presa, siete mil quinientos pies, en tránsito hacia Guadalajara." },
       { titulo: "Cuándo importan más", texto: "cerca de espacio aéreo controlado o en zonas de tráfico denso." },
       { titulo: "Quién los usa", texto: "control, y también otros pilotos que monitorean la frecuencia para mantener separación." },
     ],
@@ -1125,7 +1126,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "Cuándo se pide", texto: "para cruzar espacio Clase B, C o D sin aterrizar." },
       { titulo: "Antes de entrar", texto: "solicitas y recibes la autorización de tránsito VFR." },
-      { titulo: "Cómo suena", texto: "Aproximación Guadalajara, Cessna XB-VLA, solicito tránsito VFR de norte a sur, seis mil pies, sobre la ciudad." },
+      { titulo: "Cómo suena", texto: "Aproximación Guadalajara, Cessna XB-VLA, solicito tránsito VFR de norte a sur, ocho mil quinientos pies, sobre la ciudad." },
       { titulo: "Qué puede responder control", texto: "autorizarlo tal cual, darte otra ruta o altitud, o negarlo si hay demasiado tráfico." },
     ],
   },
@@ -1134,7 +1135,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "A quién contactas primero", texto: "a Aproximación, antes de que te transfieran a Torre." },
       { titulo: "Qué te da", texto: "vectores, altitudes y secuenciación respecto a otro tráfico." },
-      { titulo: "Cómo suena", texto: "XB-VLA, vire rumbo 180, descienda y mantenga cinco mil pies, espere vectores para secuencia visual." },
+      { titulo: "Cómo suena", texto: "XB-VLA, vire rumbo 180, descienda y mantenga nueve mil pies, espere vectores para secuencia visual." },
       { titulo: "El aviso de tráfico", texto: "tráfico a las 10, dos millas, mismo nivel." },
       { titulo: "Qué debes hacer", texto: "reportar en cuanto lo tengas a la vista." },
     ],
@@ -1150,12 +1151,13 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     ],
   },
   "comunicaciones-tema11": {
-    clave: "El readback correcto confirmado por control es lo que te autoriza a proceder.",
+    clave: "Colacionas la autorización completa; si algo está mal, control te corrige.",
     puntos: [
-      { titulo: "Qué recibes antes de salir", texto: "el clearance con ruta, altitud inicial, código squawk y frecuencia de salida." },
-      { titulo: "Cómo se lee de vuelta", texto: "completo y palabra por palabra, sobre todo el squawk y las altitudes." },
-      { titulo: "Si te equivocas", texto: "control te corrige y debes repetir la versión correcta antes de continuar." },
-      { titulo: "Por qué es más crítico en IFR", texto: "hay menos margen de referencia visual para detectar un error a tiempo." },
+      { titulo: "Qué recibes antes de salir", texto: "límite, ruta, altitud inicial, frecuencia de salida y código: el orden CRAFT." },
+      { titulo: "Cómo se colaciona", texto: "completa, con todos sus elementos; sobre todo el código y las altitudes." },
+      { titulo: "Si te equivocas", texto: "el controlador te corrige y repites la versión correcta antes de continuar." },
+      { titulo: "Lo que te autoriza", texto: "la autorización misma; la colación solo confirma que la entendiste." },
+      { titulo: "Por qué es más crítico en IFR", texto: "hay menos referencias visuales para detectar un error a tiempo." },
     ],
   },
   "comunicaciones-tema12": {
@@ -1163,8 +1165,8 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "PAN-PAN", texto: "repetido tres veces, para una urgencia sin peligro inmediato de vida, como un pasajero enfermo." },
       { titulo: "MAYDAY", texto: "repetido tres veces, para peligro grave e inminente: falla de motor, incendio a bordo." },
-      { titulo: "El formato", texto: "matrícula, naturaleza de la emergencia, posición, altitud, almas a bordo, combustible restante e intenciones." },
-      { titulo: "Qué te da", texto: "prioridad absoluta sobre cualquier otro tráfico." },
+      { titulo: "El formato", texto: "la estación si hay tiempo, matrícula, emergencia, posición, altitud, almas a bordo, combustible e intenciones." },
+      { titulo: "La prioridad", texto: "MAYDAY va antes que cualquier otra comunicación; PAN-PAN, antes que todas menos MAYDAY." },
       { titulo: "Lo que hará control", texto: "todo lo posible por asistirte." },
     ],
   },

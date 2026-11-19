@@ -2,17 +2,7 @@ import type { PhraseologyCard } from "../features/academia/AudioPhraseology";
 
 export const FRASEOLOGIA_RODAJE_DESPEGUE: PhraseologyCard[] = [
   {
-    situacion: "Acabas de encender el motor y quieres solicitar la información meteorológica antes de pedir rodaje.",
-    callout: "Guadalajara Torre, XB-VLA, solicito información Alfa.",
-    audioUrl: "/audio/fraseologia/rodaje-1.mp3",
-    elementos: [
-      { descripcion: "A quién llamas (Torre)", palabrasClave: ["torre"] },
-      { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra", "extre", "extray"] },
-      { descripcion: "Qué solicitas (información ATIS)", palabrasClave: ["información alfa", "informacion alfa", "solicito información", "solicito informacion"] },
-    ],
-  },
-  {
-    situacion: "Ya tienes la información ATIS y estás listo para pedir rodaje hacia la pista activa.",
+    situacion: "Ya escuchaste la información Alfa en la frecuencia del ATIS y estás listo para pedir rodaje hacia la pista activa.",
     callout: "Guadalajara Torre, XB-VLA, plataforma de aviación general, solicito rodaje, con información Alfa.",
     audioUrl: "/audio/fraseologia/rodaje-2.mp3",
     elementos: [
@@ -24,23 +14,21 @@ export const FRASEOLOGIA_RODAJE_DESPEGUE: PhraseologyCard[] = [
     ],
   },
   {
-    situacion: "La torre te autoriza a rodar, indicando la ruta y un punto donde debes mantenerte corto.",
-    callout: "XB-VLA, ruede a pista 20 por calle Alfa, mantenga corto de pista 02.",
-    audioUrl: "/audio/fraseologia/rodaje-3.mp3",
+    situacion: "La torre te dice: «XB-VLA, ruede a punto de espera pista 20 por calle Alfa, mantenga corto de pista 20». Colaciónala.",
+    callout: "Ruede a punto de espera pista 20 por calle Alfa, mantenga corto de pista 20, XB-VLA.",
     elementos: [
-      { descripcion: "Repites la ruta exacta", palabrasClave: ["calle alfa", "pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
-      { descripcion: "Repites el punto de espera (hold short)", palabrasClave: ["corto de pista 02", "corto de pista cero dos", "mantenga corto"] },
+      { descripcion: "Repites la ruta exacta", palabrasClave: ["calle alfa", "punto de espera"] },
+      { descripcion: "Repites el mantenga corto (hold short)", palabrasClave: ["corto de pista 20", "corto de pista veinte", "corto de pista dos cero", "mantenga corto"] },
       { descripcion: "Dices tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra", "extre", "extray"] },
     ],
   },
   {
     situacion: "Terminaste tu run-up y checklist previa, y estás listo para solicitar la pista.",
-    callout: "Torre, XB-VLA, listo para despegue, pista 20.",
-    audioUrl: "/audio/fraseologia/rodaje-4.mp3",
+    callout: "Torre, XB-VLA, listo para salida, pista 20.",
     elementos: [
       { descripcion: "A quién llamas", palabrasClave: ["torre"] },
       { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra", "extre", "extray"] },
-      { descripcion: "Qué solicitas", palabrasClave: ["listo para despegue"] },
+      { descripcion: "Reportas que estás listo", palabrasClave: ["listo para salida", "listo para despegue"] },
       { descripcion: "Pista", palabrasClave: ["pista 20", "pista veinte", "pista dos cero", "pista 2 cero", "pista 2 0"] },
     ],
   },
@@ -59,11 +47,10 @@ export const FRASEOLOGIA_RODAJE_DESPEGUE: PhraseologyCard[] = [
 export const FRASEOLOGIA_EMERGENCIAS_APROXIMACION: PhraseologyCard[] = [
   {
     situacion: "Aproximación te da vectores y una altitud para secuenciarte con tráfico al frente.",
-    callout: "Vire rumbo 180, descienda y mantenga cinco mil pies, espere vectores para secuencia visual, XB-VLA.",
-    audioUrl: "/audio/fraseologia/emergencia-1.mp3",
+    callout: "Vire rumbo 180, descienda y mantenga nueve mil pies, espere vectores para secuencia visual, XB-VLA.",
     elementos: [
       { descripcion: "Repites rumbo", palabrasClave: ["rumbo 180", "rumbo uno ochenta", "vire rumbo"] },
-      { descripcion: "Repites altitud", palabrasClave: ["cinco mil pies", "5000 pies", "mantenga cinco mil"] },
+      { descripcion: "Repites altitud", palabrasClave: ["nueve mil pies", "9000 pies", "9 000 pies", "mantenga nueve mil"] },
       { descripcion: "Confirmas que entendiste la secuencia", palabrasClave: ["vectores", "secuencia visual", "espere vectores"] },
       { descripcion: "Terminas con tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra", "extre", "extray"] },
     ],
@@ -89,13 +76,12 @@ export const FRASEOLOGIA_EMERGENCIAS_APROXIMACION: PhraseologyCard[] = [
   },
   {
     situacion: "Tienes un pasajero con un malestar que no representa peligro inmediato, pero quieres que control lo sepa.",
-    callout: "PAN-PAN, PAN-PAN, PAN-PAN, XB-VLA, pasajero con malestar médico, solicito prioridad para aterrizar, posición 10 millas al sur de Guadalajara, cinco mil pies, dos almas a bordo.",
-    audioUrl: "/audio/fraseologia/emergencia-4.mp3",
+    callout: "PAN-PAN, PAN-PAN, PAN-PAN, XB-VLA, pasajero con malestar médico, solicito prioridad para aterrizar, posición 10 millas al sur de Guadalajara, nueve mil pies, dos almas a bordo.",
     elementos: [
       { descripcion: "PAN-PAN repetido 3 veces", palabrasClave: ["pan-pan", "pan pan"] },
       { descripcion: "Tu identificación", palabrasClave: ["xb vla", "xb-vla", "x-ray bravo", "x ray bravo", "xray bravo", "ex rey bravo", "ex ray bravo", "torre eiffel", "extreme", "victor lima alfa", "lima alfa", "excre", "extremo", "excel", "exhebra", "extre", "extray"] },
       { descripcion: "Naturaleza de la urgencia", palabrasClave: ["malestar médico", "malestar medico", "pasajero con malestar"] },
-      { descripcion: "Posición y altitud", palabrasClave: ["millas al sur", "cinco mil pies"] },
+      { descripcion: "Posición y altitud", palabrasClave: ["millas al sur", "nueve mil pies"] },
       { descripcion: "Almas a bordo", palabrasClave: ["almas a bordo"] },
     ],
   },

@@ -1,6 +1,6 @@
 # Revisión de Comunicaciones — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-18 · Estado: **auditoría lista, esperando la decisión de Erik**.
+Fecha: 2026-11-18 · Estado: **correcciones aplicadas** (aprobadas por Erik el 2026-11-18).
 
 Qué se revisó:
 - los 13 temas (texto, idea clave y puntos);
@@ -74,3 +74,21 @@ términos; y las 17 preguntas.
   dejarlo genérico como allá («sobre la presa»), salvo que me digas un punto real de MMGL.
 
 Efecto en el avance: ninguno. Siguen 13 lecturas y los mismos 6 ejercicios con los mismos ids.
+
+## Cambios aplicados
+
+Erik aprobó todo: «Sí, apruébalas todas; usa la voz sintética y déjalo genérico».
+
+- **E1–E5 y P1–P8:** corregidos en los textos, las ideas clave y los puntos de los temas 1, 2, 3, 4, 7, 8, 9, 11 y 12;
+  en el circuito de tráfico (el primer tramo ahora es «Salida (viento en cara)») y en las tarjetas de audio.
+- **D4 · Grabaciones:** la tarjeta rodaje-1 (pedir la información Alfa a la torre) se quitó; rodaje-2 ahora dice que
+  ya escuchaste la información en la frecuencia del ATIS. Las tarjetas rodaje-3, rodaje-4, emergencia-1 y
+  emergencia-4 tienen el texto nuevo y usan la voz sintética. Las grabaciones de Erik no se editaron; quedan en su
+  lugar sin usarse.
+- **D5 · Genérico:** el rodaje se pide «a la torre, o a la frecuencia de rodaje si el aeropuerto tiene una»; *line up
+  and wait* se queda en inglés con su explicación en español.
+- **D6 · Genérico:** el punto VFR de ejemplo es «sobre la presa».
+- **D1–D3:** 4 capítulos con sus candados (com-q3, com-q12, com-q13 y com-q6) y los ejercicios repartidos como se
+  propuso. Las 13 infografías se reemplazaron por 76 clips de Remotion, uno por paso.
+- La imagen /images/temas/comunicaciones-tema7.jpg se dejó en su lugar porque el módulo VFR la sigue usando; se
+  revisa en la ronda de VFR.

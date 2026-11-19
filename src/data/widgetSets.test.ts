@@ -239,3 +239,29 @@ test("Cartografía: cada juego de términos va con lo que enseña su capítulo",
   assert.deepEqual(ids("cartografia-3"), ["Punto VFR", "Trazar la ruta", "Aeropuerto no controlado", "MOA", "Vía aérea Víctor", "Declinación magnética"]);
   assert.ok(!MODULE_TERMS["cartografia-2"][0].definition.includes("seguridad"), "el MEF no es una altitud de seguridad");
 });
+
+test("Comunicaciones: cada juego de términos va con lo que enseña su capítulo", () => {
+  const ids = (k: string) => MODULE_TERMS[k].map((t) => t.term);
+  assert.deepEqual(ids("comunicaciones"), ["Wilco", "Roger", "Affirm", "Negative", "Say again", "Standby", "Readback obligatorio"]);
+  assert.deepEqual(ids("comunicaciones-2"), ["Fraseología estándar", "CTAF", "Traffic in sight", "Frequency change approved", "PAN-PAN", "MAYDAY", "Stepping on"]);
+});
+
+test("Comunicaciones: la fraseología con audio no repite los errores de la revisión", () => {
+  const tarjetas = [...AUDIO_SETS["rodaje-despegue"], ...AUDIO_SETS["emergencias-aproximacion"]];
+  const textos = tarjetas.map((c) => c.situacion + " " + c.callout).join(" ");
+  assert.ok(!/pista 02/.test(textos), "la 02 y la 20 son la misma pista");
+  assert.ok(!/cinco mil pies/.test(textos), "cinco mil pies es el nivel de Guadalajara");
+  assert.ok(!/solicito información/i.test(textos), "el ATIS se escucha, no se pide");
+  const listo = AUDIO_SETS["rodaje-despegue"].find((c) => /listo para/.test(c.callout))!;
+  assert.match(listo.callout, /listo para salida/);
+  assert.ok(listo.elementos.some((e) => e.palabrasClave.includes("listo para salida") && e.palabrasClave.includes("listo para despegue")));
+  // Las tarjetas que cambiaron de texto ya no coinciden con la grabación: usan la voz sintética.
+  for (const c of tarjetas) {
+    if (/punto de espera|listo para salida|nueve mil/.test(c.callout)) assert.equal(c.audioUrl, undefined, c.callout);
+  }
+});
+
+test("Circuito: el tramo alineado con la pista después del despegue es la salida", () => {
+  const t = TRAMOS_CIRCUITO.find((x) => x.id === "viento-en-cara")!;
+  assert.match(t.nombre, /^Salida/);
+});

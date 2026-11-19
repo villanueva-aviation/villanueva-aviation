@@ -19,11 +19,11 @@ export const TRAMOS_CIRCUITO: TramoCircuito[] = [
   {
     id: "viento-en-cara",
     numero: 1,
-    nombre: "Viento en Cara",
-    nombreIngles: "Upwind",
+    nombre: "Salida (viento en cara)",
+    nombreIngles: "Departure (upwind)",
     xPct: 68,
     yPct: 80,
-    queHace: "Mantén el rumbo de pista y sigue ascendiendo hasta acercarte a la altitud de circuito (usualmente 1000 pies AGL), preparándote para el primer viraje de 90° hacia viento cruzado.",
+    queHace: "Es el tramo de salida, alineado con la pista; mucha gente lo llama viento en cara, aunque en rigor el viento en cara va paralelo a la pista, desplazado a un lado. Mantén el rumbo de pista y sigue ascendiendo hasta acercarte a la altitud de circuito (usualmente 1000 pies AGL), preparándote para el primer viraje de 90° hacia viento cruzado.",
     reporteRadio: "No suele haber un reporte de radio aquí — ya despegaste con autorización de torre o anunciaste tu salida en la frecuencia CTAF.",
   },
   {
@@ -70,7 +70,7 @@ export const TRAMOS_CIRCUITO: TramoCircuito[] = [
 
 export const SITUACIONES_CIRCUITO: SituacionCircuito[] = [
   { id: "sit-1", prompt: "Acabas de despegar y sigues alineado con el eje de pista, ganando altitud antes del primer viraje. ¿En qué tramo estás?", tramoCorrectoId: "viento-en-cara" },
-  { id: "sit-2", prompt: "Estás a la altitud de despegue, todavía sin haber virado, justo después de cruzar el umbral de pista. ¿Qué tramo es este?", tramoCorrectoId: "viento-en-cara" },
+  { id: "sit-2", prompt: "Estás a la altitud de despegue, todavía sin haber virado, justo después de pasar el final de la pista. ¿Qué tramo es este?", tramoCorrectoId: "viento-en-cara" },
   { id: "sit-3", prompt: "Escuchas: \"Torre, XB-VLA, viento cruzado pista 20.\" ¿En qué tramo está ese avión?", tramoCorrectoId: "viento-cruzado" },
   { id: "sit-4", prompt: "Acabas de virar 90° tras el despegue y sigues ascendiendo hacia la altitud de circuito. ¿Qué tramo es?", tramoCorrectoId: "viento-cruzado" },
   { id: "sit-5", prompt: "Escuchas: \"Torre, XB-VLA, viento en cola pista 20.\" ¿En qué tramo está?", tramoCorrectoId: "viento-en-cola" },

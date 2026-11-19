@@ -200,3 +200,11 @@ test("Cartografía: tres capítulos y los ejercicios donde van", () => {
   const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
   assert.deepEqual(candados, [["cart-q17"], ["cart-q13"], []]);
 });
+
+test("Comunicaciones: cuatro capítulos y los ejercicios donde van", () => {
+  const caps = armarCapitulos("comunicaciones");
+  assert.deepEqual(caps.map((c) => c.titulo), ["Fraseología, primer contacto y rodaje", "Despegue y circuito", "En ruta y llegada", "Aterrizaje, IFR, emergencias y errores"]);
+  assert.deepEqual(caps.map((c) => c.interactivos), [["interactividad-2"], ["interactividad-1"], ["interactividad-3"], ["interactividad-4", "interactividad-5", "interactividad-6"]]);
+  const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
+  assert.deepEqual(candados, [["com-q3"], ["com-q12"], ["com-q13"], ["com-q6"]]);
+});
