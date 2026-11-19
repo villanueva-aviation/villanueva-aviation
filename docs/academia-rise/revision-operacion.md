@@ -1,6 +1,6 @@
 # Revisión de Operación de Aeronave — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-19 · Estado: **pendiente de aprobación de Erik**.
+Fecha: 2026-11-19 · Estado: **correcciones aplicadas (aprobadas por Erik el 2026-11-19)**.
 
 Qué se revisó:
 - los 12 temas (texto, idea clave y puntos);
@@ -77,3 +77,26 @@ Todo lo demás se revisó y está bien:
   magneto) porque cambian mucho de un avión a otro; el texto ya remite al manual.
 
 Efecto en el avance: ninguno. Siguen 12 lecturas y los mismos ejercicios, con los mismos id.
+
+## Cambios aplicados
+
+Erik aprobó todo el 2026-11-19: «Adelante».
+
+- E1 a E3 y P1 a P8: textos, ideas clave, puntos, los términos op-5, op2-4 y op2-5, las preguntas op-q4, op-q14 y
+  op-q16, el escenario del fuego en el arranque y la situación ope-2 del circuito corregidos como se propuso.
+- E4 y D1: 69 clips de Remotion (uno por paso) reemplazan las 12 imágenes, en una sola tanda. Los pasos por tema no
+  cambiaron.
+- D2: el capítulo 1 lleva los dos escenarios; el capítulo 2, los dos juegos de términos y el circuito. Los capítulos,
+  los candados y los id no cambian.
+- D3: las cifras que se agregaron son del C172S y van con «según el POH de tu avión».
+- La prueba del reparto automático de ejercicios usaba Operación de ejemplo; ahora usa Espacios aéreos, que todavía no
+  declara sus ejercicios por capítulo.
+- Pruebas nuevas:
+  - los ejercicios y candados de cada capítulo;
+  - los textos sin los errores de la revisión;
+  - el fuego en el arranque: bombear el acelerador es la opción equivocada y la explicación pide seguir girando;
+  - op-q14 aborta el despegue;
+  - estabilizado a 500 ft (op-5), *hold short* como instrucción y el despegue rechazado sin V1;
+  - en base sigues descendiendo (ope-2);
+  - la presión de aceite en el tiempo del POH (op-q16);
+  - un clip por paso.

@@ -100,7 +100,7 @@ export const SITUACIONES_CIRCUITO_VFR: SituacionCircuito[] = [
 
 export const SITUACIONES_CIRCUITO_OPERACION: SituacionCircuito[] = [
   { id: "ope-1", prompt: "Es el tramo donde corresponde completar el checklist previo a aterrizaje: mezcla, mandos y luces. ¿Cuál es?", tramoCorrectoId: "viento-en-cola" },
-  { id: "ope-2", prompt: "Aquí ajustas flaps y empiezas a configurar la aeronave para el descenso final, después de virar 90° hacia la pista. ¿Qué tramo es?", tramoCorrectoId: "base" },
+  { id: "ope-2", prompt: "Acabas de virar 90° desde el viento en cola: sigues descendiendo y pones más flaps. ¿Qué tramo es?", tramoCorrectoId: "base" },
   { id: "ope-3", prompt: "Es donde confirmas tu autorización de aterrizaje antes de cruzar el umbral. ¿En qué tramo estás?", tramoCorrectoId: "final" },
   { id: "ope-4", prompt: "En este tramo todavía no hay reporte de radio: ya despegaste con autorización o anunciaste tu salida en la frecuencia. ¿Cuál es?", tramoCorrectoId: "viento-en-cara" },
   { id: "ope-5", prompt: "Aquí terminas de alcanzar la altitud de circuito por completo, antes del siguiente viraje. ¿Qué tramo es?", tramoCorrectoId: "viento-cruzado" },

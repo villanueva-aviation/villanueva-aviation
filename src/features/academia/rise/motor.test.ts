@@ -69,13 +69,13 @@ test("cada comprobación va como candado justo después de su tema", () => {
 });
 
 test("los interactivos se reparten en orden entre los capítulos", () => {
-  // Operación todavía no declara sus ejercicios por capítulo: usa el reparto automático.
-  const caps = armarCapitulos("operacion");
+  // Espacios aéreos todavía no declara sus ejercicios por capítulo: usa el reparto automático.
+  const caps = armarCapitulos("espacios-aereos");
   assert.deepEqual(
     caps.map((c) => c.interactivos.length),
-    [2, 3],
+    [2, 2],
   );
-  const orden = ACADEMIA_MODULOS.find((m) => m.slug === "operacion")!
+  const orden = ACADEMIA_MODULOS.find((m) => m.slug === "espacios-aereos")!
     .actividades.filter((a) => a.tipo === "interactividad")
     .map((a) => a.id);
   assert.deepEqual(
@@ -272,4 +272,34 @@ test("VFR: los textos no repiten los errores de la revisión", () => {
   assert.match(todo(2), /FAA/);
   assert.match(todo(2), /ENR 1\.2/);
   assert.match(todo(8), /meterte delante/);
+});
+
+test("Operación: cada ejercicio va en el capítulo donde ya se enseñó lo que pregunta", () => {
+  const caps = armarCapitulos("operacion");
+  assert.deepEqual(caps.map((c) => c.interactivos), [["interactividad-2", "interactividad-4"], ["interactividad-1", "interactividad-3", "interactividad-5"]]);
+  const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
+  assert.deepEqual(candados, [["op-q4", "op-q14"], ["op-q9", "op-q15"]]);
+});
+
+test("Operación: los textos no repiten los errores de la revisión", () => {
+  const temas = flattenTemas("operacion")!;
+  const todo = (n: number) => {
+    const t = temas.find((x) => x.id === "operacion-tema" + n)!;
+    return [t.texto, ...pasosDeTema(t).map((p) => p.titulo + " " + p.texto)].join(" ");
+  };
+  assert.ok(!/manecillas del reloj/.test(todo(1)), "el orden de la inspección es el del POH");
+  assert.match(todo(1), /POH/);
+  assert.match(todo(1), /cabina, cola, ala derecha, nariz y ala izquierda/);
+  assert.ok(!/antes de cruzar el umbral/.test(todo(10)), "estabilizado a más tardar a 500 ft");
+  assert.match(todo(10), /500 pies/);
+  assert.match(todo(2), /[Ll]eer y ejecutar/);
+  assert.ok(!/Lo que no se hace/.test(todo(2)), "leer y ejecutar también es un método");
+  assert.match(todo(3), /30 a 60 segundos/);
+  assert.match(todo(3), /baliza/);
+  assert.match(todo(4), /autorización/);
+  assert.match(todo(4), /línea de espera/);
+  assert.match(todo(6), /en qué punto/);
+  assert.match(todo(8), /acelere/);
+  assert.match(todo(9), /ATIS/);
+  assert.match(todo(9), /5 veces/);
 });

@@ -736,7 +736,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "Siempre, con el mismo patrón, aunque hayas volado ese avión ayer.",
     puntos: [
       { titulo: "Por qué existe", texto: "es tu primera línea de defensa contra fallas mecánicas en el aire." },
-      { titulo: "Mismo patrón cada vez", texto: "normalmente en sentido de las manecillas, para no saltarte ningún punto." },
+      { titulo: "Mismo orden cada vez", texto: "el del POH de tu avión; en el C172: cabina, cola, ala derecha, nariz y ala izquierda." },
       { titulo: "Qué revisas", texto: "superficies de control libres, aceite y combustible, llantas, estructura, luces y antenas." },
       { titulo: "El drenado", texto: "sacar el agua del sistema de combustible antes de que la encuentre el motor." },
       { titulo: "La excusa que no vale", texto: "ya la volé ayer: las condiciones cambian de un vuelo a otro, incluso de una hora a otra." },
@@ -746,7 +746,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "La checklist no reemplaza tu conocimiento: verifica que lo aplicaste bien.",
     puntos: [
       { titulo: "Flujo y verificación", texto: "ejecutas la secuencia de memoria en un flujo lógico por la cabina y después lees la lista para confirmar." },
-      { titulo: "Lo que no se hace", texto: "leer y ejecutar línea por línea desde cero." },
+      { titulo: "Leer y ejecutar", texto: "para lo poco frecuente, lo anormal y la emergencia, después de los pasos de memoria." },
       { titulo: "Normales", texto: "para la operación de rutina." },
       { titulo: "Anormales", texto: "situaciones fuera de lo común que no son emergencia inmediata." },
       { titulo: "De emergencia", texto: "los primeros pasos críticos se memorizan; el resto se consulta." },
@@ -754,21 +754,21 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     ],
   },
   "operacion-tema3": {
-    clave: "Si la presión de aceite no sube en los primeros segundos, apagas de inmediato.",
+    clave: "Si la presión de aceite no sube en el tiempo que marca el POH, apagas de inmediato.",
     puntos: [
-      { titulo: "La secuencia", texto: "sigue la del fabricante: mezcla y potencia en posición, cebado si el motor lo pide en frío, bomba de combustible si aplica." },
+      { titulo: "La secuencia", texto: "sigue la del fabricante: frenos puestos, baliza encendida, mezcla y potencia en posición, cebado si el motor lo pide en frío, bomba de combustible si aplica." },
       { titulo: "DESPEJADO", texto: "en voz alta antes de girar la llave, para alertar a quien esté cerca de la hélice." },
-      { titulo: "Lo primero que miras", texto: "la presión de aceite, apenas arranca." },
+      { titulo: "Lo primero que miras", texto: "la presión de aceite: en el C172S debe llegar al arco verde en 30 a 60 segundos." },
       { titulo: "Por qué tan rápido", texto: "operar sin lubricación adecuada daña el motor severamente en muy poco tiempo." },
     ],
   },
   "operacion-tema4": {
     clave: "El rodaje exige la misma atención que el vuelo mismo.",
     puntos: [
-      { titulo: "La dirección", texto: "con los pedales de timón, que mueven la rueda de nariz en la mayoría de los entrenadores." },
+      { titulo: "La dirección", texto: "con los pedales de timón, que mueven la rueda de nariz en la mayoría de los entrenadores; con viento, los mandos se colocan para que no te levante un ala." },
       { titulo: "La potencia", texto: "la mínima necesaria para mantener movimiento, sin velocidades excesivas." },
       { titulo: "Prueba de frenos", texto: "un leve toque al iniciar el movimiento para confirmar respuesta antes de continuar." },
-      { titulo: "Conciencia situacional", texto: "otro tráfico, vehículos de servicio e instrucciones de control si el aeropuerto es controlado." },
+      { titulo: "En un aeropuerto controlado", texto: "ruedas con autorización y nunca cruzas la línea de espera de una pista sin que te lo autoricen." },
       { titulo: "Por qué importa tanto", texto: "es donde más incursiones de pista y colisiones en tierra ocurren por distracción." },
     ],
   },
@@ -783,7 +783,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     ],
   },
   "operacion-tema6": {
-    clave: "Si algo se ve mal en los primeros segundos, todavía tienes pista para abortar.",
+    clave: "Decide antes en qué punto de la pista abortarías; si algo va mal antes, cierras potencia y frenas.",
     puntos: [
       { titulo: "Potencia y dirección", texto: "potencia completa suave pero sin demora, y pies activos para mantener la línea." },
       { titulo: "Los instrumentos", texto: "monitoreas los del motor en los primeros segundos para confirmar parámetros normales." },
@@ -803,7 +803,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
   "operacion-tema8": {
     clave: "Es el momento de menor carga de trabajo: aprovéchalo para navegar.",
     puntos: [
-      { titulo: "Al nivelar", texto: "reduces potencia al ajuste del POH para esa configuración." },
+      { titulo: "Al nivelar", texto: "dejas que acelere a la velocidad de crucero y después reduces potencia al ajuste del POH." },
       { titulo: "La mezcla", texto: "ajustas para optimizar consumo y rendimiento a esa altitud." },
       { titulo: "Por qué empobrecer", texto: "volar rico de más desperdicia combustible y puede ensuciar bujías." },
       { titulo: "Qué hacer con el tiempo libre", texto: "confirmar posición contra el plan, corregir deriva y hacer tus reportes." },
@@ -814,9 +814,9 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "Multiplica por 3 la altitud a perder en miles de pies: esas son las millas de anticipación.",
     puntos: [
       { titulo: "Por qué planearlo", texto: "evita tener que descender abruptamente cerca del destino." },
-      { titulo: "La regla del 3", texto: "altitud a perder en miles por 3, para bajar a una tasa razonable de unos 500 pies por minuto." },
+      { titulo: "La regla del 3", texto: "altitud a perder en miles por 3; la tasa es unas 5 veces tu velocidad sobre el terreno: a 100 nudos, unos 500 pies por minuto." },
       { titulo: "Antes de bajar", texto: "reduces potencia gradualmente." },
-      { titulo: "Qué más se aprovecha", texto: "reajustar la mezcla hacia más rica, revisar el altímetro contra el reporte del destino." },
+      { titulo: "Qué más se aprovecha", texto: "reajustar la mezcla hacia más rica, escuchar el ATIS del destino y ajustar el altímetro." },
       { titulo: "El repaso mental", texto: "la configuración esperada de aproximación y aterrizaje." },
     ],
   },
@@ -824,7 +824,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "Una aproximación inestable es la señal más clara para irte al aire.",
     puntos: [
       { titulo: "La configuración", texto: "reduces potencia y extiendes flaps en las etapas y velocidades del POH." },
-      { titulo: "Qué es estar estabilizado", texto: "velocidad correcta, tasa de descenso adecuada, alineado y configurado antes de cruzar el umbral." },
+      { titulo: "Qué es estar estabilizado", texto: "velocidad correcta, tasa de descenso adecuada, alineado y configurado a más tardar a 500 pies sobre la pista; si no, te vas al aire." },
       { titulo: "Qué es estar inestable", texto: "muy rápido, muy alto, mal alineado o con la configuración incompleta." },
       { titulo: "La decisión", texto: "go-around, sin dudar y sin sentir vergüenza." },
     ],

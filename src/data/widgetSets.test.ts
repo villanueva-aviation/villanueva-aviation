@@ -362,3 +362,37 @@ test("VFR: en base ya vas descendiendo; el descenso empieza en viento en cola", 
   assert.ok(!/Acabas de dejar la altitud de circuito/.test(s.prompt));
   assert.match(s.prompt, /ya en descenso/);
 });
+
+const preguntaOp = (id: string) => [...MODULE_PRACTICA.operacion, ...MODULE_EVALUACION.operacion].find((p) => p.id === id)!;
+
+test("Operación: fuego en el arranque, seguir girando el arranque es lo correcto", () => {
+  const inicio = MODULE_SCENARIOS.operacion.tree.inicio;
+  const mala = inicio.options.find((o) => o.next === "falla-1")!;
+  assert.match(mala.label, /bombear el acelerador/);
+  const fb = MODULE_SCENARIOS.operacion.tree["falla-1"].outcome!.feedback;
+  assert.ok(!/alimenta el incendio/.test(fb));
+  assert.match(fb, /seguir girando/);
+});
+
+test("Operación: ante una falla en la carrera de despegue se aborta", () => {
+  const q = preguntaOp("op-q14");
+  assert.match(q.opciones[q.correcta], /^Abortar/);
+});
+
+test("Operación: estabilizado a más tardar a 500 ft y términos corregidos", () => {
+  const t = (id: string) => [...MODULE_TERMS.operacion, ...MODULE_TERMS["operacion-2"]].find((x) => x.id === id)!.definition;
+  assert.match(t("op-5"), /500 ft/);
+  assert.match(t("op2-4"), /[Ii]nstrucción/);
+  assert.ok(!/velocidad de decisión/.test(t("op2-5")));
+});
+
+test("Operación: en base sigues descendiendo, el viraje es desde el viento en cola", () => {
+  const s = CIRCUITO_SETS.operacion.find((x) => x.id === "ope-2")!;
+  assert.match(s.prompt, /desde el viento en cola/);
+  assert.match(s.prompt, /sigues descendiendo/);
+});
+
+test("Operación: la presión de aceite con la cifra del C172S", () => {
+  const q = preguntaOp("op-q16");
+  assert.match(q.pregunta, /tiempo que marca el POH/);
+});
