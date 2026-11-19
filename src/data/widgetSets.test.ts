@@ -334,3 +334,31 @@ test("Rendimiento: el simulador dice que sus valores son de ejemplo", () => {
   assert.equal(pista.from, carrera.from * 1.5);
   assert.equal(pista.to, carrera.to * 1.5);
 });
+
+const preguntaVfr = (id: string) => [...MODULE_PRACTICA.vfr, ...MODULE_EVALUACION.vfr].find((p) => p.id === id)!;
+
+test("VFR: de noche solo cambian los mínimos de la Clase G", () => {
+  const q = preguntaVfr("vfr-q15");
+  assert.match(q.opciones[q.correcta], /iguales/);
+  assert.match(q.opciones[q.correcta], /Clase G/);
+});
+
+test("VFR: 500/1,000/2,000 ft es para las Clases C, D y E", () => {
+  assert.match(preguntaVfr("vfr-q2").pregunta, /Clase C, D o E/);
+});
+
+test("VFR: con techo de 900 ft hace falta Special VFR", () => {
+  const q = preguntaVfr("vfr-q8");
+  assert.match(q.opciones[q.correcta], /Special VFR/);
+});
+
+test("VFR: la baliza se enciende antes de arrancar", () => {
+  const t = MODULE_TERMS.vfr.find((x) => x.term === "Baliza (Beacon)")!;
+  assert.match(t.definition, /antes de arrancar/);
+});
+
+test("VFR: en base ya vas descendiendo; el descenso empieza en viento en cola", () => {
+  const s = CIRCUITO_SETS.vfr.find((x) => x.id === "vfr-3")!;
+  assert.ok(!/Acabas de dejar la altitud de circuito/.test(s.prompt));
+  assert.match(s.prompt, /ya en descenso/);
+});

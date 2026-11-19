@@ -1,6 +1,6 @@
 # Revisión de VFR — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-19 · Estado: **propuesta, esperando a Erik**.
+Fecha: 2026-11-19 · Estado: **correcciones aplicadas (aprobadas por Erik el 2026-11-19)**.
 
 Qué se revisó:
 - los 9 temas (texto, idea clave y puntos);
@@ -77,3 +77,30 @@ Todo lo demás se revisó y está bien:
   Si prefieres las de México, necesito que me digas la fuente que quieres citar; no las voy a escribir de memoria.
 
 Efecto en el avance: ninguno. Siguen 9 lecturas y los mismos ejercicios, con los mismos id.
+
+## Cambios aplicados
+
+Erik aprobó todo el 2026-11-19: «Adelante».
+
+- E1 a E4 y P1 a P8: textos, ideas clave, puntos, el término de la baliza, las preguntas vfr-q2, vfr-q8 y vfr-q15
+  y la situación vfr-3 del circuito corregidos como se propuso.
+- E4 también estaba en piezas compartidas del circuito de tráfico (las usan Comunicaciones y Operación): la
+  descripción del viento en cola ahora dice que ahí empieza el descenso, la de base dice «sigues descendiendo», y
+  la situación sit-8 de Comunicaciones también.
+- E5 y D1: 52 clips de Remotion (uno por paso) reemplazan las 9 imágenes. Los temas 2 y 3 ganaron un paso cada uno,
+  porque ahora muestran la tabla de mínimos.
+- D2: el capítulo 1 lleva el escenario de clima cambiante; el capítulo 2, el circuito y el escenario del patrón;
+  el capítulo 3, los términos. Los capítulos, los candados y los id no cambian.
+- D3: el tema 2 dice que las cifras son de la FAA y remite al AIP de México (ENR 1.2); el tema 3 y vfr-q15 dicen
+  «con las reglas de la FAA».
+- La prueba del reparto automático de ejercicios usaba VFR de ejemplo; ahora usa Operación, que todavía no declara
+  sus ejercicios por capítulo.
+- Pruebas nuevas:
+  - los ejercicios de cada capítulo;
+  - los textos sin los errores de la revisión;
+  - de noche solo cambia la Clase G (vfr-q15);
+  - 500/1,000/2,000 ft para las Clases C, D y E (vfr-q2);
+  - el Special VFR con techo bajo 1,000 ft (vfr-q8);
+  - la baliza antes de arrancar;
+  - el descenso desde el viento en cola (vfr-3);
+  - un clip por paso.

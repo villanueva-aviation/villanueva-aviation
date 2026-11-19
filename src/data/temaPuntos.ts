@@ -576,7 +576,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "Qué definen", texto: "la visibilidad mínima y la distancia mínima a las nubes para volar por referencias visuales." },
       { titulo: "De dónde salen", texto: "del principio de ver y evitar, la base de todo el sistema VFR." },
-      { titulo: "Quién es responsable", texto: "el piloto, no el ATC, de detectar y separarse de otro tráfico y de obstáculos." },
+      { titulo: "Quién es responsable", texto: "el piloto, siempre, de detectar y separarse de otro tráfico y de obstáculos, aunque el ATC le dé separación o avisos de tráfico." },
       { titulo: "Qué pasa sin ellos", texto: "sin visibilidad o pegado a las nubes no tienes tiempo de ver a otra aeronave y maniobrar." },
     ],
   },
@@ -584,25 +584,27 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "A más tránsito y más velocidad de cierre, más margen visual te exigen.",
     puntos: [
       { titulo: "De qué dependen", texto: "de la clase de espacio aéreo y de la altitud." },
-      { titulo: "Cerca de un aeropuerto controlado", texto: "más tránsito y aeronaves más rápidas, así que los mínimos son más exigentes." },
-      { titulo: "En no controlado y bajo", texto: "suele bastar con mantenerse despejado de nubes, con visibilidad reducida." },
-      { titulo: "Para el examen", texto: "memorizar la tabla completa por clase de espacio aéreo es parte esencial de la preparación." },
+      { titulo: "Clase B", texto: "3 millas de visibilidad y libre de nubes." },
+      { titulo: "Clases C, D y E", texto: "3 millas, y 500 ft por debajo, 1,000 por encima y 2,000 horizontal de las nubes." },
+      { titulo: "Clase G de día, bajo 1,200 ft AGL", texto: "1 milla y libre de nubes." },
+      { titulo: "De dónde son", texto: "son las cifras de la FAA (EUA); en México consulta el AIP (ENR 1.2) para las vigentes." },
     ],
   },
   "vfr-tema3": {
-    clave: "De noche la referencia exterior es menos confiable, y los mínimos suben con eso.",
+    clave: "De noche ves menos afuera, pero con la FAA los mínimos solo suben en la Clase G.",
     puntos: [
-      { titulo: "Por qué son más estrictos", texto: "la referencia visual del horizonte y del terreno se reduce drásticamente." },
+      { titulo: "El reto", texto: "la referencia visual del horizonte y del terreno se reduce drásticamente." },
       { titulo: "El riesgo", texto: "es mucho más fácil perder la orientación espacial o no detectar tráfico a tiempo." },
-      { titulo: "Qué se vuelve crítico", texto: "identificar bien las luces de otras aeronaves y las del aeródromo." },
-      { titulo: "El respaldo", texto: "un escaneo instrumental más frecuente, porque afuera ves menos." },
+      { titulo: "En espacio controlado", texto: "los mínimos son los mismos de día y de noche." },
+      { titulo: "En Clase G", texto: "de noche suben de 1 milla y libre de nubes a 3 millas y 500, 1,000 y 2,000 ft de las nubes." },
+      { titulo: "Qué se vuelve crítico", texto: "identificar bien las luces de otras aeronaves y del aeródromo, con un escaneo instrumental más frecuente." },
     ],
   },
   "vfr-tema4": {
     clave: "No es un derecho: se pide, y el controlador puede negarlo.",
     puntos: [
-      { titulo: "Qué es", texto: "una autorización del ATC para operar en espacio controlado por debajo de los mínimos VFR normales." },
-      { titulo: "Las condiciones", texto: "mantenerse despejado de nubes, con una visibilidad mínima, típicamente 1 milla estatutaria, y de día." },
+      { titulo: "Qué es", texto: "una autorización del ATC para operar dentro de la zona de superficie de un aeropuerto controlado, por debajo de los mínimos VFR normales." },
+      { titulo: "Las condiciones", texto: "libre de nubes y al menos 1 milla de visibilidad; de noche, solo con habilitación de instrumentos y avión IFR." },
       { titulo: "Cuándo lo niegan", texto: "si hay tránsito IFR que lo haga inseguro; se autoriza aeronave por aeronave." },
       { titulo: "Para qué sirve", texto: "casos límite, como entrar a un aeropuerto controlado justo cuando baja el techo." },
       { titulo: "La condición real", texto: "que el piloto ejerza un juicio conservador antes de siquiera solicitarlo." },
@@ -620,8 +622,8 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
   "vfr-tema6": {
     clave: "El patrón es una secuencia de decisiones, no una figura geométrica que volar.",
     puntos: [
-      { titulo: "Viento en cola", texto: "te da tiempo para el checklist de aterrizaje y para espaciarte del tráfico de adelante." },
-      { titulo: "Viraje a base", texto: "marca el inicio del descenso y es tu última oportunidad de verificar la pista despejada." },
+      { titulo: "Viento en cola", texto: "te da tiempo para el checklist y para espaciarte; a la altura del punto de toque reduces potencia y empiezas a descender." },
+      { titulo: "Base", texto: "sigues descendiendo y es tu última oportunidad de verificar la pista despejada y la final libre." },
       { titulo: "Final", texto: "te alinea con la pista, con la configuración completa ya establecida." },
       { titulo: "Qué distingue a un buen piloto", texto: "gestionar la carga de trabajo en cada tramo, en vez de solo seguir las líneas del circuito." },
     ],
@@ -630,16 +632,16 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "En la CTAF nadie autoriza nada: es información, no instrucción.",
     puntos: [
       { titulo: "Cómo se coordina", texto: "los pilotos se anuncian entre sí en una frecuencia común, sin que nadie autorice movimientos." },
-      { titulo: "El formato", texto: "nombre del aeródromo, matrícula, posición en el patrón y pista." },
-      { titulo: "Un ejemplo", texto: "Tráfico [aeródromo], XB-VLA, entrando viento en cola pista 20." },
-      { titulo: "Dónde reportar", texto: "en entrada, viento en cola, base y final." },
+      { titulo: "El formato", texto: "nombre del aeródromo, matrícula, posición en el patrón, pista y otra vez el nombre del aeródromo." },
+      { titulo: "Un ejemplo", texto: "Tráfico [aeródromo], XB-VLA, entrando viento en cola pista 20, [aeródromo]." },
+      { titulo: "Dónde reportar", texto: "a unas 10 millas, al entrar, en viento en cola, base, final y al librar la pista." },
       { titulo: "Para qué", texto: "para que el resto pueda autosepararse cuando no todos se ven entre sí." },
     ],
   },
   "vfr-tema8": {
     clave: "La prioridad no exime a nadie de ver y evitar.",
     puntos: [
-      { titulo: "La regla general", texto: "la aeronave con menor altura o más cerca de aterrizar tiene preferencia." },
+      { titulo: "La regla general", texto: "la aeronave con menor altura o más cerca de aterrizar tiene preferencia, pero eso no te permite meterte delante de quien ya va en final." },
       { titulo: "El caso típico", texto: "quien ya está en final normalmente tiene prioridad sobre quien apenas entra al patrón." },
       { titulo: "Lo que la prioridad no hace", texto: "no te libera de detectar el conflicto y resolverlo." },
       { titulo: "Qué hacer si lo ves", texto: "comunicarlo por radio y ajustar tu propia trayectoria, por ejemplo extendiendo el viento en cola." },
@@ -649,12 +651,12 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
   "vfr-tema9": {
     clave: "Roja y verde de frente significa que viene directo hacia ti.",
     puntos: [
-      { titulo: "Las de posición", texto: "roja en el ala izquierda, verde en la derecha y blanca en la cola, igual que los barcos." },
-      { titulo: "Cómo se leen", texto: "ver las dos de frente es rumbo de colisión; ver solo una te dice de qué lado va su trayectoria." },
-      { titulo: "La baliza (beacon)", texto: "roja rotativa, se enciende al arrancar el motor: nunca te acerques a una hélice con la baliza prendida." },
+      { titulo: "Las de posición", texto: "roja en el ala izquierda, verde en la derecha y blanca en la cola, igual que los barcos; obligatorias para volar de noche." },
+      { titulo: "Cómo se leen", texto: "las dos de frente: viene hacia ti. Solo su roja: va de tu derecha a tu izquierda y tiene el paso; solo su verde: el paso es tuyo; solo la blanca: se aleja." },
+      { titulo: "La baliza (beacon)", texto: "roja rotativa: se enciende antes de arrancar y se queda encendida con el motor en marcha; nunca te acerques a una hélice con la baliza prendida." },
       { titulo: "Los estrobos", texto: "destellos blancos de alta intensidad, de día y de noche; conviene apagarlos dentro de nubes porque el reflejo desorienta." },
       { titulo: "Aterrizaje y rodaje", texto: "mejoran tu visibilidad ante otros y tu propia visión de la pista o plataforma." },
-      { titulo: "Cuándo van encendidas", texto: "las de posición desde 30 minutos después del ocaso hasta 30 antes del orto; la anticolisión, siempre que el motor esté en marcha." },
+      { titulo: "Cuándo van encendidas", texto: "las de posición, de la puesta a la salida del sol; la anticolisión, siempre que el avión opere, salvo que la apagues por seguridad." },
     ],
   },
 

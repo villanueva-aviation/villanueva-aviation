@@ -43,7 +43,7 @@ export const TRAMOS_CIRCUITO: TramoCircuito[] = [
     nombreIngles: "Downwind",
     xPct: 50,
     yPct: 20,
-    queHace: "Vuelas paralelo a la pista, en sentido contrario a tu despegue, manteniendo la altitud de circuito — aquí completas tu checklist previo a aterrizaje (mezcla, mandos, luces).",
+    queHace: "Vuelas paralelo a la pista, en sentido contrario a tu despegue, manteniendo la altitud de circuito — aquí completas tu checklist previo a aterrizaje (mezcla, mandos, luces), y a la altura del punto de toque reduces potencia y empiezas a descender.",
     reporteRadio: "Torre, XB-VLA, viento en cola pista 20.",
   },
   {
@@ -53,7 +53,7 @@ export const TRAMOS_CIRCUITO: TramoCircuito[] = [
     nombreIngles: "Base",
     xPct: 15,
     yPct: 50,
-    queHace: "Viras 90° hacia la pista, inicias el descenso y ajustas flaps según tu procedimiento, buscando alinear tu tramo final con el eje de pista.",
+    queHace: "Viras 90° hacia la pista, sigues descendiendo y ajustas flaps según tu procedimiento, buscando alinear tu tramo final con el eje de pista.",
     reporteRadio: "Torre, XB-VLA, base pista 20.",
   },
   {
@@ -76,7 +76,7 @@ export const SITUACIONES_CIRCUITO: SituacionCircuito[] = [
   { id: "sit-5", prompt: "Escuchas: \"Torre, XB-VLA, viento en cola pista 20.\" ¿En qué tramo está?", tramoCorrectoId: "viento-en-cola" },
   { id: "sit-6", prompt: "Vuelas paralelo a la pista, en sentido contrario a tu despegue, completando tu checklist previo a aterrizaje. ¿Qué tramo es?", tramoCorrectoId: "viento-en-cola" },
   { id: "sit-7", prompt: "Escuchas: \"Torre, XB-VLA, base pista 20.\" ¿En qué tramo está?", tramoCorrectoId: "base" },
-  { id: "sit-8", prompt: "Acabas de virar hacia la pista y comienzas a descender, bajando flaps. ¿Qué tramo es?", tramoCorrectoId: "base" },
+  { id: "sit-8", prompt: "Acabas de virar 90° hacia la pista y sigues descendiendo, bajando flaps. ¿Qué tramo es?", tramoCorrectoId: "base" },
   { id: "sit-9", prompt: "Escuchas: \"Torre, XB-VLA, final pista 20.\" ¿En qué tramo está?", tramoCorrectoId: "final" },
   { id: "sit-10", prompt: "Estás alineado con el eje de pista, en descenso estabilizado, a punto de cruzar el umbral. ¿Qué tramo es?", tramoCorrectoId: "final" },
 ];
@@ -90,7 +90,7 @@ export const SITUACIONES_CIRCUITO: SituacionCircuito[] = [
 export const SITUACIONES_CIRCUITO_VFR: SituacionCircuito[] = [
   { id: "vfr-1", prompt: "Vienes desde fuera del aeródromo y te incorporas al circuito con un ángulo de 45° hacia el tramo largo, paralelo a la pista. ¿A qué tramo te estás incorporando?", tramoCorrectoId: "viento-en-cola" },
   { id: "vfr-2", prompt: "Es el único tramo en el que vuelas en sentido contrario al de aterrizaje, manteniendo la altitud de circuito. ¿Cuál es?", tramoCorrectoId: "viento-en-cola" },
-  { id: "vfr-3", prompt: "Acabas de dejar la altitud de circuito e iniciaste el descenso, perpendicular al eje de pista. ¿En qué tramo vas?", tramoCorrectoId: "base" },
+  { id: "vfr-3", prompt: "Vas perpendicular al eje de pista, ya en descenso, entre el viento en cola y la final. ¿En qué tramo vas?", tramoCorrectoId: "base" },
   { id: "vfr-4", prompt: "Es el último viraje antes de quedar alineado con la pista, y el punto donde más accidentes por entrada en pérdida ocurren por cruzar el viraje con timón. ¿De qué tramo sales en ese viraje?", tramoCorrectoId: "base" },
   { id: "vfr-5", prompt: "Todavía no has virado y sigues ascendiendo sobre la prolongación del eje de pista, con el viento de frente. ¿Qué tramo es?", tramoCorrectoId: "viento-en-cara" },
   { id: "vfr-6", prompt: "Es el primer viraje después del despegue, perpendicular a la pista y todavía en ascenso hacia la altitud de circuito. ¿Cómo se llama ese tramo?", tramoCorrectoId: "viento-cruzado" },

@@ -5,6 +5,7 @@ import { checkpointsDeModulo, flattenTemas } from "../../../data/moduleContent.t
 import { MISIONES } from "../../../data/misiones.ts";
 import { ESCENAS } from "../../../data/escenas.ts";
 import { armarCapitulos, capituloCompleto, capituloInicial, visualesDeTema } from "./motor.ts";
+import { pasosDeTema } from "../lecturaScroll.ts";
 
 test("los 14 módulos tienen capítulos que abren con portada y terminan con cierre", () => {
   assert.equal(ACADEMIA_MODULOS.length, 14);
@@ -68,12 +69,13 @@ test("cada comprobación va como candado justo después de su tema", () => {
 });
 
 test("los interactivos se reparten en orden entre los capítulos", () => {
-  const caps = armarCapitulos("vfr");
+  // Operación todavía no declara sus ejercicios por capítulo: usa el reparto automático.
+  const caps = armarCapitulos("operacion");
   assert.deepEqual(
     caps.map((c) => c.interactivos.length),
-    [1, 1, 2],
+    [2, 3],
   );
-  const orden = ACADEMIA_MODULOS.find((m) => m.slug === "vfr")!
+  const orden = ACADEMIA_MODULOS.find((m) => m.slug === "operacion")!
     .actividades.filter((a) => a.tipo === "interactividad")
     .map((a) => a.id);
   assert.deepEqual(
@@ -243,4 +245,31 @@ test("Rendimiento: los textos no repiten los errores de la revisión", () => {
   assert.ok(!/30-50%/.test(texto(5)));
   assert.match(texto(6), /un solo control/);
   assert.match(texto(6), /Vs1/);
+});
+
+test("VFR: cada ejercicio va en el capítulo donde ya se enseñó lo que pregunta", () => {
+  const caps = armarCapitulos("vfr");
+  assert.deepEqual(caps.map((c) => c.interactivos), [["interactividad-1"], ["interactividad-3", "interactividad-4"], ["interactividad-2"]]);
+  const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
+  assert.deepEqual(candados, [["vfr-q16"], ["vfr-q6"], ["vfr-q12"]]);
+});
+
+test("VFR: los textos no repiten los errores de la revisión", () => {
+  const temas = flattenTemas("vfr")!;
+  const todo = (n: number) => {
+    const t = temas.find((x) => x.id === "vfr-tema" + n)!;
+    return [t.texto, ...pasosDeTema(t).map((p) => p.titulo + " " + p.texto)].join(" ");
+  };
+  assert.ok(!/en cuanto el motor arranca/.test(todo(9)), "la baliza se enciende antes de arrancar");
+  assert.match(todo(9), /antes de arrancar/);
+  assert.ok(!/30 minutos/.test(todo(9)), "las luces de posición van de la puesta a la salida del sol");
+  assert.match(todo(9), /puesta a la salida del sol/);
+  assert.match(todo(3), /Clase G/);
+  assert.match(todo(3), /mismos/);
+  assert.ok(!/marca el inicio del descenso/.test(todo(6)), "el descenso empieza en viento en cola");
+  assert.match(todo(6), /punto de toque/);
+  assert.match(todo(1), /siempre/);
+  assert.match(todo(2), /FAA/);
+  assert.match(todo(2), /ENR 1\.2/);
+  assert.match(todo(8), /meterte delante/);
 });
