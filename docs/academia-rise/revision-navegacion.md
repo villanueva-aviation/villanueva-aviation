@@ -9,7 +9,7 @@ Qué se revisó:
 - las 12 imágenes de los temas (11 infografías y el SVG del CDI del tema 5).
 
 Fuentes: FAA *Pilot's Handbook of Aeronautical Knowledge* (PHAK, FAA-H-8083-25C, cap. 16), *Instrument Flying
-Handbook* (IFH, FAA-H-8083-15B, cap. 9), AIM 1-1-3 (VOR) y 1-1-8 (NDB).
+Handbook* (IFH, FAA-H-8083-15B, cap. 9), AIM 1-1-2 (NDB) y 1-1-3 (VOR).
 
 ## Errores (se proponen corregir)
 
