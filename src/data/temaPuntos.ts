@@ -318,11 +318,12 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
   "cartografia-tema2": {
     clave: "La leyenda impresa en los márgenes es la fuente oficial de todo símbolo.",
     puntos: [
-      { titulo: "Aeropuertos", texto: "círculo azul relleno si tiene torre de control; magenta si no está controlado." },
-      { titulo: "Tipo de pista", texto: "relleno sólido para pista dura, contorno abierto para superficie blanda." },
+      { titulo: "El color del aeropuerto", texto: "azul si tiene torre de control; magenta si no." },
+      { titulo: "La forma", texto: "círculo abierto con la pista adentro si es pista dura; círculo relleno si no lo es." },
+      { titulo: "Las marquitas", texto: "alrededor del círculo indican combustible y servicio en horario normal." },
       { titulo: "Obstáculos", texto: "un punto y una torre pequeña, acompañados de su altura." },
-      { titulo: "Terreno", texto: "tonos más oscuros de café y naranja conforme sube la elevación." },
-      { titulo: "Por dónde empezar", texto: "aprendiendo la leyenda de tu propia carta: ahí están todos los símbolos explicados." },
+      { titulo: "Terreno", texto: "capas de color del verde en lo bajo al café en lo alto." },
+      { titulo: "Aerovías e isogónicas", texto: "las aerovías Víctor en azul entre los VOR; las isogónicas, discontinuas en magenta, marcan la declinación magnética." },
     ],
   },
   "cartografia-tema3": {
@@ -332,8 +333,9 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
       { titulo: "Clase B", texto: "los aeropuertos más grandes; autorización explícita para entrar." },
       { titulo: "Clase C", texto: "aeropuertos medianos; con reglas OACI también pide autorización." },
       { titulo: "Clase D", texto: "aeropuertos con torre; autorización de la torre para entrar." },
-      { titulo: "Clase E", texto: "espacio controlado general, líneas discontinuas magenta o sombreado." },
+      { titulo: "Clase E", texto: "espacio controlado general: discontinua magenta desde la superficie; franja magenta desde 700 ft o azul desde 1,200 ft." },
       { titulo: "Clase G", texto: "no controlado, sin marcado especial, a baja altura en zonas rurales." },
+      { titulo: "MOA", texto: "zona de operaciones militares con borde rayado magenta: no prohibida, se cruza con precaución." },
     ],
   },
   "cartografia-tema4": {
@@ -347,12 +349,13 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     ],
   },
   "cartografia-tema5": {
-    clave: "El MEF de cada cuadrante es tu referencia rápida de altitud mínima segura.",
+    clave: "El MEF es lo más alto del cuadrante; tu altitud segura va por encima, con margen.",
     puntos: [
-      { titulo: "Cómo se ve el terreno", texto: "sombreado por capas de color, más oscuro cuanto más alto, y líneas de contorno en zonas montañosas." },
+      { titulo: "Cómo se ve el terreno", texto: "capas de color del verde al café, y curvas de nivel que unen puntos de igual elevación." },
       { titulo: "Qué es el MEF", texto: "Maximum Elevation Figure: el número grande impreso en cada cuadrante de la carta." },
-      { titulo: "Qué incluye", texto: "la elevación más alta redondeada hacia arriba, con el obstáculo más alto conocido y un margen de seguridad." },
-      { titulo: "Para qué sirve", texto: "saber la altitud mínima de sobrevuelo sin revisar cada elevación una por una." },
+      { titulo: "Qué incluye", texto: "lo más alto del cuadrante, terreno u obstáculo, con un pequeño margen, redondeado al siguiente centenar." },
+      { titulo: "Cómo se lee", texto: "miles en grande y cientos en chico: 12 y 4 son 12,400 pies." },
+      { titulo: "Lo que no es", texto: "una altitud segura: tu altitud va por encima del MEF, con margen." },
     ],
   },
   "cartografia-tema6": {
@@ -360,7 +363,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "Dónde están", texto: "impresas junto a cada aeropuerto y límite de espacio aéreo, en pequeñas cajas de texto." },
       { titulo: "Cuáles aparecen", texto: "CTAF en aeropuertos no controlados, Torre, Aproximación y Salida, y ATIS." },
-      { titulo: "El color", texto: "azul o magenta según la clase de espacio aéreo asociado." },
+      { titulo: "El color", texto: "el del aeropuerto: azul con torre, magenta sin torre; las de aproximación de B y C, en recuadros junto a su límite." },
       { titulo: "El punto de contacto", texto: "normalmente lo marca el límite dibujado del espacio aéreo correspondiente." },
     ],
   },
@@ -368,7 +371,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "Un punto VFR reemplaza toda una descripción de dónde estás.",
     puntos: [
       { titulo: "Qué son", texto: "ubicaciones visuales reconocibles: cerros, cruces de carreteras, presas, poblados." },
-      { titulo: "Cómo se marcan", texto: "con una estrella o triángulo magenta y un nombre corto." },
+      { titulo: "Cómo se marcan", texto: "banderita o estrella magenta en las cartas de EUA; triángulo en las OACI, relleno si el reporte es obligatorio." },
       { titulo: "Dónde se usan", texto: "cerca de aeropuertos con tráfico denso o espacio Clase B, C y D." },
       { titulo: "Cómo suena", texto: "reportas estar sobre el punto por su nombre y el controlador sabe exactamente dónde estás." },
       { titulo: "El hábito", texto: "memorizar los de tus aeropuertos frecuentes agiliza mucho la radio." },
@@ -378,7 +381,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "Traza la ruta en la carta antes del vuelo; en el aire solo confirmas.",
     puntos: [
       { titulo: "Primero la ruta", texto: "identifica el trazo general y qué espacios aéreos vas a cruzar." },
-      { titulo: "Después la altitud", texto: "revisa el MEF de cada cuadrante que atravesarás." },
+      { titulo: "Después la altitud", texto: "revisa el MEF de cada cuadrante que atravesarás y vuela por encima, con margen." },
       { titulo: "Luego los riesgos", texto: "ubica los obstáculos relevantes en tu trayectoria." },
       { titulo: "Tus referencias", texto: "localiza los VOR y puntos VFR que usarás como checkpoints." },
       { titulo: "Las frecuencias", texto: "anota cuáles necesitarás contactar en cada etapa." },

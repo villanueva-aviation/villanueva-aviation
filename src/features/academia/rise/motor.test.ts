@@ -192,3 +192,11 @@ test("Navegación II: cuatro capítulos y los ejercicios donde van", () => {
   const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
   assert.deepEqual(candados, [["nav-q6"], ["nav-q8"], ["nav-q15", "nav-q12"], []]);
 });
+
+test("Cartografía: tres capítulos y los ejercicios donde van", () => {
+  const caps = armarCapitulos("cartografia");
+  assert.deepEqual(caps.map((c) => c.titulo), ["Cartas, símbolos y espacio aéreo", "Obstáculos, elevaciones y frecuencias", "Puntos VFR y lectura completa"]);
+  assert.deepEqual(caps.map((c) => c.interactivos), [["interactividad-1"], ["interactividad-2"], ["interactividad-3", "interactividad-4"]]);
+  const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
+  assert.deepEqual(candados, [["cart-q17"], ["cart-q13"], []]);
+});

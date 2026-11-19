@@ -231,3 +231,11 @@ test("el slider de Navegación II calcula el tiempo con distancia ÷ velocidad, 
   assert.equal(Math.round(valorMetrica(tiempo, 1)), 93);
   assert.equal(Math.round(valorMetrica(litros, 0.5)), 48); // 72 min a 40 L/h
 });
+
+test("Cartografía: cada juego de términos va con lo que enseña su capítulo", () => {
+  const ids = (k: string) => MODULE_TERMS[k].map((t) => t.term);
+  assert.deepEqual(ids("cartografia"), ["Carta VFR (Sectional)", "Aeropuerto controlado", "Espacio Clase B", "Espacio Clase D"]);
+  assert.deepEqual(ids("cartografia-2"), ["MEF", "CTAF", "Obstáculo '1500 (450)'", "Curvas de nivel"]);
+  assert.deepEqual(ids("cartografia-3"), ["Punto VFR", "Trazar la ruta", "Aeropuerto no controlado", "MOA", "Vía aérea Víctor", "Declinación magnética"]);
+  assert.ok(!MODULE_TERMS["cartografia-2"][0].definition.includes("seguridad"), "el MEF no es una altitud de seguridad");
+});

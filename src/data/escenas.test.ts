@@ -70,3 +70,11 @@ test("los textos de las escenas no usan palabras prohibidas", () => {
   const todo = JSON.stringify(ESCENAS).toLowerCase();
   for (const p of ["certificado", "cfi", "licencia", "curso oficial", "afac", "con ia", "garmin"]) assert.ok(!todo.includes(p), p);
 });
+
+test("cada tema de Cartografía tiene un clip por paso", () => {
+  for (const tema of flattenTemas("cartografia")!) {
+    const visuales = ESCENAS[tema.id] ?? [];
+    assert.equal(visuales.length, pasosDeTema(tema).length, tema.id);
+    assert.ok(visuales.every((v) => v.tipo === "clip"), tema.id);
+  }
+});

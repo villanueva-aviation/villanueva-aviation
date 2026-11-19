@@ -1,6 +1,6 @@
 # Revisión de Cartografía Aeronáutica — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-18 · Estado: **auditoría lista, esperando la decisión de Erik**.
+Fecha: 2026-11-18 · Estado: **correcciones aplicadas (aprobadas por Erik el 2026-11-18)**.
 
 Qué se revisó:
 - los 8 temas (texto, idea clave y puntos);
@@ -66,3 +66,16 @@ cart-q15 a cart-q17.
   («reportas "sobre el punto" por su nombre»). No voy a inventar uno.
 
 Efecto en el avance: ninguno. Siguen 8 lecturas y los mismos 4 ejercicios con los mismos ids.
+
+## Cambios aplicados
+
+Erik aprobó todo el 2026-11-18 («Sí, apruébalas todas; déjalo genérico»).
+
+- **E1–E3 y P1–P7:** textos, puntos, términos, preguntas cart-q3, cart-q5, cart-q10, cart-q12 y cart-q14, y el
+  escenario (falla-2 y éxito) corregidos como se propuso.
+- **E4 y D1:** las 8 infografías se reemplazaron por 50 clips de Remotion, uno por paso (5, 7, 8, 6, 6, 5, 6 y 7),
+  dibujados como la leyenda real. Las frecuencias de los clips son de ejemplo y lo dicen.
+- **D2:** 3 capítulos con los candados cart-q17 y cart-q13 al final de los dos primeros.
+- **D3:** se agregó MOA al tema 3 y aerovías Víctor e isogónicas al tema 2.
+- **D4:** los términos se repartieron por capítulo como se propuso; se quitó el término sobrante cart3-4.
+- **D5:** genérico. Ni «Vista Hermosa» ni ningún otro nombre de punto real; el ejemplo es «sobre la presa».
