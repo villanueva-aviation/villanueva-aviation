@@ -225,3 +225,22 @@ test("Instrumentos: los textos no repiten los errores de la revisión", () => {
   assert.match(texto(7), /único indicador de rumbo/);
   assert.match(texto(10), /oblicua/);
 });
+
+test("Rendimiento: cada ejercicio va en el capítulo donde ya se enseñó lo que pregunta", () => {
+  const caps = armarCapitulos("rendimiento");
+  assert.deepEqual(caps.map((c) => c.interactivos), [["interactividad-3", "interactividad-2"], ["interactividad-1", "interactividad-4"]]);
+  const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
+  assert.deepEqual(candados, [["ren-q16"], ["ren-q6"]]);
+});
+
+test("Rendimiento: los textos no repiten los errores de la revisión", () => {
+  const temas = flattenTemas("rendimiento")!;
+  const texto = (n: number) => temas.find((t) => t.id === "rendimiento-tema" + n)!.texto;
+  assert.ok(!/20-30%/.test(texto(4)), "con 10 nudos de cola, el C172 pide 50%");
+  assert.match(texto(4), /50%/);
+  assert.ok(!/sin previo aviso/.test(texto(2)));
+  assert.match(texto(2), /barrena/);
+  assert.ok(!/30-50%/.test(texto(5)));
+  assert.match(texto(6), /un solo control/);
+  assert.match(texto(6), /Vs1/);
+});

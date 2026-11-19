@@ -300,3 +300,37 @@ test("Instrumentos: el escenario es una sola falla de la toma estática", () => 
   const textos = Object.values(tree).map((n) => n.prompt + " " + (n.outcome?.feedback ?? "")).join(" ");
   assert.ok(!/en descenso indica menos/.test(textos), "con la estática bloqueada, en descenso marca más");
 });
+
+const preguntaRen = (id: string) => [...MODULE_PRACTICA.rendimiento, ...MODULE_EVALUACION.rendimiento].find((p) => p.id === id)!;
+
+test("Rendimiento: la pregunta de altitud de densidad tiene sus propias opciones", () => {
+  const q = preguntaRen("ren-q15");
+  assert.match(q.opciones[q.correcta], /motor/);
+  assert.ok(!q.opciones.some((o) => /estable|ágil/.test(o)), "eran las opciones de la pregunta del CG");
+});
+
+test("Rendimiento: el viento de cola de 10 nudos suma 50% en un C172", () => {
+  for (const id of ["ren-q4", "ren-q17"]) {
+    const q = preguntaRen(id);
+    assert.match(q.opciones[q.correcta], /50%/, id);
+    assert.ok(!q.opciones.some((o) => /20-30%/.test(o)), id);
+  }
+  const q12 = preguntaRen("ren-q12");
+  assert.match(q12.opciones[q12.correcta], /50%/);
+});
+
+test("Rendimiento: el peso vacío ya no excluye el aceite", () => {
+  const t = MODULE_TERMS["rendimiento-2"].find((x) => x.term === "Peso vacío")!;
+  assert.ok(!/aceite utilizable/.test(t.definition));
+  assert.match(t.definition, /combustible no utilizable/);
+});
+
+test("Rendimiento: el simulador dice que sus valores son de ejemplo", () => {
+  const s = MODULE_SLIDERS.rendimiento;
+  assert.match(s.footnote, /ejemplo/i);
+  assert.ok(!s.metrics.some((m) => /Margen de seguridad/.test(m.label)));
+  const pista = s.metrics.find((m) => /50% de margen/.test(m.label))!;
+  const carrera = s.metrics.find((m) => /Carrera/.test(m.label))!;
+  assert.equal(pista.from, carrera.from * 1.5);
+  assert.equal(pista.to, carrera.to * 1.5);
+});

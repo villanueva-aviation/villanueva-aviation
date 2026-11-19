@@ -1,6 +1,6 @@
 # Revisión de Peso y Rendimiento — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-19 · Estado: **auditoría lista, esperando la decisión de Erik**.
+Fecha: 2026-11-19 · Estado: **correcciones aplicadas (aprobadas por Erik el 2026-11-19)**.
 
 Qué se revisó:
 - los 7 temas (texto, idea clave y puntos);
@@ -74,3 +74,25 @@ Todo lo demás se revisó y está bien:
   manual que quieres citar.
 
 Efecto en el avance: ninguno. Siguen 7 lecturas y los mismos ejercicios, con los mismos id.
+
+## Cambios aplicados
+
+Erik aprobó todo el 2026-11-19: «Sí, apruébalas todas; déjalo como ejemplo genérico».
+
+- E1 a E4 y P1 a P6: textos, ideas clave, puntos, términos (ren-5 y ren2-1), preguntas (ren-q4, ren-q12, ren-q15 y
+  ren-q17) y la retroalimentación del escenario corregidos como se propuso.
+- E5 y D1: 42 clips de Remotion (uno por paso) reemplazan las 7 infografías generadas por IA.
+- D2: el capítulo 1 lleva los términos 2 y el simulador de altitud de densidad; el capítulo 2, los términos 1 y el
+  escenario. Los capítulos, los candados y los id no cambian.
+- D3: el simulador queda como ejemplo genérico. La nota dice que los valores son de ejemplo, y el «margen de
+  seguridad» se cambió por «Pista que necesitas, con 50% de margen» (675 a 1,275 m).
+- Los clips que comparan distancias dicen «comparación de ejemplo». Las únicas cifras de un avión real son las del
+  viento de cola del Cessna 172 (10% por cada 2 nudos).
+- Pruebas nuevas:
+  - los ejercicios de cada capítulo;
+  - los textos sin los errores de la revisión;
+  - ren-q15 con sus propias opciones;
+  - el 50% con 10 nudos de cola;
+  - el peso vacío con el aceite;
+  - el simulador rotulado como ejemplo;
+  - un clip por paso.
