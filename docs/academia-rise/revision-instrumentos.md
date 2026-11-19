@@ -1,6 +1,6 @@
 # Revisión de Instrumentos — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-18 · Estado: **auditoría lista, esperando la decisión de Erik**.
+Fecha: 2026-11-18 · Estado: **correcciones aplicadas (aprobadas por Erik el 2026-11-18)**.
 
 Qué se revisó:
 - los 11 temas (texto, idea clave y puntos);
@@ -79,3 +79,19 @@ de vacío (panel parcial y desviarse al campo con mejor clima); y las otras 16 p
   alterna.
 
 Efecto en el avance: ninguno, salvo E6. Siguen 11 lecturas y los mismos ejercicios.
+
+## Cambios aplicados
+
+Erik aprobó todo el 2026-11-18: «Sí, apruébalas todas; usa la falla de la estática».
+
+- E1 a E5 y P1 a P9: textos, ideas clave, puntos, términos y la pregunta ins-q7 corregidos como se propuso.
+- E4 y D5: el escenario pitot-estático quedó como una sola falla de la toma estática; la respuesta correcta es abrir
+  la estática alterna.
+- E6: el segundo juego de términos ahora es `interactividad-5`. El escenario de falla de vacío conserva
+  `interactividad-3`, así que quien ya lo completó no pierde nada.
+- E7 y D1: 63 clips de Remotion (uno por paso) reemplazan las 11 infografías generadas por IA. El tema 9 ya no usa
+  la imagen del RMI de Navegación.
+- D2, D3 y D4: 4 capítulos, candados ins-q4, ins-q6 e ins-q12, y cada ejercicio en el capítulo donde ya se enseñó
+  lo que pregunta.
+- Pruebas nuevas: cuatro capítulos y sus ejercicios, textos sin los errores de la revisión, ANDS en rumbos
+  este-oeste, pitot con presión total, escenario de la estática, ningún id de actividad repetido y un clip por paso.

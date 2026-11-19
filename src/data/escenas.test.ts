@@ -86,3 +86,11 @@ test("cada tema de Comunicaciones tiene un clip por paso", () => {
     assert.ok(visuales.every((v) => v.tipo === "clip"), tema.id);
   }
 });
+
+test("cada tema de Instrumentos tiene un clip por paso", () => {
+  for (const tema of flattenTemas("instrumentos")!) {
+    const visuales = ESCENAS[tema.id] ?? [];
+    assert.equal(visuales.length, pasosDeTema(tema).length, tema.id);
+    assert.ok(visuales.every((v) => v.tipo === "clip"), tema.id);
+  }
+});

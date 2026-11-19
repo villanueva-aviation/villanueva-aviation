@@ -265,3 +265,38 @@ test("Circuito: el tramo alineado con la pista después del despegue es la salid
   const t = TRAMOS_CIRCUITO.find((x) => x.id === "viento-en-cara")!;
   assert.match(t.nombre, /^Salida/);
 });
+
+// Dos actividades con el mismo id comparten el avance: completar una marca las dos.
+test("ningún módulo repite el id de una actividad", () => {
+  for (const m of ACADEMIA_MODULOS) {
+    const ids = m.actividades.map((a) => a.id);
+    assert.equal(new Set(ids).size, ids.length, m.slug);
+  }
+});
+
+test("Instrumentos: el error ANDS es en rumbos este-oeste", () => {
+  const ands = MODULE_TERMS.instrumentos.find((t) => t.term === "ANDS")!;
+  assert.match(ands.definition, /este-oeste/);
+  const q7 = [...MODULE_PRACTICA.instrumentos, ...MODULE_EVALUACION.instrumentos].find((p) => p.id === "ins-q7")!;
+  assert.match(q7.opciones[q7.correcta], /este-oeste/);
+});
+
+test("Instrumentos: el pitot capta la presión total y su bloqueo se describe completo", () => {
+  const t = Object.fromEntries(MODULE_TERMS["instrumentos-2"].map((x) => [x.term, x.definition]));
+  assert.match(t["Tubo pitot"], /presión total/);
+  assert.match(t["Bloqueo del pitot"], /drenaje/);
+});
+
+test("Instrumentos: el escenario es una sola falla de la toma estática", () => {
+  const { tree, startId } = MODULE_SCENARIOS["instrumentos-2"];
+  const inicio = tree[startId];
+  assert.match(inicio.prompt, /altímetro se queda fijo/);
+  const bien = inicio.options.find((o) => /toma estática/.test(o.label))!;
+  assert.equal(bien.next, "segunda");
+  const alterna = tree.segunda.options.find((o) => /estática alterna/.test(o.label))!;
+  assert.equal(tree[alterna.next].outcome?.correct, true);
+  const pitot = tree.segunda.options.find((o) => /calefacción del pitot/.test(o.label))!;
+  assert.equal(tree[pitot.next].outcome?.correct, false);
+  const textos = Object.values(tree).map((n) => n.prompt + " " + (n.outcome?.feedback ?? "")).join(" ");
+  assert.ok(!/en descenso indica menos/.test(textos), "con la estática bloqueada, en descenso marca más");
+});

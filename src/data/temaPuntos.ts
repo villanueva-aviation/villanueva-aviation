@@ -463,32 +463,32 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
 
   // ---------- Instrumentos de Vuelo ----------
   "instrumentos-tema1": {
-    clave: "De alta a baja presión, cuidado abajo: el altímetro te miente a tu favor.",
+    clave: "De alta a baja presión, cuidado abajo: el altímetro marca más altura de la que tienes.",
     puntos: [
-      { titulo: "Cómo mide", texto: "usa la presión estática exterior contra la referencia que ajustas en la ventana Kollsman, en inHg." },
+      { titulo: "Cómo mide", texto: "usa la presión estática exterior contra la referencia que ajustas en la ventana Kollsman: inHg en México y EUA, hectopascales en muchos otros países." },
       { titulo: "Indicada y verdadera", texto: "la que lees directo, y la altura real sobre el nivel del mar corregida por temperatura." },
-      { titulo: "De presión y de densidad", texto: "contra la referencia estándar 29.92, y ajustada por temperatura y presión." },
-      { titulo: "El error peligroso", texto: "si vuelas hacia baja presión sin reajustar, el altímetro marca más altura de la que tienes." },
+      { titulo: "De presión y de densidad", texto: "contra la referencia estándar 29.92, y la de presión corregida por temperatura." },
+      { titulo: "El error peligroso", texto: "si vuelas hacia baja presión o hacia aire más frío sin reajustar, el altímetro marca más altura de la que tienes." }
     ],
   },
   "instrumentos-tema2": {
     clave: "Los arcos de color no son decoración: cada uno marca un rango de operación.",
     puntos: [
-      { titulo: "Cómo mide", texto: "la diferencia entre la presión dinámica del tubo pitot y la presión estática." },
+      { titulo: "Cómo mide", texto: "compara la presión total del tubo pitot con la presión estática: la diferencia es la presión dinámica." },
       { titulo: "Arco blanco y verde", texto: "rango de operación de flaps, y rango normal de operación." },
       { titulo: "Arco amarillo y línea roja", texto: "precaución, solo en aire calmo; y Vne, la que nunca se excede." },
-      { titulo: "IAS, CAS y TAS", texto: "la indicada, la corregida por errores del instrumento y la verdadera, ajustada por densidad." },
-      { titulo: "En altura", texto: "tu TAS real es mayor que la IAS que estás leyendo." },
+      { titulo: "IAS, CAS y TAS", texto: "la indicada, la corregida por errores de instalación y del instrumento, y la verdadera, ajustada por densidad." },
+      { titulo: "En altura", texto: "tu TAS real es mayor que la IAS que estás leyendo." }
     ],
   },
   "instrumentos-tema3": {
-    clave: "En IMC es tu única referencia confiable de actitud.",
+    clave: "En IMC es el único que te muestra la actitud directamente; los demás lo confirman.",
     puntos: [
       { titulo: "Qué muestra", texto: "inclinación y cabeceo respecto al horizonte real." },
       { titulo: "Cómo funciona", texto: "un giroscopio que mantiene su orientación en el espacio sin importar cómo se mueva el avión." },
       { titulo: "De qué se alimenta", texto: "de vacío por bomba, o eléctricamente en aviones más modernos." },
       { titulo: "Su punto débil", texto: "como todo giróscopo mecánico puede sufrir precesión, un error que se acumula poco a poco." },
-      { titulo: "El hábito", texto: "contrastarlo periódicamente con otros instrumentos para confirmar que sigue siendo confiable." },
+      { titulo: "El hábito", texto: "contrastarlo periódicamente con otros instrumentos para confirmar que sigue siendo confiable." }
     ],
   },
   "instrumentos-tema4": {
@@ -511,23 +511,23 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     ],
   },
   "instrumentos-tema6": {
-    clave: "Tiene entre 6 y 9 segundos de retraso: no es para maniobras rápidas.",
+    clave: "La tasa exacta tarda entre 6 y 9 segundos en estabilizarse: no es para maniobras rápidas.",
     puntos: [
       { titulo: "Qué muestra", texto: "la tasa de ascenso o descenso en pies por minuto." },
       { titulo: "Cómo lo mide", texto: "por el cambio de presión estática a través de una fuga calibrada." },
-      { titulo: "El retraso", texto: "no da la tasa instantánea, sino una tendencia que llega tarde." },
+      { titulo: "El retraso", texto: "la tendencia aparece casi de inmediato, pero la tasa exacta tarda 6 a 9 segundos en estabilizarse." },
       { titulo: "Qué usar en su lugar", texto: "para cabeceo rápido, el horizonte artificial es inmediato." },
-      { titulo: "Donde sí brilla", texto: "manteniendo tasas constantes en tramos largos, como una aproximación estabilizada." },
+      { titulo: "Donde sí brilla", texto: "manteniendo tasas constantes en tramos largos, como una aproximación estabilizada." }
     ],
   },
   "instrumentos-tema7": {
-    clave: "Es el único que funciona sin electricidad ni vacío, y el que más miente en maniobra.",
+    clave: "Es el único indicador de rumbo que funciona sin electricidad ni vacío, y el que más miente en maniobra.",
     puntos: [
       { titulo: "Variación", texto: "la diferencia entre norte magnético y verdadero; cambia según dónde estés." },
       { titulo: "Desviación", texto: "la interferencia de los componentes eléctricos y metálicos del propio avión." },
-      { titulo: "ANDS", texto: "en el hemisferio norte, al acelerar hacia el norte marca un giro que no existe; al desacelerar hacia el sur, lo contrario." },
+      { titulo: "ANDS", texto: "en el hemisferio norte, al acelerar en rumbo este u oeste marca un viraje hacia el norte que no existe; al desacelerar, hacia el sur." },
       { titulo: "En virajes", texto: "oscila y se retrasa, así que no sirve como referencia durante la maniobra." },
-      { titulo: "Cómo se usa bien", texto: "vuelas por el indicador de rumbo giroscópico y lo recalibras contra el compás en vuelo recto y nivelado." },
+      { titulo: "Cómo se usa bien", texto: "vuelas por el indicador de rumbo giroscópico y lo recalibras contra el compás en vuelo recto y nivelado." }
     ],
   },
   "instrumentos-tema8": {
@@ -535,27 +535,27 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "Qué combina", texto: "un giro direccional con la información de desviación de curso VOR o ILS." },
       { titulo: "Su ventaja", texto: "al ser giroscópico no sufre la oscilación ni el error ANDS del compás magnético." },
-      { titulo: "Lo que sí necesita", texto: "sincronizarse cada tanto con el compás para corregir la precesión del giróscopo." },
-      { titulo: "A quién reemplaza", texto: "al indicador de rumbo y al CDI tradicional, en cabinas más equipadas." },
+      { titulo: "Lo que sí necesita", texto: "si no está esclavizado a un compás remoto, sincronizarlo cada tanto con el compás para corregir la precesión." },
+      { titulo: "A quién reemplaza", texto: "al indicador de rumbo y al CDI tradicional, en cabinas más equipadas." }
     ],
   },
   "instrumentos-tema9": {
-    clave: "Sus agujas dan rumbo magnético real a la estación, no un rumbo relativo a tu nariz.",
+    clave: "Sus agujas dan el rumbo magnético hacia la estación, no un rumbo relativo a tu nariz.",
     puntos: [
       { titulo: "Qué combina", texto: "una carátula de compás giroscópico con una o dos agujas hacia estaciones ADF o VOR." },
-      { titulo: "Por qué es distinto del ADF simple", texto: "la rosa gira con tu rumbo real, así que la aguja ya te da el rumbo magnético." },
+      { titulo: "Por qué es distinto del ADF simple", texto: "la rosa gira con tu rumbo, así que la punta de la aguja ya te da el rumbo magnético hacia la estación." },
       { titulo: "Su gran ventaja", texto: "orientación instantánea respecto a dos estaciones al mismo tiempo." },
-      { titulo: "Para qué sirve eso", texto: "para fijaciones cruzadas sin cálculos mentales adicionales." },
+      { titulo: "Para qué sirve eso", texto: "para fijaciones cruzadas sin cálculos mentales adicionales." }
     ],
   },
   "instrumentos-tema10": {
     clave: "Te da tres datos a la vez: distancia, velocidad de acercamiento y tiempo.",
     puntos: [
       { titulo: "Cómo mide", texto: "envía un pulso a la estación y cronometra la respuesta, usando la velocidad conocida de la señal." },
-      { titulo: "Distancia", texto: "en millas náuticas hasta la estación." },
-      { titulo: "Groundspeed", texto: "calculada por el cambio de distancia en el tiempo." },
+      { titulo: "Distancia", texto: "en millas náuticas, en línea recta hasta la antena: sobre la estación a 6,000 pies marca cerca de 1 milla." },
+      { titulo: "Groundspeed", texto: "calculada por el cambio de distancia; exacta solo volando directo hacia la estación o desde ella." },
       { titulo: "Tiempo estimado", texto: "a la estación, derivado de los dos anteriores." },
-      { titulo: "Dónde vive", texto: "suele venir integrado con el receptor de NAV o VOR, porque comparten frecuencia de estación." },
+      { titulo: "Dónde vive", texto: "suele venir integrado con el receptor de NAV o VOR, porque comparten frecuencia de estación." }
     ],
   },
   "instrumentos-tema11": {

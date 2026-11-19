@@ -290,24 +290,38 @@ export const MODULE_LECCIONES: Record<string, LeccionContenido[]> = {
   ],
   "instrumentos": [
     {
-      titulo: "Instrumentos de vuelo: altímetro, velocidad, actitud y viraje",
+      titulo: "Altímetro, velocidad y actitud",
+      interactivos: ["interactividad-5"],
       temas: [
-      { id: "instrumentos-tema1", titulo: "Altímetro", texto: "El altímetro mide tu altitud usando la presión estática del aire exterior, comparándola contra una referencia que ajustas manualmente en la ventana Kollsman (en pulgadas de mercurio, inHg). Existen varios tipos de altitud: Indicada (lo que lees directo), Verdadera (altura real sobre el nivel del mar, corregida por temperatura), de Presión (referencia estándar 29.92), y de Densidad (ajustada por temperatura y presión, la que afecta el rendimiento real del avión). Regla clave: 'de alta a baja presión, cuidado abajo' — si vuelas de una zona de alta presión hacia una de baja sin ajustar tu Kollsman, tu altímetro te muestra más altura de la que realmente tienes, un error peligroso cerca del terreno." , imagenes: ["/images/temas/instrumentos-tema1.jpg"]},
-      { id: "instrumentos-tema2", titulo: "Velocidad indicada", texto: "El indicador de velocidad (Airspeed Indicator) mide la diferencia entre presión dinámica (captada por el tubo pitot, que enfrenta el viento relativo) y presión estática, traduciéndola en velocidad. El disco tiene arcos de color con significado operacional: blanco (rango de operación de flaps), verde (rango normal de operación), amarillo (precaución, solo en aire calmo), y una línea roja (Vne, velocidad nunca exceder). Es importante distinguir IAS (velocidad indicada, lo que lees), CAS (corregida por errores del instrumento), y TAS (verdadera, ajustada por densidad del aire a tu altitud) — a mayor altitud, tu TAS real es mayor que tu IAS indicada." , imagenes: ["/images/temas/instrumentos-tema2.jpg"]},
-      { id: "instrumentos-tema3", titulo: "Horizonte artificial", texto: "El Horizonte Artificial (Attitude Indicator) es tu referencia primaria de actitud: muestra tu inclinación (bank) y cabeceo (pitch) respecto al horizonte real, usando un giroscopio que mantiene su orientación en el espacio independientemente del movimiento del avión. Tradicionalmente accionado por vacío (bomba de vacío) o eléctricamente en aviones más modernos. Es especialmente crítico en vuelo por instrumentos (IMC), donde es tu única referencia confiable de actitud sin visibilidad exterior. Como cualquier giróscopo mecánico, puede sufrir precesión (error gradual acumulado) y requiere revisión periódica contra otros instrumentos para confirmar que sigue siendo confiable." , imagenes: ["/images/temas/instrumentos-tema3.jpg"]},
-      { id: "instrumentos-tema4", titulo: "Giro y viraje", texto: "El indicador de Giro y Viraje (Turn and Bank / Turn Needle) muestra tu TASA de giro —qué tan rápido estás virando en grados por segundo— no tu ángulo de inclinación. Un 'viraje estándar' (standard rate turn) es 3 grados por segundo, completando un giro de 360° en exactamente 2 minutos, y es la referencia que se enseña para procedimientos instrumentales. Junto a la aguja de tasa de giro va la bola inclinómetro, que indica si tu viraje está coordinado (bola centrada), derrapando hacia afuera (skidding, bola hacia el lado exterior del viraje) o resbalando hacia adentro (slipping, bola hacia el interior) — información clave para pisar el pedal correcto y corregir." , imagenes: ["/images/temas/instrumentos-tema4.jpg"]},
-      { id: "instrumentos-tema5", titulo: "Coordinador de viraje", texto: "El Coordinador de Viraje (Turn Coordinator) es una evolución del indicador de giro y viraje: en vez de una aguja simple, usa un pequeño avión miniatura inclinado que muestra tanto tu velocidad de alabeo (roll rate) como tu tasa de giro combinadas en un solo movimiento. Mantiene la misma bola inclinómetro en la base para verificar coordinación. Es más intuitivo de leer en maniobras dinámicas porque responde más rápido al inicio de un viraje que el indicador de giro tradicional, dándote información antes en la maniobra." , imagenes: ["/images/temas/instrumentos-tema5.jpg"]},
-      { id: "instrumentos-tema6", titulo: "VSI", texto: "El VSI (Vertical Speed Indicator, o Variómetro) muestra tu tasa de ascenso o descenso en pies por minuto (fpm), midiendo el cambio en la presión estática a través de un sistema de fuga calibrada. Su característica más importante es el retraso (lag) inherente de 6-9 segundos: no muestra tu tasa vertical instantánea, sino una tendencia con retraso, por lo que no debes usarlo como referencia primaria para maniobras rápidas de cabeceo — el horizonte artificial es más inmediato para eso. El VSI es excelente para mantener tasas constantes de ascenso/descenso durante tramos prolongados, como en una aproximación estabilizada." , imagenes: ["/images/temas/instrumentos-tema6.jpg"]},
+      { id: "instrumentos-tema1", titulo: "Altímetro", texto: "El altímetro mide tu altitud usando la presión estática del aire exterior, comparándola contra una referencia que ajustas manualmente en la ventana Kollsman (en México y EUA, en pulgadas de mercurio, inHg; en muchos otros países, en hectopascales). Existen varios tipos de altitud: Indicada (lo que lees directo), Verdadera (altura real sobre el nivel del mar, corregida por temperatura), de Presión (referencia estándar 29.92) y de Densidad (la de presión corregida por temperatura, la que afecta el rendimiento real del avión). Regla clave: 'de alta a baja presión, cuidado abajo' — si vuelas de una zona de alta presión hacia una de baja sin ajustar tu Kollsman, tu altímetro te muestra más altura de la que realmente tienes, un error peligroso cerca del terreno. Con la temperatura pasa igual: en aire más frío que el estándar estás más bajo de lo que indica." , imagenes: ["/videos/academia/instrumentos-tema1-0.jpg"]},
+      { id: "instrumentos-tema2", titulo: "Velocidad indicada", texto: "El indicador de velocidad (Airspeed Indicator) compara la presión total que capta el tubo pitot, que enfrenta el viento relativo, con la presión estática: la diferencia es la presión dinámica, y eso es tu velocidad. El disco tiene arcos de color con significado operacional: blanco (rango de operación de flaps), verde (rango normal de operación), amarillo (precaución, solo en aire calmo), y una línea roja (Vne, velocidad nunca exceder). Es importante distinguir IAS (velocidad indicada, lo que lees), CAS (corregida por errores de instalación y del instrumento), y TAS (verdadera, ajustada por densidad del aire a tu altitud) — a mayor altitud, tu TAS real es mayor que tu IAS indicada." , imagenes: ["/videos/academia/instrumentos-tema2-0.jpg"]},
+      { id: "instrumentos-tema3", titulo: "Horizonte artificial", texto: "El Horizonte Artificial (Attitude Indicator) es tu referencia primaria de actitud: muestra tu inclinación (bank) y cabeceo (pitch) respecto al horizonte real, usando un giroscopio que mantiene su orientación en el espacio independientemente del movimiento del avión. Tradicionalmente accionado por vacío (bomba de vacío) o eléctricamente en aviones más modernos. Es especialmente crítico en vuelo por instrumentos (IMC): es el único que te muestra la actitud directamente, y los demás instrumentos lo confirman. Como cualquier giróscopo mecánico, puede sufrir precesión (error gradual acumulado) y requiere revisión periódica contra otros instrumentos para confirmar que sigue siendo confiable." , imagenes: ["/videos/academia/instrumentos-tema3-0.jpg"]},
       ],
     },
     {
-      titulo: "VSI, compás, HSI, RMI, DME y transponder",
+      titulo: "Viraje y velocidad vertical",
+      interactivos: ["interactividad-1", "interactividad-4"],
       temas: [
-      { id: "instrumentos-tema7", titulo: "Compás", texto: "El compás magnético es el instrumento de rumbo más simple y el único que funciona sin electricidad ni vacío, pero sufre errores característicos que debes conocer: Variación (diferencia entre norte magnético y verdadero, varía por ubicación geográfica), Desviación (interferencia de componentes eléctricos/metálicos del propio avión), y errores dinámicos por la inclinación magnética (dip) — el más conocido es ANDS (Accelerate North, Decelerate South en el hemisferio norte): al acelerar volando hacia el norte el compás indica un giro hacia el norte que no existe, y al desacelerar volando hacia el sur ocurre lo opuesto. También oscila y se retrasa durante virajes, por lo que en maniobras se usa el indicador de rumbo giroscópico, recalibrado periódicamente contra el compás en vuelo recto y nivelado." , imagenes: ["/images/temas/instrumentos-tema7.jpg"]},
-      { id: "instrumentos-tema8", titulo: "HSI", texto: "Como instrumento físico, el HSI combina un giro direccional (heading gyro) con la información de desviación de curso VOR/ILS en una sola carátula integrada. A diferencia del compás magnético, no sufre de los errores dinámicos de oscilación y ANDS porque su referencia de rumbo es giroscópica, no magnética directa — aunque debe sincronizarse periódicamente con el compás magnético para corregir la deriva natural del giróscopo (precesión). Es uno de los instrumentos de \"seis pack avanzado\" que reemplaza tanto al indicador de rumbo como al CDI tradicional en cabinas más equipadas." , imagenes: ["/images/temas/instrumentos-tema8.jpg"]},
-      { id: "instrumentos-tema9", titulo: "RMI", texto: "Como instrumento físico, el RMI combina una carátula de compás giroscópico (igual que el indicador de rumbo) con una o dos agujas indicadoras que apuntan hacia estaciones ADF y/o VOR sintonizadas. La rosa completa gira con tu rumbo real, así que las agujas siempre muestran el rumbo magnético verdadero hacia la estación, no solo un rumbo relativo a tu nariz como el ADF simple. Es apreciado por su capacidad de dar orientación instantánea respecto a dos estaciones simultáneamente, útil para fixes cruzados sin cálculos mentales adicionales." , imagenes: ["/images/temas/navegacion-tema19.jpg"]},
-      { id: "instrumentos-tema10", titulo: "DME", texto: "Como instrumento físico, el DME transmite un pulso de interrogación a la estación terrestre y mide el tiempo que tarda en recibir la respuesta, calculando la distancia por la velocidad conocida de la señal de radio. La carátula típica muestra tres datos simultáneos: distancia en millas náuticas, velocidad de acercamiento (groundspeed) calculada por el cambio de distancia en el tiempo, y tiempo estimado a la estación. Es común encontrarlo integrado físicamente con el receptor de NAV/VOR en el mismo panel, ya que ambos suelen sintonizar la misma frecuencia de estación." , imagenes: ["/images/temas/instrumentos-tema10.jpg"]},
-      { id: "instrumentos-tema11", titulo: "Transponder", texto: "El Transponder es el equipo que responde automáticamente a las interrogaciones del radar de control de tráfico aéreo, transmitiendo un código de 4 dígitos (squawk) que identifica tu aeronave en la pantalla del controlador, junto con tu altitud si tienes Modo C o Modo S (que además transmite datos adicionales). Existen códigos de squawk universales de emergencia que nunca debes usar salvo la situación correspondiente: 7500 (secuestro/interferencia ilícita), 7600 (falla de comunicaciones), y 7700 (emergencia general). El botón IDENT resalta momentáneamente tu posición en la pantalla del controlador cuando te lo solicitan, útil para que te identifiquen entre tráfico denso." , imagenes: ["/images/temas/instrumentos-tema11.jpg"]},
+      { id: "instrumentos-tema4", titulo: "Giro y viraje", texto: "El indicador de Giro y Viraje (Turn and Bank / Turn Needle) muestra tu TASA de giro —qué tan rápido estás virando en grados por segundo— no tu ángulo de inclinación. Un 'viraje estándar' (standard rate turn) es 3 grados por segundo, completando un giro de 360° en exactamente 2 minutos, y es la referencia que se enseña para procedimientos instrumentales. Junto a la aguja de tasa de giro va la bola inclinómetro, que indica si tu viraje está coordinado (bola centrada), derrapando hacia afuera (skidding, bola hacia el lado exterior del viraje) o resbalando hacia adentro (slipping, bola hacia el interior) — información clave para pisar el pedal correcto y corregir." , imagenes: ["/videos/academia/instrumentos-tema4-0.jpg"]},
+      { id: "instrumentos-tema5", titulo: "Coordinador de viraje", texto: "El Coordinador de Viraje (Turn Coordinator) es una evolución del indicador de giro y viraje: en vez de una aguja simple, usa un pequeño avión miniatura inclinado que muestra tanto tu velocidad de alabeo (roll rate) como tu tasa de giro combinadas en un solo movimiento. Mantiene la misma bola inclinómetro en la base para verificar coordinación. Es más intuitivo de leer en maniobras dinámicas porque responde más rápido al inicio de un viraje que el indicador de giro tradicional, dándote información antes en la maniobra." , imagenes: ["/videos/academia/instrumentos-tema5-0.jpg"]},
+      { id: "instrumentos-tema6", titulo: "VSI", texto: "El VSI (Vertical Speed Indicator, o Variómetro) muestra tu tasa de ascenso o descenso en pies por minuto (fpm), midiendo el cambio en la presión estática a través de un sistema de fuga calibrada. Su característica más importante es el retraso (lag): la tendencia —si subes o bajas— aparece casi de inmediato, pero la tasa exacta tarda entre 6 y 9 segundos en estabilizarse, por lo que no debes usarlo como referencia primaria para maniobras rápidas de cabeceo — el horizonte artificial es más inmediato para eso. El VSI es excelente para mantener tasas constantes de ascenso/descenso durante tramos prolongados, como en una aproximación estabilizada." , imagenes: ["/videos/academia/instrumentos-tema6-0.jpg"]},
+      ],
+    },
+    {
+      titulo: "Rumbo: compás, HSI y RMI",
+      interactivos: ["interactividad-3"],
+      temas: [
+      { id: "instrumentos-tema7", titulo: "Compás", texto: "El compás magnético es el instrumento de rumbo más simple y el único indicador de rumbo que funciona sin electricidad ni vacío, pero sufre errores característicos que debes conocer: Variación (diferencia entre norte magnético y verdadero, varía por ubicación geográfica), Desviación (interferencia de componentes eléctricos/metálicos del propio avión), y errores dinámicos por la inclinación magnética (dip) — el más conocido es ANDS (Accelerate North, Decelerate South en el hemisferio norte): al acelerar en rumbo este u oeste, el compás marca un viraje hacia el norte que no existe, y al desacelerar marca uno hacia el sur; en rumbo norte o sur no aparece. También oscila y se retrasa durante virajes, por lo que en maniobras se usa el indicador de rumbo giroscópico, recalibrado periódicamente contra el compás en vuelo recto y nivelado." , imagenes: ["/videos/academia/instrumentos-tema7-0.jpg"]},
+      { id: "instrumentos-tema8", titulo: "HSI", texto: "Como instrumento físico, el HSI combina un giro direccional (heading gyro) con la información de desviación de curso VOR/ILS en una sola carátula integrada. A diferencia del compás magnético, no sufre de los errores dinámicos de oscilación y ANDS porque su referencia de rumbo es giroscópica, no magnética directa. Si está esclavizado a un compás remoto, se mantiene sincronizado solo; si no, debe sincronizarse periódicamente con el compás magnético para corregir la deriva natural del giróscopo (precesión). Reemplaza tanto al indicador de rumbo como al CDI tradicional en cabinas más equipadas." , imagenes: ["/videos/academia/instrumentos-tema8-0.jpg"]},
+      { id: "instrumentos-tema9", titulo: "RMI", texto: "Como instrumento físico, el RMI combina una carátula de compás giroscópico (igual que el indicador de rumbo) con una o dos agujas indicadoras que apuntan hacia estaciones ADF y/o VOR sintonizadas. La rosa completa gira con tu rumbo, así que la punta de cada aguja te da directamente el rumbo magnético hacia la estación, no solo un rumbo relativo a tu nariz como el ADF simple. Es apreciado por su capacidad de dar orientación instantánea respecto a dos estaciones simultáneamente, útil para fixes cruzados sin cálculos mentales adicionales." , imagenes: ["/videos/academia/instrumentos-tema9-0.jpg"]},
+      ],
+    },
+    {
+      titulo: "DME y transponder",
+      interactivos: ["interactividad-2"],
+      temas: [
+      { id: "instrumentos-tema10", titulo: "DME", texto: "Como instrumento físico, el DME transmite un pulso de interrogación a la estación terrestre y mide el tiempo que tarda en recibir la respuesta, calculando la distancia por la velocidad conocida de la señal de radio. Esa distancia es oblicua, en línea recta hasta la antena: sobre la estación a 6,000 pies marca cerca de 1 milla. La carátula típica muestra tres datos simultáneos: distancia en millas náuticas, velocidad respecto al suelo (groundspeed) calculada por el cambio de distancia en el tiempo —exacta solo si vuelas directo hacia la estación o desde ella—, y tiempo estimado a la estación. Es común encontrarlo integrado físicamente con el receptor de NAV/VOR en el mismo panel, ya que la frecuencia del DME va pareada con la del VOR." , imagenes: ["/videos/academia/instrumentos-tema10-0.jpg"]},
+      { id: "instrumentos-tema11", titulo: "Transponder", texto: "El Transponder es el equipo que responde automáticamente a las interrogaciones del radar de control de tráfico aéreo, transmitiendo un código de 4 dígitos (squawk) que identifica tu aeronave en la pantalla del controlador, junto con tu altitud si tienes Modo C o Modo S (que además transmite datos adicionales). Existen códigos de squawk universales de emergencia que nunca debes usar salvo la situación correspondiente: 7500 (secuestro/interferencia ilícita), 7600 (falla de comunicaciones), y 7700 (emergencia general). El botón IDENT resalta momentáneamente tu posición en la pantalla del controlador cuando te lo solicitan, útil para que te identifiquen entre tráfico denso." , imagenes: ["/videos/academia/instrumentos-tema11-0.jpg"]},
       ],
     },
   ],
@@ -491,8 +505,8 @@ export const MODULE_TERMS: Record<string, TermPair[]> = {
     { id: "ins-2", term: "Vne", definition: "Línea roja en el velocímetro: velocidad que nunca debe excederse." },
     { id: "ins-3", term: "Horizonte artificial", definition: "Instrumento primario de actitud, accionado por vacío o eléctricamente." },
     { id: "ins-4", term: "Viraje estándar", definition: "Tasa de giro de 3° por segundo; completa 360° en 2 minutos." },
-    { id: "ins-5", term: "VSI", definition: "Muestra la tasa de ascenso o descenso, con un retraso de 6-9 segundos." },
-    { id: "ins-6", term: "ANDS", definition: "Error del compás magnético al acelerar/desacelerar en rumbos norte-sur." },
+    { id: "ins-5", term: "VSI", definition: "Muestra la tasa de ascenso o descenso; la tasa exacta tarda 6-9 segundos en estabilizarse." },
+    { id: "ins-6", term: "ANDS", definition: "Error del compás magnético al acelerar o desacelerar en rumbos este-oeste." },
     { id: "ins-7", term: "Squawk 7700", definition: "Código de transponder para emergencia general." },
   ],
   rendimiento: [
@@ -569,9 +583,9 @@ export const MODULE_TERMS: Record<string, TermPair[]> = {
   ],
   "instrumentos-2": [
     { id: "ins2-1", term: "Bomba de vacío", definition: "Sistema que energiza el horizonte artificial y el indicador de rumbo en muchos aviones." },
-    { id: "ins2-2", term: "Tubo pitot", definition: "Mide la presión dinámica del aire para calcular la velocidad indicada." },
+    { id: "ins2-2", term: "Tubo pitot", definition: "Capta la presión total (de impacto) del aire; el velocímetro la compara con la estática." },
     { id: "ins2-3", term: "Toma estática", definition: "Mide la presión atmosférica ambiente, usada por altímetro, VSI y velocímetro." },
-    { id: "ins2-4", term: "Bloqueo del pitot", definition: "Falla que hace que el velocímetro se comporte como un altímetro, con lecturas erróneas al cambiar de altitud." },
+    { id: "ins2-4", term: "Bloqueo del pitot", definition: "Si se tapan la entrada y el drenaje, el velocímetro se comporta como altímetro; si solo se tapa la entrada, cae a cero." },
     { id: "ins2-5", term: "Giroscopio", definition: "Instrumento que mantiene su orientación en el espacio, base del horizonte artificial e indicador de rumbo." },
     { id: "ins2-6", term: "Precesión", definition: "Error del horizonte artificial durante virajes o aceleraciones prolongadas; se autocorrige en vuelo nivelado." },
     { id: "ins2-7", term: "Sistema pitot-estático", definition: "Conjunto de instrumentos (velocímetro, altímetro, VSI) que dependen de la presión del aire." },
@@ -762,12 +776,12 @@ const QUIZ_INSTRUMENTOS: QuizPregunta[] = [
   { id: "ins-q4", pregunta: "El horizonte artificial funciona mediante:", opciones: ["Señales GPS recibidas por satélite", "El compás magnético del avión", "El transponder instalado a bordo", "Un giróscopo que mantiene orientación en el espacio"], correcta: 3 },
   { id: "ins-q5", pregunta: "Un 'viraje estándar' completa 360° en:", opciones: ["2 minutos", "30 segundos", "1 minuto", "5 minutos"], correcta: 0 },
   { id: "ins-q6", pregunta: "El retraso característico del VSI es de aproximadamente:", opciones: ["Sin retraso, instantáneo", "6-9 segundos", "1 minuto", "No tiene retraso relevante"], correcta: 1 },
-  { id: "ins-q7", pregunta: "El error ANDS del compás magnético ocurre principalmente:", opciones: ["En vuelo recto y nivelado sin cambios", "Únicamente durante los vuelos nocturnos", "Al acelerar/desacelerar en rumbos norte-sur en el hemisferio norte", "Solo con el transponder del avión encendido"], correcta: 2 },
+  { id: "ins-q7", pregunta: "El error ANDS del compás magnético ocurre principalmente:", opciones: ["En vuelo recto y nivelado sin cambios", "Únicamente durante los vuelos nocturnos", "Al acelerar/desacelerar en rumbos este-oeste en el hemisferio norte", "Solo con el transponder del avión encendido"], correcta: 2 },
   { id: "ins-q8", pregunta: "¿Qué ventaja tiene el HSI sobre el compás magnético en errores dinámicos?", opciones: ["No tiene ninguna ventaja real sobre el compás", "Es más barato de instalar en cabina", "Funciona incluso sin ninguna electricidad", "Su referencia giroscópica no sufre oscilación ni ANDS"], correcta: 3 },
   { id: "ins-q9", pregunta: "¿Qué squawk se usa para indicar secuestro o interferencia ilícita?", opciones: ["7500", "7600", "7700", "1200"], correcta: 0 },
   { id: "ins-q10", pregunta: "El botón IDENT en el transponder sirve para:", opciones: ["Apagar por completo el equipo transponder", "Resaltar tu posición en la pantalla del controlador", "Cambiar la frecuencia sintonizada actualmente", "Declarar una emergencia de forma automática"], correcta: 1 },
   { id: "ins-q11", pregunta: "El Coordinador de Viraje, a diferencia del indicador de giro tradicional, muestra:", opciones: ["Solo la altitud actual del avión", "La presión de aceite del motor", "Velocidad de alabeo y tasa de giro combinadas", "El rumbo magnético del avión en ese momento"], correcta: 2 },
-  { id: "ins-q12", pregunta: "¿Qué distingue al RMI del ADF simple?", opciones: ["No tiene ninguna aguja indicadora visible", "Solo funciona correctamente estando en tierra", "Es un instrumento mucho más antiguo", "Muestra el rumbo magnético real hacia la estación, no solo relativo"], correcta: 3 },
+  { id: "ins-q12", pregunta: "¿Qué distingue al RMI del ADF simple?", opciones: ["No tiene ninguna aguja indicadora visible", "Solo funciona correctamente estando en tierra", "Es un instrumento mucho más antiguo", "Muestra el rumbo magnético hacia la estación, no solo el relativo"], correcta: 3 },
   { id: "ins-q13", pregunta: "El DME calcula la distancia mediante:", opciones: ["El tiempo que tarda la señal en ir y regresar", "El consumo de combustible del motor", "La velocidad del viento en ruta", "El ángulo de la aguja del ADF"], correcta: 0 },
   { id: "ins-q14", pregunta: "IAS, CAS y TAS se diferencian en que:", opciones: ["Son exactamente lo mismo sin ninguna diferencia real", "TAS es la velocidad verdadera, ajustada por la densidad del aire", "CAS solo se usa mientras el avión está en tierra", "IAS es siempre mayor que TAS en cualquier caso"], correcta: 1 },
   { id: "ins-q15", pregunta: "¿Qué error puede sufrir un giróscopo mecánico como el del horizonte artificial?", opciones: ["Oxidación", "Sobrecarga eléctrica", "Precesión", "Ninguno, es infalible"], correcta: 2 },
@@ -986,7 +1000,7 @@ export const MODULE_CHECKPOINTS: Record<string, string[]> = {
   "navegacion-2": ["nav-q6", "nav-q8", "nav-q15", "nav-q12"],
   cartografia: ["cart-q17", "cart-q13"],
   comunicaciones: ["com-q3", "com-q12", "com-q13", "com-q6"],
-  instrumentos: ["ins-q17", "ins-q6", "ins-q12"],
+  instrumentos: ["ins-q4", "ins-q6", "ins-q12"],
   rendimiento: ["ren-q16", "ren-q6"],
   vfr: ["vfr-q16", "vfr-q6", "vfr-q12"],
   operacion: ["op-q4", "op-q14", "op-q9", "op-q15"],
@@ -1081,7 +1095,7 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
       "inicio": {
         id: "inicio",
         prompt:
-          "En vuelo IFR en nubes, notas que el horizonte artificial y el indicador de rumbo comienzan a inclinarse lentamente sin motivo aparente — sospechas una falla de la bomba de vacío.",
+          "En vuelo IFR en nubes, notas que el horizonte artificial se inclina lentamente y el indicador de rumbo gira aunque no estás virando. El indicador de succión marca bajo: sospechas una falla de la bomba de vacío.",
         options: [
           { label: "Ignorar y seguir confiando en el horizonte artificial", next: "falla-1" },
           { label: "Reconocer la falla y volar 'panel parcial' con coordinador de viraje, altímetro y compás", next: "segunda" },
@@ -1582,10 +1596,10 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
       "inicio": {
         id: "inicio",
         prompt:
-          "En vuelo, notas que el velocímetro empieza a comportarse de forma errática: sube y baja igual que el altímetro en vez de reflejar cambios reales de velocidad.",
+          "Subiendo en nubes, el altímetro se queda fijo, el VSI marca cero y el velocímetro marca cada vez menos aunque no cambiaste ni la actitud ni la potencia.",
         options: [
-          { label: "Confiar en el velocímetro y ajustar la actitud según sus lecturas", next: "falla-1" },
-          { label: "Sospechar un bloqueo del sistema pitot-estático, y usar actitud + potencia conocidas en vez del velocímetro", next: "segunda" },
+          { label: "Bajar la nariz para recuperar la velocidad indicada", next: "falla-1" },
+          { label: "Sospechar un bloqueo de la toma estática y volar por actitud y potencia conocidas", next: "segunda" },
         ],
       },
       "falla-1": {
@@ -1596,16 +1610,16 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
         outcome: {
           correct: false,
           feedback:
-            "Un velocímetro que se comporta como altímetro es el síntoma clásico de un bloqueo del sistema pitot-estático — confiar en él puede llevarte a una actitud peligrosa.",
+            "El altímetro fijo y el VSI en cero delatan una toma estática bloqueada. Por encima de la altitud del bloqueo, el velocímetro marca menos de lo que realmente vuelas: bajar la nariz persiguiendo esa lectura te lleva a exceso de velocidad real.",
         },
       },
       "segunda": {
         id: "segunda",
         prompt:
-          "Correcto. Ante indicaciones erráticas del sistema pitot-estático, la referencia segura es la combinación conocida de actitud y potencia para la fase de vuelo, no las lecturas del instrumento afectado.\n\nVuelas por actitud y potencia. Al iniciar el descenso, el velocímetro marca cada vez menos aunque no has reducido potencia, y el altímetro se quedó congelado en la última lectura.",
+          "Correcto. Con la toma estática bloqueada, la referencia segura es la combinación conocida de actitud y potencia para la fase de vuelo, no los instrumentos que dependen de ella.\n\nSigues volando por actitud y potencia. ¿Qué haces con la falla?",
         options: [
-          { label: "Bajar la nariz para recuperar la velocidad indicada", next: "falla-2" },
-          { label: "Abrir la fuente de estática alterna y seguir volando por actitud y potencia", next: "exito" },
+          { label: "Encender la calefacción del pitot y seguir con el velocímetro", next: "falla-2" },
+          { label: "Abrir la fuente de estática alterna", next: "exito" },
         ],
       },
       "falla-2": {
@@ -1616,7 +1630,7 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
         outcome: {
           correct: false,
           feedback:
-            "El altímetro congelado delata que lo bloqueado es la toma estática, no el pitot. Con esa falla el velocímetro miente al revés: en descenso indica menos de lo que realmente vuelas. Bajar la nariz persiguiendo esa lectura te lleva a exceso de velocidad real.",
+            "La calefacción del pitot no destapa la toma estática: lo bloqueado es la estática, como delatan el altímetro fijo y el VSI en cero. El velocímetro seguiría mintiendo.",
         },
       },
       "exito": {
@@ -1627,7 +1641,7 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
         outcome: {
           correct: true,
           feedback:
-            "Correcto. La estática alterna, que toma presión del interior de la cabina, devuelve lecturas utilizables aunque ligeramente altas en altitud. Y mientras tanto, la actitud y la potencia conocidas siguen siendo la referencia que no depende de tuberías bloqueadas.",
+            "Correcto. La estática alterna, que toma presión del interior de la cabina, devuelve lecturas utilizables aunque ligeramente altas en altitud y velocidad. Y mientras tanto, la actitud y la potencia conocidas siguen siendo la referencia que no depende de tuberías bloqueadas.",
         },
       },
     },

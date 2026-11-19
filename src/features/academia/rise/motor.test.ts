@@ -208,3 +208,20 @@ test("Comunicaciones: cuatro capítulos y los ejercicios donde van", () => {
   const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
   assert.deepEqual(candados, [["com-q3"], ["com-q12"], ["com-q13"], ["com-q6"]]);
 });
+
+test("Instrumentos: cuatro capítulos y los ejercicios donde van", () => {
+  const caps = armarCapitulos("instrumentos");
+  assert.deepEqual(caps.map((c) => c.titulo), ["Altímetro, velocidad y actitud", "Viraje y velocidad vertical", "Rumbo: compás, HSI y RMI", "DME y transponder"]);
+  assert.deepEqual(caps.map((c) => c.interactivos), [["interactividad-5"], ["interactividad-1", "interactividad-4"], ["interactividad-3"], ["interactividad-2"]]);
+  const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
+  assert.deepEqual(candados, [["ins-q4"], ["ins-q6"], ["ins-q12"], []]);
+});
+
+test("Instrumentos: los textos no repiten los errores de la revisión", () => {
+  const texto = (n: number) => flattenTemas("instrumentos")!.find((t) => t.id === "instrumentos-tema" + n)!.texto;
+  assert.match(texto(2), /presión total/);
+  assert.ok(!/acelerar volando hacia el norte/.test(texto(7)), "ANDS es en rumbos este u oeste");
+  assert.match(texto(7), /este u oeste/);
+  assert.match(texto(7), /único indicador de rumbo/);
+  assert.match(texto(10), /oblicua/);
+});
