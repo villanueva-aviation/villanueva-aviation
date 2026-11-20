@@ -328,3 +328,36 @@ test("Espacios aéreos: los textos no repiten los errores de la revisión", () =
   const vfr2 = flattenTemas("vfr")!.find((x) => x.id === "vfr-tema2")!;
   assert.match(vfr2.texto, /Espacios aéreos/);
 });
+
+test("Reglamentación: cada ejercicio va en el capítulo donde ya se enseñó lo que pregunta", () => {
+  const caps = armarCapitulos("reglamentacion");
+  assert.deepEqual(caps.map((c) => c.interactivos), [["interactividad-1"], ["interactividad-2", "interactividad-3", "interactividad-4"]]);
+  const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
+  assert.deepEqual(candados, [["reg-q5"], ["reg-q15"]]);
+});
+
+test("Reglamentación: los textos no repiten los errores de la revisión", () => {
+  const temas = flattenTemas("reglamentacion")!;
+  const todo = (n: number) => {
+    const t = temas.find((x) => x.id === "reglamentacion-tema" + n)!;
+    return [t.texto, ...pasosDeTema(t).map((p) => p.titulo + " " + p.texto)].join(" ");
+  };
+  for (const n of [1, 2, 4, 5, 6, 7]) assert.ok(!/RAC 61/.test(todo(n)), "tema " + n);
+  assert.ok(!/marco del RAC 61/.test(todo(3)), "el RAC 61 es de Colombia");
+  assert.match(todo(3), /Colombia/);
+  assert.match(todo(3), /Reglamento para la Expedición de Permisos, Licencias y Certificados/);
+  assert.ok(!/referencia visual constante/.test(todo(1)));
+  assert.ok(!/más lento/.test(todo(1)));
+  for (const r of [/VMC/, /convergen/, /aterriza/, /responsable final/]) assert.match(todo(1), r);
+  assert.ok(!/continu/.test(todo(2)), "fuera del espacio controlado no hay instrucciones continuas");
+  assert.match(todo(2), /[Ff]uera del espacio controlado/);
+  assert.ok(!/Student Pilot/.test(todo(3)));
+  for (const r of [/TPI/, /5,700 kg/, /permiso para formación/i]) assert.match(todo(3), r);
+  for (const r of [/180 horas/, /1,500/, /art\. 50/, /art\. 54/, /art\. 56/]) assert.match(todo(4), r);
+  for (const r of [/aptitud psicofísica/, /21 años/, /tres años/, /nivel 6/]) assert.match(todo(5), r);
+  assert.ok(!/más estricto/.test(todo(6)), "con la tabla OACI los mínimos dependen de la altitud");
+  for (const r of [/alterno/, /altitud/, /Espacios aéreos/]) assert.match(todo(6), r);
+  for (const r of [/alterno/, /Parte II/]) assert.match(todo(7), r);
+  const m = ACADEMIA_MODULOS.find((x) => x.slug === "reglamentacion")!;
+  assert.ok(!/RAC 61/.test(m.proyectoPrompt ?? ""));
+});

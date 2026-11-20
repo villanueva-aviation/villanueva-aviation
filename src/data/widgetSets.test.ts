@@ -438,3 +438,53 @@ test("Espacios aéreos: restricciones temporales por NOTAM, no TFR de la FAA", (
   const act = ACADEMIA_MODULOS.find((m) => m.slug === "espacios-aereos")!.actividades.find((a) => a.id === "interactividad-4")!;
   assert.ok(!/TFR/.test(act.titulo));
 });
+
+const preguntaReg = (id: string) => [...MODULE_PRACTICA.reglamentacion, ...MODULE_EVALUACION.reglamentacion].find((p) => p.id === id)!;
+const terminosReg = [...MODULE_TERMS.reglamentacion, ...MODULE_TERMS["reglamentacion-2"], ...MODULE_TERMS["reglamentacion-3"]];
+const terminoReg = (id: string) => terminosReg.find((x) => x.id === id)!;
+const correctaReg = (id: string) => preguntaReg(id).opciones[preguntaReg(id).correcta];
+
+test("Reglamentación: el RAC 61 es de Colombia; en México manda el Reglamento de licencias", () => {
+  assert.ok(!/RAC 61/.test(terminoReg("reg-4").definition));
+  assert.match(terminoReg("reg-4").definition, /Reglamento/);
+  assert.match(correctaReg("reg-q5"), /Reglamento/);
+  assert.ok(!/RAC/.test(correctaReg("reg-q5")));
+  assert.ok(preguntaReg("reg-q5").opciones.some((o, i) => i !== preguntaReg("reg-q5").correcta && /RAC 61/.test(o)));
+});
+
+test("Reglamentación: sin figuras de la FAA (BFR, endoso, ATP)", () => {
+  const nombres = terminosReg.map((x) => x.term);
+  for (const t of ["BFR", "Endoso", "ATP"]) assert.ok(!nombres.includes(t), t);
+  for (const t of ["Revalidación", "Bitácora de vuelo", "TPI"]) assert.ok(nombres.includes(t), t);
+  assert.match(terminoReg("reg3-2").definition, /3 años/);
+});
+
+test("Reglamentación: VFR en condiciones visuales e IFR sin control continuo", () => {
+  assert.match(terminoReg("reg-1").definition, /VMC/);
+  assert.ok(!/horizonte/.test(terminoReg("reg-1").definition));
+  assert.ok(!/continu/.test(terminoReg("reg-2").definition));
+  assert.match(correctaReg("reg-q1"), /VMC/);
+  assert.ok(!/continu/.test(correctaReg("reg-q3")));
+  assert.match(correctaReg("reg-q3"), /espacio controlado/);
+  assert.ok(!/cruce frontal/.test(preguntaReg("reg-q2").pregunta));
+});
+
+test("Reglamentación: horas, inglés, mínimos y alterno con la regla real", () => {
+  assert.match(correctaReg("reg-q11"), /180/);
+  assert.match(correctaReg("reg-q12"), /tres años/);
+  assert.match(correctaReg("reg-q8"), /altitud/);
+  assert.match(correctaReg("reg-q15"), /alterno/);
+  assert.match(correctaReg("reg-q15"), /no salir/);
+  assert.ok(!/de noche/.test(preguntaReg("reg-q17").pregunta));
+});
+
+test("Reglamentación: el escenario usa una regla mexicana, no los 90 días de la FAA", () => {
+  const textos = Object.values(MODULE_SCENARIOS.reglamentacion.tree)
+    .flatMap((n) => [n.prompt, ...n.options.map((o) => o.label), n.outcome?.feedback ?? ""])
+    .join(" ");
+  assert.ok(!/90 días/.test(textos));
+  assert.ok(!/currency/i.test(textos));
+  assert.match(textos, /aptitud psicofísica/);
+  const act = ACADEMIA_MODULOS.find((m) => m.slug === "reglamentacion")!.actividades.find((a) => a.id === "interactividad-4")!;
+  assert.ok(!/currency/i.test(act.titulo));
+});

@@ -303,13 +303,13 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
     icon: Gavel,
     nivel: "Básico",
     proyectoPrompt:
-      "Investiga los requisitos reales de la autoridad aeronáutica de tu país (AFAC/RAC 61 u otra) para obtener el PPL, y escribe tu propio plan de progresión personal: horas, exámenes y calificaciones que necesitas, en el orden correcto. Envíalo para revisión.",
+      "Investiga los requisitos vigentes de la AFAC (o de la autoridad de tu país) para obtener la licencia de piloto privado, y escribe tu propio plan de progresión: horas, exámenes, certificado de aptitud psicofísica y capacidades que necesitas, en el orden correcto. Envíalo para revisión.",
     actividades: [
       ...leccionesDeTemas("reglamentacion"),
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Relaciona requisitos y mínimos", widget: "terminos", termSetId: "reglamentacion-2" },
       { id: "interactividad-3", tipo: "interactividad", titulo: "Relaciona más términos clave", widget: "terminos", termSetId: "reglamentacion-3" },
-      { id: "interactividad-4", tipo: "interactividad", titulo: "Simulador de decisión: currency vencida", widget: "escenario" },
+      { id: "interactividad-4", tipo: "interactividad", titulo: "Simulador de decisión: tu licencia vigente", widget: "escenario" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: marco regulatorio" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Reglamentación" },
       { id: "proyecto-1", tipo: "proyecto", titulo: "Proyecto final: tu plan de progresión de licencias" },

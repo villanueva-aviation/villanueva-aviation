@@ -1,6 +1,6 @@
 # Revisión de Reglamentación — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-19 · Estado: **propuesta, pendiente de aprobación de Erik**.
+Fecha: 2026-11-19 · Estado: **correcciones aplicadas (aprobadas por Erik el 2026-11-19)**.
 
 Qué se revisó:
 - los 7 temas (texto, idea clave y puntos);
@@ -94,3 +94,30 @@ Todo lo demás se revisó y está bien:
   mantener el módulo general para toda Latinoamérica, dejo la OACI como cifra principal y México como ejemplo.
 
 Efecto en el avance: ninguno. Siguen 7 lecturas y los mismos ejercicios, con los mismos id.
+
+## Cambios aplicados
+
+Erik aprobó todo el 2026-11-19: «Adelante». En D3 se tomó el camino (a) y en D4, las cifras mexicanas con su artículo.
+
+- E1 a E6 y P1 a P8: textos, puntos, ideas clave, términos, preguntas y el proyecto final, corregidos como se propuso:
+  - el tema 1 pasa de 5 a 7 puntos (convergentes y aterrizaje);
+  - el tema 2, de 5 a 6;
+  - el tema 5, de 5 a 6;
+  - el tema 6, de 5 a 6;
+  - el tema 7, de 4 a 5.
+- Términos: reg-1 a reg-4 y reg2-3 corregidos. En el tercer juego, Currency pasa a «Experiencia reciente», BFR a
+  «Revalidación», Endoso a «Bitácora de vuelo», ATP a «TPI» y Rating a «Capacidad (rating)».
+- E7 y D3: el escenario ahora trata del certificado de aptitud psicofísica vencido. Su título pasa a «Simulador de
+  decisión: tu licencia vigente». Los id no cambian.
+- E8 y D1: 48 clips de Remotion (uno por paso) reemplazan las 7 imágenes.
+- D2: el capítulo 1 lleva el primer juego de términos. El capítulo 2 lleva el segundo y el tercer juego y el
+  escenario. Los capítulos, los candados y los id no cambian.
+- Pruebas nuevas:
+  - los ejercicios y candados de cada capítulo;
+  - los textos sin los errores de la revisión;
+  - el RAC 61 es de Colombia (reg-4, reg-q5);
+  - sin BFR, endoso ni ATP;
+  - VFR en VMC e IFR sin control continuo;
+  - horas, inglés, mínimos y alterno;
+  - el escenario sin los 90 días de la FAA;
+  - un clip por paso.

@@ -126,3 +126,11 @@ test("cada tema de Espacios aéreos tiene un clip por paso", () => {
     assert.ok(visuales.every((v) => v.tipo === "clip"), tema.id);
   }
 });
+
+test("cada tema de Reglamentación tiene un clip por paso", () => {
+  for (const tema of flattenTemas("reglamentacion")!) {
+    const visuales = ESCENAS[tema.id] ?? [];
+    assert.equal(visuales.length, pasosDeTema(tema).length, tema.id);
+    assert.ok(visuales.every((v) => v.tipo === "clip"), tema.id);
+  }
+});

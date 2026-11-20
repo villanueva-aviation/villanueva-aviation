@@ -402,19 +402,21 @@ export const MODULE_LECCIONES: Record<string, LeccionContenido[]> = {
   "reglamentacion": [
     {
       titulo: "Reglas VFR/IFR, licencias y horas de vuelo",
+      interactivos: ["interactividad-1"],
       temas: [
-      { id: "reglamentacion-tema1", titulo: "Reglas VFR", texto: "El vuelo VFR (Visual Flight Rules) exige que el piloto mantenga referencia visual constante con el horizonte y el terreno para navegar y evitar tráfico y obstáculos — es la base regulatoria de todo vuelo bajo condiciones meteorológicas visuales (VMC). Incluye reglas de prioridad de paso (right-of-way): un avión que se aproxima de frente cede ambos a la derecha, quien va más lento tiene prioridad sobre quien alcanza por detrás, y las aeronaves menos maniobrables (globos, planeadores, dirigibles) tienen prioridad sobre las motorizadas. También exige respetar los mínimos de visibilidad y separación de nubes correspondientes a cada clase de espacio aéreo que cruces, y llevar a bordo la documentación requerida del avión y del piloto." , imagenes: ["/images/temas/reglamentacion-tema1.jpg"]},
-      { id: "reglamentacion-tema2", titulo: "Reglas IFR", texto: "El vuelo IFR (Instrument Flight Rules) permite operar sin referencia visual externa, navegando exclusivamente por instrumentos y siguiendo instrucciones continuas de control de tránsito aéreo. Requiere presentar y recibir autorización de un plan de vuelo antes de salir, equipo específico a bordo (instrumentos de vuelo redundantes, navegación certificada), y seguir exactamente la ruta y altitud autorizadas — cualquier desviación necesita solicitar y recibir una nueva autorización, salvo emergencia. El piloto IFR también debe mantener su competencia (currency) mediante un mínimo de aproximaciones y procedimientos practicados en un período reciente, cuyo detalle exacto debes verificar contra la normativa vigente de tu autoridad aeronáutica." , imagenes: ["/images/temas/reglamentacion-tema2.jpg"]},
-      { id: "reglamentacion-tema3", titulo: "Licencias", texto: "La progresión típica de licencias/certificados de piloto es: Alumno Piloto (Student Pilot, para entrenamiento con instructor), Piloto Privado (PPL, permite volar sin remuneración, con pasajeros, VFR), Piloto Comercial (CPL, permite volar por remuneración, generalmente requiere también la calificación de instrumentos para operar comercialmente en la práctica), y Piloto de Transporte de Línea Aérea (ATP, el nivel más alto, requerido para operar como comandante en aerolíneas). A esto se suman calificaciones adicionales (ratings) como Instrumentos, Multimotor, e Instructor de Vuelo. En México, la autoridad emisora es la AFAC (Agencia Federal de Aviación Civil), bajo el marco del RAC 61 — consulta siempre la versión vigente para los requisitos exactos actuales." , imagenes: ["/images/temas/reglamentacion-tema3.jpg"]},
-      { id: "reglamentacion-tema4", titulo: "Horas de vuelo", texto: "Los requisitos mínimos de horas de vuelo varían según la autoridad aeronáutica de cada país, aunque suelen seguir referencias similares basadas en estándares OACI: como orden de magnitud ampliamente enseñado internacionalmente, un PPL típicamente requiere alrededor de 40 horas totales de vuelo (con mínimos específicos de instrucción dual y solo), y un CPL requiere considerablemente más, generalmente en el rango de 150-250 horas totales dependiendo del país y la vía de entrenamiento. Estos números son solo una referencia general — para tu examen y tu bitácora oficial, siempre debes confirmar las cifras exactas vigentes en el RAC 61 de la AFAC en México, ya que la regulación puede actualizarse." , imagenes: ["/images/temas/reglamentacion-tema4.jpg"]},
+      { id: "reglamentacion-tema1", titulo: "Reglas VFR", texto: "El vuelo VFR (Visual Flight Rules) se hace en condiciones meteorológicas visuales (VMC): con la visibilidad y la distancia de las nubes que pide cada clase de espacio aéreo, y mirando afuera para ver y evitar el tránsito, el terreno y los obstáculos. Las reglas de derecho de paso dicen quién se aparta. Si dos aviones se acercan de frente, ambos viran a su derecha. Si sus rutas convergen, cede el que tiene al otro a su derecha. Al alcanzar a otro avión, el alcanzado tiene prioridad y quien lo alcanza lo pasa por la derecha. El avión que aterriza o está en final tiene prioridad sobre los que vuelan o están en tierra. Y las aeronaves menos maniobrables (globos, planeadores, dirigibles) tienen prioridad sobre los aviones con motor. Además, hay que llevar a bordo la documentación del avión y del piloto. Por encima de todo, el piloto al mando es el responsable final del vuelo y de cumplir estas reglas." , imagenes: ["/videos/academia/reglamentacion-tema1-0.jpg"]},
+      { id: "reglamentacion-tema2", titulo: "Reglas IFR", texto: "El vuelo IFR (Instrument Flight Rules) permite volar sin referencia visual externa, navegando por instrumentos. Antes de salir hay que presentar un plan de vuelo. En espacio controlado, además, recibes la autorización del control y sigues exactamente la ruta y la altitud autorizadas: cualquier desviación necesita una nueva autorización, salvo emergencia. Fuera del espacio controlado nadie te da instrucciones: vuelas con tu plan de vuelo y el servicio de información de vuelo. El avión debe llevar el equipo que la regulación exige para IFR (instrumentos de vuelo y radios de navegación aprobados), y el piloto necesita la capacidad de vuelo por instrumentos inscrita en su licencia y experiencia reciente, con aproximaciones y procedimientos practicados; confirma el detalle con tu autoridad." , imagenes: ["/videos/academia/reglamentacion-tema2-0.jpg"]},
+      { id: "reglamentacion-tema3", titulo: "Licencias", texto: "En México, la AFAC (Agencia Federal de Aviación Civil) expide las licencias con el Reglamento para la Expedición de Permisos, Licencias y Certificados de Capacidad del Personal Técnico Aeronáutico. No lo confundas con el RAC 61, que es el reglamento de Colombia. La progresión empieza con el permiso para formación como piloto, para volar con instructor y practicar solo; no permite vuelo internacional ni llevar pasajeros. Sigue el piloto privado (PPL), para el servicio privado no comercial en aviones de hasta 5,700 kg. Luego el piloto comercial (CPL), que vuela para terceros y en transporte público como piloto al mando hasta 5,700 kg, o como copiloto de cualquier avión; se examina ya con instrumentos y multimotor y pide título profesional de piloto. Al final, el piloto de transporte público ilimitado (TPI, el ATPL de la OACI), obligatorio para ser piloto al mando de transporte público en aviones de más de 5,700 kg. A la licencia se le suman capacidades o habilitaciones (ratings), como instrumentos, multimotor o instructor de vuelo." , imagenes: ["/videos/academia/reglamentacion-tema3-0.jpg"]},
+      { id: "reglamentacion-tema4", titulo: "Horas de vuelo", texto: "En México, las horas mínimas están en el reglamento de licencias. Piloto privado (art. 50): 40 horas, con al menos 20 con instructor, 5 solo, 5 de travesía con una ruta de al menos 150 millas náuticas y dos aterrizajes en puntos distintos, y 5 en los dos meses anteriores a la solicitud. Piloto comercial (art. 54): 180 horas de instrucción, con 100 como piloto al mando, 20 solo, 5 de noche, 10 en multimotor, 15 reales bajo reglas IFR y 10 en los dos meses anteriores. TPI (art. 56): 1,500 horas. Como comparación, la OACI pide 40, 200 y 1,500 horas; cada país fija las suyas. El reglamento se reforma (la última vez, en agosto de 2023), así que antes de un trámite confirma la versión vigente con la AFAC." , imagenes: ["/videos/academia/reglamentacion-tema4-0.jpg"]},
       ],
     },
     {
       titulo: "Requisitos, mínimos meteorológicos y combustible de reserva",
+      interactivos: ["interactividad-2", "interactividad-3", "interactividad-4"],
       temas: [
-      { id: "reglamentacion-tema5", titulo: "Requisitos", texto: "Más allá de las horas de vuelo, obtener una licencia requiere: un Certificado Médico Aeronáutico vigente (de la clase correspondiente a la licencia que buscas), cumplir la edad mínima establecida por tu autoridad (generalmente 17 años para PPL, 18 para CPL como referencia común, aunque verifica el valor exacto vigente), aprobar un examen de conocimientos teóricos, y aprobar un examen práctico de vuelo (checkride) con un examinador designado. Para operaciones internacionales o radiocomunicación en inglés, también se exige demostrar un nivel de competencia en idioma inglés según la escala OACI, revalidado periódicamente." , imagenes: ["/images/temas/reglamentacion-tema5.jpg"]},
-      { id: "reglamentacion-tema6", titulo: "Mínimos meteorológicos", texto: "Cada clase de espacio aéreo tiene mínimos específicos de visibilidad y distancia de separación respecto a las nubes para poder volar VFR legalmente — en general, el espacio aéreo controlado exige mínimos más estrictos (mayor visibilidad, mayor separación vertical/horizontal de nubes) que el espacio no controlado, y estos mínimos suelen ser aún más exigentes por encima de ciertas altitudes. Para vuelo IFR, cada aeropuerto de destino y alterno tiene mínimos meteorológicos publicados en sus cartas de aproximación (techo y visibilidad mínimos requeridos para intentar la aproximación) — si el pronóstico no alcanza esos mínimos, la regulación exige planificar un alterno adecuado. Consulta siempre la tabla oficial de mínimos VFR/IFR vigente de tu autoridad para los valores exactos por clase de espacio aéreo." , imagenes: ["/images/temas/reglamentacion-tema6.jpg"]},
-      { id: "reglamentacion-tema7", titulo: "Combustible de reserva", texto: "La regulación exige llevar combustible suficiente no solo para completar el vuelo planeado, sino con una reserva adicional obligatoria por si surge un desvío, espera, o condición imprevista. Como referencia ampliamente usada en el estándar internacional: para vuelo VFR diurno se exige comúnmente una reserva mínima de 30 minutos de vuelo a velocidad de crucero normal más allá de tu destino planeado; para VFR nocturno o vuelo IFR, la reserva mínima común aumenta a 45 minutos. Estos números son la referencia general enseñada internacionalmente — confirma el valor exacto vigente en la normativa de tu autoridad antes de aplicarlo como regla absoluta en tu planificación real, ya que estos mínimos pueden variar y son de cumplimiento obligatorio, nunca opcional." , imagenes: ["/images/temas/reglamentacion-tema7.jpg"]},
+      { id: "reglamentacion-tema5", titulo: "Requisitos", texto: "Además de las horas, una licencia pide el certificado de aptitud psicofísica vigente, que es como se llama en México el certificado médico, de la clase que corresponde a la licencia (en la OACI, clase 2 para privado y clase 1 para comercial y TPI). Pide la edad mínima: en México, 18 años para comercial y 21 años para TPI; para privado, el permiso de formación pide ser mayor de edad al terminar su vigencia, y la OACI pide 17. Pide aprobar los exámenes teóricos y el examen práctico de vuelo con un examinador designado, y la bitácora de vuelo con tus horas certificadas por la AFAC. La licencia dura tres años y se revalida con horas recientes en la bitácora (para privado, 3 horas en los últimos dos meses) y el certificado de aptitud psicofísica vigente. Para radiocomunicación en inglés se pide la competencia lingüística de la escala OACI: el nivel 4 dura tres años, el nivel 5 dura seis años y el nivel 6 ya no se vuelve a evaluar." , imagenes: ["/videos/academia/reglamentacion-tema5-0.jpg"]},
+      { id: "reglamentacion-tema6", titulo: "Mínimos meteorológicos", texto: "Para volar VFR, cada clase de espacio aéreo tiene mínimos de visibilidad y de distancia de las nubes. Con la tabla de la OACI, que es la que usa México, dependen sobre todo de la altitud. Por debajo de 10,000 pies se piden 5 km de visibilidad, y 1,500 m horizontales y 1,000 pies verticales de las nubes. Por encima, la visibilidad sube a 8 km. Solo cerca del suelo, en espacio F y G, basta con 5 km, libre de nubes y con la superficie a la vista. La tabla completa está en el módulo Espacios aéreos. En IFR, cada aeropuerto publica techo y visibilidad mínimos en sus cartas de aproximación. El plan IFR lleva un aeropuerto alterno, salvo que el pronóstico del destino sea claramente bueno, y no sales si ni el destino ni el alterno tienen un pronóstico igual o mejor que los mínimos a tu hora de llegada." , imagenes: ["/videos/academia/reglamentacion-tema6-0.jpg"]},
+      { id: "reglamentacion-tema7", titulo: "Combustible de reserva", texto: "La regulación exige llevar combustible para completar el vuelo planeado y, además, una reserva por si surge un desvío, una espera o un imprevisto. La referencia de la OACI para la aviación general (Anexo 6, Parte II) es esta. En VFR de día, combustible hasta el destino y 30 minutos más a velocidad de crucero normal. En VFR de noche, hasta el destino y 45 minutos más. En IFR, hasta el destino, luego hasta el aeropuerto alterno, y después 45 minutos más. Confirma el valor vigente con la AFAC antes de aplicarlo a un vuelo real. Son mínimos de cumplimiento obligatorio, nunca opcionales, y no son un objetivo: con viento en contra o de noche, conviene cargar más." , imagenes: ["/videos/academia/reglamentacion-tema7-0.jpg"]},
       ],
     },
   ],
@@ -545,15 +547,15 @@ export const MODULE_TERMS: Record<string, TermPair[]> = {
     { id: "esp-6", term: "Área prohibida (P-)", definition: "Vuelo prohibido para cualquier avión, sin horario." },
   ],
   reglamentacion: [
-    { id: "reg-1", term: "VFR", definition: "Exige referencia visual constante con el horizonte y el terreno." },
-    { id: "reg-2", term: "IFR", definition: "Permite volar sin referencia visual, siguiendo instrucciones continuas de ATC." },
-    { id: "reg-3", term: "PPL", definition: "Piloto Privado: permite volar sin remuneración, con pasajeros, VFR." },
-    { id: "reg-4", term: "AFAC", definition: "Autoridad que emite licencias de piloto en México, bajo el RAC 61." },
+    { id: "reg-1", term: "VFR", definition: "Vuelo en condiciones visuales (VMC), con los mínimos de cada espacio, viendo y evitando." },
+    { id: "reg-2", term: "IFR", definition: "Vuelo por instrumentos, con plan de vuelo y, en espacio controlado, autorización del control." },
+    { id: "reg-3", term: "PPL", definition: "Piloto privado: servicio privado no comercial, en aviones de hasta 5,700 kg." },
+    { id: "reg-4", term: "AFAC", definition: "Autoridad que expide las licencias de piloto en México, con su Reglamento de licencias." },
   ],
   "reglamentacion-2": [
     { id: "reg2-1", term: "Checkride", definition: "Examen práctico de vuelo con un examinador designado." },
     { id: "reg2-2", term: "Reserva VFR diurna", definition: "Referencia mínima ampliamente enseñada: 30 minutos más allá del destino." },
-    { id: "reg2-3", term: "Certificado médico", definition: "Documento vigente requerido según la clase de licencia buscada." },
+    { id: "reg2-3", term: "Aptitud psicofísica", definition: "Certificado médico vigente que pide toda licencia, de la clase que le corresponde." },
   ],
   ifr: [
     { id: "ifr-1", term: "CRAFT", definition: "Formato de la autorización: Clearance, Route, Altitude, Frequency, Transponder." },
@@ -627,11 +629,11 @@ export const MODULE_TERMS: Record<string, TermPair[]> = {
     { id: "esp2-7", term: "NOTAM de espacio aéreo", definition: "Aviso temporal que puede modificar o restringir un espacio aéreo normalmente disponible." },
   ],
   "reglamentacion-3": [
-    { id: "reg3-1", term: "Currency", definition: "Vigencia reciente de experiencia (despegues/aterrizajes, IFR) requerida para ciertos privilegios." },
-    { id: "reg3-2", term: "BFR", definition: "Revisión de vuelo bienal con instructor, requerida cada 24 meses para mantener vigentes los privilegios." },
-    { id: "reg3-3", term: "Endoso", definition: "Autorización escrita de un instructor para una operación o calificación específica." },
-    { id: "reg3-4", term: "ATP", definition: "Piloto de Transporte de Línea Aérea: el nivel más alto de licencia, requerido para ser comandante en aerolíneas." },
-    { id: "reg3-5", term: "Rating", definition: "Calificación adicional a la licencia, como instrumentos, multimotor o instructor de vuelo." },
+    { id: "reg3-1", term: "Experiencia reciente", definition: "Horas y procedimientos volados hace poco, que se piden para revalidar y para ciertos privilegios." },
+    { id: "reg3-2", term: "Revalidación", definition: "Cada 3 años, con horas recientes en la bitácora y la aptitud psicofísica vigente." },
+    { id: "reg3-3", term: "Bitácora de vuelo", definition: "Registro de tus horas, que la AFAC certifica y pide para cada licencia y revalidación." },
+    { id: "reg3-4", term: "TPI", definition: "Piloto de transporte público ilimitado: obligatorio para ser piloto al mando de transporte público de más de 5,700 kg." },
+    { id: "reg3-5", term: "Capacidad (rating)", definition: "Lo que se suma a la licencia, como instrumentos, multimotor o instructor de vuelo." },
     { id: "reg3-6", term: "NOTAM", definition: "Aviso a los aviadores sobre cambios temporales relevantes para la seguridad del vuelo." },
     { id: "reg3-7", term: "Responsabilidad del PIC", definition: "El piloto al mando es el responsable final de la seguridad y legalidad del vuelo, sin excepción." },
   ],
@@ -859,23 +861,23 @@ const QUIZ_ESPACIOS: QuizPregunta[] = [
 ];
 
 const QUIZ_REGLAMENTACION: QuizPregunta[] = [
-  { id: "reg-q1", pregunta: "El vuelo VFR se basa fundamentalmente en:", opciones: ["Referencia visual constante con el horizonte y el terreno", "Navegación exclusiva por instrumentos de vuelo", "Autorización obligatoria de control en todo momento", "No requiere ninguna regla de separación real"], correcta: 0 },
-  { id: "reg-q2", pregunta: "En reglas de prioridad de paso VFR, ante un cruce frontal:", opciones: ["El más rápido tiene prioridad", "Ambos ceden a la derecha", "El de mayor tamaño siempre tiene prioridad", "No hay regla definida"], correcta: 1 },
-  { id: "reg-q3", pregunta: "El vuelo IFR requiere:", opciones: ["Nunca presentar ningún plan de vuelo formal", "Solo referencia visual del terreno circundante", "Plan de vuelo autorizado y seguir instrucciones continuas de ATC", "No necesita ningún equipo especial a bordo"], correcta: 2 },
-  { id: "reg-q4", pregunta: "La progresión típica de licencias es:", opciones: ["ATP, CPL, PPL, Alumno", "Solo existe una licencia universal", "Comercial, luego Privado", "Alumno, Privado (PPL), Comercial (CPL), ATP"], correcta: 3 },
-  { id: "reg-q5", pregunta: "¿Qué autoridad emite licencias de piloto en México?", opciones: ["AFAC, bajo el marco del RAC 61 mexicano", "FAA, la autoridad estadounidense de aviación", "EASA, la autoridad europea de seguridad aérea", "OACI directamente a cada piloto individual"], correcta: 0 },
+  { id: "reg-q1", pregunta: "El vuelo VFR se basa en:", opciones: ["Volar en condiciones visuales (VMC), viendo y evitando", "Navegación exclusiva por instrumentos de vuelo", "Autorización obligatoria de control en todo momento", "No requiere ninguna regla de separación real"], correcta: 0 },
+  { id: "reg-q2", pregunta: "Si dos aviones se acercan de frente, según el derecho de paso:", opciones: ["El más rápido tiene prioridad", "Ambos viran a su derecha", "El de mayor tamaño siempre tiene prioridad", "No hay regla definida"], correcta: 1 },
+  { id: "reg-q3", pregunta: "El vuelo IFR requiere:", opciones: ["Nunca presentar ningún plan de vuelo formal", "Solo referencia visual del terreno circundante", "Plan de vuelo y, en espacio controlado, autorización del control", "No necesita ningún equipo especial a bordo"], correcta: 2 },
+  { id: "reg-q4", pregunta: "La progresión de licencias en México es:", opciones: ["TPI, comercial, privado, formación", "Solo existe una licencia universal", "Comercial, luego privado", "Permiso de formación, privado, comercial y TPI"], correcta: 3 },
+  { id: "reg-q5", pregunta: "¿Quién expide las licencias de piloto en México, y con qué reglamento?", opciones: ["La AFAC, con su Reglamento de licencias del personal técnico aeronáutico", "La AFAC, con el RAC 61", "La FAA, la autoridad estadounidense de aviación", "La OACI, directamente a cada piloto"], correcta: 0 },
   { id: "reg-q6", pregunta: "Además de horas de vuelo, obtener una licencia requiere:", opciones: ["Solo pagar una cuota administrativa correspondiente", "Certificado médico vigente, examen teórico y checkride práctico", "Nada más que cumplir la edad mínima", "Solo aprobar un examen de manejo automotriz"], correcta: 1 },
   { id: "reg-q7", pregunta: "Como referencia general, la reserva mínima de combustible VFR diurno es aproximadamente:", opciones: ["5 minutos", "3 horas", "30 minutos", "No se requiere reserva en VFR diurno"], correcta: 2 },
-  { id: "reg-q8", pregunta: "Los mínimos meteorológicos VFR generalmente son:", opciones: ["Iguales en absolutamente todo tipo de espacio aéreo", "Solo aplican durante los vuelos nocturnos", "No existen mínimos legales en ningún tipo de espacio", "Más estrictos en espacio controlado que en no controlado"], correcta: 3 },
+  { id: "reg-q8", pregunta: "Con la tabla de la OACI, los mínimos meteorológicos VFR:", opciones: ["Son iguales en todas partes y a cualquier altitud", "Solo aplican durante los vuelos nocturnos", "No existen mínimos legales en ningún tipo de espacio", "Dependen de la clase de espacio y de la altitud"], correcta: 3 },
   { id: "reg-q9", pregunta: "¿Qué calificación adicional (rating) se suma comúnmente a una licencia?", opciones: ["Instrumentos, Multimotor, Instructor de vuelo", "Ninguna, la licencia es fija", "Solo se permite una licencia por vida", "Únicamente vuelo acrobático"], correcta: 0 },
-  { id: "reg-q10", pregunta: "Como referencia general, un PPL requiere aproximadamente:", opciones: ["10 horas totales", "40 horas totales de vuelo", "500 horas totales", "No tiene mínimo de horas"], correcta: 1 },
-  { id: "reg-q11", pregunta: "Como referencia general, un CPL requiere aproximadamente:", opciones: ["10-20 horas", "1,000 horas mínimo siempre", "150-250 horas totales", "No requiere horas adicionales al PPL"], correcta: 2 },
-  { id: "reg-q12", pregunta: "Para operaciones internacionales o radiocomunicación en inglés se exige:", opciones: ["Nada especial de parte del piloto", "Solo saber leer números en voz alta", "Un examen de un idioma completamente distinto", "Demostrar competencia en inglés según la escala OACI"], correcta: 3 },
-  { id: "reg-q13", pregunta: "El vuelo IFR requiere mantener competencia (currency) mediante:", opciones: ["Un mínimo de aproximaciones y procedimientos practicados recientemente", "Nada adicional más allá de la licencia", "Solo volar una vez cada año", "Un examen médico de forma mensual"], correcta: 0 },
-  { id: "reg-q14", pregunta: "Para VFR nocturno o vuelo IFR, la reserva mínima común de combustible aumenta a:", opciones: ["15 minutos", "45 minutos", "3 horas", "No cambia respecto al VFR diurno"], correcta: 1 },
-  { id: "reg-q15", pregunta: "Si el pronóstico no alcanza los mínimos IFR publicados de destino, la regulación exige:", opciones: ["Volar de todas formas", "Cancelar toda la temporada de vuelos", "Planificar un alterno adecuado", "Ninguna acción especial"], correcta: 2 },
+  { id: "reg-q10", pregunta: "En México, la licencia de piloto privado pide un mínimo de:", opciones: ["10 horas totales", "40 horas de vuelo", "500 horas totales", "No tiene mínimo de horas"], correcta: 1 },
+  { id: "reg-q11", pregunta: "En México, la licencia de piloto comercial pide un mínimo de:", opciones: ["10 a 20 horas", "1,500 horas", "180 horas de instrucción", "No pide horas adicionales al privado"], correcta: 2 },
+  { id: "reg-q12", pregunta: "El nivel 4 de competencia lingüística OACI, que se pide para radiocomunicación en inglés:", opciones: ["No vence nunca", "Dura un mes", "Solo vale para vuelos nacionales", "Dura tres años y se vuelve a evaluar"], correcta: 3 },
+  { id: "reg-q13", pregunta: "El piloto IFR mantiene su experiencia reciente con:", opciones: ["Un mínimo de aproximaciones y procedimientos practicados recientemente", "Nada adicional más allá de la licencia", "Solo volar una vez cada año", "Un examen médico de forma mensual"], correcta: 0 },
+  { id: "reg-q14", pregunta: "En VFR de noche, la reserva mínima de combustible de la OACI es:", opciones: ["15 minutos", "45 minutos", "3 horas", "No cambia respecto al VFR diurno"], correcta: 1 },
+  { id: "reg-q15", pregunta: "Si el pronóstico del destino no alcanza los mínimos IFR publicados:", opciones: ["Volar de todas formas y decidir al llegar", "Cancelar toda la temporada de vuelos", "Llevar un alterno cuyo pronóstico sí alcance los mínimos; si ninguno los alcanza, no salir", "Ninguna acción especial"], correcta: 2 },
   { id: "reg-q16", pregunta: "Comparando la reserva VFR diurna (30 min) contra la nocturna (45 min), si tu ETA de un vuelo nocturno planeado al límite se recorre 20 minutos por viento en contra, ¿qué debiste haber hecho al planear?", opciones: ["Nada, la reserva mínima siempre alcanza sin importar cualquier retraso", "Volar mucho más rápido para compensar automáticamente el retraso", "El retraso nunca afecta en nada los requisitos de combustible", "Agregar un margen adicional de combustible más allá del mínimo legal, sobre todo de noche"], correcta: 3 },
-  { id: "reg-q17", pregunta: "Comparando la progresión Alumno → PPL → CPL, si un cadete quiere volar de noche con pasajeros antes de tener 40 horas totales, ¿qué le falta y por qué importa el orden de los requisitos?", opciones: ["Le falta completar el PPL, ya que llevar pasajeros requiere una licencia vigente, no solo horas", "Nada, puede llevar pasajeros sin licencia si tiene experiencia suficiente", "Solo necesita aprobar el examen médico correspondiente", "El orden de los requisitos no importa realmente en la práctica"], correcta: 0 },
+  { id: "reg-q17", pregunta: "Comparando la progresión formación → privado → comercial, si un cadete quiere llevar pasajeros antes de tener 40 horas totales, ¿qué le falta y por qué importa el orden de los requisitos?", opciones: ["Le falta la licencia de piloto privado, ya que llevar pasajeros requiere una licencia vigente, no solo horas", "Nada, puede llevar pasajeros sin licencia si tiene experiencia suficiente", "Solo necesita aprobar el examen médico correspondiente", "El orden de los requisitos no importa realmente en la práctica"], correcta: 0 },
 ];
 
 const QUIZ_IFR: QuizPregunta[] = [
@@ -1829,10 +1831,10 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
       "inicio": {
         id: "inicio",
         prompt:
-          "Un amigo te pide ser tu primer pasajero. Han pasado más de 90 días desde tu último despegue y aterrizaje.",
+          "Un amigo te pide ser tu primer pasajero. Al preparar el vuelo revisas tus documentos y ves que tu certificado de aptitud psicofísica venció la semana pasada.",
         options: [
-          { label: "Llevarlo de todos modos, ya sabes volar", next: "falla-1" },
-          { label: "Verificar tu currency de despegues y aterrizajes recientes antes de llevar pasajeros, y practicar solo si no la cumples", next: "segunda" },
+          { label: "Volar de todos modos: te sientes bien y la licencia sigue vigente", next: "falla-1" },
+          { label: "No volar: sin la aptitud psicofísica vigente no puedes ejercer tu licencia; primero la renuevas", next: "segunda" },
         ],
       },
       "falla-1": {
@@ -1843,16 +1845,16 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
         outcome: {
           correct: false,
           feedback:
-            "Saber volar no es lo mismo que cumplir la currency legal requerida para llevar pasajeros — hacerlo sin ella, aunque te sientas capaz, es una violación reglamentaria.",
+            "La licencia solo se puede ejercer con el certificado de aptitud psicofísica vigente. Sentirte bien no lo sustituye: volar así es una violación reglamentaria, y con un pasajero a bordo.",
         },
       },
       "segunda": {
         id: "segunda",
         prompt:
-          "Correcto. La regulación exige un mínimo de despegues y aterrizajes recientes para poder llevar pasajeros — si no la cumples, primero debes practicar solo (o con instructor) hasta recuperarla.\n\nConfirmas que no cumples: tu último despegue y aterrizaje fue hace cuatro meses. Vas al aeródromo a hacer los tres despegues y aterrizajes que te devuelven la vigencia, y tu amigo ya está ahí esperándote.",
+          "Correcto. Toda licencia pide el certificado de aptitud psicofísica vigente; sin él no puedes ejercerla.\n\nTu amigo insiste: «Es solo una vuelta al circuito, diez minutos, nadie se va a enterar».",
         options: [
-          { label: "Hacer los tres circuitos con él a bordo: total, él es quien quiere volar contigo", next: "falla-2" },
-          { label: "Hacer los tres despegues y aterrizajes solo, y recogerlo después", next: "exito" },
+          { label: "Dar la vuelta: es corta y conoces bien el aeródromo", next: "falla-2" },
+          { label: "Decirle que no, renovar el certificado y llevarlo cuando esté vigente", next: "exito" },
         ],
       },
       "falla-2": {
@@ -1863,7 +1865,7 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
         outcome: {
           correct: false,
           feedback:
-            "Los vuelos con los que recuperas la vigencia son justamente los que no puedes hacer llevando pasajeros: ese es el sentido del requisito. Tu amigo no deja de ser pasajero por ser tu amigo.",
+            "La regla no cambia con la duración del vuelo: diez minutos sin certificado vigente siguen siendo un vuelo sin poder ejercer tu licencia, y con un pasajero a bordo.",
         },
       },
       "exito": {
@@ -1874,7 +1876,7 @@ export const MODULE_SCENARIOS: Record<string, { tree: Record<string, ScenarioNod
         outcome: {
           correct: true,
           feedback:
-            "Correcto. Primero recuperas la vigencia solo, y una vez cumplidos los tres despegues y aterrizajes, ya puedes llevarlo. Son veinte minutos de circuitos que separan un vuelo legal de uno que no lo es.",
+            "Correcto. Renuevas el certificado y lo llevas en cuanto esté vigente. Revisar la vigencia de tu licencia y de tu aptitud psicofísica antes de cada vuelo es parte de la planeación.",
         },
       },
     },
