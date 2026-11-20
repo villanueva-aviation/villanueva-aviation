@@ -290,7 +290,7 @@ export const ACADEMIA_MODULOS: AcademiaModulo[] = [
       { id: "interactividad-1", tipo: "interactividad", titulo: "Relaciona los términos clave", widget: "terminos" },
       { id: "interactividad-2", tipo: "interactividad", titulo: "Simulador de decisión: cruce de espacio Clase C", widget: "escenario" },
       { id: "interactividad-3", tipo: "interactividad", titulo: "Relaciona más términos clave", widget: "terminos", termSetId: "espacios-aereos-2" },
-      { id: "interactividad-4", tipo: "interactividad", titulo: "Simulador de decisión: TFR inesperado", widget: "escenario", scenarioId: "espacios-aereos-2" },
+      { id: "interactividad-4", tipo: "interactividad", titulo: "Simulador de decisión: restricción temporal inesperada", widget: "escenario", scenarioId: "espacios-aereos-2" },
       { id: "practica-1", tipo: "practica", titulo: "Práctica: clasificación de espacios" },
       { id: "evaluacion-1", tipo: "evaluacion", titulo: "Evaluación de Espacios Aéreos" },
       { id: "proyecto-1", tipo: "proyecto", titulo: "Proyecto final: tu propia ruta multi-espacio aéreo" },

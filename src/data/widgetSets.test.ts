@@ -396,3 +396,45 @@ test("Operación: la presión de aceite con la cifra del C172S", () => {
   const q = preguntaOp("op-q16");
   assert.match(q.pregunta, /tiempo que marca el POH/);
 });
+
+const preguntaEsp = (id: string) => [...MODULE_PRACTICA["espacios-aereos"], ...MODULE_EVALUACION["espacios-aereos"]].find((p) => p.id === id)!;
+const terminoEsp = (id: string) => [...MODULE_TERMS["espacios-aereos"], ...MODULE_TERMS["espacios-aereos-2"]].find((x) => x.id === id)!;
+
+test("Espacios aéreos: la zona prohibida no se cruza a ninguna hora, para ningún avión", () => {
+  assert.ok(!/civiles/.test(terminoEsp("esp-6").definition));
+  assert.match(terminoEsp("esp-6").definition, /cualquier avión/);
+  const q7 = preguntaEsp("esp-q7");
+  assert.ok(q7.opciones.every((o) => !/civiles/.test(o)));
+  assert.match(q7.opciones[q7.correcta], /prohibido/);
+  assert.ok(q7.opciones.some((o, i) => i !== q7.correcta && /por radio/.test(o)));
+  const q17 = preguntaEsp("esp-q17");
+  assert.ok(!/nunca es cruzable/.test(q17.opciones[q17.correcta]));
+  assert.match(q17.opciones[q17.correcta], /a ninguna hora/);
+});
+
+test("Espacios aéreos: una ruta VFR no quita la autorización en B, C y D", () => {
+  const d = terminoEsp("esp2-4").definition;
+  assert.ok(!/sin autorización/.test(d));
+  assert.match(d, /autorización/);
+  assert.match(terminoEsp("esp2-6").definition, /autorización/);
+});
+
+test("Espacios aéreos: restricciones temporales por NOTAM, no TFR de la FAA", () => {
+  const t = terminoEsp("esp2-3");
+  assert.ok(!/^TFR/.test(t.term));
+  assert.match(t.definition, /NOTAM/);
+  assert.match(t.definition, /TFR/);
+  const r = terminoEsp("esp-5").definition;
+  assert.ok(!/activa solo/.test(r));
+  assert.match(r, /NOTAM/);
+  const arbol = MODULE_SCENARIOS["espacios-aereos-2"].tree;
+  const textos = Object.values(arbol)
+    .flatMap((n) => [n.prompt, ...n.options.map((o) => o.label), n.outcome?.feedback ?? ""])
+    .join(" ");
+  assert.ok(!/TFR/.test(textos));
+  assert.ok(!/número de teléfono/.test(textos));
+  assert.match(textos, /NOTAM/);
+  assert.match(textos, /por radio/);
+  const act = ACADEMIA_MODULOS.find((m) => m.slug === "espacios-aereos")!.actividades.find((a) => a.id === "interactividad-4")!;
+  assert.ok(!/TFR/.test(act.titulo));
+});

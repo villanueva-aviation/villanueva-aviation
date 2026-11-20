@@ -1,6 +1,6 @@
 # Revisión de Espacios Aéreos — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-19 · Estado: **propuesta, pendiente de aprobación de Erik**.
+Fecha: 2026-11-19 · Estado: **correcciones aplicadas (aprobadas por Erik el 2026-11-19)**.
 
 Qué se revisó:
 - los 10 temas (texto, idea clave y puntos);
@@ -70,3 +70,23 @@ Todo lo demás se revisó y está bien:
   aéreos». Así el cadete no las lee como contradicción.
 
 Efecto en el avance: ninguno. Siguen 10 lecturas y los mismos ejercicios, con los mismos id.
+
+## Cambios aplicados
+
+Erik aprobó todo el 2026-11-19: «Adelante».
+
+- E2, E3 y P1 a P6: textos, puntos, los términos esp-5, esp-6, esp2-3, esp2-4 y esp2-6, las preguntas esp-q6, esp-q7 y
+  esp-q17, el escenario de la restricción temporal y su título corregidos como se propuso. El tema 10 tiene un punto
+  nuevo, «Además», y pasa de 6 a 7 pasos.
+- E1 y D1: 60 clips de Remotion (uno por paso) reemplazan las 10 imágenes.
+- D2: el capítulo 1 lleva el escenario de la Clase C; el capítulo 2, los dos juegos de términos y el escenario de la
+  restricción temporal. Los capítulos, los candados y los id no cambian. La prueba del reparto automático ahora usa IFR.
+- D3: el tema 2 de VFR remite a la tabla de la OACI en Espacios aéreos.
+- Pruebas nuevas:
+  - los ejercicios y candados de cada capítulo;
+  - los textos sin los errores de la revisión (zona prohibida, lo que quede más alto, 250 nudos, el punto «Además»,
+    zona peligrosa sin «tráfico intenso»);
+  - la zona prohibida no se cruza a ninguna hora, para ningún avión (esp-6, esp-q7, esp-q17);
+  - una ruta VFR no quita la autorización en B, C y D (esp2-4, esp2-6);
+  - restricciones temporales por NOTAM y no TFR (esp2-3, esp-5, el escenario y su título);
+  - un clip por paso.

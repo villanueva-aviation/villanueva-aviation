@@ -895,7 +895,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "Controlado para el IFR; el VFR entra sin permiso pero con mínimos.",
     puntos: [
       { titulo: "Para el IFR", texto: "autorización y separación entre IFR." },
-      { titulo: "Para el VFR", texto: "sin autorización ni radio; información de tránsito si es posible." },
+      { titulo: "Para el VFR", texto: "sin autorización ni radio; 250 nudos máximo bajo 10,000 ft." },
       { titulo: "Mínimos", texto: "5 km de visibilidad bajo 10,000 ft; 1,500 m y 1,000 ft de las nubes." },
       { titulo: "Dónde empieza", texto: "lo publica el AIP." },
       { titulo: "700 y 1,200 ft", texto: "son alturas de las cartas de Estados Unidos." },
@@ -906,7 +906,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "Qué es", texto: "espacio no controlado; solo hay información de vuelo." },
       { titulo: "Qué no se requiere", texto: "autorización ni radio para el VFR." },
-      { titulo: "Mínimos a baja altura", texto: "5 km, libre de nubes y con la superficie a la vista." },
+      { titulo: "Mínimos a baja altura", texto: "hasta 3,000 ft sobre el mar o 1,000 ft sobre el terreno, lo que quede más alto: 5 km, libre de nubes y viendo la superficie." },
       { titulo: "Tu responsabilidad", texto: "mantener separación visual con el otro tráfico." },
       { titulo: "Clase F", texto: "existe en la OACI, con asesoramiento para IFR, pero es poco común." },
     ],
@@ -934,7 +934,7 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     clave: "Puedes cruzarlas legalmente; si están activas, mejor rodéalas.",
     puntos: [
       { titulo: "Cómo se designan", texto: "prefijo del país, D y número; en México, MM D." },
-      { titulo: "Qué señalan", texto: "ejercicios militares, disparos, paracaidismo o tráfico intenso." },
+      { titulo: "Qué señalan", texto: "ejercicios militares, disparos o paracaidismo; muchas, sobre aguas internacionales." },
       { titulo: "La diferencia clave", texto: "no necesitas autorización para entrar." },
       { titulo: "El costo", texto: "lo haces bajo tu propio riesgo." },
       { titulo: "La recomendación", texto: "evitarlas cuando estén activas, revisando los NOTAM." },
@@ -945,8 +945,9 @@ export const TEMA_PUNTOS: Record<string, TemaDestacado> = {
     puntos: [
       { titulo: "Comunicaciones", texto: "B, C y D piden autorización antes de entrar; E y G no, para el VFR." },
       { titulo: "Equipo", texto: "radio donde necesites autorización y el transpondedor que pida el AIP." },
-      { titulo: "Mínimos", texto: "5 km bajo 10,000 ft y 8 km arriba; 1,500 m y 1,000 ft de las nubes." },
+      { titulo: "Mínimos", texto: "5 km bajo 10,000 ft y 8 km arriba; 1,500 m y 1,000 ft de las nubes; 250 nudos bajo 10,000 ft." },
       { titulo: "No controlado a baja altura", texto: "5 km, libre de nubes y con la superficie a la vista." },
+      { titulo: "Además", texto: "el techo de cada espacio, las rutas VFR del AIP, los NOTAM y la ADIZ si cruzas una." },
       { titulo: "El peor caso", texto: "una situación de tránsito peligrosa por falta de coordinación." },
     ],
   },

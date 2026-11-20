@@ -69,13 +69,13 @@ test("cada comprobación va como candado justo después de su tema", () => {
 });
 
 test("los interactivos se reparten en orden entre los capítulos", () => {
-  // Espacios aéreos todavía no declara sus ejercicios por capítulo: usa el reparto automático.
-  const caps = armarCapitulos("espacios-aereos");
+  // IFR todavía no declara sus ejercicios por capítulo: usa el reparto automático.
+  const caps = armarCapitulos("ifr");
   assert.deepEqual(
     caps.map((c) => c.interactivos.length),
     [2, 2],
   );
-  const orden = ACADEMIA_MODULOS.find((m) => m.slug === "espacios-aereos")!
+  const orden = ACADEMIA_MODULOS.find((m) => m.slug === "ifr")!
     .actividades.filter((a) => a.tipo === "interactividad")
     .map((a) => a.id);
   assert.deepEqual(
@@ -302,4 +302,29 @@ test("Operación: los textos no repiten los errores de la revisión", () => {
   assert.match(todo(8), /acelere/);
   assert.match(todo(9), /ATIS/);
   assert.match(todo(9), /5 veces/);
+});
+
+test("Espacios aéreos: cada ejercicio va en el capítulo donde ya se enseñó lo que pregunta", () => {
+  const caps = armarCapitulos("espacios-aereos");
+  assert.deepEqual(caps.map((c) => c.interactivos), [["interactividad-2"], ["interactividad-1", "interactividad-3", "interactividad-4"]]);
+  const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
+  assert.deepEqual(candados, [["esp-q3"], ["esp-q5", "esp-q8"]]);
+});
+
+test("Espacios aéreos: los textos no repiten los errores de la revisión", () => {
+  const temas = flattenTemas("espacios-aereos")!;
+  const todo = (n: number) => {
+    const t = temas.find((x) => x.id === "espacios-aereos-tema" + n)!;
+    return [t.texto, ...pasosDeTema(t).map((p) => p.titulo + " " + p.texto)].join(" ");
+  };
+  assert.ok(!/autorización especial/.test(todo(8)), "la prohibida no se cruza con permiso");
+  assert.match(todo(6), /más alto/);
+  assert.match(todo(6), /8,300/);
+  assert.match(todo(5), /250 nudos/);
+  assert.match(todo(10), /250 nudos/);
+  for (const r of [/ADIZ/, /NOTAM/, /techo/, /rutas VFR/]) assert.match(todo(10), r);
+  assert.ok(!/tráfico intenso/.test(todo(9)), "tráfico intenso no es una actividad peligrosa");
+  assert.match(todo(9), /aguas internacionales/);
+  const vfr2 = flattenTemas("vfr")!.find((x) => x.id === "vfr-tema2")!;
+  assert.match(vfr2.texto, /Espacios aéreos/);
 });
