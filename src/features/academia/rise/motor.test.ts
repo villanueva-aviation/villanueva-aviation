@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { ACADEMIA_MODULOS } from "../../../data/academia.ts";
-import { checkpointsDeModulo, flattenTemas } from "../../../data/moduleContent.ts";
+import { MODULE_LECCIONES, checkpointsDeModulo, flattenTemas } from "../../../data/moduleContent.ts";
 import { MISIONES } from "../../../data/misiones.ts";
 import { ESCENAS } from "../../../data/escenas.ts";
 import { armarCapitulos, capituloCompleto, capituloInicial, visualesDeTema } from "./motor.ts";
@@ -68,20 +68,12 @@ test("cada comprobación va como candado justo después de su tema", () => {
   }
 });
 
-test("los interactivos se reparten en orden entre los capítulos", () => {
-  // IFR todavía no declara sus ejercicios por capítulo: usa el reparto automático.
-  const caps = armarCapitulos("ifr");
-  assert.deepEqual(
-    caps.map((c) => c.interactivos.length),
-    [2, 2],
-  );
-  const orden = ACADEMIA_MODULOS.find((m) => m.slug === "ifr")!
-    .actividades.filter((a) => a.tipo === "interactividad")
-    .map((a) => a.id);
-  assert.deepEqual(
-    caps.flatMap((c) => c.interactivos),
-    orden,
-  );
+test("cada módulo armado por temas declara los ejercicios de cada capítulo", () => {
+  // Los módulos con misiones se arman aparte; el resto debe decir qué ejercicio va en cada capítulo, para que ninguno
+  // se pregunte antes de enseñarse por el reparto automático.
+  for (const m of ACADEMIA_MODULOS.filter((x) => !MISIONES[x.slug])) {
+    for (const g of MODULE_LECCIONES[m.slug] ?? []) assert.ok(g.interactivos, m.slug + ": " + g.titulo);
+  }
 });
 
 test("las tarjetas salen de los puntos del capítulo, sin texto nuevo", () => {
@@ -360,4 +352,30 @@ test("Reglamentación: los textos no repiten los errores de la revisión", () =>
   for (const r of [/alterno/, /Parte II/]) assert.match(todo(7), r);
   const m = ACADEMIA_MODULOS.find((x) => x.slug === "reglamentacion")!;
   assert.ok(!/RAC 61/.test(m.proyectoPrompt ?? ""));
+});
+
+test("IFR: cada ejercicio va en el capítulo donde ya se enseñó lo que pregunta", () => {
+  const caps = armarCapitulos("ifr");
+  assert.deepEqual(caps.map((c) => c.interactivos), [["interactividad-1"], ["interactividad-2", "interactividad-3", "interactividad-4"]]);
+  const candados = caps.map((c) => c.bloques.flatMap((b) => (b.tipo === "candado" ? [b.pregunta.id] : [])));
+  assert.deepEqual(candados, [["ifr-q12"], ["ifr-q7", "ifr-q15"]]);
+});
+
+test("IFR: los textos no repiten los errores de la revisión", () => {
+  const temas = flattenTemas("ifr")!;
+  const todo = (n: number) => {
+    const t = temas.find((x) => x.id === "ifr-tema" + n)!;
+    return [t.texto, ...pasosDeTema(t).map((p) => p.titulo + " " + p.texto)].join(" ");
+  };
+  for (const n of [1, 4, 10]) assert.ok(!/control continuo/.test(todo(n)), "tema " + n);
+  assert.ok(!/prioridad de tránsito/.test(todo(1)), "el IFR no tiene prioridad sobre el VFR");
+  for (const r of [/[Ff]uera del espacio controlado/, /D y E/, /prioridad/]) assert.match(todo(1), r);
+  assert.match(todo(2), /OACI/);
+  assert.match(todo(3), /3\.3 %/);
+  assert.ok(!/Victor hasta FL180/.test(todo(4)));
+  for (const r of [/letra y un número/, /AIP/, /Estados Unidos/]) assert.match(todo(4), r);
+  assert.ok(!/aproximaciones de precisión/.test(todo(7)), "LPV es con guía vertical, no de precisión");
+  assert.match(todo(7), /SBAS/);
+  assert.match(todo(8), /CDFA/);
+  for (const r of [/70°/, /110°/, /1 minuto/]) assert.match(todo(9), r);
 });

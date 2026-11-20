@@ -488,3 +488,30 @@ test("Reglamentación: el escenario usa una regla mexicana, no los 90 días de l
   const act = ACADEMIA_MODULOS.find((m) => m.slug === "reglamentacion")!.actividades.find((a) => a.id === "interactividad-4")!;
   assert.ok(!/currency/i.test(act.titulo));
 });
+
+const preguntaIfr = (id: string) => [...MODULE_PRACTICA.ifr, ...MODULE_EVALUACION.ifr].find((p) => p.id === id)!;
+const correctaIfr = (id: string) => preguntaIfr(id).opciones[preguntaIfr(id).correcta];
+
+test("IFR: el primer juego de términos solo pregunta lo del capítulo 1", () => {
+  const uno = MODULE_TERMS.ifr.map((x) => x.term);
+  for (const t of ["DA", "MDA", "LPV", "Holding"]) assert.ok(!uno.includes(t), t);
+  const dos = MODULE_TERMS["ifr-2"].map((x) => x.term);
+  for (const t of ["DA", "MDA", "LPV", "Holding"]) assert.ok(dos.includes(t), t);
+  assert.match(MODULE_TERMS["ifr-2"].find((x) => x.term === "DA")!.definition, /LPV/);
+  assert.ok(!/libre de obstáculos/.test(MODULE_TERMS["ifr-2"].find((x) => x.id === "ifr2-1")!.definition));
+});
+
+test("IFR: rutas ATS de la OACI y SID con gradiente", () => {
+  assert.match(correctaIfr("ifr-q4"), /letra y un número/);
+  assert.match(correctaIfr("ifr-q13"), /Estados Unidos/);
+  assert.match(correctaIfr("ifr-q12"), /gradiente/);
+  assert.ok(!/brevemente/.test(correctaIfr("ifr-q16")));
+});
+
+test("IFR: el escenario del MDA no enseña la regla de los 100 pies de la FAA", () => {
+  const arbol = MODULE_SCENARIOS["ifr-2"].tree;
+  const etiquetas = Object.values(arbol).flatMap((n) => n.options.map((o) => o.label)).join(" ");
+  assert.ok(!/cien pies/.test(etiquetas));
+  assert.match(arbol["exito"].outcome!.feedback, /FAA/);
+  assert.match(arbol["exito"].outcome!.feedback, /referencia visual requerida/);
+});

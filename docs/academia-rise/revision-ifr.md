@@ -1,6 +1,6 @@
 # Revisión de IFR — ronda 1 (estilo Rise)
 
-Fecha: 2026-11-19 · Estado: **propuesta, pendiente de aprobación de Erik**.
+Fecha: 2026-11-19 · Estado: **aprobada por Erik y correcciones aplicadas** (ver «Cambios aplicados» al final).
 
 Qué se revisó:
 - los 10 temas (texto, idea clave y puntos);
@@ -88,3 +88,30 @@ Todo lo demás se revisó y está bien:
   mandar al AIP (ENR 3 y las cartas). Si tienes a la mano el AIP o las cartas de SENEAM, con eso lo agrego.
 
 Efecto en el avance: ninguno. Siguen 10 lecturas y los mismos ejercicios, con los mismos id.
+
+## Cambios aplicados
+
+Erik aprobó todo con las recomendaciones (D1, D2 y D3 como se propusieron).
+
+- **E1:** temas 1 y 10, sus puntos y la idea clave del tema 1 reescritos. En espacio controlado el control te separa
+  de los otros IFR (en D y E, no del VFR); fuera de él nadie te separa; el IFR no tiene prioridad sobre el VFR.
+- **E2:** tema 4 con las rutas ATS de la OACI (letra y número, U en las superiores, letras RNAV) y el AIP (ENR 3);
+  Victor, Jet y FL180 señalados como de Estados Unidos. ifr-q4 e ifr-q13 reescritas.
+- **E3:** segunda decisión del escenario «sin referencias en el MDA»: seguir nivelado hasta el punto de frustrada.
+  El desenlace explica la referencia visual requerida de la OACI y que la regla de los cien pies es de la FAA. El
+  desenlace equivocado (falla-2) ya no habla de «referencia intermedia».
+- **E4:** ifr2-1 «Espacio protegido» con el margen mínimo sobre obstáculos.
+- **E5 / D1:** 68 clips (uno por paso) en lugar de las 10 imágenes.
+- **P1:** CRAFT como truco de Estados Unidos, con la colación (tema 2, ifr-1, ifr-q11).
+- **P2:** gradiente de 3.3 % en el tema 3, su idea clave y ifr-q12 (ahora candado sobre el gradiente).
+- **P3:** tema 7 con GNSS, DME/DME u otros sensores, LNAV, LNAV/VNAV y LPV con guía vertical, SBAS y la cobertura en
+  México; ifr-q8 sobre las aproximaciones RNAV.
+- **P4:** punto «Descenso continuo (CDFA)» en el tema 8; ifr-q16 sin «brevemente».
+- **P5:** tema 9 con las entradas por sector (gota 70°, paralela 110°, directa 180°) y el tramo de 1 minuto hasta
+  14,000 ft (1.5 arriba).
+- **P6:** DA también en LPV y LNAV/VNAV; se quitó «Minimums».
+- **D2:** capítulo 1 con interactividad-1 y el juego de términos rehecho (CRAFT, SID, STAR, límite de autorización,
+  colación, ruta ATS y gradiente); capítulo 2 con interactividad-2, 3 y 4, y el segundo juego con DA, MDA, LPV y
+  holding (9 términos). La prueba del reparto automático se cambió por una que exige que cada módulo armado por temas
+  declare sus ejercicios por capítulo.
+- **D3:** sin cifras de México para la altitud de transición ni nombres de rutas; se manda al AIP.
