@@ -35,19 +35,22 @@ export function Portada({
 }) {
   const quieto = usarQuieto();
   return (
-    <section className="relative -mx-6 flex min-h-[70vh] items-end overflow-hidden bg-gradient-to-br from-navy-700 via-navy-900 to-navy-950 md:mx-0 md:rounded-3xl">
+    // La imagen es un cuadro 16:9 con texto de orilla a orilla: en pantallas angostas va completa arriba del título,
+    // porque cubrir una caja alta le cortaría los lados; desde lg el título va encima, como portada de cine, y el alto
+    // mínimo no pasa de la mitad del ancho para que la caja nunca sea más angosta que la imagen.
+    <section className="relative -mx-6 overflow-hidden bg-gradient-to-br from-navy-700 via-navy-900 to-navy-950 md:mx-0 md:rounded-3xl lg:flex lg:min-h-[min(70vh,50vw)] lg:items-end">
       {imagen && (
         <motion.img
           src={imagen}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover"
+          className="block aspect-video w-full object-cover lg:absolute lg:inset-0 lg:aspect-auto lg:h-full"
           initial={quieto ? false : { scale: 1.08 }}
           animate={{ scale: 1 }}
           transition={{ duration: quieto ? 0 : 14, ease: "easeOut" }}
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/70 to-navy-950/10" />
-      <div className="relative max-w-3xl px-6 pb-10 pt-24 md:px-12 md:pb-14">
+      <div className="absolute inset-0 hidden bg-gradient-to-t from-navy-950 via-navy-950/70 to-navy-950/10 lg:block" />
+      <div className={`relative max-w-3xl px-6 pb-10 md:px-12 md:pb-14 lg:pt-24 ${imagen ? "pt-6" : "pt-24"}`}>
         <p className="flex flex-wrap items-center gap-x-4 gap-y-1 font-display text-xs font-semibold uppercase tracking-[0.2em] text-gold-400">
           <span>
             Capítulo {numero} de {total}
