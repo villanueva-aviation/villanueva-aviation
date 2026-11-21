@@ -31,15 +31,23 @@ async function sintetizar(idioma: Idioma, texto: string, archivo: string) {
     return;
   }
   const ssml = `<speak version="1.0" xml:lang="${lang}"><voice name="${voz}"><prosody rate="-8%">${escapar(texto)}</prosody></voice></speak>`;
-  const r = await fetch(`https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`, {
-    method: "POST",
-    headers: {
-      "Ocp-Apim-Subscription-Key": llave!,
-      "Content-Type": "application/ssml+xml",
-      "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
-    },
-    body: ssml,
-  });
+  let r: Response;
+  // El nivel gratis (F0) permite ~20 peticiones por minuto: ante 429 se espera y se reintenta.
+  for (let intento = 1; ; intento++) {
+    r = await fetch(`https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`, {
+      method: "POST",
+      headers: {
+        "Ocp-Apim-Subscription-Key": llave!,
+        "Content-Type": "application/ssml+xml",
+        "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+      },
+      body: ssml,
+    });
+    if (r.status !== 429 || intento === 8) break;
+    const seg = Number(r.headers.get("retry-after")) || 15;
+    console.log(`Azure pide esperar ${seg} s…`);
+    await new Promise((listo) => setTimeout(listo, seg * 1000));
+  }
   if (!r.ok) throw new Error(`Azure ${r.status}: ${await r.text()}`);
   const audio = Buffer.from(await r.arrayBuffer());
   if (!audio.length) throw new Error("Azure devolvió un cuerpo vacío");

@@ -36,5 +36,3 @@ __pycache__/
 tools/instructor-lector/out/
 tools/atis-lector/out/
 
-# Piezas provisionales de edge-tts: no deben publicarse (se quita en la Tarea 8)
-public/atis/piezas/

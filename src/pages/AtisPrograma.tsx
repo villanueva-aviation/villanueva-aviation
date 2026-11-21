@@ -55,13 +55,6 @@ function tocar(c: Canal, faseMs: number, mezcla: Mezcla) {
   c.sonando = true;
 }
 
-// ponytail: temporal, solo para probar el audio sin el lector. Se borra junto con el botón «Probar MMGL».
-const METAR_PRUEBA: Metar = {
-  icaoId: "MMGL", rawOb: "METAR MMGL 162240Z 12004KT 7SM FEW120 BKN300 25/09 A3014 RMK 8/078 ISOL SC",
-  obsTime: Date.UTC(2026, 10, 16, 22, 40) / 1000, wdir: 120, wspd: 4, wgst: null, visib: 7,
-  clouds: [{ cover: "FEW", base: 12000 }, { cover: "BKN", base: 30000 }], wxString: null, temp: 25, dewp: 9, altim: 1020.6, elev: 1529,
-};
-
 export function AtisPrograma() {
   const { user } = useAuth();
   const fundador = user?.email === FOUNDER_EMAIL;
@@ -72,15 +65,14 @@ export function AtisPrograma() {
       </div>
     );
   }
-  return <Programa fundador={fundador} />;
+  return <Programa />;
 }
 
-function Programa({ fundador }: { fundador: boolean }) {
+function Programa() {
   const { estado, muestra } = useLectorAtis();
   const [aeropuertos, setAeropuertos] = useState<AeropuertoAtis[] | null>(null);
   const [iniciado, setIniciado] = useState(false);
   const [silenciado, setSilenciado] = useState(false);
-  const [prueba, setPrueba] = useState(false);
   const [vistas, setVistas] = useState<(Vista | null)[]>([null, null]);
   const ctxRef = useRef<AudioContext | null>(null);
   const canales = useRef<Canal[]>([]);
@@ -127,7 +119,7 @@ function Programa({ fundador }: { fundador: boolean }) {
   // Cada muestra del lector: qué oye cada COM y cómo suena.
   useEffect(() => {
     const ctx = ctxRef.current;
-    if (!iniciado || !ctx || !aeropuertos || prueba) return;
+    if (!iniciado || !ctx || !aeropuertos) return;
     const m = muestra;
     const pos = m && m.lat !== null && m.lon !== null && m.aglFt !== null ? { lat: m.lat, lon: m.lon, aglFt: m.aglFt } : null;
     setVistas(canales.current.map((c, i): Vista | null => {
@@ -174,7 +166,7 @@ function Programa({ fundador }: { fundador: boolean }) {
       return { ...base, atis, faltantes: atis ? c.faltantes! : [], avisoMetar };
     }));
     // metarDe y cargar solo tocan refs; la muestra llega cada segundo.
-  }, [muestra, iniciado, aeropuertos, prueba, silenciado]);
+  }, [muestra, iniciado, aeropuertos, silenciado]);
 
   const empezar = () => {
     if (ctxRef.current) return ctxRef.current;
@@ -183,39 +175,6 @@ function Programa({ fundador }: { fundador: boolean }) {
     canales.current = [0, 1].map(() => ({ radio: new RadioAtis(ctx), cargando: null, siguiente: null, faseMs: 0, sonando: false }));
     setIniciado(true);
     return ctx;
-  };
-
-  const probar = async () => {
-    const ctx = empezar();
-    const c = canales.current[0];
-    const ap = aeropuertos?.find((a) => a.icao === "MMGL");
-    if (!ap) return;
-    setPrueba(true);
-    const atis = armarAtisMx(METAR_PRUEBA, ap);
-    const r = await cargarAudio(ctx, atis, aeropuertos!);
-    for (const x of canales.current) apagar(x);
-    Object.assign(c, { atis, ...r, cargando: null, siguiente: null });
-    const mezcla = mezclaPorDistancia(10, 100, null)!;
-    if (!silenciado) tocar(c, Date.now(), mezcla);
-    setVistas([{ icao: "MMGL", distNm: 10, senal: senalDe(mezcla), atis, faltantes: r.faltantes, avisoMetar: null }, null]);
-  };
-
-  const terminarPrueba = () => {
-    const c = canales.current[0];
-    apagar(c);
-    Object.assign(c, { atis: undefined, buffer: undefined, faltantes: undefined });
-    setVistas([null, null]);
-    setPrueba(false);
-  };
-
-  // Lo en vivo lo apaga y lo vuelve a sintonizar el efecto de la muestra; la prueba no pasa por ahí.
-  const alternarSilencio = () => {
-    const c = canales.current[0];
-    if (prueba && c.buffer) {
-      if (silenciado) tocar(c, Date.now(), mezclaPorDistancia(10, 100, null)!);
-      else apagar(c);
-    }
-    setSilenciado(!silenciado);
   };
 
   const sintonizados = vistas.filter((v): v is Vista => v !== null);
@@ -254,14 +213,9 @@ function Programa({ fundador }: { fundador: boolean }) {
       ))}
 
       {iniciado && (
-        <Button variant="secondary" onClick={alternarSilencio} className="w-full">
+        <Button variant="secondary" onClick={() => setSilenciado(!silenciado)} className="w-full">
           {silenciado ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           {silenciado ? "Quitar silencio" : "Silenciar"}
-        </Button>
-      )}
-      {fundador && aeropuertos && (
-        <Button variant="ghost" onClick={prueba ? terminarPrueba : probar} className="w-full">
-          {prueba ? "Terminar prueba" : "Probar MMGL"}
         </Button>
       )}
 
