@@ -16,6 +16,10 @@ export interface Mision {
   temas: string[];
   /** Ids de las actividades "interactividad" del módulo que van en esta misión. */
   interactivos: string[];
+  /** Ejercicio de clasificar (id en data/clasificar.ts); no cuenta para el avance. */
+  clasificar?: string;
+  /** Diagrama con puntos para tocar (id en HOTSPOT_SETS); no cuenta para el avance. */
+  puntos?: string;
   /** Pasos concretos para hacer en el simulador. */
   enSimulador: string[];
   /** Comprobación rápida: no cuenta para el avance, solo para repasar. */
@@ -55,12 +59,12 @@ const FUNDAMENTOS: Mision[] = [
     enSimulador: [
       "Despega y nivela a una altura segura, por ejemplo 3,000 ft sobre el terreno.",
       "Deja que la velocidad se estabilice y vuela recto y nivelado.",
-      "Reduce un poco la potencia sin mover el yugo: la velocidad baja y el avión empieza a descender.",
+      "Reduce un poco la potencia y sostén la nariz en la misma actitud: la velocidad baja y el avión empieza a descender.",
       "Regresa la potencia a donde estaba y recupera tu altura.",
     ],
     preguntas: [
       { id: "mis-fun-2a", pregunta: "En vuelo recto y nivelado a velocidad constante, la sustentación es igual a:", opciones: ["El empuje", "El peso", "La resistencia", "La potencia"], correcta: 1 },
-      { id: "mis-fun-2b", pregunta: "Si reduces la potencia y no mueves el yugo, el avión:", opciones: ["Acelera y sube", "Se queda igual", "Pierde velocidad y empieza a descender", "Gira a la izquierda"], correcta: 2 },
+      { id: "mis-fun-2b", pregunta: "Si reduces la potencia y sostienes la misma actitud, el avión:", opciones: ["Acelera y sube", "Se queda igual", "Pierde velocidad y empieza a descender", "Gira a la izquierda"], correcta: 2 },
     ],
   },
   {
@@ -74,8 +78,8 @@ const FUNDAMENTOS: Mision[] = [
     interactivos: [],
     enSimulador: [
       "En vuelo recto y nivelado, sin tocar la potencia, levanta la nariz despacio unos grados.",
-      "Mira el indicador de velocidad: baja, porque al aumentar el ángulo de ataque también aumenta la resistencia.",
-      "Si suena la bocina de pérdida, baja la nariz de inmediato: es el aviso de que el ala está cerca de dejar de sustentar.",
+      "Mira el indicador de velocidad: baja, porque el avión empieza a subir y, con más ángulo de ataque, también hay más resistencia.",
+      "Si suena la bocina de pérdida, baja la nariz de inmediato: avisa que estás cerca de la pérdida (en el C172 suena unos 5 a 10 nudos antes).",
       "Regresa a vuelo nivelado y deja que la velocidad se recupere.",
     ],
     preguntas: [
@@ -92,6 +96,7 @@ const FUNDAMENTOS: Mision[] = [
     videoId: null,
     temas: ["fundamentos-tema5", "fundamentos-tema6"],
     interactivos: ["interactividad-3"],
+    clasificar: "fundamentos-ejes",
     enSimulador: [
       "En tierra y con el motor apagado, cambia a la vista exterior.",
       "Gira el yugo a un lado: un alerón sube y el otro baja. Eso es el alabeo.",
@@ -133,8 +138,9 @@ const FUNDAMENTOS: Mision[] = [
     videoId: null,
     temas: ["fundamentos-tema8"],
     interactivos: [],
+    puntos: "six-pack",
     enSimulador: [
-      "Carga un Cessna 172 con instrumentos analógicos. Si el tuyo trae G1000, busca los mismos datos en la pantalla principal.",
+      "Carga un Cessna 172 con instrumentos analógicos. Si el tuyo trae pantallas digitales, busca los mismos datos en la pantalla principal.",
       "En la fila de arriba, ubica la velocidad, el horizonte artificial y el altímetro.",
       "En la fila de abajo, ubica el coordinador de viraje, el indicador de rumbo y el variómetro.",
       "En vuelo, haz un viraje suave y observa cómo cambian el horizonte, el rumbo y el coordinador de viraje.",

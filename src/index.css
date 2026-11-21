@@ -17,6 +17,27 @@
   --color-gold-700: #8a7122;
 }
 
+/* Alto del menú fijo del sitio: logo (h-16 sm:h-20 md:h-24 lg:h-28 en Logo.tsx) + py-3 + borde.
+   Lo usan las piezas fijas de la lección para quedar debajo del menú; si cambia el logo, cambia aquí. */
+:root {
+  --alto-menu: 89px;
+}
+@media (min-width: 40rem) {
+  :root {
+    --alto-menu: 105px;
+  }
+}
+@media (min-width: 48rem) {
+  :root {
+    --alto-menu: 121px;
+  }
+}
+@media (min-width: 64rem) {
+  :root {
+    --alto-menu: 137px;
+  }
+}
+
 @layer base {
   * {
     margin: 0;

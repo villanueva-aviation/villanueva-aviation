@@ -13,6 +13,7 @@ import {
   MODULE_TERMS,
   checkpointsDeModulo,
 } from "./moduleContent.ts";
+import { valorMetrica } from "../features/academia/sliderValor.ts";
 
 const interactividades = ACADEMIA_MODULOS.flatMap((m) =>
   m.actividades.filter((a) => a.tipo === "interactividad").map((a) => ({ modulo: m.slug, ...a })),
@@ -220,4 +221,297 @@ test("ningún módulo se dispara en número de temas", () => {
   for (const c of cuentas) {
     assert.ok(c.temas <= 16, `${c.slug} tiene ${c.temas} temas: conviene partirlo`);
   }
+});
+
+test("el slider de Navegación II calcula el tiempo con distancia ÷ velocidad, no en línea recta", () => {
+  const [gs, tiempo, litros] = MODULE_SLIDERS["navegacion-2"].metrics;
+  assert.deepEqual([valorMetrica(gs, 0), valorMetrica(gs, 0.5), valorMetrica(gs, 1)], [110, 90, 70]);
+  assert.equal(Math.round(valorMetrica(tiempo, 0)), 59);
+  assert.equal(Math.round(valorMetrica(tiempo, 0.5)), 72); // 108.6 NM a 90 kt
+  assert.equal(Math.round(valorMetrica(tiempo, 1)), 93);
+  assert.equal(Math.round(valorMetrica(litros, 0.5)), 48); // 72 min a 40 L/h
+});
+
+test("Cartografía: cada juego de términos va con lo que enseña su capítulo", () => {
+  const ids = (k: string) => MODULE_TERMS[k].map((t) => t.term);
+  assert.deepEqual(ids("cartografia"), ["Carta VFR (Sectional)", "Aeropuerto controlado", "Espacio Clase B", "Espacio Clase D"]);
+  assert.deepEqual(ids("cartografia-2"), ["MEF", "CTAF", "Obstáculo '1500 (450)'", "Curvas de nivel"]);
+  assert.deepEqual(ids("cartografia-3"), ["Punto VFR", "Trazar la ruta", "Aeropuerto no controlado", "MOA", "Vía aérea Víctor", "Declinación magnética"]);
+  assert.ok(!MODULE_TERMS["cartografia-2"][0].definition.includes("seguridad"), "el MEF no es una altitud de seguridad");
+});
+
+test("Comunicaciones: cada juego de términos va con lo que enseña su capítulo", () => {
+  const ids = (k: string) => MODULE_TERMS[k].map((t) => t.term);
+  assert.deepEqual(ids("comunicaciones"), ["Wilco", "Roger", "Affirm", "Negative", "Say again", "Standby", "Readback obligatorio"]);
+  assert.deepEqual(ids("comunicaciones-2"), ["Fraseología estándar", "CTAF", "Traffic in sight", "Frequency change approved", "PAN-PAN", "MAYDAY", "Stepping on"]);
+});
+
+test("Comunicaciones: la fraseología con audio no repite los errores de la revisión", () => {
+  const tarjetas = [...AUDIO_SETS["rodaje-despegue"], ...AUDIO_SETS["emergencias-aproximacion"]];
+  const textos = tarjetas.map((c) => c.situacion + " " + c.callout).join(" ");
+  assert.ok(!/pista 02/.test(textos), "la 02 y la 20 son la misma pista");
+  assert.ok(!/cinco mil pies/.test(textos), "cinco mil pies es el nivel de Guadalajara");
+  assert.ok(!/solicito información/i.test(textos), "el ATIS se escucha, no se pide");
+  const listo = AUDIO_SETS["rodaje-despegue"].find((c) => /listo para/.test(c.callout))!;
+  assert.match(listo.callout, /listo para salida/);
+  assert.ok(listo.elementos.some((e) => e.palabrasClave.includes("listo para salida") && e.palabrasClave.includes("listo para despegue")));
+  // Las tarjetas que cambiaron de texto ya no coinciden con la grabación: usan la voz sintética.
+  for (const c of tarjetas) {
+    if (/punto de espera|listo para salida|nueve mil/.test(c.callout)) assert.equal(c.audioUrl, undefined, c.callout);
+  }
+});
+
+test("Circuito: el tramo alineado con la pista después del despegue es la salida", () => {
+  const t = TRAMOS_CIRCUITO.find((x) => x.id === "viento-en-cara")!;
+  assert.match(t.nombre, /^Salida/);
+});
+
+// Dos actividades con el mismo id comparten el avance: completar una marca las dos.
+test("ningún módulo repite el id de una actividad", () => {
+  for (const m of ACADEMIA_MODULOS) {
+    const ids = m.actividades.map((a) => a.id);
+    assert.equal(new Set(ids).size, ids.length, m.slug);
+  }
+});
+
+test("Instrumentos: el error ANDS es en rumbos este-oeste", () => {
+  const ands = MODULE_TERMS.instrumentos.find((t) => t.term === "ANDS")!;
+  assert.match(ands.definition, /este-oeste/);
+  const q7 = [...MODULE_PRACTICA.instrumentos, ...MODULE_EVALUACION.instrumentos].find((p) => p.id === "ins-q7")!;
+  assert.match(q7.opciones[q7.correcta], /este-oeste/);
+});
+
+test("Instrumentos: el pitot capta la presión total y su bloqueo se describe completo", () => {
+  const t = Object.fromEntries(MODULE_TERMS["instrumentos-2"].map((x) => [x.term, x.definition]));
+  assert.match(t["Tubo pitot"], /presión total/);
+  assert.match(t["Bloqueo del pitot"], /drenaje/);
+});
+
+test("Instrumentos: el escenario es una sola falla de la toma estática", () => {
+  const { tree, startId } = MODULE_SCENARIOS["instrumentos-2"];
+  const inicio = tree[startId];
+  assert.match(inicio.prompt, /altímetro se queda fijo/);
+  const bien = inicio.options.find((o) => /toma estática/.test(o.label))!;
+  assert.equal(bien.next, "segunda");
+  const alterna = tree.segunda.options.find((o) => /estática alterna/.test(o.label))!;
+  assert.equal(tree[alterna.next].outcome?.correct, true);
+  const pitot = tree.segunda.options.find((o) => /calefacción del pitot/.test(o.label))!;
+  assert.equal(tree[pitot.next].outcome?.correct, false);
+  const textos = Object.values(tree).map((n) => n.prompt + " " + (n.outcome?.feedback ?? "")).join(" ");
+  assert.ok(!/en descenso indica menos/.test(textos), "con la estática bloqueada, en descenso marca más");
+});
+
+const preguntaRen = (id: string) => [...MODULE_PRACTICA.rendimiento, ...MODULE_EVALUACION.rendimiento].find((p) => p.id === id)!;
+
+test("Rendimiento: la pregunta de altitud de densidad tiene sus propias opciones", () => {
+  const q = preguntaRen("ren-q15");
+  assert.match(q.opciones[q.correcta], /motor/);
+  assert.ok(!q.opciones.some((o) => /estable|ágil/.test(o)), "eran las opciones de la pregunta del CG");
+});
+
+test("Rendimiento: el viento de cola de 10 nudos suma 50% en un C172", () => {
+  for (const id of ["ren-q4", "ren-q17"]) {
+    const q = preguntaRen(id);
+    assert.match(q.opciones[q.correcta], /50%/, id);
+    assert.ok(!q.opciones.some((o) => /20-30%/.test(o)), id);
+  }
+  const q12 = preguntaRen("ren-q12");
+  assert.match(q12.opciones[q12.correcta], /50%/);
+});
+
+test("Rendimiento: el peso vacío ya no excluye el aceite", () => {
+  const t = MODULE_TERMS["rendimiento-2"].find((x) => x.term === "Peso vacío")!;
+  assert.ok(!/aceite utilizable/.test(t.definition));
+  assert.match(t.definition, /combustible no utilizable/);
+});
+
+test("Rendimiento: el simulador dice que sus valores son de ejemplo", () => {
+  const s = MODULE_SLIDERS.rendimiento;
+  assert.match(s.footnote, /ejemplo/i);
+  assert.ok(!s.metrics.some((m) => /Margen de seguridad/.test(m.label)));
+  const pista = s.metrics.find((m) => /50% de margen/.test(m.label))!;
+  const carrera = s.metrics.find((m) => /Carrera/.test(m.label))!;
+  assert.equal(pista.from, carrera.from * 1.5);
+  assert.equal(pista.to, carrera.to * 1.5);
+});
+
+const preguntaVfr = (id: string) => [...MODULE_PRACTICA.vfr, ...MODULE_EVALUACION.vfr].find((p) => p.id === id)!;
+
+test("VFR: de noche solo cambian los mínimos de la Clase G", () => {
+  const q = preguntaVfr("vfr-q15");
+  assert.match(q.opciones[q.correcta], /iguales/);
+  assert.match(q.opciones[q.correcta], /Clase G/);
+});
+
+test("VFR: 500/1,000/2,000 ft es para las Clases C, D y E", () => {
+  assert.match(preguntaVfr("vfr-q2").pregunta, /Clase C, D o E/);
+});
+
+test("VFR: con techo de 900 ft hace falta Special VFR", () => {
+  const q = preguntaVfr("vfr-q8");
+  assert.match(q.opciones[q.correcta], /Special VFR/);
+});
+
+test("VFR: la baliza se enciende antes de arrancar", () => {
+  const t = MODULE_TERMS.vfr.find((x) => x.term === "Baliza (Beacon)")!;
+  assert.match(t.definition, /antes de arrancar/);
+});
+
+test("VFR: en base ya vas descendiendo; el descenso empieza en viento en cola", () => {
+  const s = CIRCUITO_SETS.vfr.find((x) => x.id === "vfr-3")!;
+  assert.ok(!/Acabas de dejar la altitud de circuito/.test(s.prompt));
+  assert.match(s.prompt, /ya en descenso/);
+});
+
+const preguntaOp = (id: string) => [...MODULE_PRACTICA.operacion, ...MODULE_EVALUACION.operacion].find((p) => p.id === id)!;
+
+test("Operación: fuego en el arranque, seguir girando el arranque es lo correcto", () => {
+  const inicio = MODULE_SCENARIOS.operacion.tree.inicio;
+  const mala = inicio.options.find((o) => o.next === "falla-1")!;
+  assert.match(mala.label, /bombear el acelerador/);
+  const fb = MODULE_SCENARIOS.operacion.tree["falla-1"].outcome!.feedback;
+  assert.ok(!/alimenta el incendio/.test(fb));
+  assert.match(fb, /seguir girando/);
+});
+
+test("Operación: ante una falla en la carrera de despegue se aborta", () => {
+  const q = preguntaOp("op-q14");
+  assert.match(q.opciones[q.correcta], /^Abortar/);
+});
+
+test("Operación: estabilizado a más tardar a 500 ft y términos corregidos", () => {
+  const t = (id: string) => [...MODULE_TERMS.operacion, ...MODULE_TERMS["operacion-2"]].find((x) => x.id === id)!.definition;
+  assert.match(t("op-5"), /500 ft/);
+  assert.match(t("op2-4"), /[Ii]nstrucción/);
+  assert.ok(!/velocidad de decisión/.test(t("op2-5")));
+});
+
+test("Operación: en base sigues descendiendo, el viraje es desde el viento en cola", () => {
+  const s = CIRCUITO_SETS.operacion.find((x) => x.id === "ope-2")!;
+  assert.match(s.prompt, /desde el viento en cola/);
+  assert.match(s.prompt, /sigues descendiendo/);
+});
+
+test("Operación: la presión de aceite con la cifra del C172S", () => {
+  const q = preguntaOp("op-q16");
+  assert.match(q.pregunta, /tiempo que marca el POH/);
+});
+
+const preguntaEsp = (id: string) => [...MODULE_PRACTICA["espacios-aereos"], ...MODULE_EVALUACION["espacios-aereos"]].find((p) => p.id === id)!;
+const terminoEsp = (id: string) => [...MODULE_TERMS["espacios-aereos"], ...MODULE_TERMS["espacios-aereos-2"]].find((x) => x.id === id)!;
+
+test("Espacios aéreos: la zona prohibida no se cruza a ninguna hora, para ningún avión", () => {
+  assert.ok(!/civiles/.test(terminoEsp("esp-6").definition));
+  assert.match(terminoEsp("esp-6").definition, /cualquier avión/);
+  const q7 = preguntaEsp("esp-q7");
+  assert.ok(q7.opciones.every((o) => !/civiles/.test(o)));
+  assert.match(q7.opciones[q7.correcta], /prohibido/);
+  assert.ok(q7.opciones.some((o, i) => i !== q7.correcta && /por radio/.test(o)));
+  const q17 = preguntaEsp("esp-q17");
+  assert.ok(!/nunca es cruzable/.test(q17.opciones[q17.correcta]));
+  assert.match(q17.opciones[q17.correcta], /a ninguna hora/);
+});
+
+test("Espacios aéreos: una ruta VFR no quita la autorización en B, C y D", () => {
+  const d = terminoEsp("esp2-4").definition;
+  assert.ok(!/sin autorización/.test(d));
+  assert.match(d, /autorización/);
+  assert.match(terminoEsp("esp2-6").definition, /autorización/);
+});
+
+test("Espacios aéreos: restricciones temporales por NOTAM, no TFR de la FAA", () => {
+  const t = terminoEsp("esp2-3");
+  assert.ok(!/^TFR/.test(t.term));
+  assert.match(t.definition, /NOTAM/);
+  assert.match(t.definition, /TFR/);
+  const r = terminoEsp("esp-5").definition;
+  assert.ok(!/activa solo/.test(r));
+  assert.match(r, /NOTAM/);
+  const arbol = MODULE_SCENARIOS["espacios-aereos-2"].tree;
+  const textos = Object.values(arbol)
+    .flatMap((n) => [n.prompt, ...n.options.map((o) => o.label), n.outcome?.feedback ?? ""])
+    .join(" ");
+  assert.ok(!/TFR/.test(textos));
+  assert.ok(!/número de teléfono/.test(textos));
+  assert.match(textos, /NOTAM/);
+  assert.match(textos, /por radio/);
+  const act = ACADEMIA_MODULOS.find((m) => m.slug === "espacios-aereos")!.actividades.find((a) => a.id === "interactividad-4")!;
+  assert.ok(!/TFR/.test(act.titulo));
+});
+
+const preguntaReg = (id: string) => [...MODULE_PRACTICA.reglamentacion, ...MODULE_EVALUACION.reglamentacion].find((p) => p.id === id)!;
+const terminosReg = [...MODULE_TERMS.reglamentacion, ...MODULE_TERMS["reglamentacion-2"], ...MODULE_TERMS["reglamentacion-3"]];
+const terminoReg = (id: string) => terminosReg.find((x) => x.id === id)!;
+const correctaReg = (id: string) => preguntaReg(id).opciones[preguntaReg(id).correcta];
+
+test("Reglamentación: el RAC 61 es de Colombia; en México manda el Reglamento de licencias", () => {
+  assert.ok(!/RAC 61/.test(terminoReg("reg-4").definition));
+  assert.match(terminoReg("reg-4").definition, /Reglamento/);
+  assert.match(correctaReg("reg-q5"), /Reglamento/);
+  assert.ok(!/RAC/.test(correctaReg("reg-q5")));
+  assert.ok(preguntaReg("reg-q5").opciones.some((o, i) => i !== preguntaReg("reg-q5").correcta && /RAC 61/.test(o)));
+});
+
+test("Reglamentación: sin figuras de la FAA (BFR, endoso, ATP)", () => {
+  const nombres = terminosReg.map((x) => x.term);
+  for (const t of ["BFR", "Endoso", "ATP"]) assert.ok(!nombres.includes(t), t);
+  for (const t of ["Revalidación", "Bitácora de vuelo", "TPI"]) assert.ok(nombres.includes(t), t);
+  assert.match(terminoReg("reg3-2").definition, /3 años/);
+});
+
+test("Reglamentación: VFR en condiciones visuales e IFR sin control continuo", () => {
+  assert.match(terminoReg("reg-1").definition, /VMC/);
+  assert.ok(!/horizonte/.test(terminoReg("reg-1").definition));
+  assert.ok(!/continu/.test(terminoReg("reg-2").definition));
+  assert.match(correctaReg("reg-q1"), /VMC/);
+  assert.ok(!/continu/.test(correctaReg("reg-q3")));
+  assert.match(correctaReg("reg-q3"), /espacio controlado/);
+  assert.ok(!/cruce frontal/.test(preguntaReg("reg-q2").pregunta));
+});
+
+test("Reglamentación: horas, inglés, mínimos y alterno con la regla real", () => {
+  assert.match(correctaReg("reg-q11"), /180/);
+  assert.match(correctaReg("reg-q12"), /tres años/);
+  assert.match(correctaReg("reg-q8"), /altitud/);
+  assert.match(correctaReg("reg-q15"), /alterno/);
+  assert.match(correctaReg("reg-q15"), /no salir/);
+  assert.ok(!/de noche/.test(preguntaReg("reg-q17").pregunta));
+});
+
+test("Reglamentación: el escenario usa una regla mexicana, no los 90 días de la FAA", () => {
+  const textos = Object.values(MODULE_SCENARIOS.reglamentacion.tree)
+    .flatMap((n) => [n.prompt, ...n.options.map((o) => o.label), n.outcome?.feedback ?? ""])
+    .join(" ");
+  assert.ok(!/90 días/.test(textos));
+  assert.ok(!/currency/i.test(textos));
+  assert.match(textos, /aptitud psicofísica/);
+  const act = ACADEMIA_MODULOS.find((m) => m.slug === "reglamentacion")!.actividades.find((a) => a.id === "interactividad-4")!;
+  assert.ok(!/currency/i.test(act.titulo));
+});
+
+const preguntaIfr = (id: string) => [...MODULE_PRACTICA.ifr, ...MODULE_EVALUACION.ifr].find((p) => p.id === id)!;
+const correctaIfr = (id: string) => preguntaIfr(id).opciones[preguntaIfr(id).correcta];
+
+test("IFR: el primer juego de términos solo pregunta lo del capítulo 1", () => {
+  const uno = MODULE_TERMS.ifr.map((x) => x.term);
+  for (const t of ["DA", "MDA", "LPV", "Holding"]) assert.ok(!uno.includes(t), t);
+  const dos = MODULE_TERMS["ifr-2"].map((x) => x.term);
+  for (const t of ["DA", "MDA", "LPV", "Holding"]) assert.ok(dos.includes(t), t);
+  assert.match(MODULE_TERMS["ifr-2"].find((x) => x.term === "DA")!.definition, /LPV/);
+  assert.ok(!/libre de obstáculos/.test(MODULE_TERMS["ifr-2"].find((x) => x.id === "ifr2-1")!.definition));
+});
+
+test("IFR: rutas ATS de la OACI y SID con gradiente", () => {
+  assert.match(correctaIfr("ifr-q4"), /letra y un número/);
+  assert.match(correctaIfr("ifr-q13"), /Estados Unidos/);
+  assert.match(correctaIfr("ifr-q12"), /gradiente/);
+  assert.ok(!/brevemente/.test(correctaIfr("ifr-q16")));
+});
+
+test("IFR: el escenario del MDA no enseña la regla de los 100 pies de la FAA", () => {
+  const arbol = MODULE_SCENARIOS["ifr-2"].tree;
+  const etiquetas = Object.values(arbol).flatMap((n) => n.options.map((o) => o.label)).join(" ");
+  assert.ok(!/cien pies/.test(etiquetas));
+  assert.match(arbol["exito"].outcome!.feedback, /FAA/);
+  assert.match(arbol["exito"].outcome!.feedback, /referencia visual requerida/);
 });

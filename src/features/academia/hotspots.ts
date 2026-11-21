@@ -32,7 +32,7 @@ export const CESSNA_HOTSPOTS: Hotspot[] = [
   {
     id: "fuselaje",
     label: "Fuselaje",
-    description: "Estructura principal que conecta la cabina con el empenaje y aloja la carga.",
+    description: "Estructura central: aloja la cabina y la carga, y une las alas con el empenaje.",
     xPct: 43.9,
     yPct: 65.6,
   },
@@ -99,7 +99,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
     id: "velocimetro",
     label: "Indicador de velocidad",
     description:
-      "Mide la diferencia entre la presión dinámica del tubo pitot y la presión estática. Sus arcos de color marcan el rango de flaps (blanco), el de operación normal (verde), la zona de precaución (amarillo) y la Vne (línea roja). Sistema pitot-estático.",
+      "Compara la presión total del tubo pitot con la presión estática: la diferencia (presión dinámica) es tu velocidad. Sus arcos de color marcan el rango de flaps (blanco), el de operación normal (verde), la zona de precaución (amarillo) y la Vne (línea roja). Sistema pitot-estático.",
     xPct: 20.0,
     yPct: 40.8,
   },
@@ -107,7 +107,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
     id: "horizonte",
     label: "Horizonte artificial",
     description:
-      "Tu referencia primaria de actitud: muestra inclinación y cabeceo mediante un giroscopio que mantiene su orientación en el espacio. En IMC es la única referencia confiable sin visibilidad exterior. Accionado por vacío (o eléctrico en cabinas modernas).",
+      "Tu referencia primaria de actitud: muestra inclinación y cabeceo mediante un giroscopio que mantiene su orientación en el espacio. En IMC es el centro de tu scan: los demás instrumentos lo confirman. Accionado por vacío (o eléctrico en cabinas modernas).",
     xPct: 50.0,
     yPct: 40.8,
   },
@@ -121,7 +121,7 @@ export const SIXPACK_HOTSPOTS: Hotspot[] = [
   },
   {
     id: "coordinador",
-    label: "Coordinador de giro",
+    label: "Coordinador de viraje",
     description:
       "Muestra la tasa de giro, no el ángulo de inclinación: el viraje estándar son 3° por segundo, 360° en dos minutos. La bola del inclinómetro indica si el viraje está coordinado, derrapando o resbalando. Alimentación eléctrica — por eso sobrevive a una falla de vacío.",
     xPct: 20.0,
