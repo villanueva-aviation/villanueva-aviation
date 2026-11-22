@@ -199,3 +199,15 @@ test("OVC se dice «Cielo cubierto a», sin «Nubes» delante", () => {
   const nubes = a.partes.filter((p) => p.tipo === "nubes").map((p) => p.texto);
   assert.deepEqual(nubes, ["Cielo cubierto a dos mil pies.", "Overcast at two thousand."]);
 });
+
+test("con controlador: sin letra ni pista, y cierra pidiendo confirmar con el controlador", () => {
+  const a = armarAtisMx(metar, ap, { conControlador: true });
+  assert.equal(a.conControlador, true);
+  assert.ok(!a.partes.some((p) => p.tipo === "letra" || p.tipo === "pista"));
+  const cierre = a.partes.filter((p) => p.tipo === "cierre").map((p) => p.texto);
+  assert.deepEqual(cierre, ["Confirme pista y QNH con el controlador.", "Confirm runway and QNH with the controller."]);
+});
+
+test("sin opciones: conControlador es false", () => {
+  assert.equal(armarAtisMx(metar, ap).conControlador, false);
+});

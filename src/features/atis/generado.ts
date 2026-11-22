@@ -6,7 +6,7 @@ import { FRASES, palabraDigito, type Idioma, type Pieza } from "./frases.ts";
 export type TipoParte = "aeropuerto" | "letra" | "hora" | "pista" | "viento" | "visibilidad" | "tiempo" | "nubes"
   | "temperatura" | "altimetro" | "observaciones" | "cierre";
 export type Parte = { tipo: TipoParte; idioma: Idioma; texto: string; piezas: Pieza[]; soloTexto?: boolean };
-export type Atis = { icao: string; letra: string; inicioMs: number; partes: Parte[] }; // partes es primero, luego en
+export type Atis = { icao: string; letra: string; inicioMs: number; partes: Parte[]; conControlador: boolean }; // partes es primero, luego en
 
 const ALFABETO = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -42,7 +42,9 @@ const FRACCION: Record<number, string> = { 0.25: "f-cuarto", 0.5: "f-medio", 0.7
 const DESPEJADO = ["CLR", "SKC", "NSC", "NCD", "CAVOK"];
 const CAPAS = ["FEW", "SCT", "BKN", "OVC"];
 
-export function armarAtisMx(metar: Metar, ap: AeropuertoAtis): Atis {
+// conControlador: hay ATC de la red en el aeropuerto pero sin ATIS. No se dicen letra ni pista (son del ATC),
+// pero la letra se sigue calculando para saber cuándo cambia el METAR.
+export function armarAtisMx(metar: Metar, ap: AeropuertoAtis, { conControlador = false }: { conControlador?: boolean } = {}): Atis {
   const letra = letraDe(metar.obsTime);
   const [cuerpo, rmk = ""] = metar.rawOb.split(/\sRMK\s/);
   const grupo = (re: RegExp) => re.exec(cuerpo);
@@ -50,7 +52,7 @@ export function armarAtisMx(metar: Metar, ap: AeropuertoAtis): Atis {
   const variando = grupo(/(?:^|\s)(\d{3})V(\d{3})(?=\s|$)/);
   const temps = grupo(/(?:^|\s)(M?\d{2})\/(M?\d{2})?(?=\s|$)/);
   const altim = grupo(/(?:^|\s)([AQ])(\d{4})(?=\s|$)/);
-  const pista = pistaEnUso(ap.pistas, metar.wdir, metar.wspd);
+  const pista = conControlador ? null : pistaEnUso(ap.pistas, metar.wdir, metar.wspd);
 
   const armar = (idioma: Idioma): Parte[] => {
     const partes: Parte[] = [];
@@ -79,7 +81,7 @@ export function armarAtisMx(metar: Metar, ap: AeropuertoAtis): Atis {
     };
 
     p("aeropuerto", t(`ap-${ap.icao}`, `${idioma === "es" ? ap.nombreEs : ap.nombreEn}.`));
-    p("letra", j("f-informacion", `letra-${letra}`));
+    if (!conControlador) p("letra", j("f-informacion", `letra-${letra}`));
     if (hora) {
       const x = idioma === "es" ? j("f-observacion", D(hora), "f-zulu") : j(D(hora), "f-zulu");
       p("hora", { ...x, texto: cap(x.texto) });
@@ -148,10 +150,10 @@ export function armarAtisMx(metar: Metar, ap: AeropuertoAtis): Atis {
     if (resto.length) solo("observaciones", resto.join(" "));
     for (const x of dichas) p("observaciones", x);
 
-    p("cierre", j("f-cierre", `letra-${letra}`));
+    p("cierre", conControlador ? j("f-confirme") : j("f-cierre", `letra-${letra}`));
     return partes;
   };
 
-  return { icao: ap.icao, letra, inicioMs: metar.obsTime * 1000, partes: [...armar("es"), ...armar("en")] };
+  return { icao: ap.icao, letra, inicioMs: metar.obsTime * 1000, partes: [...armar("es"), ...armar("en")], conControlador };
 }
 

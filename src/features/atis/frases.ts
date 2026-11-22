@@ -68,6 +68,7 @@ const FIJAS: Record<string, [string, string | null]> = {
   "f-menos": ["menos", "minus"],
   "f-altimetro": ["Altímetro,", "Altimeter,"],
   "f-qnh": ["QNH,", "QNH,"],
+  "f-confirme": ["Confirme pista y QNH con el controlador.", "Confirm runway and QNH with the controller."],
   "f-cierre": ["Al primer contacto, notifique que tiene la información", "Advise on initial contact you have information"],
 };
 

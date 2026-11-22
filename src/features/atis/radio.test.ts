@@ -64,11 +64,12 @@ test("entraSiguiente: el segundo cambio de letra también cae en la pausa", () =
 });
 
 test("debeCambiar", () => {
-  const a: Atis = { icao: "MMGL", letra: "A", inicioMs: 0, partes: [] };
+  const a: Atis = { icao: "MMGL", letra: "A", inicioMs: 0, partes: [], conControlador: false };
   assert.equal(debeCambiar(null, a), true);
   assert.equal(debeCambiar(a, { ...a, inicioMs: 5 }), false);
   assert.equal(debeCambiar(a, { ...a, letra: "B" }), true);
   assert.equal(debeCambiar(a, { ...a, icao: "MMMX" }), true);
+  assert.equal(debeCambiar(a, { ...a, conControlador: true }), true); // se conecta o se va un controlador
 });
 
 test("pausaTras", () => {
