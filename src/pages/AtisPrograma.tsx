@@ -7,7 +7,7 @@ import type { AeropuertoAtis } from "../features/atis/datos";
 import { LETRAS } from "../features/atis/frases";
 import { armarAtisMx, type Atis } from "../features/atis/generado";
 import { cargarAudio, RadioAtis } from "../features/atis/motorAudio";
-import { fuente, type EstadoRed, type Fuente, type Red } from "../features/atis/red";
+import { estadoVigente, fuente, type EntradaRed, type EstadoRed, type Fuente, type Red } from "../features/atis/red";
 import { alcanceNm, debeCambiar, entraSiguiente, mezclaPorDistancia, offsetLoop, PAUSA_LOOP_SEG, sintonizado, type Mezcla } from "../features/atis/radio";
 import { useLectorAtis } from "../features/atis/useLectorAtis";
 import { consultarMetar, type Metar } from "../lib/clima";
@@ -52,7 +52,7 @@ type Vista = {
   icao: string; distNm: number; senal: Senal; atis: Atis | null; faltantes: string[]; avisoMetar: string | null;
   origen: Fuente | null; atisRed: EstadoRed["atis"]; avisoRed: string | null;
 };
-type EntradaRed = { estado: EstadoRed | null; pedidoMs: number; fallo: boolean };
+type PreguntaRed = EntradaRed & { pedidoMs: number };
 type EntradaMetar = { metar: Metar | null; pedidoMs: number; viejo: boolean };
 
 const clave = (a: Atis) => `${a.icao}-${a.letra}-${a.conControlador ? "atc" : "gen"}`;
@@ -98,7 +98,7 @@ function Programa() {
   const ctxRef = useRef<AudioContext | null>(null);
   const canales = useRef<Canal[]>([]);
   const metares = useRef(new Map<string, EntradaMetar>());
-  const redes = useRef(new Map<string, EntradaRed>());
+  const redes = useRef(new Map<string, PreguntaRed>());
 
   useEffect(() => {
     fetch("/data/atis/MX.json").then((r) => r.json()).then(setAeropuertos).catch(() => setAeropuertos([]));
@@ -125,16 +125,16 @@ function Programa() {
   };
 
   // Pregunta a la red la primera vez y cada 60 s; si falla, se queda la última respuesta y avisa.
-  const redDe = (r: Red, icao: string): EntradaRed => {
+  const redDe = (r: Red, icao: string): PreguntaRed => {
     const k = `${r}-${icao}`;
     let e = redes.current.get(k);
-    if (!e) redes.current.set(k, (e = { estado: null, pedidoMs: 0, fallo: false }));
+    if (!e) redes.current.set(k, (e = { estado: null, recibidoMs: 0, pedidoMs: 0, fallo: false }));
     if (Date.now() - e.pedidoMs >= RED_CADA_MS) {
       const entrada = e;
       entrada.pedidoMs = Date.now();
       fetch(`/api/atis/red?icao=${icao}&red=${r}`)
         .then((res) => (res.ok ? (res.json() as Promise<EstadoRed>) : Promise.reject(new Error(String(res.status)))))
-        .then((estado) => Object.assign(entrada, { estado, fallo: false }), () => { entrada.fallo = true; });
+        .then((estado) => Object.assign(entrada, { estado, recibidoMs: Date.now(), fallo: false }), () => { entrada.fallo = true; });
     }
     return e;
   };
@@ -188,14 +188,16 @@ function Programa() {
       // De dónde sale el ATIS: la red manda. Mientras llega su primera respuesta no suena nada.
       const r = red === "ninguna" ? null : redDe(red, s.ap.icao);
       const avisoRed = r?.fallo ? "Sin datos de la red" : null;
-      if (r && !r.estado && !r.fallo) {
+      // Una respuesta vieja (volver a un aeropuerto, falla larga) no vale: anunciaría la pista sin controlador.
+      const vigente = r ? estadoVigente(r, Date.now()) : null;
+      if (vigente === "esperando") {
         apagar(c);
         return { ...base, atis: null, faltantes: [], avisoMetar: null, origen: null, atisRed: null, avisoRed: "Consultando la red…" };
       }
-      const origen = fuente(red, r?.estado ?? null);
+      const origen = fuente(red, vigente);
       if (origen === "cliente") {
         apagar(c); // la red ya da su ATIS por voz en el cliente del piloto
-        return { ...base, atis: null, faltantes: [], avisoMetar: null, origen, atisRed: r!.estado!.atis, avisoRed };
+        return { ...base, atis: null, faltantes: [], avisoMetar: null, origen, atisRed: vigente!.atis, avisoRed };
       }
       const conControlador = origen === "sin-letra";
 

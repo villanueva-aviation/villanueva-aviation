@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { estadoIvao, estadoVatsim, fuente, type IvaoAtc, type VatsimEstacion } from "./red.ts";
+import { estadoIvao, estadoVatsim, estadoVigente, fuente, type IvaoAtc, type VatsimEstacion } from "./red.ts";
 
 const MMGL = { icao: "MMGL", lat: 20.5218, lon: -103.3112 };
 
@@ -86,4 +86,22 @@ test("IVAO: centro a 100 NM cuenta (150 NM), aproximación a 100 NM no (60 NM), 
   assert.equal(estadoIvao({ clients: { atcs: [ivao("MMFR_APP", "APP", { lastTrack: pos })] } }, MMGL).atc, false);
   assert.equal(estadoIvao({ clients: { atcs: [ivao("MMGL_APP", "APP")] } }, MMGL).atc, true); // prefijo, sin posición
   assert.equal(estadoIvao({ clients: { atcs: [ivao("MMTO_APP", "APP")] } }, MMGL).atc, false);
+});
+
+test("VATSIM: estación ATIS sin texto sigue siendo ATIS de la red (su voz suena en vPilot)", () => {
+  const datos = { controllers: [], atis: [vat("MMGL_ATIS", 4, { atis_code: null, text_atis: null })] };
+  assert.deepEqual(estadoVatsim(datos, [], MMGL), { atc: true, atis: { lineas: [], letra: null } });
+});
+
+test("estadoVigente: respuesta reciente se usa; vieja se descarta; esperando la primera", () => {
+  const estado = { atc: false, atis: null };
+  assert.deepEqual(estadoVigente({ estado, recibidoMs: 1_000, fallo: false }, 60_000), estado);
+  // Vieja (más de 2 minutos): mientras llega la nueva no se sabe nada → esperar.
+  assert.equal(estadoVigente({ estado, recibidoMs: 1_000, fallo: false }, 200_000), "esperando");
+  assert.equal(estadoVigente({ estado: null, recibidoMs: 0, fallo: false }, 5_000), "esperando");
+  // Falló y lo último es viejo o no hay nada: ante la duda hay controlador → null (fuente da sin-letra).
+  assert.equal(estadoVigente({ estado, recibidoMs: 1_000, fallo: true }, 200_000), null);
+  assert.equal(estadoVigente({ estado: null, recibidoMs: 0, fallo: true }, 5_000), null);
+  // Falló pero lo último es reciente: se usa.
+  assert.deepEqual(estadoVigente({ estado, recibidoMs: 50_000, fallo: true }, 60_000), estado);
 });

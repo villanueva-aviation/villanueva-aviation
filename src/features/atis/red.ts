@@ -33,14 +33,24 @@ export function fuente(red: Red, estado: EstadoRed | null): Fuente {
   return estado.atc ? "sin-letra" : "generado";
 }
 
+// Respuesta de la red que la página puede usar ahora. Una de más de 2 minutos no se usa: anunciaría la pista
+// de cuando no había controlador. "esperando": no hay nada vigente y la pregunta sigue en camino (silencio).
+// null: falló y no hay nada vigente; fuente() lo toma como «hay controlador».
+export const VIGENCIA_RED_MS = 120_000;
+export type EntradaRed = { estado: EstadoRed | null; recibidoMs: number; fallo: boolean };
+export function estadoVigente(e: EntradaRed, ahoraMs: number): EstadoRed | null | "esperando" {
+  if (e.estado && ahoraMs - e.recibidoMs < VIGENCIA_RED_MS) return e.estado;
+  return e.fallo ? null : "esperando";
+}
+
 export function estadoVatsim(datos: VatsimDatos, trans: VatsimTransceptores, ap: Ap): EstadoRed {
   const atisRed = datos.atis.find((e) => delAeropuerto(e.callsign, ap.icao) && e.callsign.endsWith("ATIS"));
   const posiciones = new Map(trans.map((t) => [t.callsign, t.transceivers]));
   const cerca = (e: VatsimEstacion) => VATSIM_LEJANAS.has(e.facility) && mismaRegion(e.callsign, ap.icao)
     && (posiciones.get(e.callsign) ?? []).some((t) => distanciaNm({ lat: t.latDeg, lon: t.lonDeg }, ap) < e.visual_range);
   const atc = !!atisRed || datos.controllers.some((e) => e.facility !== 0 && (delAeropuerto(e.callsign, ap.icao) || cerca(e)));
-  const lineas = atisRed?.text_atis ?? [];
-  return { atc, atis: atisRed && lineas.length ? { lineas, letra: atisRed.atis_code ?? null } : null };
+  // En VATSIM la estación ATIS existe = vPilot la reproduce, aunque no publique texto.
+  return { atc, atis: atisRed ? { lineas: atisRed.text_atis ?? [], letra: atisRed.atis_code ?? null } : null };
 }
 
 export function estadoIvao(w: IvaoWhazzup, ap: Ap): EstadoRed {
