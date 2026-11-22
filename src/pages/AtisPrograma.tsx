@@ -7,12 +7,26 @@ import type { AeropuertoAtis } from "../features/atis/datos";
 import { LETRAS } from "../features/atis/frases";
 import { armarAtisMx, type Atis } from "../features/atis/generado";
 import { cargarAudio, RadioAtis } from "../features/atis/motorAudio";
+import { fuente, type EstadoRed, type Fuente, type Red } from "../features/atis/red";
 import { alcanceNm, debeCambiar, entraSiguiente, mezclaPorDistancia, offsetLoop, PAUSA_LOOP_SEG, sintonizado, type Mezcla } from "../features/atis/radio";
 import { useLectorAtis } from "../features/atis/useLectorAtis";
 import { consultarMetar, type Metar } from "../lib/clima";
 import { FOUNDER_EMAIL } from "../lib/constants";
 
 const METAR_CADA_MS = 60_000;
+const RED_CADA_MS = 60_000;
+const CLAVE_RED = "atis-red";
+const REDES: { red: Red; nombre: string }[] = [{ red: "ivao", nombre: "IVAO" }, { red: "vatsim", nombre: "VATSIM" }, { red: "ninguna", nombre: "Sin red" }];
+const NOMBRE_RED: Record<Red, string> = { ivao: "IVAO", vatsim: "VATSIM", ninguna: "" };
+
+function leerRed(): Red {
+  try {
+    const r = localStorage.getItem(CLAVE_RED);
+    return r === "ivao" || r === "vatsim" ? r : "ninguna";
+  } catch {
+    return "ninguna";
+  }
+}
 
 type Senal = "buena" | "débil" | "fuera de alcance";
 // Mismo corte que mezclaPorDistancia: sin trémolo es señal limpia.
@@ -33,10 +47,16 @@ type Canal = Partial<Cargado> & {
   faseMs: number; // hora de la fase 0 del loop que suena
   sonando: boolean;
 };
-type Vista = { icao: string; distNm: number; senal: Senal; atis: Atis | null; faltantes: string[]; avisoMetar: string | null };
+// origen: de dónde sale lo que se ve; null mientras llega la primera respuesta de la red.
+type Vista = {
+  icao: string; distNm: number; senal: Senal; atis: Atis | null; faltantes: string[]; avisoMetar: string | null;
+  origen: Fuente | null; atisRed: EstadoRed["atis"]; avisoRed: string | null;
+};
+type EntradaRed = { estado: EstadoRed | null; pedidoMs: number; fallo: boolean };
 type EntradaMetar = { metar: Metar | null; pedidoMs: number; viejo: boolean };
 
-const clave = (a: Atis) => `${a.icao}-${a.letra}`;
+const clave = (a: Atis) => `${a.icao}-${a.letra}-${a.conControlador ? "atc" : "gen"}`;
+const nombreLetra = (l: string) => (/^[A-Z]$/.test(l) ? LETRAS[l.charCodeAt(0) - 65] : l);
 const duracion = (b: AudioBuffer) => b.duration - PAUSA_LOOP_SEG;
 const horaMetar = (a: Atis) => new Date(a.inicioMs).toISOString().slice(11, 16).replace(":", "");
 
@@ -73,10 +93,12 @@ function Programa() {
   const [aeropuertos, setAeropuertos] = useState<AeropuertoAtis[] | null>(null);
   const [iniciado, setIniciado] = useState(false);
   const [silenciado, setSilenciado] = useState(false);
+  const [red, setRed] = useState<Red>(leerRed);
   const [vistas, setVistas] = useState<(Vista | null)[]>([null, null]);
   const ctxRef = useRef<AudioContext | null>(null);
   const canales = useRef<Canal[]>([]);
   const metares = useRef(new Map<string, EntradaMetar>());
+  const redes = useRef(new Map<string, EntradaRed>());
 
   useEffect(() => {
     fetch("/data/atis/MX.json").then((r) => r.json()).then(setAeropuertos).catch(() => setAeropuertos([]));
@@ -100,6 +122,30 @@ function Programa() {
       );
     }
     return e;
+  };
+
+  // Pregunta a la red la primera vez y cada 60 s; si falla, se queda la última respuesta y avisa.
+  const redDe = (r: Red, icao: string): EntradaRed => {
+    const k = `${r}-${icao}`;
+    let e = redes.current.get(k);
+    if (!e) redes.current.set(k, (e = { estado: null, pedidoMs: 0, fallo: false }));
+    if (Date.now() - e.pedidoMs >= RED_CADA_MS) {
+      const entrada = e;
+      entrada.pedidoMs = Date.now();
+      fetch(`/api/atis/red?icao=${icao}&red=${r}`)
+        .then((res) => (res.ok ? (res.json() as Promise<EstadoRed>) : Promise.reject(new Error(String(res.status)))))
+        .then((estado) => Object.assign(entrada, { estado, fallo: false }), () => { entrada.fallo = true; });
+    }
+    return e;
+  };
+
+  const elegirRed = (r: Red) => {
+    setRed(r);
+    try {
+      localStorage.setItem(CLAVE_RED, r);
+    } catch {
+      // Sin localStorage se elige otra vez la próxima.
+    }
   };
 
   const cargar = (ctx: AudioContext, aps: AeropuertoAtis[], c: Canal, atis: Atis) => {
@@ -136,17 +182,32 @@ function Programa() {
       const actual = c.atis?.icao === s.ap.icao ? c.atis : null;
       if (!mezcla) {
         apagar(c);
-        return { ...base, atis: actual, faltantes: actual ? c.faltantes! : [], avisoMetar: null };
+        return { ...base, atis: actual, faltantes: actual ? c.faltantes! : [], avisoMetar: null, origen: null, atisRed: null, avisoRed: null };
       }
+
+      // De dónde sale el ATIS: la red manda. Mientras llega su primera respuesta no suena nada.
+      const r = red === "ninguna" ? null : redDe(red, s.ap.icao);
+      const avisoRed = r?.fallo ? "Sin datos de la red" : null;
+      if (r && !r.estado && !r.fallo) {
+        apagar(c);
+        return { ...base, atis: null, faltantes: [], avisoMetar: null, origen: null, atisRed: null, avisoRed: "Consultando la red…" };
+      }
+      const origen = fuente(red, r?.estado ?? null);
+      if (origen === "cliente") {
+        apagar(c); // la red ya da su ATIS por voz en el cliente del piloto
+        return { ...base, atis: null, faltantes: [], avisoMetar: null, origen, atisRed: r!.estado!.atis, avisoRed };
+      }
+      const conControlador = origen === "sin-letra";
 
       const e = metarDe(s.ap.icao);
       if (e.metar) {
-        const nuevo = armarAtisMx(e.metar, s.ap);
+        const nuevo = armarAtisMx(e.metar, s.ap, { conControlador });
         if (debeCambiar(c.atis ?? null, nuevo)) cargar(ctx, aeropuertos, c, nuevo);
       }
       // El ATIS nuevo entra al momento si no suena nada, o en la pausa del final del loop si ya suena otro.
       // Uno que llegó tarde de otro aeropuerto (A→B→A rápido) no entra.
-      if (c.siguiente && c.siguiente.atis.icao !== s.ap.icao) c.siguiente = null;
+      // Uno que llegó tarde con la regla vieja de la red (se conectó o se fue un controlador) tampoco.
+      if (c.siguiente && (c.siguiente.atis.icao !== s.ap.icao || c.siguiente.atis.conControlador !== conControlador)) c.siguiente = null;
       const sig = c.siguiente;
       if (sig && entraSiguiente(c.sonando, Date.now(), c.faseMs, duracion(c.buffer ?? sig.buffer))) {
         Object.assign(c, sig, { siguiente: null });
@@ -157,16 +218,17 @@ function Programa() {
         }
       }
       if (silenciado) apagar(c);
-      else if (c.atis?.icao === s.ap.icao) {
+      // Si ya suena, el cambio de regla entra en la pausa del loop; si no, solo arranca el ATIS de la regla actual.
+      else if (c.atis?.icao === s.ap.icao && (c.sonando || c.atis.conControlador === conControlador)) {
         if (c.sonando) c.radio.ajustar(mezcla);
         else tocar(c, c.atis.inicioMs, mezcla);
       }
       const atis = c.atis?.icao === s.ap.icao ? c.atis : null;
       const avisoMetar = !e.viejo ? null : e.metar ? "METAR sin actualizar" : "Sin METAR";
-      return { ...base, atis, faltantes: atis ? c.faltantes! : [], avisoMetar };
+      return { ...base, atis, faltantes: atis ? c.faltantes! : [], avisoMetar, origen, atisRed: null, avisoRed };
     }));
     // metarDe y cargar solo tocan refs; la muestra llega cada segundo.
-  }, [muestra, iniciado, aeropuertos, silenciado]);
+  }, [muestra, iniciado, aeropuertos, silenciado, red]);
 
   const empezar = () => {
     if (ctxRef.current) return ctxRef.current;
@@ -186,18 +248,44 @@ function Programa() {
         {sintonizados.length === 0 && <span className="text-xs text-white/60">{ESTADO[estado]}</span>}
       </header>
 
+      <div className="flex gap-2" role="group" aria-label="Red">
+        {REDES.map(({ red: r, nombre }) => (
+          <button
+            key={r}
+            type="button"
+            aria-pressed={red === r}
+            onClick={() => elegirRed(r)}
+            className={`flex-1 rounded-full border px-3 py-1.5 font-display text-xs font-semibold ${red === r ? "border-gold-500 bg-gold-500/15 text-gold-200" : "border-white/15 text-white/70"}`}
+          >
+            {nombre}
+          </button>
+        ))}
+      </div>
+
       {!iniciado && <Button onClick={empezar} className="w-full">Empezar</Button>}
 
       {sintonizados.length > 0 && vistas.map((v, i) => v && (
         <section key={i} className="space-y-2 rounded-lg border border-white/10 bg-navy-900/60 p-3 text-sm">
           <p className="text-xs font-semibold text-white/50">COM{i + 1}</p>
           <h2 className="font-display font-bold text-white">
-            {v.atis ? `${v.icao} · Información ${LETRAS[v.atis.letra.charCodeAt(0) - 65]} · METAR ${horaMetar(v.atis)}Z` : v.icao}
+            {v.origen === "cliente" && v.atisRed?.letra ? `${v.icao} · Información ${nombreLetra(v.atisRed.letra)}`
+              : v.atis?.conControlador ? `${v.icao} · Sin letra · METAR ${horaMetar(v.atis)}Z`
+              : v.atis ? `${v.icao} · Información ${nombreLetra(v.atis.letra)} · METAR ${horaMetar(v.atis)}Z` : v.icao}
           </h2>
+          {v.origen === "cliente" ? <p className="text-xs text-white/50">ATIS de {NOMBRE_RED[red]}</p>
+            : v.atis?.conControlador ? <p className="text-xs text-white/50">Generado sin letra: hay controlador en línea</p>
+            : v.atis && <p className="text-xs text-white/50">Generado con el METAR de las {horaMetar(v.atis)}Z</p>}
           <p className="text-white/70">
             {v.distNm.toFixed(1)} NM · Señal: <span className={COLOR_SENAL[v.senal]}>{v.senal}</span>
           </p>
           {v.avisoMetar && <p className="text-gold-300">{v.avisoMetar}</p>}
+          {v.avisoRed && <p className="text-gold-300">{v.avisoRed}</p>}
+          {v.origen === "cliente" && v.atisRed && (
+            <div className="space-y-1 rounded border border-white/10 p-2">
+              {v.atisRed.lineas.map((l, j) => <p key={j} className="text-white/85">{l}</p>)}
+              <span className="inline-block rounded border border-gold-500/40 px-1 text-[10px] uppercase tracking-wide text-gold-200">Escúchalo en tu cliente</span>
+            </div>
+          )}
           {v.atis && (["es", "en"] as const).map((idioma) => (
             <div key={idioma} className="space-y-1 rounded border border-white/10 p-2">
               {v.atis!.partes.filter((p) => p.idioma === idioma).map((p, j) => (
