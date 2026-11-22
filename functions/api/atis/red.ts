@@ -1,7 +1,8 @@
 // Intermediario de los feeds públicos de IVAO y VATSIM para el programa ATIS:
 // responde si hay controlador en un aeropuerto y si la red publica su ATIS.
 // Los feeds pesan ~1 MB y cambian cada 15 s: Cloudflare los guarda 60 s.
-import aeropuertos from "../../../public/data/atis/MX.json" with { type: "json" };
+// Sin «with { type: "json" }»: el esbuild de wrangler 3 (el que compila las Functions en Cloudflare) no lo entiende.
+import aeropuertos from "../../../public/data/atis/MX.json";
 import { estadoIvao, estadoVatsim, type IvaoWhazzup, type VatsimDatos, type VatsimTransceptores } from "../../../src/features/atis/red.ts";
 
 const json = (cuerpo: unknown, status = 200, extra: Record<string, string> = {}) =>
