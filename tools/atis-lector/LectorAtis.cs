@@ -289,7 +289,7 @@ static class LectorAtis
             "{\"ident\": \"29L\", \"rumboV\": 293, \"largoFt\": 13123}]}]";
         Console.WriteLine(mmgl ? "Json de aeropuertos: OK" : "Json de aeropuertos: FALLA " + j);
 
-        var esc = Aeropuerto.Texto("a\"b\\c\n") == "\"a\\\"b\\\\c\\u000a\"" &&Aeropuerto.Json(new List<Aeropuerto>()) == "[]";
+        var esc = Aeropuerto.Texto("a\"b\\c\n") == "\"a\\\"b\\\\c\\u000a\"" && Aeropuerto.Json(new List<Aeropuerto>()) == "[]";
         Console.WriteLine(esc ? "Json escapa el nombre: OK" : "Json escapa el nombre: FALLA");
 
         // Sin simulador ni posicion: lista vacia.
@@ -695,6 +695,7 @@ static class Sim
             var cola = new Queue<string>();
             var abiertos = new Dictionary<uint, Pedido>();  // por RequestID
             var porUnico = new Dictionary<uint, Pedido>();  // por UniqueRequestId del aeropuerto, por si un hijo no trae el RequestID
+            var reintentado = new HashSet<string>();         // ya vencieron una vez
             var siguiente = PrimerPedido;
             Lugar pos = null, buscadoEn = null;
             LectorAtis.PublicarAeropuertos(new List<Aeropuerto>());
@@ -718,9 +719,11 @@ static class Sim
                 foreach (var id in new List<uint>(abiertos.Keys))
                     if (ahora - abiertos[id].Desde > EsperaSeg)
                     {
-                        // Sin respuesta (MSFS cargando, ICAO raro): sale de la cache y se reintenta en la proxima busqueda, a 10 NM.
-                        Console.WriteLine("ATIS: " + abiertos[id].Icao + " no respondio");
-                        cache.Remove(abiertos[id].Icao);
+                        // Sin respuesta (MSFS cargando, ICAO raro): se reintenta una vez enseguida, rehaciendo la cola desde el mas
+                        // cercano (asi el aeropuerto de salida no se pierde con el avion parado). A la segunda queda null: no se pide mas.
+                        var icao = abiertos[id].Icao;
+                        Console.WriteLine("ATIS: " + icao + " no respondio");
+                        if (reintentado.Add(icao)) { cache.Remove(icao); buscadoEn = null; }
                         terminar(id);
                     }
                 if (mundoListo && pos != null && Aeropuerto.DebeBuscar(buscadoEn, pos))
@@ -737,17 +740,32 @@ static class Sim
                     cache[icao] = null;
                     var id = siguiente++;
                     abiertos[id] = new Pedido { Icao = icao, Desde = ahora };
-                    sim.RequestFacilityData(Def.Aeropuerto, (Req)id, icao, "");
+                    // Un pedido que falla (MSFS cerrandose, ICAO raro) cuenta como terminado: no ocupa lugar ni tumba la conexion.
+                    try { sim.RequestFacilityData(Def.Aeropuerto, (Req)id, icao, ""); }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("ATIS: no pude pedir " + icao + ": " + e.Message);
+                        abiertos.Remove(id);
+                        break; // el resto espera al siguiente mensaje; si MSFS se cerro, el ciclo termina
+                    }
                 }
             };
 
+            // Una excepcion en un manejador saldria de ReceiveMessage y reconectaria pidiendo otra vez los 42 000:
+            // un dato ilegible tira solo ese aeropuerto.
             sim.OnRecvAirportList += (s, d) =>
             {
+                var malos = 0;
                 foreach (var o in d.rgData)
                 {
-                    var a = (SC.SIMCONNECT_DATA_FACILITY_AIRPORT)o;
-                    mundo.Add(new Lugar { Icao = a.Ident, Lat = a.Latitude, Lon = a.Longitude });
+                    try
+                    {
+                        var a = (SC.SIMCONNECT_DATA_FACILITY_AIRPORT)o;
+                        mundo.Add(new Lugar { Icao = a.Ident, Lat = a.Latitude, Lon = a.Longitude });
+                    }
+                    catch (Exception) { malos++; }
                 }
+                if (malos > 0) Console.WriteLine("ATIS: " + malos + " aeropuertos ilegibles en la lista");
                 if (d.dwEntryNumber + 1 >= d.dwOutOf && !mundoListo)
                 {
                     mundoListo = true;
@@ -759,25 +777,34 @@ static class Sim
             {
                 Pedido p;
                 if (!abiertos.TryGetValue(d.UserRequestId, out p) && !porUnico.TryGetValue(d.ParentUniqueRequestId, out p)) return;
-                var o = d.Data[0];
-                if (o is ApFac)
+                try
                 {
-                    var a = (ApFac)o;
-                    p.Unico = d.UniqueRequestId;
-                    if (p.Unico != 0) porUnico[p.Unico] = p;
-                    p.Ap = new Aeropuerto { Icao = p.Icao, Nombre = (a.Nombre ?? "").Trim(), Lat = a.Lat, Lon = a.Lon, ElevFt = (int)Math.Round(a.Alt * Aeropuerto.PiesPorMetro) };
+                    var o = d.Data[0];
+                    if (o is ApFac)
+                    {
+                        var a = (ApFac)o;
+                        p.Unico = d.UniqueRequestId;
+                        if (p.Unico != 0) porUnico[p.Unico] = p;
+                        p.Ap = new Aeropuerto { Icao = p.Icao, Nombre = (a.Nombre ?? "").Trim(), Lat = a.Lat, Lon = a.Lon, ElevFt = (int)Math.Round(a.Alt * Aeropuerto.PiesPorMetro) };
+                    }
+                    else if (p.Ap == null) return;
+                    else if (o is FrecFac)
+                    {
+                        var f = (FrecFac)o;
+                        var mhz = Math.Round(f.Hz / 1e6, 3);
+                        if (f.Tipo == 1 && !p.Ap.Mhz.Contains(mhz)) p.Ap.Mhz.Add(mhz);
+                    }
+                    else if (o is PistaFac)
+                    {
+                        var r = (PistaFac)o;
+                        p.Ap.Pistas.AddRange(Aeropuerto.Extremos(r.Rumbo, r.Largo, r.N1, r.D1, r.N2, r.D2));
+                    }
                 }
-                else if (p.Ap == null) return;
-                else if (o is FrecFac)
+                catch (Exception e)
                 {
-                    var f = (FrecFac)o;
-                    var mhz = Math.Round(f.Hz / 1e6, 3);
-                    if (f.Tipo == 1 && !p.Ap.Mhz.Contains(mhz)) p.Ap.Mhz.Add(mhz);
-                }
-                else if (o is PistaFac)
-                {
-                    var r = (PistaFac)o;
-                    p.Ap.Pistas.AddRange(Aeropuerto.Extremos(r.Rumbo, r.Largo, r.N1, r.D1, r.N2, r.D2));
+                    // Sin p.Ap el resto de sus datos se ignora (sale antes del try) y al terminar queda null: una linea por aeropuerto.
+                    Console.WriteLine("ATIS: dato ilegible de " + p.Icao + ": " + e.Message);
+                    p.Ap = null;
                 }
             };
             sim.OnRecvFacilityDataEnd += (s, d) => terminar(d.RequestId);
