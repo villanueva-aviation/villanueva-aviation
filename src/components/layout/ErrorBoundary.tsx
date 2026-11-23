@@ -2,6 +2,10 @@ import { Component, type ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "../ui/Button";
 import { CONTACT_EMAIL } from "../../lib/constants";
+import { recargarSiHayVersionNueva } from "../../lib/recargaVersion";
+
+// Chrome, Firefox y Safari: así se ve un archivo de la versión anterior que ya no existe.
+const VERSION_VIEJA = /dynamically imported module|Importing a module script failed/i;
 
 interface State {
   hasError: boolean;
@@ -16,6 +20,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
 
   componentDidCatch(error: unknown, info: unknown) {
     console.error("Error no capturado en la app:", error, info);
+    if (error instanceof Error && VERSION_VIEJA.test(error.message)) recargarSiHayVersionNueva();
   }
 
   render() {
