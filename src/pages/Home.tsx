@@ -13,6 +13,7 @@ import { MetarEnVivo } from "../features/home/MetarEnVivo";
 import { FondoHero } from "../features/home/FondoHero";
 import { FLOTA, TOTAL_AVIONES, fotoFlota } from "../data/flota";
 import { SECCIONES } from "../data/secciones";
+import { PAGINA_INSTRUCTOR } from "../data/paginaInstructor";
 
 // Uno por categoría: el primer vuelo, el salto a multimotor y el turbohélice.
 const ADELANTO_FLOTA = ["c152", "seneca", "c90"].map((clave) =>
@@ -94,6 +95,28 @@ export function Home() {
                 </Link>
               </Reveal>
             ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* INSTRUCTOR VIRTUAL */}
+      <section className="border-t border-white/10 py-20 md:py-28">
+        <Container>
+          <div className="grid items-center gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-400">{PAGINA_INSTRUCTOR.eyebrow}</p>
+              <h2 className="mt-4 font-display text-3xl font-bold leading-tight text-white text-balance sm:text-4xl">{PAGINA_INSTRUCTOR.titulo}</h2>
+              <p className="mt-5 text-white/70">{PAGINA_INSTRUCTOR.subtitulo}</p>
+              <div className="mt-8">
+                <Button to={ROUTES.instructor} variant="primary" className="group">
+                  Conoce el instructor
+                  <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+                </Button>
+              </div>
+            </div>
+            <Reveal className="overflow-hidden rounded-3xl border border-white/10 bg-navy-900 shadow-2xl shadow-black/40">
+              <img src={PAGINA_INSTRUCTOR.debriefing.img} alt={PAGINA_INSTRUCTOR.debriefing.alt} loading="lazy" className="block w-full" />
+            </Reveal>
           </div>
         </Container>
       </section>

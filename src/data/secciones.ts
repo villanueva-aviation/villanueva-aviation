@@ -143,7 +143,7 @@ export const SECCIONES: Seccion[] = [
       {
         titulo: "Instructor virtual (beta)",
         texto: "Vuela el viraje escarpado en el C172 y el instructor te califica con las tolerancias de un checkride. Está en beta: lo seguimos mejorando. Gratis con tu cuenta.",
-        to: ROUTES.instructorVirajeEscarpado,
+        to: ROUTES.instructor,
         img: { src: "/images/descargas-simhub-c172.jpg" },
         alt: "Instrumentos del Cessna 172 en un monitor aparte",
       },
