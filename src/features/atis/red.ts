@@ -19,6 +19,7 @@ type Ap = { icao: string; lat: number; lon: number };
 const VATSIM_LEJANAS = new Set([1, 5, 6]); // FSS, APP/DEP, CTR
 const IVAO_ALCANCE: Record<string, number> = { CTR: 150, FSS: 150, APP: 60, DEP: 60 }; // IVAO no publica alcance
 const IVAO_PRIORIDAD = ["TWR", "APP", "GND", "DEL"]; // quien transmite el ATIS de voz en Aurora
+const IVAO_LOCALES = ["TWR", "GND", "DEL"];
 const SERVIDOR_VOZ = /\.ivao\.aero\//;
 
 // EE. UU. (K, PA, PH, PG) llama a sus estaciones sin la primera letra: LAX_TWR para KLAX, ANC_TWR para PANC.
@@ -26,18 +27,25 @@ const sinPrefijo = (icao: string) => /^(K|PA|PH|PG)/.test(icao) ? icao.slice(1) 
 const delAeropuerto = (callsign: string, icao: string) =>
   callsign.startsWith(icao + "_") || (!!sinPrefijo(icao) && callsign.startsWith(sinPrefijo(icao)!));
 // Por distancia solo cuentan estaciones de la misma región OACI: el centro de Houston en VATSIM publica
-// 600 NM de alcance y no controla Guadalajara. Regiones de una letra (C, Y, Z, U): compara la primera.
-// En EE. UU. y Canadá un prefijo que no es de 4 letras (HOU_CTR, TOR_CTR) también cuenta, y en EE. UU. los
-// centros KZxx de IVAO; ante la duda, hay controlador (la distancia sigue acotando).
-const REGION_1 = ["C", "Y", "Z", "U"];
+// 600 NM de alcance y no controla Guadalajara. Regiones de una letra (C, Y, Z, U y la K de EE. UU.): compara la primera.
+// Un prefijo que no es OACI de 4 letras (HOU_CTR, TOR_CTR, LON_S_CTR) cuenta en todo aeropuerto que no sea de México
+// ni Latinoamérica (ahí Houston queda fuera), y en EE. UU. los centros KZxx de IVAO; ante la duda, hay controlador
+// (la distancia sigue acotando).
+const REGION_1 = ["C", "Y", "Z", "U", "K"];
+const prefijoOaci = (callsign: string) => /^[A-Z]{4}$/.test(callsign.split("_")[0]);
 const mismaRegion = (callsign: string, icao: string) => {
   const pref = callsign.split("_")[0];
-  const eeuu = formatoDe(icao) === "faa";
-  if ((eeuu || icao[0] === "C") && !/^[A-Z]{4}$/.test(pref)) return true;
-  if (eeuu && pref.startsWith("KZ")) return true;
+  const formato = formatoDe(icao);
+  if (formato !== "mx" && formato !== "latam" && !prefijoOaci(callsign)) return true;
+  if (formato === "faa" && pref.startsWith("KZ")) return true;
   const n = REGION_1.includes(icao[0]) ? 1 : 2;
   return pref.slice(0, n) === icao.slice(0, n);
 };
+// Torre, superficie o autorizaciones con un prefijo que no es OACI (FAI_TWR en PAFA, SJU_TWR en TJSJ, SY_TWR en YSSY):
+// cuentan si están a menos de 10 NM del aeropuerto.
+const LOCAL_NM = 10;
+const localCerca = (callsign: string, lat: number, lon: number, ap: Ap) =>
+  !prefijoOaci(callsign) && distanciaNm({ lat, lon }, ap) < LOCAL_NM;
 
 export function fuente(red: Red, estado: EstadoRed | null): Fuente {
   if (red === "ninguna") return "generado";
@@ -61,7 +69,9 @@ export function estadoVatsim(datos: VatsimDatos, trans: VatsimTransceptores, ap:
   const posiciones = new Map(trans.map((t) => [t.callsign, t.transceivers]));
   const cerca = (e: VatsimEstacion) => VATSIM_LEJANAS.has(e.facility) && mismaRegion(e.callsign, ap.icao)
     && (posiciones.get(e.callsign) ?? []).some((t) => distanciaNm({ lat: t.latDeg, lon: t.lonDeg }, ap) < e.visual_range);
-  const atc = !!atisRed || datos.controllers.some((e) => e.facility !== 0 && (delAeropuerto(e.callsign, ap.icao) || cerca(e)));
+  const local = (e: VatsimEstacion) => e.facility >= 2 && e.facility <= 4 // DEL, GND, TWR
+    && (posiciones.get(e.callsign) ?? []).some((t) => localCerca(e.callsign, t.latDeg, t.lonDeg, ap));
+  const atc = !!atisRed || datos.controllers.some((e) => e.facility !== 0 && (delAeropuerto(e.callsign, ap.icao) || cerca(e) || local(e)));
   // En VATSIM la estación ATIS existe = vPilot la reproduce, aunque no publique texto.
   return { atc, atis: atisRed ? { lineas: atisRed.text_atis ?? [], letra: atisRed.atis_code ?? null } : null };
 }
@@ -72,7 +82,9 @@ export function estadoIvao(w: IvaoWhazzup, ap: Ap): EstadoRed {
     const alcance = IVAO_ALCANCE[e.atcSession.position];
     return !!alcance && mismaRegion(e.callsign, ap.icao) && !!e.lastTrack && distanciaNm({ lat: e.lastTrack.latitude, lon: e.lastTrack.longitude }, ap) < alcance;
   };
-  const atc = propias.length > 0 || w.clients.atcs.some(cerca);
+  const local = (e: IvaoAtc) => IVAO_LOCALES.includes(e.atcSession.position) && !!e.lastTrack
+    && localCerca(e.callsign, e.lastTrack.latitude, e.lastTrack.longitude, ap);
+  const atc = propias.length > 0 || w.clients.atcs.some((e) => cerca(e) || local(e));
   const rango = (e: IvaoAtc) => { const i = IVAO_PRIORIDAD.indexOf(e.atcSession.position); return i < 0 ? IVAO_PRIORIDAD.length : i; };
   const conAtis = propias.filter((e) => e.atis).sort((a, b) => rango(a) - rango(b))[0];
   const lineas = conAtis?.atis!.lines.filter((l) => !SERVIDOR_VOZ.test(l)) ?? [];

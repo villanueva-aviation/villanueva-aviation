@@ -24,9 +24,10 @@ export const onRequestGet = async ({ request }: { request: Request }) => {
   const q = new URL(request.url).searchParams;
   const icao = (q.get("icao") ?? "").toUpperCase();
   const red = q.get("red");
-  const lat = Number(q.get("lat") ?? NaN), lon = Number(q.get("lon") ?? NaN); // Number("") es 0: se exige que vengan
+  const lat = Number(q.get("lat") ?? NaN), lon = Number(q.get("lon") ?? NaN); // Number("") y Number(" ") son 0: se exige que vengan
   const ap = { icao, lat, lon };
-  if (!/^[A-Z]{4}$/.test(icao) || !q.get("lat") || !q.get("lon") || !(Math.abs(lat) <= 90) || !(Math.abs(lon) <= 180) || (red !== "ivao" && red !== "vatsim")) return json({ error: "Solicitud inválida" }, 400);
+  // Hay ICAO con cifras (IL48) y de 3 caracteres en MSFS.
+  if (!/^[A-Z0-9]{3,4}$/.test(icao) || !q.get("lat")?.trim() || !q.get("lon")?.trim() || !(Math.abs(lat) <= 90) || !(Math.abs(lon) <= 180) || (red !== "ivao" && red !== "vatsim")) return json({ error: "Solicitud inválida" }, 400);
 
   try {
     const estado = red === "ivao"

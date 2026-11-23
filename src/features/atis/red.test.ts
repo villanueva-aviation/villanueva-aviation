@@ -138,3 +138,30 @@ test("mundial: centros vistos en vivo (TOR_CTR en Canadá, KZLA_CTR de IVAO en E
   assert.equal(estadoIvao({ clients: { atcs: [ivao("KZLA_CTR", "CTR", { lastTrack: pos })] } }, KLAX).atc, true);
   assert.equal(estadoIvao({ clients: { atcs: [ivao("KZLA_CTR", "CTR", { lastTrack: pos })] } }, MMGL).atc, false);
 });
+
+test("IVAO mundial: KSCT_APP a ~40 NM cuenta en KLAX (EE. UU. es región de una letra)", () => {
+  const pos = { latitude: 34.6, longitude: -118.408 };
+  assert.equal(estadoIvao({ clients: { atcs: [ivao("KSCT_APP", "APP", { lastTrack: pos })] } }, KLAX).atc, true);
+});
+
+test("mundial: prefijos que no son OACI fuera de México y Latinoamérica (LON_S_CTR en EGLL); Houston sigue fuera de MMGL", () => {
+  const egll = { icao: "EGLL", lat: 51.4706, lon: -0.4619 };
+  const datos = { controllers: [vat("LON_S_CTR", 6, { visual_range: 300 })], atis: [] };
+  const trans = [{ callsign: "LON_S_CTR", transceivers: [{ latDeg: 51.9, lonDeg: -0.5 }] }];
+  assert.equal(estadoVatsim(datos, trans, egll).atc, true);
+  const cerca = { latitude: 22.19, longitude: -103.3112 };
+  assert.equal(estadoIvao({ clients: { atcs: [ivao("HOU_CTR", "CTR", { lastTrack: cerca })] } }, MMGL).atc, false);
+  assert.equal(estadoIvao({ clients: { atcs: [ivao("KZHU_CTR", "CTR", { lastTrack: cerca })] } }, MMGL).atc, false);
+});
+
+test("mundial: torres con prefijo raro cuentan a menos de 10 NM (SY_TWR en YSSY, FAI_TWR en PAFA), lejos no", () => {
+  const yssy = { icao: "YSSY", lat: -33.9461, lon: 151.1772 };
+  const pafa = { icao: "PAFA", lat: 64.8151, lon: -147.8561 };
+  const en = (lat: number, lon: number) => [{ callsign: "SY_TWR", transceivers: [{ latDeg: lat, lonDeg: lon }] }];
+  const sy = { controllers: [vat("SY_TWR", 4)], atis: [] };
+  assert.equal(estadoVatsim(sy, en(-33.95, 151.18), yssy).atc, true);
+  assert.equal(estadoVatsim(sy, en(-33.45, 151.18), yssy).atc, false); // ~30 NM
+  const fai = (lat: number) => ({ clients: { atcs: [ivao("FAI_TWR", "TWR", { lastTrack: { latitude: lat, longitude: -147.85 } })] } });
+  assert.equal(estadoIvao(fai(64.82), pafa).atc, true);
+  assert.equal(estadoIvao(fai(65.3), pafa).atc, false); // ~29 NM
+});
