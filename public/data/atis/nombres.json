@@ -1,0 +1,86 @@
+{
+ "MMAA": {
+  "es": "Aeropuerto Internacional de Acapulco",
+  "en": "Acapulco International Airport"
+ },
+ "MMAN": {
+  "es": "Aeropuerto Internacional del Norte",
+  "en": "Del Norte International Airport"
+ },
+ "MMCL": {
+  "es": "Aeropuerto Internacional de Culiacán",
+  "en": "Culiacán International Airport"
+ },
+ "MMCN": {
+  "es": "Aeropuerto Internacional de Ciudad Obregón",
+  "en": "Ciudad Obregón International Airport"
+ },
+ "MMCU": {
+  "es": "Aeropuerto Internacional de Chihuahua",
+  "en": "Chihuahua International Airport"
+ },
+ "MMDO": {
+  "es": "Aeropuerto Internacional de Durango",
+  "en": "Durango International Airport"
+ },
+ "MMGL": {
+  "es": "Aeropuerto Internacional de Guadalajara",
+  "en": "Guadalajara International Airport"
+ },
+ "MMHO": {
+  "es": "Aeropuerto Internacional de Hermosillo",
+  "en": "Hermosillo International Airport"
+ },
+ "MMLO": {
+  "es": "Aeropuerto Internacional de Guanajuato",
+  "en": "Guanajuato International Airport"
+ },
+ "MMLP": {
+  "es": "Aeropuerto Internacional de La Paz",
+  "en": "La Paz International Airport"
+ },
+ "MMMD": {
+  "es": "Aeropuerto Internacional de Mérida",
+  "en": "Mérida International Airport"
+ },
+ "MMML": {
+  "es": "Aeropuerto Internacional de Mexicali",
+  "en": "Mexicali International Airport"
+ },
+ "MMMX": {
+  "es": "Aeropuerto Internacional de la Ciudad de México",
+  "en": "Mexico City International Airport"
+ },
+ "MMMY": {
+  "es": "Aeropuerto Internacional de Monterrey",
+  "en": "Monterrey International Airport"
+ },
+ "MMMZ": {
+  "es": "Aeropuerto Internacional de Mazatlán",
+  "en": "Mazatlán International Airport"
+ },
+ "MMPR": {
+  "es": "Aeropuerto Internacional de Puerto Vallarta",
+  "en": "Puerto Vallarta International Airport"
+ },
+ "MMSD": {
+  "es": "Aeropuerto Internacional de San José del Cabo",
+  "en": "San José del Cabo International Airport"
+ },
+ "MMTJ": {
+  "es": "Aeropuerto Internacional de Tijuana",
+  "en": "Tijuana International Airport"
+ },
+ "MMTO": {
+  "es": "Aeropuerto Internacional de Toluca",
+  "en": "Toluca International Airport"
+ },
+ "MMUN": {
+  "es": "Aeropuerto Internacional de Cancún",
+  "en": "Cancún International Airport"
+ },
+ "MMVR": {
+  "es": "Aeropuerto Internacional de Veracruz",
+  "en": "Veracruz International Airport"
+ }
+}

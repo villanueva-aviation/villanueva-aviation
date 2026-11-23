@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { useAuth } from "../features/auth/AuthContext";
 import { ACCESO_ATIS } from "../features/atis/acceso";
-import type { AeropuertoAtis } from "../features/atis/datos";
+import { conNombres, type AeropuertoAtis, type Nombres } from "../features/atis/datos";
 import { LETRAS } from "../features/atis/frases";
-import { armarAtisMx, type Atis } from "../features/atis/generado";
+import { armarAtis, type Atis } from "../features/atis/generado";
 import { cargarAudio, RadioAtis } from "../features/atis/motorAudio";
 import { estadoVigente, fuente, type EntradaRed, type EstadoRed, type Fuente, type Red } from "../features/atis/red";
 import { alcanceNm, debeCambiar, entraSiguiente, mezclaPorDistancia, offsetLoop, PAUSA_LOOP_SEG, sintonizado, type Mezcla } from "../features/atis/radio";
@@ -16,7 +16,7 @@ import { FOUNDER_EMAIL } from "../lib/constants";
 const METAR_CADA_MS = 60_000;
 const RED_CADA_MS = 60_000;
 const CLAVE_RED = "atis-red";
-const REDES: { red: Red; nombre: string }[] = [{ red: "ivao", nombre: "IVAO" }, { red: "vatsim", nombre: "VATSIM" }, { red: "ninguna", nombre: "Sin red" }];
+const REDES: Red[] = ["ivao", "vatsim", "ninguna"];
 const NOMBRE_RED: Record<Red, string> = { ivao: "IVAO", vatsim: "VATSIM", ninguna: "" };
 
 function leerRed(): Red {
@@ -28,16 +28,34 @@ function leerRed(): Red {
   }
 }
 
-type Senal = "buena" | "débil" | "fuera de alcance";
+type Senal = "buena" | "debil" | "fuera";
 // Mismo corte que mezclaPorDistancia: sin trémolo es señal limpia.
-const senalDe = (m: Mezcla | null): Senal => (!m ? "fuera de alcance" : m.tremolo > 0 ? "débil" : "buena");
-const COLOR_SENAL: Record<Senal, string> = { buena: "text-emerald-300", "débil": "text-gold-300", "fuera de alcance": "text-red-300" };
+const senalDe = (m: Mezcla | null): Senal => (!m ? "fuera" : m.tremolo > 0 ? "debil" : "buena");
+const COLOR_SENAL: Record<Senal, string> = { buena: "text-emerald-300", debil: "text-gold-300", fuera: "text-red-300" };
 
-const ESTADO = {
-  "sin-lector": "Abre el lector ATIS",
-  "sin-simulador": "Esperando a MSFS",
-  conectado: "Sintoniza la frecuencia ATIS de un aeropuerto",
-} as const;
+// La pantalla sigue el idioma del navegador; el texto del ATIS sigue el formato del aeropuerto.
+const en = !navigator.language.toLowerCase().startsWith("es");
+const TEXTOS = {
+  es: {
+    "sin-lector": "Abre el lector ATIS", "sin-simulador": "Esperando a MSFS", conectado: "Sintoniza la frecuencia ATIS de un aeropuerto",
+    buscando: "Buscando aeropuertos…", red: "Red", ninguna: "Sin red", empezar: "Empezar", silenciar: "Silenciar", quitarSilencio: "Quitar silencio",
+    senal: "Señal", buena: "buena", debil: "débil", fuera: "fuera de alcance",
+    sinMetar: "Sin METAR", metarViejo: "METAR sin actualizar", sinDatosRed: "Sin datos de la red", consultando: "Consultando la red…",
+    atisDe: (n: string) => `ATIS de ${n}`, sinLetraAviso: "Generado sin letra: hay controlador en línea",
+    generado: (h: string) => `Generado con el METAR de las ${h}Z`, cliente: "Escúchalo en tu cliente", soloTexto: "Solo en texto",
+    faltaAudio: "Falta audio:", informacion: "Información", sinLetra: "Sin letra", soloSim: "Solo para simulación",
+  },
+  en: {
+    "sin-lector": "Open the ATIS reader", "sin-simulador": "Waiting for MSFS", conectado: "Tune an airport's ATIS frequency",
+    buscando: "Finding airports…", red: "Network", ninguna: "No network", empezar: "Start", silenciar: "Mute", quitarSilencio: "Unmute",
+    senal: "Signal", buena: "good", debil: "weak", fuera: "out of range",
+    sinMetar: "No METAR", metarViejo: "METAR not updated", sinDatosRed: "No network data", consultando: "Checking the network…",
+    atisDe: (n: string) => `${n} ATIS`, sinLetraAviso: "Generated without letter: a controller is online",
+    generado: (h: string) => `Generated from the ${h}Z METAR`, cliente: "Listen in your client", soloTexto: "Text only",
+    faltaAudio: "Missing audio:", informacion: "Information", sinLetra: "No letter", soloSim: "For simulation only",
+  },
+};
+const T = en ? TEXTOS.en : TEXTOS.es;
 
 type Cargado = { atis: Atis; buffer: AudioBuffer; faltantes: string[] };
 type Canal = Partial<Cargado> & {
@@ -49,7 +67,7 @@ type Canal = Partial<Cargado> & {
 };
 // origen: de dónde sale lo que se ve; null mientras llega la primera respuesta de la red.
 type Vista = {
-  icao: string; distNm: number; senal: Senal; atis: Atis | null; faltantes: string[]; avisoMetar: string | null;
+  icao: string; titulo: string; distNm: number; senal: Senal; atis: Atis | null; faltantes: string[]; avisoMetar: string | null;
   origen: Fuente | null; atisRed: EstadoRed["atis"]; avisoRed: string | null;
 };
 type PreguntaRed = EntradaRed & { pedidoMs: number };
@@ -89,8 +107,8 @@ export function AtisPrograma() {
 }
 
 function Programa() {
-  const { estado, muestra } = useLectorAtis();
-  const [aeropuertos, setAeropuertos] = useState<AeropuertoAtis[] | null>(null);
+  const { estado, muestra, aeropuertos: delLector } = useLectorAtis();
+  const [nombres, setNombres] = useState<Nombres | null>(null);
   const [iniciado, setIniciado] = useState(false);
   const [silenciado, setSilenciado] = useState(false);
   const [red, setRed] = useState<Red>(leerRed);
@@ -101,8 +119,14 @@ function Programa() {
   const redes = useRef(new Map<string, PreguntaRed>());
 
   useEffect(() => {
-    fetch("/data/atis/MX.json").then((r) => r.json()).then(setAeropuertos).catch(() => setAeropuertos([]));
+    fetch("/data/atis/nombres.json").then((r) => r.json()).then(setNombres).catch(() => setNombres({}));
   }, []);
+
+  // Aeropuertos del lector con sus nombres; sin nombre, el encabezado dice el nombre de MSFS y el ATIS abre en fonética.
+  const aeropuertos = useMemo<AeropuertoAtis[] | null>(
+    () => (delLector && nombres ? conNombres(delLector.map(({ nombre, ...a }) => ({ ...a, nombreSim: nombre })), nombres) : null),
+    [delLector, nombres],
+  );
 
   useEffect(() => () => {
     for (const c of canales.current) c.radio.cerrar();
@@ -125,14 +149,15 @@ function Programa() {
   };
 
   // Pregunta a la red la primera vez y cada 60 s; si falla, se queda la última respuesta y avisa.
-  const redDe = (r: Red, icao: string): PreguntaRed => {
+  const redDe = (r: Red, ap: AeropuertoAtis): PreguntaRed => {
+    const { icao } = ap;
     const k = `${r}-${icao}`;
     let e = redes.current.get(k);
     if (!e) redes.current.set(k, (e = { estado: null, recibidoMs: 0, pedidoMs: 0, fallo: false }));
     if (Date.now() - e.pedidoMs >= RED_CADA_MS) {
       const entrada = e;
       entrada.pedidoMs = Date.now();
-      fetch(`/api/atis/red?icao=${icao}&red=${r}`)
+      fetch(`/api/atis/red?icao=${icao}&red=${r}&lat=${ap.lat}&lon=${ap.lon}`)
         .then((res) => (res.ok ? (res.json() as Promise<EstadoRed>) : Promise.reject(new Error(String(res.status)))))
         .then((estado) => Object.assign(entrada, { estado, recibidoMs: Date.now(), fallo: false }), () => { entrada.fallo = true; });
     }
@@ -184,7 +209,8 @@ function Programa() {
       }
       const mezcla = mezclaPorDistancia(s.distNm, alcanceNm(pos.aglFt), com.volumen);
       if (c.atis && c.atis.icao !== s.ap.icao) apagar(c); // otra frecuencia: corte
-      const base = { icao: s.ap.icao, distNm: s.distNm, senal: senalDe(mezcla) };
+      const titulo = s.ap.nombreEs === null && s.ap.nombreEn === null ? `${s.ap.icao} · ${s.ap.nombreSim}` : s.ap.icao;
+      const base = { icao: s.ap.icao, titulo, distNm: s.distNm, senal: senalDe(mezcla) };
       const actual = c.atis?.icao === s.ap.icao ? c.atis : null;
       if (!mezcla) {
         apagar(c);
@@ -192,13 +218,13 @@ function Programa() {
       }
 
       // De dónde sale el ATIS: la red manda. Mientras llega su primera respuesta no suena nada.
-      const r = red === "ninguna" ? null : redDe(red, s.ap.icao);
-      const avisoRed = r?.fallo ? "Sin datos de la red" : null;
+      const r = red === "ninguna" ? null : redDe(red, s.ap);
+      const avisoRed = r?.fallo ? T.sinDatosRed : null;
       // Una respuesta vieja (volver a un aeropuerto, falla larga) no vale: anunciaría la pista sin controlador.
       const vigente = r ? estadoVigente(r, Date.now()) : null;
       if (vigente === "esperando") {
         apagar(c);
-        return { ...base, atis: null, faltantes: [], avisoMetar: null, origen: null, atisRed: null, avisoRed: "Consultando la red…" };
+        return { ...base, atis: null, faltantes: [], avisoMetar: null, origen: null, atisRed: null, avisoRed: T.consultando };
       }
       const origen = fuente(red, vigente);
       if (origen === "cliente") {
@@ -209,7 +235,7 @@ function Programa() {
 
       const e = metarDe(s.ap.icao);
       if (e.metar) {
-        const nuevo = armarAtisMx(e.metar, s.ap, { conControlador });
+        const nuevo = armarAtis(e.metar, s.ap, { conControlador });
         if (debeCambiar(c.atis ?? null, nuevo)) cargar(ctx, aeropuertos, c, nuevo);
       }
       // El ATIS nuevo entra al momento si no suena nada, o en la pausa del final del loop si ya suena otro.
@@ -232,7 +258,7 @@ function Programa() {
         else tocar(c, c.atis.inicioMs, mezcla);
       }
       const atis = c.atis?.icao === s.ap.icao ? c.atis : null;
-      const avisoMetar = !e.viejo ? null : e.metar ? "METAR sin actualizar" : "Sin METAR";
+      const avisoMetar = !e.viejo ? null : e.metar ? T.metarViejo : T.sinMetar;
       return { ...base, atis, faltantes: atis ? c.faltantes! : [], avisoMetar, origen, atisRed: null, avisoRed };
     }));
     // metarDe y cargar solo tocan refs; la muestra llega cada segundo.
@@ -253,11 +279,11 @@ function Programa() {
     <div className="mx-auto max-w-[480px] space-y-4 px-4 py-4">
       <header className="flex items-baseline justify-between gap-3">
         <h1 className="font-display text-base font-bold text-white">ATIS</h1>
-        {sintonizados.length === 0 && <span className="text-xs text-white/60">{ESTADO[estado]}</span>}
+        {sintonizados.length === 0 && <span className="text-xs text-white/60">{estado === "conectado" && delLector?.length === 0 ? T.buscando : T[estado]}</span>}
       </header>
 
-      <div className="flex gap-2" role="group" aria-label="Red">
-        {REDES.map(({ red: r, nombre }) => (
+      <div className="flex gap-2" role="group" aria-label={T.red}>
+        {REDES.map((r) => (
           <button
             key={r}
             type="button"
@@ -265,33 +291,33 @@ function Programa() {
             onClick={() => elegirRed(r)}
             className={`flex-1 rounded-full border px-3 py-1.5 font-display text-xs font-semibold ${red === r ? "border-gold-500 bg-gold-500/15 text-gold-200" : "border-white/15 text-white/70"}`}
           >
-            {nombre}
+            {r === "ninguna" ? T.ninguna : NOMBRE_RED[r]}
           </button>
         ))}
       </div>
 
-      {!iniciado && <Button onClick={empezar} className="w-full">Empezar</Button>}
+      {!iniciado && <Button onClick={empezar} className="w-full">{T.empezar}</Button>}
 
       {sintonizados.length > 0 && vistas.map((v, i) => v && (
         <section key={i} className="space-y-2 rounded-lg border border-white/10 bg-navy-900/60 p-3 text-sm">
           <p className="text-xs font-semibold text-white/50">COM{i + 1}</p>
           <h2 className="font-display font-bold text-white">
-            {v.origen === "cliente" && v.atisRed?.letra ? `${v.icao} · Información ${nombreLetra(v.atisRed.letra)}`
-              : v.atis?.conControlador ? `${v.icao} · Sin letra · METAR ${horaMetar(v.atis)}Z`
-              : v.atis ? `${v.icao} · Información ${nombreLetra(v.atis.letra)} · METAR ${horaMetar(v.atis)}Z` : v.icao}
+            {v.origen === "cliente" && v.atisRed?.letra ? `${v.titulo} · ${T.informacion} ${nombreLetra(v.atisRed.letra)}`
+              : v.atis?.conControlador ? `${v.titulo} · ${T.sinLetra} · METAR ${horaMetar(v.atis)}Z`
+              : v.atis ? `${v.titulo} · ${T.informacion} ${nombreLetra(v.atis.letra)} · METAR ${horaMetar(v.atis)}Z` : v.titulo}
           </h2>
-          {v.origen === "cliente" ? <p className="text-xs text-white/50">ATIS de {NOMBRE_RED[red]}</p>
-            : v.atis?.conControlador ? <p className="text-xs text-white/50">Generado sin letra: hay controlador en línea</p>
-            : v.atis && <p className="text-xs text-white/50">Generado con el METAR de las {horaMetar(v.atis)}Z</p>}
+          {v.origen === "cliente" ? <p className="text-xs text-white/50">{T.atisDe(NOMBRE_RED[red])}</p>
+            : v.atis?.conControlador ? <p className="text-xs text-white/50">{T.sinLetraAviso}</p>
+            : v.atis && <p className="text-xs text-white/50">{T.generado(horaMetar(v.atis))}</p>}
           <p className="text-white/70">
-            {v.distNm.toFixed(1)} NM · Señal: <span className={COLOR_SENAL[v.senal]}>{v.senal}</span>
+            {v.distNm.toFixed(1)} NM · {T.senal}: <span className={COLOR_SENAL[v.senal]}>{T[v.senal]}</span>
           </p>
           {v.avisoMetar && <p className="text-gold-300">{v.avisoMetar}</p>}
           {v.avisoRed && <p className="text-gold-300">{v.avisoRed}</p>}
           {v.origen === "cliente" && v.atisRed && (
             <div className="space-y-1 rounded border border-white/10 p-2">
               {v.atisRed.lineas.map((l, j) => <p key={j} className="text-white/85">{l}</p>)}
-              <span className="inline-block rounded border border-gold-500/40 px-1 text-[10px] uppercase tracking-wide text-gold-200">Escúchalo en tu cliente</span>
+              <span className="inline-block rounded border border-gold-500/40 px-1 text-[10px] uppercase tracking-wide text-gold-200">{T.cliente}</span>
             </div>
           )}
           {v.atis && (["es", "en"] as const).map((idioma) => (
@@ -299,23 +325,23 @@ function Programa() {
               {v.atis!.partes.filter((p) => p.idioma === idioma).map((p, j) => (
                 <p key={j} className={p.soloTexto ? "text-white/40" : "text-white/85"}>
                   {p.texto}
-                  {p.soloTexto && <span className="ml-2 rounded border border-white/15 px-1 text-[10px] uppercase tracking-wide">Solo en texto</span>}
+                  {p.soloTexto && <span className="ml-2 rounded border border-white/15 px-1 text-[10px] uppercase tracking-wide">{T.soloTexto}</span>}
                 </p>
               ))}
             </div>
           ))}
-          {v.faltantes.length > 0 && <p className="text-gold-300">Falta audio: {v.faltantes.join(", ")}</p>}
+          {v.faltantes.length > 0 && <p className="text-gold-300">{T.faltaAudio} {v.faltantes.join(", ")}</p>}
         </section>
       ))}
 
       {iniciado && (
         <Button variant="secondary" onClick={() => setSilenciado(!silenciado)} className="w-full">
           {silenciado ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-          {silenciado ? "Quitar silencio" : "Silenciar"}
+          {silenciado ? T.quitarSilencio : T.silenciar}
         </Button>
       )}
 
-      <footer className="text-center text-xs text-white/40">Solo para simulación</footer>
+      <footer className="text-center text-xs text-white/40">{T.soloSim}</footer>
     </div>
   );
 }
