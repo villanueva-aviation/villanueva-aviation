@@ -5,9 +5,21 @@ import { formatoDe } from "./formato.ts";
 // El nombre corto de MSFS, sin abreviaturas, para leerlo en voz alta.
 const ABREVIATURAS: Record<string, string> = {
   Intl: "International", Rgnl: "Regional", Muni: "Municipal", AB: "Air Base", Apt: "Airport", Arpt: "Airport",
-  Natl: "National", Fld: "Field", Mem: "Memorial",
+  Natl: "National", Fld: "Field", Mem: "Memorial", AFB: "Air Force Base",
 };
 const expandir = (s: string) => s.trim().replace(/[A-Za-z]+\.?/g, (w) => Object.hasOwn(ABREVIATURAS, w.replace(/\.$/, "")) ? ABREVIATURAS[w.replace(/\.$/, "")] : w);
+
+// Nombre en ingles -> espanol hablado. Los que ya vienen en espanol se dejan.
+export function aEspanol(n: string): string {
+  n = n.trim();
+  if (/^(Aeropuerto|Aer[oó]dromo|Aeroparque|Base A[eé]rea)\b/i.test(n)) return n;
+  let m = n.match(/^(.+?)\s+(?:Air\s?Force\s+Base|Air\s?Base)$/i);
+  if (m) return `Base Aérea ${m[1]}`;
+  m = n.match(/^(.+?)\s+International(?:\s+Airport)?$/i);
+  if (m) return `Aeropuerto Internacional ${m[1]}`;
+  m = n.match(/^(.+?)\s+Airport$/i);
+  return `Aeropuerto ${m ? m[1] : n}`;
+}
 
 export function nombresAtis(
   volcado: { icao: string; nombre: string }[],
@@ -25,9 +37,9 @@ export function nombresAtis(
     const f = formatoDe(icao);
     const habla = f === "mx" || f === "latam";
     if (mx[icao]) salida[icao] = mx[icao];
-    else if (!a) { const n = expandir(nombre); salida[icao] = habla ? { es: n, en: n } : { en: n }; }
+    else if (!a) { const n = expandir(nombre); salida[icao] = habla ? { es: aEspanol(n), en: n } : { en: n }; }
     else if (habla && ciudad(icao) && porCiudad.get(ciudad(icao)) === 1) salida[icao] = NOMBRES_FIJOS[icao] ?? nombres(a.name, a.municipality);
-    else salida[icao] = habla ? { es: a.name, en: a.name } : { en: a.name };
+    else salida[icao] = habla ? { es: aEspanol(a.name), en: a.name } : { en: a.name };
   }
 
   // Los de MX.json que faltan en el volcado: su audio ya esta grabado, se quedan.

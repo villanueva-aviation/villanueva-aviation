@@ -1,86 +1,6193 @@
 {
- "MMAA": {
-  "es": "Aeropuerto Internacional de Acapulco",
-  "en": "Acapulco International Airport"
+ "PABE": {
+  "en": "Bethel Airport"
  },
- "MMAN": {
-  "es": "Aeropuerto Internacional del Norte",
-  "en": "Del Norte International Airport"
+ "PAPK": {
+  "en": "Napaskiak Airport"
  },
- "MMCL": {
-  "es": "Aeropuerto Internacional de Culiacán",
-  "en": "Culiacán International Airport"
+ "PADQ": {
+  "en": "Kodiak Airport"
  },
- "MMCN": {
-  "es": "Aeropuerto Internacional de Ciudad Obregón",
-  "en": "Ciudad Obregón International Airport"
+ "PHNG": {
+  "en": "Kaneohe Bay MCAS (Marion E. Carl Field) Airport"
  },
- "MMCU": {
-  "es": "Aeropuerto Internacional de Chihuahua",
-  "en": "Chihuahua International Airport"
+ "PHLI": {
+  "en": "Lihue Airport"
  },
- "MMDO": {
-  "es": "Aeropuerto Internacional de Durango",
-  "en": "Durango International Airport"
+ "PHBK": {
+  "en": "Barking Sands Airport"
  },
- "MMGL": {
-  "es": "Aeropuerto Internacional de Guadalajara",
-  "en": "Guadalajara International Airport"
+ "PHHI": {
+  "en": "Wheeler Army Airfield"
  },
- "MMHO": {
-  "es": "Aeropuerto Internacional de Hermosillo",
-  "en": "Hermosillo International Airport"
+ "PHNL": {
+  "en": "Daniel K. Inouye International Airport"
  },
- "MMLO": {
-  "es": "Aeropuerto Internacional de Guanajuato",
-  "en": "Guanajuato International Airport"
+ "PHSF": {
+  "en": "Bradshaw Army Airfield"
  },
- "MMLP": {
-  "es": "Aeropuerto Internacional de La Paz",
-  "en": "La Paz International Airport"
+ "PHMK": {
+  "en": "Molokai Airport"
  },
- "MMMD": {
-  "es": "Aeropuerto Internacional de Mérida",
-  "en": "Mérida International Airport"
+ "PHOG": {
+  "en": "Kahului International Airport"
  },
- "MMML": {
-  "es": "Aeropuerto Internacional de Mexicali",
-  "en": "Mexicali International Airport"
+ "PHTO": {
+  "en": "Hilo International Airport"
  },
- "MMMX": {
-  "es": "Aeropuerto Internacional de la Ciudad de México",
-  "en": "Mexico City International Airport"
+ "PHKO": {
+  "en": "Ellison Onizuka Kona International Airport at Keāhole"
  },
- "MMMY": {
-  "es": "Aeropuerto Internacional de Monterrey",
-  "en": "Monterrey International Airport"
+ "NLWW": {
+  "en": "Hihifo Airport"
  },
- "MMMZ": {
-  "es": "Aeropuerto Internacional de Mazatlán",
-  "en": "Mazatlán International Airport"
+ "NTTP": {
+  "en": "Maupiti Airport"
  },
- "MMPR": {
-  "es": "Aeropuerto Internacional de Puerto Vallarta",
-  "en": "Puerto Vallarta International Airport"
+ "CYEV": {
+  "en": "Inuvik Mike Zubko Airport"
  },
- "MMSD": {
-  "es": "Aeropuerto Internacional de San José del Cabo",
-  "en": "San José del Cabo International Airport"
+ "PAFB": {
+  "en": "Ladd Army Airfield"
+ },
+ "PAFA": {
+  "en": "Fairbanks International Airport"
+ },
+ "PAEI": {
+  "en": "Eielson Air Force Base"
+ },
+ "PAED": {
+  "en": "Elmendorf Air Force Base"
+ },
+ "PAMR": {
+  "en": "Merrill Field"
+ },
+ "PAFR": {
+  "en": "Bryant Army Airfield"
+ },
+ "PANC": {
+  "en": "Ted Stevens Anchorage International Airport"
+ },
+ "PALH": {
+  "en": "Lake Hood Seaplane Base"
+ },
+ "PABI": {
+  "en": "Allen Army Airfield"
+ },
+ "CYXY": {
+  "en": "Whitehorse / Erik Nielsen International Airport"
+ },
+ "PAJN": {
+  "en": "Juneau International Airport"
+ },
+ "CYZT": {
+  "en": "Port Hardy Airport"
+ },
+ "CYBL": {
+  "en": "Campbell River Airport"
+ },
+ "CYQQ": {
+  "en": "Comox Valley International Airport / CFB Comox"
+ },
+ "CYCD": {
+  "en": "Nanaimo Airport"
+ },
+ "CYYE": {
+  "en": "Fort Nelson Airport"
+ },
+ "CYXS": {
+  "en": "Prince George (International) Airport"
+ },
+ "CYXJ": {
+  "en": "Fort St John / North Peace Regional Airport"
+ },
+ "CYXX": {
+  "en": "Abbotsford International Airport"
+ },
+ "CYWH": {
+  "en": "Victoria Harbour Seaplane Base"
+ },
+ "CYYJ": {
+  "en": "Victoria International Airport"
+ },
+ "CYHC": {
+  "en": "Vancouver Harbour Water Aerodrome"
+ },
+ "KBLI": {
+  "en": "Bellingham International Airport"
+ },
+ "CAK3": {
+  "en": "Delta Heritage Air Park"
+ },
+ "CYVR": {
+  "en": "Vancouver International Airport"
+ },
+ "CYNJ": {
+  "en": "Langley Airport"
+ },
+ "CZBB": {
+  "en": "Boundary Bay Airport"
+ },
+ "KNUW": {
+  "en": "Whidbey Island Naval Air Station (Ault Field)"
+ },
+ "KPAE": {
+  "en": "Seattle Paine Field International Airport"
+ },
+ "KFHR": {
+  "en": "Friday Harbor Airport"
+ },
+ "CYPK": {
+  "en": "Pitt Meadows Regional Airport"
+ },
+ "KOLM": {
+  "en": "Olympia Regional Airport"
+ },
+ "KTCM": {
+  "en": "McChord Air Force Base"
+ },
+ "KTIW": {
+  "en": "Tacoma Narrows Airport"
+ },
+ "KRNT": {
+  "en": "Renton Municipal Airport"
+ },
+ "KYKM": {
+  "en": "Yakima Air Terminal McAllister Field"
+ },
+ "KBFI": {
+  "en": "King County International Airport - Boeing Field"
+ },
+ "KUAO": {
+  "en": "Aurora State Airport"
+ },
+ "KPDX": {
+  "en": "Portland International Airport"
+ },
+ "KSEA": {
+  "en": "Seattle–Tacoma International Airport"
+ },
+ "KGRF": {
+  "en": "Gray Army Air Field"
+ },
+ "KSLE": {
+  "en": "Salem-Willamette Valley Airport/McNary Field"
+ },
+ "KEUG": {
+  "en": "Eugene Airport"
+ },
+ "KMFR": {
+  "en": "Rogue Valley International-Medford Airport"
+ },
+ "KCIC": {
+  "en": "Chico Regional Airport"
+ },
+ "KRDD": {
+  "en": "Redding Municipal Airport"
+ },
+ "KBAB": {
+  "en": "Beale Air Force Base"
+ },
+ "KSAC": {
+  "en": "Sacramento Executive Airport"
+ },
+ "KSNS": {
+  "en": "Salinas Municipal Airport"
+ },
+ "KSUU": {
+  "en": "Travis Air Force Base"
+ },
+ "KSTS": {
+  "en": "Charles M. Schulz Sonoma County Airport"
+ },
+ "KTRK": {
+  "en": "Truckee Tahoe Airport"
+ },
+ "KSQL": {
+  "en": "San Carlos Airport"
+ },
+ "KCCR": {
+  "en": "Buchanan Field"
+ },
+ "KMOD": {
+  "en": "Modesto City Co-Harry Sham Field"
+ },
+ "KMRY": {
+  "en": "Monterey Regional Airport"
+ },
+ "KOAK": {
+  "en": "Oakland San Francisco Bay Airport"
+ },
+ "KHWD": {
+  "en": "Hayward Executive Airport"
+ },
+ "KPAO": {
+  "en": "Palo Alto Airport"
+ },
+ "KSJC": {
+  "en": "Mineta San Jose International Airport"
+ },
+ "KRHV": {
+  "en": "Reid-Hillview Airport of Santa Clara County"
+ },
+ "KSCK": {
+  "en": "Stockton Metropolitan Airport"
+ },
+ "KSMF": {
+  "en": "Sacramento International Airport"
+ },
+ "KMER": {
+  "en": "Castle Airport"
+ },
+ "KSFO": {
+  "en": "San Francisco International Airport"
+ },
+ "KNUQ": {
+  "en": "Moffett Federal Airfield"
+ },
+ "KAPC": {
+  "en": "Napa County Airport"
+ },
+ "KMHR": {
+  "en": "Sacramento Mather Airport"
+ },
+ "KLVK": {
+  "en": "Livermore Municipal Airport"
+ },
+ "KVBG": {
+  "en": "Vandenberg Space Force Base"
+ },
+ "KSBP": {
+  "en": "San Luis County Regional Airport"
+ },
+ "NTGK": {
+  "en": "Kaukura Airport"
+ },
+ "NTAA": {
+  "en": "Fa'a'ā International Airport"
+ },
+ "NTTM": {
+  "en": "Moorea Temae Airport"
+ },
+ "NTGF": {
+  "en": "Fakarava Airport"
+ },
+ "CYQU": {
+  "en": "Grande Prairie Airport"
+ },
+ "CYLW": {
+  "en": "Kelowna International Airport"
+ },
+ "KPSC": {
+  "en": "Tri Cities Airport"
+ },
+ "KMWH": {
+  "en": "Grant County International Airport"
+ },
+ "KGEG": {
+  "en": "Spokane International Airport"
+ },
+ "KSFF": {
+  "en": "Felts Field"
+ },
+ "CYZF": {
+  "en": "Yellowknife International Airport"
+ },
+ "CZVL": {
+  "en": "Edmonton / Villeneuve Airport"
+ },
+ "CYQF": {
+  "en": "Red Deer Regional Airport"
+ },
+ "CYYC": {
+  "en": "Calgary International Airport"
+ },
+ "CYEG": {
+  "en": "Edmonton International Airport"
+ },
+ "CYBW": {
+  "en": "Calgary / Springbank Airport"
+ },
+ "CYQL": {
+  "en": "Lethbridge County Airport"
+ },
+ "KMSO": {
+  "en": "Missoula Montana Airport"
+ },
+ "CYMM": {
+  "en": "Fort McMurray International Airport"
+ },
+ "CES7": {
+  "en": "Fort McMurray Seaplane Base"
+ },
+ "CEN5": {
+  "en": "Cold Lake Regional Airport"
+ },
+ "CYOD": {
+  "en": "CFB Cold Lake"
+ },
+ "CYXH": {
+  "en": "Medicine Hat Regional Airport"
+ },
+ "KBZN": {
+  "en": "Bozeman Yellowstone International Airport"
+ },
+ "KHLN": {
+  "en": "Helena Regional Airport"
+ },
+ "KGTF": {
+  "en": "Great Falls International Airport"
+ },
+ "CYVC": {
+  "en": "La Ronge Airport"
+ },
+ "CYXE": {
+  "en": "Saskatoon John G. Diefenbaker International Airport"
+ },
+ "CYMJ": {
+  "en": "Moose Jaw Air Vice Marshal C. M. McEwen Airport"
+ },
+ "KBIL": {
+  "en": "Billings Logan International Airport"
+ },
+ "CYQR": {
+  "en": "Regina International Airport"
+ },
+ "CYTH": {
+  "en": "Thompson Airport"
+ },
+ "CJS7": {
+  "en": "Carman (South) Airport"
+ },
+ "CYPG": {
+  "en": "Portage-la-Prairie / Southport Airport"
+ },
+ "CTN6": {
+  "en": "Treherne (South Norfolk Airpark) Airport"
+ },
+ "KBIS": {
+  "en": "Bismarck Municipal Airport"
+ },
+ "CYYQ": {
+  "en": "Churchill Airport"
+ },
+ "KGFK": {
+  "en": "Grand Forks International Airport"
+ },
+ "CYWG": {
+  "en": "Winnipeg / James Armstrong Richardson International Airport"
+ },
+ "CYQK": {
+  "en": "Kenora Airport"
+ },
+ "CYAV": {
+  "en": "Winnipeg / St. Andrews Airport"
+ },
+ "KSTC": {
+  "en": "Saint Cloud Regional Airport"
+ },
+ "KFAR": {
+  "en": "Hector International Airport"
+ },
+ "CYXL": {
+  "en": "Sioux Lookout Airport"
+ },
+ "KANE": {
+  "en": "Anoka County-Blaine (Janes Field) Airport"
+ },
+ "KMIC": {
+  "en": "Crystal Airport"
+ },
+ "KDLH": {
+  "en": "Duluth International Airport"
+ },
+ "KRNO": {
+  "en": "Reno Tahoe International Airport"
+ },
+ "KFAT": {
+  "en": "Fresno Yosemite International Airport"
+ },
+ "KOXR": {
+  "en": "Oxnard Airport"
+ },
+ "KPOC": {
+  "en": "Brackett Field"
+ },
+ "KCMA": {
+  "en": "Camarillo Airport"
+ },
+ "KONT": {
+  "en": "Ontario International Airport"
+ },
+ "KSMO": {
+  "en": "Santa Monica Municipal Airport"
+ },
+ "KWJF": {
+  "en": "General William J Fox Airfield"
+ },
+ "KHHR": {
+  "en": "Jack Northrop Field Hawthorne Municipal Airport"
+ },
+ "KVNY": {
+  "en": "Van Nuys Airport"
+ },
+ "KNLC": {
+  "en": "Lemoore Naval Air Station (Reeves Field) Airport"
+ },
+ "KPSP": {
+  "en": "Palm Springs International Airport"
+ },
+ "KBFL": {
+  "en": "Meadows Field"
+ },
+ "KCNO": {
+  "en": "Chino Airport"
+ },
+ "KEDW": {
+  "en": "Edwards Air Force Base"
+ },
+ "KLGB": {
+  "en": "Long Beach International Airport"
+ },
+ "KBUR": {
+  "en": "Hollywood Burbank/Bob Hope Airport"
+ },
+ "KNTD": {
+  "en": "Point Mugu Naval Air Station (Naval Base Ventura Co)"
+ },
+ "KTOA": {
+  "en": "Zamperini Field"
+ },
+ "KLAX": {
+  "en": "Los Angeles International Airport"
+ },
+ "KRAL": {
+  "en": "Riverside Municipal Airport"
+ },
+ "KSBA": {
+  "en": "Santa Barbara Municipal Airport"
+ },
+ "KFUL": {
+  "en": "Fullerton Municipal Airport"
+ },
+ "KSBD": {
+  "en": "San Bernardino International Airport"
+ },
+ "KVCV": {
+  "en": "Southern California Logistics Airport"
+ },
+ "KPMD": {
+  "en": "Palmdale Regional Airport / USAF Plant 42 Airport"
+ },
+ "KEMT": {
+  "en": "San Gabriel Valley Airport"
+ },
+ "KSLI": {
+  "en": "Los Alamitos Army Air Field"
+ },
+ "KWHP": {
+  "en": "Whiteman Airport"
+ },
+ "KRIV": {
+  "en": "March Air Reserve Base"
+ },
+ "KSAN": {
+  "en": "San Diego International Airport"
+ },
+ "KCRQ": {
+  "en": "McClellan-Palomar Airport"
+ },
+ "KSEE": {
+  "en": "Gillespie Field"
  },
  "MMTJ": {
   "es": "Aeropuerto Internacional de Tijuana",
   "en": "Tijuana International Airport"
  },
+ "KMYF": {
+  "en": "Montgomery-Gibbs Executive Airport"
+ },
+ "KSDM": {
+  "en": "Brown Field Municipal Airport"
+ },
+ "KNKX": {
+  "en": "Miramar Marine Corps Air Station - Mitscher Field"
+ },
+ "KSNA": {
+  "en": "John Wayne Orange County International Airport"
+ },
+ "KSUN": {
+  "en": "Friedman Memorial Airport"
+ },
+ "KHND": {
+  "en": "Henderson Executive Airport"
+ },
+ "KIFP": {
+  "en": "Laughlin Bullhead International Airport"
+ },
+ "KLAS": {
+  "en": "Harry Reid International Airport"
+ },
+ "KNYL": {
+  "en": "Yuma International Airport / Marine Corps Air Station Yuma"
+ },
+ "MMML": {
+  "es": "Aeropuerto Internacional de Mexicali",
+  "en": "Mexicali International Airport"
+ },
+ "KLGF": {
+  "en": "Laguna Army Airfield"
+ },
+ "KIDA": {
+  "en": "Idaho Falls Regional Airport"
+ },
+ "KJAC": {
+  "en": "Jackson Hole Airport"
+ },
+ "KHIF": {
+  "en": "Hill Air Force Base"
+ },
+ "KOGD": {
+  "en": "Ogden Hinckley Airport"
+ },
+ "KPVU": {
+  "en": "Provo Municipal Airport"
+ },
+ "KSLC": {
+  "en": "Salt Lake City International Airport"
+ },
+ "KFLG": {
+  "en": "Flagstaff Pulliam Airport"
+ },
+ "KGCN": {
+  "en": "Grand Canyon National Park Airport"
+ },
+ "KPRC": {
+  "en": "Prescott Regional Airport - Ernest A. Love Field"
+ },
+ "KRYN": {
+  "en": "Ryan Field"
+ },
+ "KSDL": {
+  "en": "Scottsdale Airport"
+ },
+ "KFFZ": {
+  "en": "Falcon Field"
+ },
+ "KDVT": {
+  "en": "Phoenix Deer Valley Airport"
+ },
+ "KPHX": {
+  "en": "Phoenix Sky Harbor International Airport"
+ },
+ "KFHU": {
+  "en": "Sierra Vista Municipal Airport / Libby Army Air Field"
+ },
+ "KIWA": {
+  "en": "Mesa Gateway Airport"
+ },
+ "KGYR": {
+  "en": "Phoenix Goodyear Airport"
+ },
+ "KTUS": {
+  "en": "Tucson International Airport"
+ },
+ "KLUF": {
+  "en": "Luke Air Force Base"
+ },
+ "KCHD": {
+  "en": "Chandler Municipal Airport"
+ },
+ "KGEU": {
+  "en": "Glendale Municipal Airport"
+ },
+ "MMHO": {
+  "es": "Aeropuerto Internacional de Hermosillo",
+  "en": "Hermosillo International Airport"
+ },
+ "MMCN": {
+  "es": "Aeropuerto Internacional de Ciudad Obregón",
+  "en": "Ciudad Obregón International Airport"
+ },
+ "MMSL": {
+  "es": "Aeropuerto Internacional de Cabo San Lucas",
+  "en": "Cabo San Lucas International Airport"
+ },
+ "MMSD": {
+  "es": "Aeropuerto Internacional de San José del Cabo",
+  "en": "San José del Cabo International Airport"
+ },
+ "MMLP": {
+  "es": "Aeropuerto Internacional de La Paz",
+  "en": "La Paz International Airport"
+ },
+ "KCPR": {
+  "en": "Casper-Natrona County International Airport"
+ },
+ "KBJC": {
+  "en": "Rocky Mountain Metropolitan Airport"
+ },
+ "KEGE": {
+  "en": "Eagle County Regional Airport"
+ },
+ "KFNL": {
+  "en": "Northern Colorado Regional Airport"
+ },
+ "KASE": {
+  "en": "Aspen-Pitkin County Airport (Sardy Field)"
+ },
+ "KFMN": {
+  "en": "Four Corners Regional Airport"
+ },
+ "KGJT": {
+  "en": "Grand Junction Regional Airport"
+ },
+ "KABQ": {
+  "en": "Albuquerque International Sunport"
+ },
+ "KSAF": {
+  "en": "Santa Fe Municipal Airport"
+ },
+ "KAEG": {
+  "en": "Double Eagle II Airport"
+ },
+ "KBIF": {
+  "en": "Biggs Army Air Field (Fort Bliss)"
+ },
+ "KELP": {
+  "en": "El Paso International Airport"
+ },
+ "MMCU": {
+  "es": "Aeropuerto Internacional de Chihuahua",
+  "en": "Chihuahua International Airport"
+ },
+ "MMMZ": {
+  "es": "Aeropuerto Internacional de Mazatlán",
+  "en": "Mazatlán International Airport"
+ },
+ "MMCL": {
+  "es": "Aeropuerto Internacional de Culiacán",
+  "en": "Culiacán International Airport"
+ },
+ "KGUR": {
+  "en": "Camp Guernsey"
+ },
+ "KRCA": {
+  "en": "Ellsworth Air Force Base"
+ },
+ "KCFO": {
+  "en": "Colorado Air And Space Port"
+ },
+ "KDEN": {
+  "en": "Denver International Airport"
+ },
+ "KBKF": {
+  "en": "Buckley Space Force Base"
+ },
+ "KAPA": {
+  "en": "Centennial Airport"
+ },
+ "KCYS": {
+  "en": "Cheyenne Regional Jerry Olson Field"
+ },
+ "KAFF": {
+  "en": "USAF Academy Airfield"
+ },
+ "KPUB": {
+  "en": "Pueblo Memorial Airport"
+ },
+ "KCOS": {
+  "en": "City of Colorado Springs Municipal Airport"
+ },
+ "KCVS": {
+  "en": "Cannon Air Force Base"
+ },
+ "KAMA": {
+  "en": "Rick Husband Amarillo International Airport"
+ },
+ "KMAF": {
+  "en": "Midland International Air and Space Port"
+ },
+ "KLBB": {
+  "en": "Lubbock Preston Smith International Airport"
+ },
+ "KHOB": {
+  "en": "Lea County Regional Airport"
+ },
+ "KLLN": {
+  "en": "Levelland Municipal Airport"
+ },
+ "KROW": {
+  "en": "Roswell Air Center Airport"
+ },
+ "MMDO": {
+  "es": "Aeropuerto Internacional de Durango",
+  "en": "Durango International Airport"
+ },
+ "KGRI": {
+  "en": "Central Nebraska Regional Airport"
+ },
+ "KSLN": {
+  "en": "Salina Municipal Airport"
+ },
+ "KHUT": {
+  "en": "Hutchinson Municipal Airport"
+ },
+ "KOKC": {
+  "en": "OKC Will Rogers World Airport"
+ },
+ "KPWA": {
+  "en": "Wiley Post Airport"
+ },
+ "KSPS": {
+  "en": "Wichita Falls Municipal Airport / Sheppard Air Force Base"
+ },
+ "KLAW": {
+  "en": "Lawton Fort Sill Regional Airport"
+ },
+ "KGRK": {
+  "en": "Killeen Regional Airport / Robert Gray Army Airfield"
+ },
+ "KABI": {
+  "en": "Abilene Regional Airport"
+ },
+ "KSJT": {
+  "en": "San Angelo Regional Mathis Field"
+ },
+ "KWEA": {
+  "en": "Parker County Airport"
+ },
+ "KGTU": {
+  "en": "Georgetown Executive Airport at Johnny Gantt Field"
+ },
+ "KHYI": {
+  "en": "San Marcos Regional Airport"
+ },
+ "KSKF": {
+  "en": "Lackland Air Force Base"
+ },
+ "KSSF": {
+  "en": "Stinson Municipal Airport"
+ },
+ "KSAT": {
+  "en": "San Antonio International Airport"
+ },
+ "KAUS": {
+  "en": "Austin Bergstrom International Airport"
+ },
+ "MMMY": {
+  "es": "Aeropuerto Internacional de Monterrey",
+  "en": "Monterrey International Airport"
+ },
+ "KHRL": {
+  "en": "Valley International Airport"
+ },
+ "KLRD": {
+  "en": "Laredo International Airport"
+ },
+ "KCRP": {
+  "en": "Corpus Christi International Airport"
+ },
+ "MMAN": {
+  "es": "Aeropuerto Internacional del Norte",
+  "en": "Del Norte International Airport"
+ },
+ "KFSD": {
+  "en": "Sioux Falls Regional Airport"
+ },
+ "KSUX": {
+  "en": "Sioux Gateway Airport / Brigadier General Bud Day Field"
+ },
+ "KSTJ": {
+  "en": "Rosecrans Memorial Airport"
+ },
+ "KOMA": {
+  "en": "Eppley Airfield"
+ },
+ "KLNK": {
+  "en": "Lincoln Airport"
+ },
+ "KOFF": {
+  "en": "Offutt Air Force Base"
+ },
+ "KMCI": {
+  "en": "Kansas City International Airport"
+ },
+ "KOJC": {
+  "en": "Johnson County Executive Airport"
+ },
+ "KJLN": {
+  "en": "Joplin Regional Airport"
+ },
+ "KMKC": {
+  "en": "Charles B. Wheeler Downtown Airport"
+ },
+ "KIAB": {
+  "en": "McConnell Air Force Base"
+ },
+ "KFRI": {
+  "en": "Marshall Army Air Field"
+ },
+ "KICT": {
+  "en": "Wichita Dwight D. Eisenhower National Airport"
+ },
+ "KFOE": {
+  "en": "Topeka Regional Airport"
+ },
+ "KRVS": {
+  "en": "Tulsa Riverside Airport"
+ },
+ "KTUL": {
+  "en": "Tulsa International Airport"
+ },
+ "KFSM": {
+  "en": "Fort Smith Regional Airport"
+ },
+ "KFYV": {
+  "en": "Drake Field"
+ },
+ "KADM": {
+  "en": "Ardmore Municipal Airport"
+ },
+ "KNFW": {
+  "en": "NAS Fort Worth JRB / Carswell Field"
+ },
+ "KTYR": {
+  "en": "Tyler Pounds Regional Airport"
+ },
+ "KRBD": {
+  "en": "Dallas Executive Airport"
+ },
+ "KGGG": {
+  "en": "East Texas Regional Airport"
+ },
+ "KFTW": {
+  "en": "Fort Worth Meacham International Airport"
+ },
+ "KDFW": {
+  "en": "Dallas Fort Worth International Airport"
+ },
+ "KAFW": {
+  "en": "Perot Field/Fort Worth Alliance Airport"
+ },
+ "KFWS": {
+  "en": "Fort Worth Spinks Airport"
+ },
+ "KDAL": {
+  "en": "Dallas Love Field"
+ },
+ "KGYI": {
+  "en": "North Texas Regional Airport Perrin Field"
+ },
+ "KACT": {
+  "en": "Waco Regional Airport"
+ },
+ "KTXK": {
+  "en": "Texarkana Regional Airport (Webb Field)"
+ },
+ "KADS": {
+  "en": "Addison Airport"
+ },
+ "KSHV": {
+  "en": "Shreveport Regional Airport"
+ },
+ "KDWH": {
+  "en": "David Wayne Hooks Memorial Airport"
+ },
+ "KBPT": {
+  "en": "Jack Brooks Regional Airport"
+ },
+ "KSGR": {
+  "en": "Sugar Land Regional Airport"
+ },
+ "KHPY": {
+  "en": "Baytown Airport"
+ },
+ "KTME": {
+  "en": "Houston Executive Airport"
+ },
+ "KEFD": {
+  "en": "Ellington Airport"
+ },
+ "KCLL": {
+  "en": "Easterwood Field"
+ },
+ "KVCT": {
+  "en": "Victoria Regional Airport"
+ },
+ "KIAH": {
+  "en": "George Bush Intercontinental Airport"
+ },
+ "KNGP": {
+  "en": "Naval Air Station Corpus Christi Truax Field"
+ },
+ "KBRO": {
+  "en": "Brownsville South Padre Island International Airport"
+ },
+ "KALO": {
+  "en": "Waterloo Regional Airport"
+ },
+ "KRST": {
+  "en": "Rochester International Airport"
+ },
+ "KEAU": {
+  "en": "Chippewa Valley Regional Airport"
+ },
+ "KVOK": {
+  "en": "Volk Field"
+ },
+ "KLSE": {
+  "en": "La Crosse Regional Airport"
+ },
+ "KFCM": {
+  "en": "Flying Cloud Airport"
+ },
+ "KDBQ": {
+  "en": "Dubuque Regional Airport"
+ },
+ "KMSP": {
+  "en": "Minneapolis–Saint Paul International Airport / Wold–Chamberlain Field"
+ },
+ "KSTP": {
+  "en": "Saint Paul Downtown Holman Field"
+ },
+ "KMLI": {
+  "en": "Quad City International Airport"
+ },
+ "KDSM": {
+  "en": "Des Moines International Airport"
+ },
+ "KCID": {
+  "en": "The Eastern Iowa Airport"
+ },
+ "KSGF": {
+  "en": "Springfield Branson National Airport"
+ },
+ "KALN": {
+  "en": "St Louis Regional Airport"
+ },
+ "KCPS": {
+  "en": "St Louis Downtown Airport"
+ },
+ "KSTL": {
+  "en": "St. Louis Lambert International Airport"
+ },
+ "KSUS": {
+  "en": "Spirit of St Louis Airport"
+ },
+ "KSZL": {
+  "en": "Whiteman Air Force Base"
+ },
+ "KTBN": {
+  "en": "Waynesville-St. Robert Regional Airport-Forney Field"
+ },
+ "KCOU": {
+  "en": "Columbia Regional Airport"
+ },
+ "KLIT": {
+  "en": "Bill & Hillary Clinton National Airport/Adams Field"
+ },
+ "KBBG": {
+  "en": "Branson Airport"
+ },
+ "KLRF": {
+  "en": "Little Rock Air Force Base"
+ },
+ "KMLU": {
+  "en": "Monroe Regional Airport"
+ },
+ "KJAN": {
+  "en": "Jackson-Medgar Wiley Evers International Airport"
+ },
+ "KCWF": {
+  "en": "Chennault International Airport"
+ },
+ "KLCH": {
+  "en": "Lake Charles Regional Airport"
+ },
+ "KMSY": {
+  "en": "Louis Armstrong New Orleans International Airport"
+ },
+ "KHDC": {
+  "en": "Hammond Northshore Regional Airport"
+ },
+ "KBTR": {
+  "en": "Baton Rouge Metropolitan Airport"
+ },
+ "KLFT": {
+  "en": "Lafayette Regional Airport"
+ },
+ "KHUM": {
+  "en": "Houma Terrebonne Airport"
+ },
+ "KNEW": {
+  "en": "Lakefront Airport"
+ },
+ "MMPR": {
+  "es": "Aeropuerto Internacional de Puerto Vallarta",
+  "en": "Puerto Vallarta International Airport"
+ },
+ "MMTL": {
+  "es": "Aeropuerto de Tulum",
+  "en": "Tulum Airport"
+ },
+ "MMGL": {
+  "es": "Aeropuerto Internacional de Guadalajara",
+  "en": "Guadalajara International Airport"
+ },
+ "MMLO": {
+  "es": "Aeropuerto Internacional de Guanajuato",
+  "en": "Guanajuato International Airport"
+ },
+ "MMSM": {
+  "es": "Aeropuerto Internacional Felipe Ángeles",
+  "en": "Felipe Ángeles International Airport"
+ },
+ "MMQT": {
+  "es": "Aeropuerto de Querétaro",
+  "en": "Querétaro Airport"
+ },
+ "MMSP": {
+  "es": "Aeropuerto Internacional de San Luis Potosí",
+  "en": "San Luis Potosí International Airport"
+ },
+ "MMMX": {
+  "es": "Aeropuerto Internacional de la Ciudad de México",
+  "en": "Mexico City International Airport"
+ },
  "MMTO": {
   "es": "Aeropuerto Internacional de Toluca",
   "en": "Toluca International Airport"
+ },
+ "MMVR": {
+  "es": "Aeropuerto Internacional de Veracruz",
+  "en": "Veracruz International Airport"
+ },
+ "MMVA": {
+  "es": "Aeropuerto Internacional de Villahermosa",
+  "en": "Villahermosa International Airport"
+ },
+ "MMCE": {
+  "es": "Aeropuerto Internacional de Ciudad del Carmen",
+  "en": "Ciudad del Carmen International Airport"
+ },
+ "MMTG": {
+  "es": "Aeropuerto Internacional de Tuxtla Gutiérrez",
+  "en": "Tuxtla Gutiérrez International Airport"
+ },
+ "MGGT": {
+  "es": "Aeropuerto Internacional de Guatemala City",
+  "en": "Guatemala City International Airport"
+ },
+ "MMTP": {
+  "es": "Aeropuerto Internacional de Tapachula",
+  "en": "Tapachula International Airport"
+ },
+ "CYQT": {
+  "en": "Thunder Bay International Airport"
+ },
+ "CYAM": {
+  "en": "Sault Ste Marie Airport"
+ },
+ "CYTS": {
+  "en": "Timmins/Victor M. Power"
+ },
+ "CYSB": {
+  "en": "Sudbury Airport"
+ },
+ "CYYB": {
+  "en": "North Bay Jack Garland Airport"
+ },
+ "CYOW": {
+  "en": "Ottawa Macdonald-Cartier International Airport"
+ },
+ "CYQB": {
+  "en": "Quebec Jean Lesage International Airport"
+ },
+ "CYHU": {
+  "en": "Montréal / Saint-Hubert Metropolitan Airport"
+ },
+ "CYUL": {
+  "en": "Montreal / Pierre Elliott Trudeau International Airport"
+ },
+ "CYMX": {
+  "en": "Montreal Mirabel International Airport"
+ },
+ "CYBG": {
+  "en": "Saguenay-Bagotville Airport"
+ },
+ "CYRC": {
+  "en": "Chicoutimi/Saint-Honoré Aerodrome"
+ },
+ "CYWK": {
+  "en": "Wabush Airport"
+ },
+ "CYZV": {
+  "en": "Sept-Îles Airport"
+ },
+ "CDT5": {
+  "en": "Bouctouche Airport"
+ },
+ "CYFC": {
+  "en": "Fredericton International Airport"
+ },
+ "CYQM": {
+  "en": "Greater Moncton Roméo LeBlanc International Airport"
+ },
+ "CCS4": {
+  "en": "Chipman Airport"
+ },
+ "CYYR": {
+  "en": "Goose Bay Airport"
+ },
+ "KJVL": {
+  "en": "Southern Wisconsin Regional Airport"
+ },
+ "KUES": {
+  "en": "Waukesha County Airport"
+ },
+ "KRFD": {
+  "en": "Chicago Rockford International Airport"
+ },
+ "KMSN": {
+  "en": "Dane County Regional Truax Field"
+ },
+ "KMKE": {
+  "en": "General Mitchell International Airport"
+ },
+ "KMWC": {
+  "en": "Lawrence J Timmerman Airport"
+ },
+ "KGRB": {
+  "en": "Austin Straubel International Airport"
+ },
+ "KENW": {
+  "en": "Kenosha Regional Airport"
+ },
+ "KATW": {
+  "en": "Appleton International Airport"
+ },
+ "KOSH": {
+  "en": "Wittman Regional Airport"
+ },
+ "KUGN": {
+  "en": "Waukegan National Airport"
+ },
+ "KCWA": {
+  "en": "Central Wisconsin Airport"
+ },
+ "KDEC": {
+  "en": "Decatur Airport"
+ },
+ "KGYY": {
+  "en": "Gary/Chicago International Airport"
+ },
+ "KCMI": {
+  "en": "University of Illinois Willard Airport"
+ },
+ "KPWK": {
+  "en": "Chicago Executive Airport"
+ },
+ "KLAF": {
+  "en": "Purdue University Airport"
+ },
+ "KLOT": {
+  "en": "Lewis University Airport"
+ },
+ "IL48": {
+  "en": "Lunn"
+ },
+ "KHUF": {
+  "en": "Terre Haute Regional Airport, Hulman Field"
+ },
+ "KPIA": {
+  "en": "General Wayne A. Downing Peoria International Airport"
+ },
+ "KORD": {
+  "en": "Chicago O'Hare International Airport"
+ },
+ "KSPI": {
+  "en": "Abraham Lincoln Capital Airport"
+ },
+ "KMDW": {
+  "en": "Chicago Midway International Airport"
+ },
+ "KSBN": {
+  "en": "South Bend International Airport"
+ },
+ "KIND": {
+  "en": "Indianapolis International Airport"
+ },
+ "KARR": {
+  "en": "Aurora Municipal Airport"
+ },
+ "KDPA": {
+  "en": "Dupage Airport"
+ },
+ "KBMI": {
+  "en": "Central Illinois Regional Airport at Bloomington-Normal"
+ },
+ "KEVV": {
+  "en": "Evansville Regional Airport"
+ },
+ "KHOP": {
+  "en": "Campbell Army Airfield (Fort Campbell)"
+ },
+ "KBLV": {
+  "en": "Scott AFB/Midamerica Airport"
+ },
+ "KMDH": {
+  "en": "Southern Illinois Airport"
+ },
+ "KJWN": {
+  "en": "John C Tune Airport"
+ },
+ "KBNA": {
+  "en": "Nashville International Airport"
+ },
+ "KNQA": {
+  "en": "Millington-Memphis Airport"
+ },
+ "KOLV": {
+  "en": "Olive Branch Airport"
+ },
+ "KHUA": {
+  "en": "Redstone Army Air Field"
+ },
+ "KHSV": {
+  "en": "Huntsville International Airport"
+ },
+ "KMEM": {
+  "en": "Frederick W. Smith International Airport"
+ },
+ "KMGM": {
+  "en": "Montgomery Regional (Dannelly Field) Airport"
+ },
+ "KGTR": {
+  "en": "Golden Triangle Regional Airport"
+ },
+ "KMEI": {
+  "en": "Key Field / Meridian Regional Airport"
+ },
+ "KMXF": {
+  "en": "Maxwell Air Force Base"
+ },
+ "KBHM": {
+  "en": "Birmingham-Shuttlesworth International Airport"
+ },
+ "KJKA": {
+  "en": "Jack Edwards National Airport"
+ },
+ "KDTS": {
+  "en": "Destin Executive Airport"
+ },
+ "KHRT": {
+  "en": "Hurlburt Field"
+ },
+ "KNSE": {
+  "en": "Whiting Field Naval Air Station - North"
+ },
+ "KBFM": {
+  "en": "Mobile Downtown Airport"
+ },
+ "KGPT": {
+  "en": "Gulfport Biloxi International Airport"
+ },
+ "KPNS": {
+  "en": "Pensacola International Airport"
+ },
+ "KNPA": {
+  "en": "Naval Air Station Pensacola Forrest Sherman Field"
+ },
+ "KVPS": {
+  "en": "Destin-Fort Walton Beach Airport"
+ },
+ "KARB": {
+  "en": "Ann Arbor Municipal Airport"
+ },
+ "KBTL": {
+  "en": "Battle Creek Executive Airport at Kellogg Field"
+ },
+ "KGRR": {
+  "en": "Gerald R. Ford International Airport"
+ },
+ "KDTW": {
+  "en": "Detroit Metropolitan Wayne County Airport"
+ },
+ "KMTC": {
+  "en": "Selfridge Air National Guard Base Airport"
+ },
+ "KJXN": {
+  "en": "Jackson County Airport/Reynolds Field"
+ },
+ "KAZO": {
+  "en": "Kalamazoo/Battle Creek International Airport"
+ },
+ "CYQG": {
+  "en": "Windsor International Airport"
+ },
+ "KGOV": {
+  "en": "Grayling Army Air Field"
+ },
+ "KDET": {
+  "en": "Coleman A. Young Municipal Airport"
+ },
+ "KMKG": {
+  "en": "Muskegon County Airport"
+ },
+ "KFNT": {
+  "en": "Bishop International Airport"
+ },
+ "KYIP": {
+  "en": "Willow Run Airport"
+ },
+ "KPTK": {
+  "en": "Oakland County International Airport"
+ },
+ "KTVC": {
+  "en": "Cherry Capital Airport"
+ },
+ "KMBS": {
+  "en": "MBS International Airport"
+ },
+ "KLCK": {
+  "en": "Rickenbacker International Airport"
+ },
+ "KTOL": {
+  "en": "Eugene F. Kranz Toledo Express Airport"
+ },
+ "KDAY": {
+  "en": "James M. Cox Dayton International Airport"
+ },
+ "KGUS": {
+  "en": "Grissom Air Reserve Base"
+ },
+ "KMIE": {
+  "en": "Delaware County Johnson Field"
+ },
+ "KCMH": {
+  "en": "John Glenn Columbus International Airport"
+ },
+ "KILN": {
+  "en": "Wilmington Airpark"
+ },
+ "KOSU": {
+  "en": "The Ohio State University Airport - Don Scott Field"
+ },
+ "KFWA": {
+  "en": "Fort Wayne International Airport"
+ },
+ "KFFO": {
+  "en": "Wright-Patterson Air Force Base"
+ },
+ "KMFD": {
+  "en": "Mansfield Lahm Regional Airport"
+ },
+ "KLOU": {
+  "en": "Bowman Field"
+ },
+ "KSDF": {
+  "en": "Louisville Muhammad Ali International Airport"
+ },
+ "KCVG": {
+  "en": "Cincinnati Northern Kentucky International Airport"
+ },
+ "KLUK": {
+  "en": "Cincinnati Municipal Airport Lunken Field"
+ },
+ "KHTS": {
+  "en": "Tri-State Airport / Milton J. Ferguson Field"
+ },
+ "KLEX": {
+  "en": "Blue Grass Airport"
+ },
+ "KPDK": {
+  "en": "DeKalb Peachtree Airport"
+ },
+ "KCHA": {
+  "en": "Chattanooga Metropolitan Airport (Lovell Field)"
+ },
+ "KFTY": {
+  "en": "Fulton County Airport Brown Field"
+ },
+ "KTYS": {
+  "en": "McGhee Tyson Airport"
+ },
+ "KRYY": {
+  "en": "Cobb County International Airport-McCollum Field"
+ },
+ "KAVL": {
+  "en": "Asheville Regional Airport"
+ },
+ "KLZU": {
+  "en": "Gwinnett County Briscoe Field"
+ },
+ "KEZM": {
+  "en": "Heart of Georgia Regional Airport"
+ },
+ "KDHN": {
+  "en": "Dothan Regional Airport"
+ },
+ "KCSG": {
+  "en": "Columbus Airport"
+ },
+ "KWRB": {
+  "en": "Robins Air Force Base"
+ },
+ "KHMP": {
+  "en": "Henry County Airport"
+ },
+ "KATL": {
+  "en": "Hartsfield Jackson Atlanta International Airport"
+ },
+ "KABY": {
+  "en": "Southwest Georgia Regional Airport"
+ },
+ "KLSF": {
+  "en": "Lawson Army Air Field"
+ },
+ "KTOI": {
+  "en": "Troy Municipal Airport at N Kenneth Campbell Field"
+ },
+ "KTLH": {
+  "en": "Tallahassee International Airport"
+ },
+ "KTPA": {
+  "en": "Tampa International Airport"
+ },
+ "KMCF": {
+  "en": "MacDill Air Force Base"
+ },
+ "KPIE": {
+  "en": "St. Petersburg Clearwater International Airport"
+ },
+ "CYYZ": {
+  "en": "Toronto Pearson International Airport"
+ },
+ "CYXU": {
+  "en": "London International Airport"
+ },
+ "CYSN": {
+  "en": "Niagara District Airport"
+ },
+ "KIAG": {
+  "en": "Niagara Falls International Airport"
+ },
+ "CYHM": {
+  "en": "John C. Munro Hamilton International Airport"
+ },
+ "CYTZ": {
+  "en": "Billy Bishop Toronto City Airport"
+ },
+ "CYOO": {
+  "en": "Oshawa Executive Airport"
+ },
+ "CYKF": {
+  "en": "Region of Waterloo International Airport"
+ },
+ "KAGC": {
+  "en": "Allegheny County Airport"
+ },
+ "KCAK": {
+  "en": "Akron Canton Regional Airport"
+ },
+ "KERI": {
+  "en": "Erie International Tom Ridge Field"
+ },
+ "KCGF": {
+  "en": "Cuyahoga County Airport"
+ },
+ "KPIT": {
+  "en": "Pittsburgh International Airport"
+ },
+ "KBVI": {
+  "en": "Beaver County Airport"
+ },
+ "KYNG": {
+  "en": "Youngstown Warren Regional Airport"
+ },
+ "KLBE": {
+  "en": "Arnold Palmer Regional Airport"
+ },
+ "KCLE": {
+  "en": "Cleveland Hopkins International Airport"
+ },
+ "KPKB": {
+  "en": "Mid Ohio Valley Regional Airport"
+ },
+ "KLWB": {
+  "en": "Greenbrier Valley Airport"
+ },
+ "KCKB": {
+  "en": "North Central West Virginia Airport"
+ },
+ "KROA": {
+  "en": "Roanoke–Blacksburg Regional Airport"
+ },
+ "KCRW": {
+  "en": "Yeager Airport"
+ },
+ "KSSC": {
+  "en": "Shaw Air Force Base"
+ },
+ "KCAE": {
+  "en": "Columbia Metropolitan Airport"
+ },
+ "KGSP": {
+  "en": "Greenville-Spartanburg International Airport"
+ },
+ "KPOB": {
+  "en": "Pope Field"
+ },
+ "KGYH": {
+  "en": "Donaldson Field Airport"
+ },
+ "KFBG": {
+  "en": "Simmons Army Air Field"
+ },
+ "KLKR": {
+  "en": "Lancaster County-Mc Whirter Field"
+ },
+ "KVUJ": {
+  "en": "Stanly County Airport"
+ },
+ "KJQF": {
+  "en": "Concord-Padgett Regional Airport"
+ },
+ "KFLO": {
+  "en": "Florence Regional Airport"
+ },
+ "KCLT": {
+  "en": "Charlotte Douglas International Airport"
+ },
+ "KTRI": {
+  "en": "Tri-Cities Regional TN/VA Airport"
+ },
+ "KUZA": {
+  "en": "Rock Hill - York County Airport"
+ },
+ "KRDU": {
+  "en": "Raleigh-Durham International Airport"
+ },
+ "KGSO": {
+  "en": "Piedmont Triad International Airport"
+ },
+ "KINT": {
+  "en": "Smith Reynolds Airport"
+ },
+ "KHFF": {
+  "en": "Mackall Army Air Field"
+ },
+ "KFAY": {
+  "en": "Fayetteville Regional Airport - Grannis Field"
+ },
+ "KCHS": {
+  "en": "Charleston International Airport"
+ },
+ "KHXD": {
+  "en": "Hilton Head Airport"
+ },
+ "KAGS": {
+  "en": "Augusta Regional At Bush Field"
+ },
+ "KSVN": {
+  "en": "Hunter Army Air Field"
+ },
+ "KLHW": {
+  "en": "MidCoast Regional Airport at Wright Army Airfield"
+ },
+ "KSAV": {
+  "en": "Savannah Hilton Head International Airport"
+ },
+ "KMYR": {
+  "en": "Myrtle Beach International Airport"
+ },
+ "KFIN": {
+  "en": "Flagler Executive"
+ },
+ "KJAX": {
+  "en": "Jacksonville International Airport"
+ },
+ "KSGJ": {
+  "en": "Northeast Florida Regional Airport"
+ },
+ "KEVB": {
+  "en": "New Smyrna Beach Municipal Airport"
+ },
+ "KOMN": {
+  "en": "Ormond Beach Municipal Airport"
+ },
+ "KTIX": {
+  "en": "Space Coast Regional Airport"
+ },
+ "KNIP": {
+  "en": "Jacksonville Naval Air Station (Towers Field)"
+ },
+ "KDAB": {
+  "en": "Daytona Beach International Airport"
+ },
+ "KCRG": {
+  "en": "Jacksonville Executive at Craig Airport"
+ },
+ "KGNV": {
+  "en": "Gainesville Regional Airport"
+ },
+ "KVQQ": {
+  "en": "Cecil Airport"
+ },
+ "KORL": {
+  "en": "Orlando Executive Airport"
+ },
+ "KISM": {
+  "en": "Kissimmee Gateway Airport"
+ },
+ "KCOF": {
+  "en": "Patrick Space Force Base"
+ },
+ "KSFB": {
+  "en": "Orlando Sanford International Airport"
+ },
+ "KOCF": {
+  "en": "Ocala International Airport - Jim Taylor Field"
+ },
+ "KMCO": {
+  "en": "Orlando International Airport"
+ },
+ "KSUA": {
+  "en": "Witham Field"
+ },
+ "KMLB": {
+  "en": "Melbourne Orlando International Airport"
+ },
+ "KRSW": {
+  "en": "Southwest Florida International Airport"
+ },
+ "KAPF": {
+  "en": "Naples Municipal Airport"
+ },
+ "KPMP": {
+  "en": "Pompano Beach Airpark"
+ },
+ "KFPR": {
+  "en": "Treasure Coast International Airport"
+ },
+ "KHST": {
+  "en": "Homestead Air Reserve Base"
+ },
+ "KVRB": {
+  "en": "Vero Beach Regional Airport"
+ },
+ "KHWO": {
+  "en": "North Perry Airport"
+ },
+ "KBCT": {
+  "en": "Boca Raton Airport"
+ },
+ "KLAL": {
+  "en": "Lakeland Linder International Airport"
+ },
+ "KTMB": {
+  "en": "Miami Executive Airport"
+ },
+ "KFLL": {
+  "en": "Fort Lauderdale Hollywood International Airport"
+ },
+ "KFXE": {
+  "en": "Fort Lauderdale Executive Airport"
+ },
+ "KOPF": {
+  "en": "Miami-Opa Locka Executive Airport"
+ },
+ "KMIA": {
+  "en": "Miami International Airport"
+ },
+ "MUHA": {
+  "es": "Aeropuerto Internacional de Havana",
+  "en": "Havana International Airport"
+ },
+ "KEYW": {
+  "en": "Key West International Airport"
+ },
+ "KSYR": {
+  "en": "Syracuse Hancock International Airport"
+ },
+ "KITH": {
+  "en": "Ithaca Tompkins Regional Airport"
+ },
+ "KBUF": {
+  "en": "Buffalo Niagara International Airport"
+ },
+ "KGTB": {
+  "en": "Wheeler Sack Army Air Field"
+ },
+ "CYTR": {
+  "en": "CFB Trenton"
+ },
+ "KRME": {
+  "en": "Griffiss International Airport"
+ },
+ "KBGM": {
+  "en": "Greater Binghamton/Edwin A Link field"
+ },
+ "CYGK": {
+  "en": "Kingston Norman Rogers Airport"
+ },
+ "KRDG": {
+  "en": "Reading Regional Airport (Carl A Spaatz Field)"
+ },
+ "KELM": {
+  "en": "Elmira Corning Regional Airport"
+ },
+ "KPNE": {
+  "en": "Northeast Philadelphia Airport"
+ },
+ "KILG": {
+  "en": "Wilmington Airport"
+ },
+ "KUNV": {
+  "en": "State College Regional Airport"
+ },
+ "KMDT": {
+  "en": "Harrisburg International Airport"
+ },
+ "KAPG": {
+  "en": "Phillips Army Air Field"
+ },
+ "KAVP": {
+  "en": "Wilkes-Barre/Scranton International Airport"
+ },
+ "KFDK": {
+  "en": "Frederick Municipal Airport"
+ },
+ "KLNS": {
+  "en": "Lancaster Airport"
+ },
+ "KCXY": {
+  "en": "Capital City Airport"
+ },
+ "KABE": {
+  "en": "Lehigh Valley International Airport"
+ },
+ "KPHL": {
+  "en": "Philadelphia International Airport"
+ },
+ "KRIC": {
+  "en": "Richmond International Airport"
+ },
+ "KBWI": {
+  "en": "Baltimore/Washington International Thurgood Marshall Airport"
+ },
+ "KADW": {
+  "en": "Joint Base Andrews"
+ },
+ "KORF": {
+  "en": "Norfolk International Airport"
+ },
+ "KPHF": {
+  "en": "Newport News Williamsburg International Airport"
+ },
+ "KHEF": {
+  "en": "Washington Manassas Harry P. Davis Field"
+ },
+ "KIAD": {
+  "en": "Washington Dulles International Airport"
+ },
+ "KCHO": {
+  "en": "Charlottesville Albemarle Airport"
+ },
+ "KMTN": {
+  "en": "Martin State Airport"
+ },
+ "KNGU": {
+  "en": "Norfolk Naval Station (Chambers Field)"
+ },
+ "KBKT": {
+  "en": "Allen C Perkinson Blackstone Army Air Field"
+ },
+ "KDAA": {
+  "en": "Davison Army Air Field"
+ },
+ "KESN": {
+  "en": "Easton Airport / Newnam Field"
+ },
+ "KDOV": {
+  "en": "Dover Civil Air Terminal/Dover Air Force Base"
+ },
+ "KDCA": {
+  "en": "Ronald Reagan Washington National Airport"
+ },
+ "KNKT": {
+  "en": "Cherry Point MCAS / Cunningham Field/"
+ },
+ "KILM": {
+  "en": "Wilmington International Airport"
+ },
+ "KCRE": {
+  "en": "Grand Strand Airport"
+ },
+ "KOAJ": {
+  "en": "Albert J Ellis Airport"
+ },
+ "MYAM": {
+  "en": "Leonard M. Thompson International Airport"
+ },
+ "MYAT": {
+  "en": "Treasure Cay Airport"
+ },
+ "MYNN": {
+  "en": "Lynden Pindling International Airport"
+ },
+ "KCEF": {
+  "en": "Westover Metropolitan Airport / Westover Air Reserve Base"
+ },
+ "KALB": {
+  "en": "Albany International Airport"
+ },
+ "KMHT": {
+  "en": "Manchester-Boston Regional Airport"
+ },
+ "KORH": {
+  "en": "Worcester Regional Airport"
+ },
+ "KASH": {
+  "en": "Nashua Airport / Boire Field"
+ },
+ "KSWF": {
+  "en": "New York Stewart International Airport"
+ },
+ "KTEB": {
+  "en": "Teterboro Airport"
+ },
+ "KOQU": {
+  "en": "Quonset State Airport"
+ },
+ "KEWR": {
+  "en": "Newark Liberty International Airport"
+ },
+ "KACY": {
+  "en": "Atlantic City International Airport"
+ },
+ "KBDL": {
+  "en": "Bradley International Airport"
+ },
+ "KGON": {
+  "en": "Groton New London Airport"
+ },
+ "KHVN": {
+  "en": "Tweed New Haven Airport"
+ },
+ "KPVD": {
+  "en": "Rhode Island T. F. Green International Airport"
+ },
+ "KLGA": {
+  "en": "LaGuardia Airport"
+ },
+ "KHFD": {
+  "en": "Hartford Brainard Airport"
+ },
+ "KBDR": {
+  "en": "Igor I Sikorsky Memorial Airport"
+ },
+ "KJFK": {
+  "en": "John F. Kennedy International Airport"
+ },
+ "KHPN": {
+  "en": "Westchester County Airport"
+ },
+ "KISP": {
+  "en": "Long Island MacArthur Airport"
+ },
+ "KBAF": {
+  "en": "Westfield-Barnes Regional Airport"
+ },
+ "KCDW": {
+  "en": "Essex County Airport"
+ },
+ "KMMU": {
+  "en": "Morristown Municipal Airport"
+ },
+ "KFRG": {
+  "en": "Republic Airport"
+ },
+ "KOXC": {
+  "en": "Waterbury Oxford Airport"
+ },
+ "KPWM": {
+  "en": "Portland International Jetport"
+ },
+ "KBGR": {
+  "en": "Bangor International Airport"
+ },
+ "KOWD": {
+  "en": "Norwood Memorial Airport"
+ },
+ "KBVY": {
+  "en": "Beverly Regional Airport"
+ },
+ "KBOS": {
+  "en": "Boston Logan International Airport"
+ },
+ "KPSM": {
+  "en": "Portsmouth International Airport at Pease"
+ },
+ "KHYA": {
+  "en": "Cape Cod Gateway Airport"
+ },
+ "KMVY": {
+  "en": "Martha's Vineyard Airport"
+ },
+ "KEWB": {
+  "en": "New Bedford Regional Airport"
+ },
+ "KFMH": {
+  "en": "Cape Cod Coast Guard Air Station"
+ },
+ "KACK": {
+  "en": "Nantucket Memorial Airport"
+ },
+ "CYAU": {
+  "en": "Liverpool South Shore Regional Airport"
+ },
+ "CYZX": {
+  "en": "CFB Greenwood"
+ },
+ "TXKF": {
+  "en": "L.F. Wade International Airport"
+ },
+ "CYAW": {
+  "en": "CFB Shearwater Heliport"
+ },
+ "CYHZ": {
+  "en": "Halifax / Stanfield International Airport"
+ },
+ "MMCZ": {
+  "es": "Aeropuerto Internacional de Cozumel",
+  "en": "Cozumel International Airport"
  },
  "MMUN": {
   "es": "Aeropuerto Internacional de Cancún",
   "en": "Cancún International Airport"
  },
- "MMVR": {
-  "es": "Aeropuerto Internacional de Veracruz",
-  "en": "Veracruz International Airport"
+ "MMMD": {
+  "es": "Aeropuerto Internacional de Mérida",
+  "en": "Mérida International Airport"
+ },
+ "MGMM": {
+  "es": "Aeropuerto Internacional Mundo Maya",
+  "en": "Mundo Maya International"
+ },
+ "MZBZ": {
+  "en": "Philip S. W. Goldson International Airport"
+ },
+ "MHRO": {
+  "es": "Aeropuerto Internacional de Coxen Hole",
+  "en": "Coxen Hole International Airport"
+ },
+ "MHLC": {
+  "es": "Aeropuerto Internacional de La Ceiba",
+  "en": "La Ceiba International Airport"
+ },
+ "MHLM": {
+  "es": "Aeropuerto Internacional de San Pedro Sula",
+  "en": "San Pedro Sula International Airport"
+ },
+ "MSLP": {
+  "es": "Aeropuerto de San Salvador (San Luis Talpa)",
+  "en": "San Salvador (San Luis Talpa) Airport"
+ },
+ "MSSS": {
+  "es": "Aeropuerto Internacional de San Salvador",
+  "en": "San Salvador International Airport"
+ },
+ "MHTG": {
+  "es": "Aeropuerto de Tegucigalpa",
+  "en": "Tegucigalpa Airport"
+ },
+ "MNMG": {
+  "es": "Aeropuerto Internacional de Managua",
+  "en": "Managua International Airport"
+ },
+ "MRLB": {
+  "es": "Aeropuerto Internacional de Liberia",
+  "en": "Liberia International Airport"
+ },
+ "MROC": {
+  "es": "Aeropuerto Internacional de San José (Alajuela)",
+  "en": "San José (Alajuela) International Airport"
+ },
+ "MWCR": {
+  "en": "Owen Roberts International Airport"
+ },
+ "SKSP": {
+  "es": "Aeropuerto Internacional de San Andrés",
+  "en": "San Andrés International Airport"
+ },
+ "MPMG": {
+  "es": "Aeropuerto Internacional de Albrook",
+  "en": "Albrook International Airport"
+ },
+ "MPPA": {
+  "es": "Base Aérea Howard",
+  "en": "Howard Air Force Base"
+ },
+ "MPBO": {
+  "es": "Aeropuerto Internacional de Isla Colón",
+  "en": "Isla Colón International Airport"
+ },
+ "MPEJ": {
+  "es": "Aeropuerto de Colón",
+  "en": "Colón Airport"
+ },
+ "MPTO": {
+  "es": "Aeropuerto Internacional de Tocumen",
+  "en": "Tocumen International Airport"
+ },
+ "MPPD": {
+  "es": "Aeropuerto de Pedasí",
+  "en": "Pedasí Airport"
+ },
+ "MPSM": {
+  "es": "Aeropuerto Internacional de Río Hato",
+  "en": "Río Hato International Airport"
+ },
+ "MPDA": {
+  "es": "Aeropuerto Internacional de David",
+  "en": "David International Airport"
+ },
+ "MPGU": {
+  "es": "Aeropuerto Augusto Vergara",
+  "en": "Augusto Vergara"
+ },
+ "MKJP": {
+  "en": "Norman Manley International Airport"
+ },
+ "MKJS": {
+  "en": "Sangster International Airport"
+ },
+ "MKBS": {
+  "en": "Ian Fleming International Airport"
+ },
+ "SKCG": {
+  "es": "Aeropuerto Internacional de Cartagena",
+  "en": "Cartagena International Airport"
+ },
+ "SKMR": {
+  "es": "Aeropuerto de Montería",
+  "en": "Montería Airport"
+ },
+ "SKCZ": {
+  "es": "Aeropuerto de Corozal",
+  "en": "Corozal Airport"
+ },
+ "SKMD": {
+  "es": "Aeropuerto Enrique Olaya Herrera",
+  "en": "Enrique Olaya Herrera Airport"
+ },
+ "SKUI": {
+  "es": "Aeropuerto de Quibdó",
+  "en": "Quibdó Airport"
+ },
+ "SKRG": {
+  "es": "Aeropuerto Internacional Jose Maria Córdova",
+  "en": "Jose Maria Córdova International Airport"
+ },
+ "SKBU": {
+  "es": "Aeropuerto de Buenaventura",
+  "en": "Buenaventura Airport"
+ },
+ "SKMZ": {
+  "es": "Aeropuerto de Manizales",
+  "en": "Manizales Airport"
+ },
+ "SKGO": {
+  "es": "Aeropuerto de Cartago",
+  "en": "Cartago Airport"
+ },
+ "SKCL": {
+  "es": "Aeropuerto Internacional de Cali",
+  "en": "Cali International Airport"
+ },
+ "SKPE": {
+  "es": "Aeropuerto Internacional de Pereira",
+  "en": "Pereira International Airport"
+ },
+ "SKIP": {
+  "es": "Aeropuerto de Ipiales",
+  "en": "Ipiales Airport"
+ },
+ "SKPS": {
+  "es": "Aeropuerto de Chachagüí",
+  "en": "Chachagüí Airport"
+ },
+ "SKCO": {
+  "es": "Aeropuerto de Tumaco",
+  "en": "Tumaco Airport"
+ },
+ "MBPV": {
+  "en": "Providenciales International Airport"
+ },
+ "SKRH": {
+  "es": "Aeropuerto de Riohacha",
+  "en": "Riohacha Airport"
+ },
+ "SKBQ": {
+  "es": "Aeropuerto Internacional de Barranquilla",
+  "en": "Barranquilla International Airport"
+ },
+ "SVMC": {
+  "es": "Aeropuerto Internacional de Maracaibo",
+  "en": "Maracaibo International Airport"
+ },
+ "SVSZ": {
+  "es": "Aeropuerto de San Carlos del Zulia",
+  "en": "San Carlos del Zulia Airport"
+ },
+ "SKSM": {
+  "es": "Aeropuerto Internacional de Santa Marta",
+  "en": "Santa Marta International Airport"
+ },
+ "SKVP": {
+  "es": "Aeropuerto de Valledupar",
+  "en": "Valledupar Airport"
+ },
+ "SVVG": {
+  "es": "Aeropuerto de El Vigía",
+  "en": "El Vigía Airport"
+ },
+ "SVSA": {
+  "es": "Aeropuerto Internacional de San Antonio del Tachira",
+  "en": "San Antonio del Tachira International Airport"
+ },
+ "SKSA": {
+  "es": "Aeropuerto de Saravena",
+  "en": "Saravena Airport"
+ },
+ "SKBG": {
+  "es": "Aeropuerto de Bucaramanga",
+  "en": "Bucaramanga Airport"
+ },
+ "SVSO": {
+  "es": "Aeropuerto Internacional de Santo Domingo",
+  "en": "Santo Domingo International Airport"
+ },
+ "SKTM": {
+  "es": "Aeropuerto de Tame",
+  "en": "Tame Airport"
+ },
+ "SKBO": {
+  "es": "Aeropuerto Internacional de Bogota",
+  "en": "Bogota International Airport"
+ },
+ "MDCY": {
+  "es": "Aeropuerto Internacional de Samana",
+  "en": "Samana International Airport"
+ },
+ "MDPC": {
+  "es": "Aeropuerto Internacional de Punta Cana",
+  "en": "Punta Cana International Airport"
+ },
+ "MDSD": {
+  "es": "Aeropuerto Internacional de Santo Domingo",
+  "en": "Santo Domingo International Airport"
+ },
+ "TNCB": {
+  "en": "Flamingo International Airport"
+ },
+ "SVJC": {
+  "es": "Aeropuerto Internacional de Paraguaná",
+  "en": "Paraguaná International Airport"
+ },
+ "TNCC": {
+  "en": "Hato International Airport"
+ },
+ "TNCA": {
+  "en": "Queen Beatrix International Airport"
+ },
+ "SVCR": {
+  "es": "Aeropuerto de Coro",
+  "en": "Coro Airport"
+ },
+ "SVVL": {
+  "es": "Aeropuerto de Valera",
+  "en": "Valera Airport"
+ },
+ "SVBM": {
+  "es": "Aeropuerto Internacional de Barquisimeto",
+  "en": "Barquisimeto International Airport"
+ },
+ "SVGU": {
+  "es": "Aeropuerto de Guanare",
+  "en": "Guanare Airport"
+ },
+ "SVAC": {
+  "es": "Aeropuerto de Acarigua",
+  "en": "Acarigua Airport"
+ },
+ "SVBL": {
+  "es": "Base Aérea El Libertador",
+  "en": "El Libertador Airbase"
+ },
+ "SVBS": {
+  "es": "Aeropuerto de Maracay",
+  "en": "Maracay Airport"
+ },
+ "SVPA": {
+  "es": "Aeropuerto de Puerto Ayacucho",
+  "en": "Puerto Ayacucho Airport"
+ },
+ "TUPJ": {
+  "en": "Terrance B. Lettsome International Airport"
+ },
+ "TJIG": {
+  "en": "Fernando Luis Ribas Dominicci Airport"
+ },
+ "TISX": {
+  "en": "Henry E. Rohlsen Airport"
+ },
+ "TJSJ": {
+  "en": "Luis Munoz Marin International Airport"
+ },
+ "TJBQ": {
+  "en": "Rafael Hernández International Airport"
+ },
+ "TIST": {
+  "en": "Cyril E. King Airport"
+ },
+ "SVVP": {
+  "es": "Aeropuerto Valle de La Pascua",
+  "en": "Valle de La Pascua Airport"
+ },
+ "SVMI": {
+  "es": "Aeropuerto Internacional de Maiquetía",
+  "en": "Maiquetía International Airport"
+ },
+ "SVHG": {
+  "es": "Aeropuerto de Higuerote",
+  "en": "Higuerote Airport"
+ },
+ "SVCU": {
+  "es": "Aeropuerto de Cumaná",
+  "en": "Cumaná Airport"
+ },
+ "SVBC": {
+  "es": "Aeropuerto Internacional de Barcelona",
+  "en": "Barcelona International Airport"
+ },
+ "SVMG": {
+  "es": "Aeropuerto Internacional de Isla Margarita",
+  "en": "Isla Margarita International Airport"
+ },
+ "TNCM": {
+  "en": "Princess Juliana International Airport"
+ },
+ "TAPA": {
+  "en": "V. C. Bird International Airport"
+ },
+ "TFFR": {
+  "en": "Maryse Condé International Airport"
+ },
+ "TFFF": {
+  "en": "Martinique Aimé Césaire International Airport"
+ },
+ "TLPL": {
+  "en": "Hewanorra International Airport"
+ },
+ "TVSA": {
+  "en": "Argyle International Airport"
+ },
+ "TLPC": {
+  "en": "George F. L. Charles Airport"
+ },
+ "SVMT": {
+  "es": "Aeropuerto Internacional de Maturín",
+  "en": "Maturín International Airport"
+ },
+ "TTPP": {
+  "en": "Piarco International Airport"
+ },
+ "TTCP": {
+  "en": "A.N.R. Robinson International Airport"
+ },
+ "SVPR": {
+  "es": "Aeropuerto Internacional de Guyana City",
+  "en": "Guyana City International Airport"
+ },
+ "SVCB": {
+  "es": "Aeropuerto de Ciudad Bolivar",
+  "en": "Ciudad Bolivar Airport"
+ },
+ "SBBV": {
+  "en": "Atlas Brasil Cantanhede International Airport"
+ },
+ "SPUR": {
+  "es": "Aeropuerto Internacional de Piura",
+  "en": "Piura International Airport"
+ },
+ "SPRU": {
+  "es": "Aeropuerto Internacional de Trujillo",
+  "en": "Trujillo International Airport"
+ },
+ "SPHI": {
+  "es": "Aeropuerto Internacional de Chiclayo",
+  "en": "Chiclayo International Airport"
+ },
+ "SEQM": {
+  "es": "Aeropuerto Internacional de Quito",
+  "en": "Quito International Airport"
+ },
+ "SPST": {
+  "es": "Aeropuerto de Tarapoto",
+  "en": "Tarapoto Airport"
+ },
+ "SPIS": {
+  "es": "Aeropuerto de Pataz",
+  "en": "Pataz Airport"
+ },
+ "SPJC": {
+  "es": "Aeropuerto Internacional Jorge Chavez",
+  "en": "Jorge Chavez International"
+ },
+ "SPSO": {
+  "es": "Aeropuerto Internacional de Pisco",
+  "en": "Pisco International Airport"
+ },
+ "SPQT": {
+  "es": "Aeropuerto Internacional de Iquitos",
+  "en": "Iquitos International Airport"
+ },
+ "SPCL": {
+  "es": "Aeropuerto Internacional de Pucallpa",
+  "en": "Pucallpa International Airport"
+ },
+ "SPZO": {
+  "es": "Aeropuerto Internacional de Cusco",
+  "en": "Cusco International Airport"
+ },
+ "SPQU": {
+  "es": "Aeropuerto Internacional de Arequipa",
+  "en": "Arequipa International Airport"
+ },
+ "SPZA": {
+  "es": "Aeropuerto de Nazca",
+  "en": "Nazca Airport"
+ },
+ "SBPV": {
+  "en": "Governador Jorge Teixeira de Oliveira International Airport"
+ },
+ "SBEG": {
+  "en": "Eduardo Gomes International Airport"
+ },
+ "SCFT": {
+  "es": "Aeropuerto de Futaleufu",
+  "en": "Futaleufu Airport"
+ },
+ "SAME": {
+  "es": "Aeropuerto Internacional de Mendoza",
+  "en": "Mendoza International Airport"
+ },
+ "SCEL": {
+  "es": "Aeropuerto Internacional de Santiago",
+  "en": "Santiago International Airport"
+ },
+ "SAZN": {
+  "es": "Aeropuerto Internacional de Neuquén",
+  "en": "Neuquén International Airport"
+ },
+ "SAZS": {
+  "es": "Aeropuerto Internacional de San Carlos de Bariloche",
+  "en": "San Carlos de Bariloche International Airport"
+ },
+ "SASA": {
+  "es": "Aeropuerto Internacional de Salta",
+  "en": "Salta International Airport"
+ },
+ "SANT": {
+  "es": "Aeropuerto Internacional de San Miguel de Tucumán",
+  "en": "San Miguel de Tucumán International Airport"
+ },
+ "SACO": {
+  "es": "Aeropuerto Internacional de Cordoba",
+  "en": "Cordoba International Airport"
+ },
+ "SAVT": {
+  "es": "Aeropuerto de Rawson",
+  "en": "Rawson Airport"
+ },
+ "SAAR": {
+  "es": "Aeropuerto Internacional de Rosario",
+  "en": "Rosario International Airport"
+ },
+ "SAWC": {
+  "es": "Aeropuerto Internacional de El Calafate",
+  "en": "El Calafate International Airport"
+ },
+ "SAWG": {
+  "es": "Aeropuerto Internacional de Rio Gallegos",
+  "en": "Rio Gallegos International Airport"
+ },
+ "SAWH": {
+  "es": "Aeropuerto Internacional de Ushuaia",
+  "en": "Ushuaia International Airport"
+ },
+ "BGJN": {
+  "en": "Ilulissat Airport"
+ },
+ "CYQX": {
+  "en": "Gander International Airport"
+ },
+ "CYYT": {
+  "en": "St. John's International Airport"
+ },
+ "BGGH": {
+  "en": "Nuuk International Airport"
+ },
+ "TBPB": {
+  "en": "Grantley Adams International Airport"
+ },
+ "SYCJ": {
+  "en": "Cheddi Jagan International Airport"
+ },
+ "SOCA": {
+  "en": "Cayenne – Félix Eboué Airport"
+ },
+ "SBCY": {
+  "en": "Várzea Grande–Marechal Rondon International Airport"
+ },
+ "SBCG": {
+  "en": "Campo Grande Airport"
+ },
+ "SBGO": {
+  "en": "Santa Genoveva International Airport"
+ },
+ "SBBU": {
+  "en": "Bauru Airport"
+ },
+ "SBBE": {
+  "en": "Val de Cans/Júlio Cezar Ribeiro International Airport"
+ },
+ "SBBR": {
+  "en": "Presidente Juscelino Kubitschek International Airport"
+ },
+ "SBRP": {
+  "en": "Leite Lopes Airport"
+ },
+ "SDSC": {
+  "en": "Mário Pereira Lopes–São Carlos International Airport"
+ },
+ "SBYS": {
+  "en": "Campo Fontenelle"
+ },
+ "SBTE": {
+  "en": "Senador Petrônio Portela Airport"
+ },
+ "SBCF": {
+  "en": "Tancredo Neves International Airport"
+ },
+ "SBME": {
+  "en": "Macaé Benedito Lacerda Airport"
+ },
+ "SBBH": {
+  "en": "Pampulha - Carlos Drummond de Andrade Airport"
+ },
+ "SBFZ": {
+  "en": "Pinto Martins International Airport"
+ },
+ "SBSV": {
+  "en": "Deputado Luiz Eduardo Magalhães International Airport"
+ },
+ "SBPS": {
+  "en": "Porto Seguro International Airport"
+ },
+ "SBVT": {
+  "en": "Eurico de Aguiar Salles International Airport"
+ },
+ "SBSG": {
+  "en": "Rio Grande do Norte/São Gonçalo do Amarante–Governador Aluízio Alves International Airport"
+ },
+ "SBNT": {
+  "en": "Natal Air Force Base"
+ },
+ "SBRF": {
+  "en": "Recife/Guararapes - Gilberto Freyre International Airport"
+ },
+ "SGAS": {
+  "es": "Aeropuerto Internacional de Asunción",
+  "en": "Asunción International Airport"
+ },
+ "SARE": {
+  "es": "Aeropuerto Internacional de Resistencia",
+  "en": "Resistencia International Airport"
+ },
+ "SUPU": {
+  "es": "Aeropuerto de Paysandú",
+  "en": "Paysandú Airport"
+ },
+ "SUCM": {
+  "es": "Aeropuerto Internacional de Carmelo",
+  "en": "Carmelo International Airport"
+ },
+ "SAEZ": {
+  "es": "Aeropuerto de Buenos Aires (Ezeiza)",
+  "en": "Buenos Aires (Ezeiza) Airport"
+ },
+ "SABE": {
+  "es": "Aeropuerto de Buenos Aires",
+  "en": "Buenos Aires Airport"
+ },
+ "SADP": {
+  "es": "Aeropuerto de El Palomar",
+  "en": "El Palomar Airport"
+ },
+ "SADM": {
+  "es": "Aeropuerto de Morón",
+  "en": "Morón Airport"
+ },
+ "SADF": {
+  "es": "Aeropuerto de San Fernando",
+  "en": "San Fernando Airport"
+ },
+ "SGES": {
+  "es": "Aeropuerto Internacional de Ciudad del Este",
+  "en": "Ciudad del Este International Airport"
+ },
+ "SARI": {
+  "es": "Aeropuerto Internacional de Puerto Iguazu",
+  "en": "Puerto Iguazu International Airport"
+ },
+ "SBSM": {
+  "en": "Santa Maria Airport"
+ },
+ "SULS": {
+  "es": "Aeropuerto Internacional de Punta del Este",
+  "en": "Punta del Este International Airport"
+ },
+ "SUMU": {
+  "es": "Aeropuerto Internacional de Ciudad de la Costa",
+  "en": "Ciudad de la Costa International Airport"
+ },
+ "SBLO": {
+  "en": "Governor José Richa Airport"
+ },
+ "SBBI": {
+  "en": "Bacacheri Airport"
+ },
+ "SBCT": {
+  "en": "Curitiba-Afonso Pena International Airport"
+ },
+ "SBPA": {
+  "en": "Porto Alegre-Salgado Filho International Airport"
+ },
+ "SBCO": {
+  "en": "Canoas Air Force Base"
+ },
+ "SBSP": {
+  "en": "Congonhas–Deputado Freitas Nobre Airport"
+ },
+ "SBMT": {
+  "en": "Campo de Marte Airport"
+ },
+ "SBGR": {
+  "en": "São Paulo/Guarulhos–Governor André Franco Montoro International Airport"
+ },
+ "SBTA": {
+  "en": "Base de Aviação de Taubaté"
+ },
+ "SBKP": {
+  "en": "Viracopos International Airport"
+ },
+ "SDCO": {
+  "en": "Sorocaba Airport"
+ },
+ "SBSJ": {
+  "en": "Professor Urbano Ernesto Stumpf Airport"
+ },
+ "SBNF": {
+  "en": "Ministro Victor Konder International Airport"
+ },
+ "SBFL": {
+  "en": "Hercílio Luz International Airport"
+ },
+ "SBRJ": {
+  "en": "Santos Dumont Airport"
+ },
+ "SBJR": {
+  "en": "Jacarepaguá - Roberto Marinho Airport"
+ },
+ "SBGL": {
+  "en": "Rio de Janeiro Galeão – Tom Jobim International Airport"
+ },
+ "EGYP": {
+  "en": "Mount Pleasant Airport / RAF Mount Pleasant"
+ },
+ "BIKF": {
+  "en": "Keflavik International Airport"
+ },
+ "BIRK": {
+  "en": "Reykjavík Domestic Airport"
+ },
+ "BIAR": {
+  "en": "Akureyri International Airport"
+ },
+ "EIKN": {
+  "en": "Ireland West Airport Knock"
+ },
+ "EIDL": {
+  "en": "Donegal Airport"
+ },
+ "EICK": {
+  "en": "Cork International Airport"
+ },
+ "EINN": {
+  "en": "Shannon Airport"
+ },
+ "EIKY": {
+  "en": "Kerry Airport"
+ },
+ "EGPL": {
+  "en": "Benbecula Airport"
+ },
+ "EGAA": {
+  "en": "Belfast International Airport"
+ },
+ "EGAE": {
+  "en": "City of Derry Airport"
+ },
+ "EGNS": {
+  "en": "Isle of Man Airport"
+ },
+ "EGPK": {
+  "en": "Glasgow Prestwick Airport"
+ },
+ "EGPF": {
+  "en": "Glasgow Airport"
+ },
+ "EGAC": {
+  "en": "George Best Belfast City Airport"
+ },
+ "EIWF": {
+  "en": "Waterford Airport"
+ },
+ "EIDW": {
+  "en": "Dublin Airport"
+ },
+ "EGOV": {
+  "en": "Anglesey Airport"
+ },
+ "EIME": {
+  "en": "Casement Air Base"
+ },
+ "EIWT": {
+  "en": "Weston Airport"
+ },
+ "LFRB": {
+  "en": "Brest Bretagne airport"
+ },
+ "EGHQ": {
+  "en": "Cornwall Airport Newquay"
+ },
+ "EGHC": {
+  "en": "Land's End Airport"
+ },
+ "EGPB": {
+  "en": "Sumburgh Airport"
+ },
+ "EGPD": {
+  "en": "Aberdeen International Airport"
+ },
+ "EGPN": {
+  "en": "Dundee Airport"
+ },
+ "EGPA": {
+  "en": "Kirkwall Airport"
+ },
+ "EGNM": {
+  "en": "Leeds Bradford Airport"
+ },
+ "EGNJ": {
+  "en": "Humberside Airport"
+ },
+ "EGNO": {
+  "en": "Warton Aerodrome"
+ },
+ "EGNH": {
+  "en": "Blackpool Airport"
+ },
+ "EGPH": {
+  "en": "Edinburgh Airport"
+ },
+ "EGNT": {
+  "en": "Newcastle International Airport"
+ },
+ "EGNV": {
+  "en": "Teesside International Airport"
+ },
+ "EGKR": {
+  "en": "Redhill Aerodrome"
+ },
+ "EGFF": {
+  "en": "Cardiff International Airport"
+ },
+ "EGYD": {
+  "en": "RAF Cranwell"
+ },
+ "EGTE": {
+  "en": "Exeter International Airport"
+ },
+ "EGNX": {
+  "en": "East Midlands Airport"
+ },
+ "EGVA": {
+  "en": "RAF Fairford"
+ },
+ "EGBJ": {
+  "en": "Gloucestershire Airport"
+ },
+ "EGYE": {
+  "en": "RAF Barkston Heath"
+ },
+ "EGGP": {
+  "en": "Liverpool John Lennon Airport"
+ },
+ "EGTK": {
+  "en": "London Oxford Airport"
+ },
+ "EGGW": {
+  "en": "London Luton Airport"
+ },
+ "EGVN": {
+  "en": "RAF Brize Norton"
+ },
+ "EGKA": {
+  "en": "Brighton City Airport"
+ },
+ "EGHH": {
+  "en": "Bournemouth Airport"
+ },
+ "EGNR": {
+  "en": "Hawarden Airport"
+ },
+ "EGBB": {
+  "en": "Birmingham Airport"
+ },
+ "EGLL": {
+  "en": "London Heathrow Airport"
+ },
+ "EGLF": {
+  "en": "Farnborough Airport"
+ },
+ "EGTC": {
+  "en": "Cranfield Airport"
+ },
+ "EGWU": {
+  "en": "RAF Northolt"
+ },
+ "EGCC": {
+  "en": "Manchester Airport"
+ },
+ "EGGD": {
+  "en": "Bristol Airport"
+ },
+ "EGHI": {
+  "en": "Southampton Airport"
+ },
+ "EGKK": {
+  "en": "London Gatwick Airport"
+ },
+ "LFRK": {
+  "en": "Caen Carpiquet airport"
+ },
+ "LFRD": {
+  "en": "Dinard Pleurtuit Saint-Malo airport"
+ },
+ "EGJJ": {
+  "en": "Jersey Airport"
+ },
+ "LFRN": {
+  "en": "Rennes-Saint-Jacques Airport"
+ },
+ "LFRZ": {
+  "en": "Saint-Nazaire-Montoir Airport"
+ },
+ "LFRS": {
+  "en": "Nantes Atlantique Airport"
+ },
+ "LFOU": {
+  "en": "Cholet Le Pontreau airfield"
+ },
+ "LFBH": {
+  "en": "La Rochelle Île de Ré Airport"
+ },
+ "LPHR": {
+  "en": "Horta Airport"
+ },
+ "LPLA": {
+  "en": "Lajes Airport"
+ },
+ "LPPD": {
+  "en": "João Paulo II Airport"
+ },
+ "LPMA": {
+  "en": "Cristiano Ronaldo International Airport"
+ },
+ "GCXO": {
+  "en": "Tenerife Norte-Ciudad de La Laguna Airport"
+ },
+ "GCLA": {
+  "en": "La Palma Airport"
+ },
+ "GCLP": {
+  "en": "Gran Canaria Airport"
+ },
+ "GCTS": {
+  "en": "Tenerife Sur Airport"
+ },
+ "GMMH": {
+  "en": "Dakhla Airport"
+ },
+ "GCFV": {
+  "en": "Fuerteventura Airport"
+ },
+ "GCRR": {
+  "en": "César Manrique-Lanzarote Airport"
+ },
+ "GMML": {
+  "en": "Laayoune Hassan I International Airport"
+ },
+ "LEVX": {
+  "en": "Vigo Airport"
+ },
+ "LEST": {
+  "en": "Santiago-Rosalía de Castro Airport"
+ },
+ "LECO": {
+  "en": "A Coruña Airport"
+ },
+ "LPPR": {
+  "en": "Francisco de Sá Carneiro Airport"
+ },
+ "LPPT": {
+  "en": "Lisbon Humberto Delgado Airport"
+ },
+ "LPFR": {
+  "en": "Faro - Gago Coutinho International Airport"
+ },
+ "GMMI": {
+  "en": "Essaouira-Mogador Airport"
+ },
+ "GMMN": {
+  "en": "Mohammed V International Airport"
+ },
+ "GMMX": {
+  "en": "Marrakesh Menara Airport"
+ },
+ "GMAD": {
+  "en": "Al Massira Airport"
+ },
+ "LEXJ": {
+  "en": "Seve Ballesteros-Santander Airport"
+ },
+ "LECU": {
+  "en": "Madrid-Cuatro Vientos Airport"
+ },
+ "LEJR": {
+  "en": "Jerez Airport"
+ },
+ "LEGR": {
+  "en": "F.G.L. Airport Granada-Jaén Airport"
+ },
+ "LEMG": {
+  "en": "Málaga-Costa del Sol Airport"
+ },
+ "LEZL": {
+  "en": "Seville Airport"
+ },
+ "GMFF": {
+  "en": "Fes Saïss International Airport"
+ },
+ "GMTN": {
+  "en": "Sania Ramel Airport"
+ },
+ "GMTA": {
+  "en": "Cherif Al Idrissi Airport"
+ },
+ "GMTT": {
+  "en": "Tangier Ibn Battuta Airport"
+ },
+ "GMME": {
+  "en": "Rabat-Salé Airport"
+ },
+ "GMMZ": {
+  "en": "Ouarzazate International Airport"
+ },
+ "LFBZ": {
+  "en": "Biarritz Pays Basque airport"
+ },
+ "LEVT": {
+  "en": "Vitoria Airport"
+ },
+ "LESO": {
+  "en": "San Sebastián Airport"
+ },
+ "LFBT": {
+  "en": "Tarbes-Lourdes-Pyrénées Airport"
+ },
+ "LEBB": {
+  "en": "Bilbao Airport"
+ },
+ "LFBD": {
+  "en": "Bordeaux–Mérignac Airport"
+ },
+ "LFBP": {
+  "en": "Pau Pyrénées Airport"
+ },
+ "LEMD": {
+  "en": "Adolfo Suárez Madrid–Barajas Airport"
+ },
+ "LEVS": {
+  "en": "Aerodromo Vistabella del Maestr"
+ },
+ "LEVC": {
+  "en": "Valencia Airport"
+ },
+ "LEAL": {
+  "en": "Alicante-Elche Miguel Hernández Airport"
+ },
+ "LEAM": {
+  "en": "Almería Airport"
+ },
+ "GMMW": {
+  "en": "Nador Al Aaroui International Airport"
+ },
+ "GMFO": {
+  "en": "Oujda Angads Airport"
+ },
+ "GQNO": {
+  "en": "Nouakchott–Oumtounsy International Airport"
+ },
+ "GOBD": {
+  "en": "Blaise Diagne International Airport"
+ },
+ "DGLE": {
+  "en": "Yakubu Tali International Airport"
+ },
+ "DGSI": {
+  "en": "Prempeh I International Airport"
+ },
+ "ENLK": {
+  "en": "Leknes Airport"
+ },
+ "ENSH": {
+  "en": "Svolvær Airport, Helle"
+ },
+ "ENRS": {
+  "en": "Røst Airport"
+ },
+ "ENDU": {
+  "en": "Bardufoss Airport"
+ },
+ "ENEV": {
+  "en": "Harstad/Narvik Airport"
+ },
+ "ENAN": {
+  "en": "Andøya Airport, Andenes"
+ },
+ "ENHK": {
+  "en": "Hasvik Airport"
+ },
+ "ENTC": {
+  "en": "Tromsø Airport"
+ },
+ "ENHF": {
+  "en": "Hammerfest Airport"
+ },
+ "EFET": {
+  "en": "Enontekio Airport"
+ },
+ "ENNA": {
+  "en": "Lakselv Airport, Banak"
+ },
+ "ENAT": {
+  "en": "Alta Airport"
+ },
+ "EFKT": {
+  "en": "Kittilä International Airport"
+ },
+ "ENBV": {
+  "en": "Berlevåg Airport"
+ },
+ "ENMH": {
+  "en": "Mehamn Airport"
+ },
+ "EFIV": {
+  "en": "Ivalo Airport"
+ },
+ "ENKR": {
+  "en": "Kirkenes Airport, Høybuktmoen"
+ },
+ "EGSS": {
+  "en": "London Stansted Airport"
+ },
+ "EGMD": {
+  "en": "Lydd London Ashford Airport"
+ },
+ "EGSH": {
+  "en": "Norwich Airport"
+ },
+ "EGKB": {
+  "en": "London Biggin Hill Airport"
+ },
+ "EGMC": {
+  "en": "London Southend Airport"
+ },
+ "EGLC": {
+  "en": "London City Airport"
+ },
+ "EBOS": {
+  "en": "Ostend-Bruges International Airport"
+ },
+ "EGSC": {
+  "en": "Cambridge City Airport"
+ },
+ "LFPN": {
+  "en": "Toussus-le-Noble Airport"
+ },
+ "LFPE": {
+  "en": "Meaux-Esbly Airfield"
+ },
+ "LFPB": {
+  "en": "Paris-Le Bourget International Airport"
+ },
+ "LFPX": {
+  "en": "Chavenay-Villepreux Airfield"
+ },
+ "LFPO": {
+  "en": "Paris-Orly Airport"
+ },
+ "LFPT": {
+  "en": "Pontoise-Cormeilles Aerodrome"
+ },
+ "LFPG": {
+  "en": "Charles de Gaulle International Airport"
+ },
+ "LFRG": {
+  "en": "Deauville Normandie airport"
+ },
+ "LFQT": {
+  "en": "Merville-Calonne Airport"
+ },
+ "LFPL": {
+  "en": "Lognes Emerainville Airfield"
+ },
+ "LFPZ": {
+  "en": "Saint-Cyr-l'École Airport"
+ },
+ "LFOB": {
+  "en": "Beauvais-Tillé airport"
+ },
+ "LFAT": {
+  "en": "Le Touquet-Côte d'Opale Airport"
+ },
+ "LFAQ": {
+  "en": "Albert Bray airport"
+ },
+ "LFQQ": {
+  "en": "Lille Airport"
+ },
+ "LFPM": {
+  "en": "Melun-Villaroche Airfield"
+ },
+ "LFOP": {
+  "en": "Rouen Vallée de Seine Airport"
+ },
+ "LFBL": {
+  "en": "Limoges Airport"
+ },
+ "LFLC": {
+  "en": "Clermont-Ferrand Auvergne airport"
+ },
+ "LFBI": {
+  "en": "Poitiers-Biard Airport"
+ },
+ "LFBU": {
+  "en": "Angoulême Brie-Champniers airport"
+ },
+ "LFLV": {
+  "en": "Vichy-Charmeil Airport"
+ },
+ "ENAL": {
+  "en": "Ålesund Airport"
+ },
+ "ENML": {
+  "en": "Molde Airport, Årø"
+ },
+ "ENBR": {
+  "en": "Bergen Airport, Flesland"
+ },
+ "ENFL": {
+  "en": "Florø Airport"
+ },
+ "ENSG": {
+  "en": "Sogndal Airport, Haukåsen"
+ },
+ "ENBL": {
+  "en": "Førde Airport, Bringeland"
+ },
+ "ENHD": {
+  "en": "Haugesund Airport, Karmøy"
+ },
+ "ENZV": {
+  "en": "Stavanger Airport, Sola"
+ },
+ "EBLG": {
+  "en": "Liège Airport"
+ },
+ "EHGG": {
+  "en": "Groningen Airport Eelde"
+ },
+ "EHBK": {
+  "en": "Maastricht Aachen Airport"
+ },
+ "EDDL": {
+  "en": "Düsseldorf Airport"
+ },
+ "EHLE": {
+  "en": "Lelystad Airport"
+ },
+ "EHEH": {
+  "en": "Eindhoven Airport"
+ },
+ "EDDK": {
+  "en": "Cologne Bonn Airport"
+ },
+ "EHAM": {
+  "en": "Amsterdam Airport Schiphol"
+ },
+ "EHRD": {
+  "en": "Rotterdam The Hague Airport"
+ },
+ "EBBR": {
+  "en": "Brussels Airport"
+ },
+ "EHKD": {
+  "en": "De Kooy Airfield / Den Helder Naval Air Station"
+ },
+ "EDLV": {
+  "en": "Weeze (Niederrhein) Airport"
+ },
+ "EBAW": {
+  "en": "Antwerp International Airport (Deurne)"
+ },
+ "LFSG": {
+  "en": "Épinal Mirecourt Airport"
+ },
+ "LFJY": {
+  "en": "Chambley airfield"
+ },
+ "LFOK": {
+  "en": "Chalons Vatry airport"
+ },
+ "ETAD": {
+  "en": "Spangdahlem Air Base"
+ },
+ "LFJL": {
+  "en": "Metz-Nancy-Lorraine Airport"
+ },
+ "EBCI": {
+  "en": "Brussels South Charleroi Airport"
+ },
+ "LFQP": {
+  "en": "Phalsbourg-Bourscheid Air Base"
+ },
+ "ELLX": {
+  "en": "Luxembourg-Findel International Airport"
+ },
+ "LFSN": {
+  "en": "Nancy-Essey Airport"
+ },
+ "EDDR": {
+  "en": "Saarbrücken Airport"
+ },
+ "LFGA": {
+  "en": "Colmar Houssen airport"
+ },
+ "EDFH": {
+  "en": "Frankfurt-Hahn Airport"
+ },
+ "LFLI": {
+  "en": "Annemasse Airfield"
+ },
+ "LSGS": {
+  "en": "Sion Airport"
+ },
+ "LFHV": {
+  "en": "Villefranche-Tarare Airfield"
+ },
+ "LFMH": {
+  "en": "Saint-Étienne-Bouthéon Airport"
+ },
+ "LFLL": {
+  "en": "Lyon Saint-Exupéry Airport"
+ },
+ "LFQM": {
+  "en": "Besançon La Vèze Airfield"
+ },
+ "LFLN": {
+  "en": "Saint-Yan Airport"
+ },
+ "LFGJ": {
+  "en": "Dole Tavaux Airport"
+ },
+ "LSZB": {
+  "en": "Bern Airport"
+ },
+ "LFLS": {
+  "en": "Grenoble Alpes Isère Airport"
+ },
+ "LFLB": {
+  "en": "Chambéry Aix les Bains airport"
+ },
+ "LFLG": {
+  "en": "Grenoble Le Versoud Airfield"
+ },
+ "LSZG": {
+  "en": "Grenchen Airfield"
+ },
+ "LFLY": {
+  "en": "Lyon Bron Airport"
+ },
+ "LSGG": {
+  "en": "Geneva International Airport"
+ },
+ "ENRM": {
+  "en": "Rørvik Airport, Ryum"
+ },
+ "ENOL": {
+  "en": "Ørland Airport"
+ },
+ "ENKB": {
+  "en": "Kristiansund Airport, Kvernberget"
+ },
+ "ENVA": {
+  "en": "Trondheim Airport, Værnes"
+ },
+ "ENGM": {
+  "en": "Oslo-Gardermoen International Airport"
+ },
+ "ENTO": {
+  "en": "Sandefjord Airport, Torp"
+ },
+ "ENRY": {
+  "en": "Moss Airport, Rygge"
+ },
+ "EKAH": {
+  "en": "Aarhus Airport"
+ },
+ "ENCN": {
+  "en": "Kristiansand Airport"
+ },
+ "EKKA": {
+  "en": "Midtjyllands Airport / Air Base Karup"
+ },
+ "EKYT": {
+  "en": "Aalborg Airport"
+ },
+ "EKEB": {
+  "en": "Esbjerg Airport"
+ },
+ "EKBI": {
+  "en": "Billund Airport"
+ },
+ "EDXW": {
+  "en": "Westerland Sylt Airport"
+ },
+ "EDHL": {
+  "en": "Lübeck Blankensee Airport"
+ },
+ "EDHI": {
+  "en": "Hamburg-Finkenwerder Airport"
+ },
+ "EKSP": {
+  "en": "Skrydstrup Air Base"
+ },
+ "EDDH": {
+  "en": "Hamburg Helmut Schmidt Airport"
+ },
+ "EDLW": {
+  "en": "Dortmund Airport"
+ },
+ "EDLA": {
+  "en": "Arnsberg-Menden Airfield"
+ },
+ "EDDG": {
+  "en": "Münster Osnabrück Airport"
+ },
+ "EDDW": {
+  "en": "Bremen Airport"
+ },
+ "EDVK": {
+  "en": "Kassel Airport"
+ },
+ "EDLP": {
+  "en": "Paderborn Lippstadt Airport"
+ },
+ "EDDV": {
+  "en": "Hannover Airport"
+ },
+ "EDVE": {
+  "en": "Braunschweig-Wolfsburg Airport"
+ },
+ "EDGS": {
+  "en": "Siegerland Airport"
+ },
+ "EDDE": {
+  "en": "Erfurt-Weimar Airport"
+ },
+ "EDFQ": {
+  "en": "Allendorf-Eder Airfield"
+ },
+ "EDMQ": {
+  "en": "Donauwörth-Genderkingen Airfield"
+ },
+ "EDDF": {
+  "en": "Frankfurt Main Airport"
+ },
+ "EDQA": {
+  "en": "Bamberg-Breitenau Airfield"
+ },
+ "EDRY": {
+  "en": "Speyer Airfield"
+ },
+ "EDQC": {
+  "en": "Coburg-Brandensteinsebene Airfield"
+ },
+ "EDFM": {
+  "en": "Mannheim-City Airport"
+ },
+ "EDJA": {
+  "en": "Memmingen Allgau Airport"
+ },
+ "EDDN": {
+  "en": "Nuremberg Airport"
+ },
+ "LFST": {
+  "en": "Strasbourg Airport"
+ },
+ "ETAR": {
+  "en": "Ramstein Air Base"
+ },
+ "EDDS": {
+  "en": "Stuttgart Airport"
+ },
+ "EDSB": {
+  "en": "Karlsruhe Baden-Baden Airport"
+ },
+ "ETOU": {
+  "en": "Wiesbaden Army Airfield"
+ },
+ "EDTY": {
+  "en": "Adolf Würth Airport"
+ },
+ "EDMA": {
+  "en": "Augsburg Airport"
+ },
+ "LIPX": {
+  "en": "Verona Villafranca Valerio Catullo Airport"
+ },
+ "LFSB": {
+  "en": "EuroAirport Basel–Mulhouse–Freiburg"
+ },
+ "LSZA": {
+  "en": "Lugano Airport"
+ },
+ "LSZH": {
+  "en": "Zürich Airport"
+ },
+ "LIME": {
+  "en": "Il Caravaggio International Airport"
+ },
+ "LIMC": {
+  "en": "Milan Malpensa International Airport"
+ },
+ "LSZR": {
+  "en": "Sankt Gallen Altenrhein Airport"
+ },
+ "EDNY": {
+  "en": "Bodensee Airport Friedrichshafen"
+ },
+ "LIML": {
+  "en": "Milano Linate Airport"
+ },
+ "LSZL": {
+  "en": "Locarno Airport"
+ },
+ "LIMF": {
+  "en": "Turin Airport"
+ },
+ "LSZS": {
+  "en": "Engadin Airport"
+ },
+ "ENBN": {
+  "en": "Brønnøysund Airport, Brønnøy"
+ },
+ "ENST": {
+  "en": "Sandnessjøen Airport, Stokka"
+ },
+ "ENBO": {
+  "en": "Bodø Airport"
+ },
+ "ENNM": {
+  "en": "Namsos Airport"
+ },
+ "ESGG": {
+  "en": "Göteborg Landvetter Airport"
+ },
+ "ESTL": {
+  "en": "Ljungbyhed Airfield"
+ },
+ "ETNL": {
+  "en": "Rostock-Laage Airport"
+ },
+ "ESMS": {
+  "en": "Malmö Sturup Airport"
+ },
+ "EKRK": {
+  "en": "Copenhagen Roskilde Airport"
+ },
+ "EKCH": {
+  "en": "Copenhagen Kastrup Airport"
+ },
+ "EPSC": {
+  "en": "Solidarity Szczecin–Goleniów Airport"
+ },
+ "EDAB": {
+  "en": "Bautzen Airfield"
+ },
+ "EDDC": {
+  "en": "Dresden Airport"
+ },
+ "EDDP": {
+  "en": "Leipzig/Halle Airport"
+ },
+ "EDDB": {
+  "en": "Berlin Brandenburg Airport"
+ },
+ "EDAZ": {
+  "en": "Schönhagen Airfield"
+ },
+ "LKPR": {
+  "en": "Václav Havel Airport Prague"
+ },
+ "EDNX": {
+  "en": "Schleissheim Airfield"
+ },
+ "LKKV": {
+  "en": "Karlovy Vary Airport"
+ },
+ "EDMO": {
+  "en": "Oberpfaffenhofen Airport"
+ },
+ "EDDM": {
+  "en": "Munich Airport"
+ },
+ "EDMS": {
+  "en": "Straubing Airport"
+ },
+ "LOLW": {
+  "en": "Wels Airfield"
+ },
+ "LOWL": {
+  "en": "Linz-Hörsching Airport"
+ },
+ "ETSI": {
+  "en": "Ingolstadt Manching Airport"
+ },
+ "EDME": {
+  "en": "Eggenfelden Airfield"
+ },
+ "EDQD": {
+  "en": "Bayreuth Airport"
+ },
+ "LJLJ": {
+  "en": "Ljubljana Jože Pučnik Airport"
+ },
+ "LOWS": {
+  "en": "Salzburg Airport"
+ },
+ "LIPA": {
+  "en": "Aviano Air Base"
+ },
+ "LOXZ": {
+  "en": "Hinterstoisser Air Base"
+ },
+ "LIPZ": {
+  "en": "Venice Marco Polo Airport"
+ },
+ "LOWK": {
+  "en": "Klagenfurt Airport"
+ },
+ "LOWI": {
+  "en": "Innsbruck Airport"
+ },
+ "ESNN": {
+  "en": "Sundsvall-Härnösand Airport"
+ },
+ "ESSB": {
+  "en": "Stockholm-Bromma Airport"
+ },
+ "ESOW": {
+  "en": "Stockholm Västerås Airport"
+ },
+ "ESSA": {
+  "en": "Stockholm-Arlanda Airport"
+ },
+ "ESKN": {
+  "en": "Stockholm Skavsta Airport"
+ },
+ "EPPR": {
+  "en": "Pruszcz Gdański Air Base"
+ },
+ "EPSN": {
+  "en": "Swidwin Military Air Base"
+ },
+ "EPDA": {
+  "en": "Darłówo Naval Air Base"
+ },
+ "EPOK": {
+  "en": "Oksywie Air Base / Gdynia-Kosakowo Airfield"
+ },
+ "EPGD": {
+  "en": "Gdańsk Lech Wałęsa Airport"
+ },
+ "EPCE": {
+  "en": "Cewice Naval Air Base"
+ },
+ "EPPO": {
+  "en": "Poznań-Ławica Airport"
+ },
+ "EPWR": {
+  "en": "Copernicus Wrocław Airport"
+ },
+ "EPBY": {
+  "en": "Ignacy Jan Paderewski Bydgoszcz Airport"
+ },
+ "EPKS": {
+  "en": "Krzesiny Military Air Base"
+ },
+ "EPPW": {
+  "en": "Powidz Military Air Base"
+ },
+ "LKMT": {
+  "en": "Leoš Janáček Airport Ostrava"
+ },
+ "LOWW": {
+  "en": "Vienna International Airport"
+ },
+ "LKTB": {
+  "en": "Brno-Tuřany Airport"
+ },
+ "LZIB": {
+  "en": "M. R. Štefánik Airport"
+ },
+ "LOWG": {
+  "en": "Graz Airport"
+ },
+ "LHPA": {
+  "en": "Pápa Air Base"
+ },
+ "LDZA": {
+  "en": "Zagreb Franjo Tuđman International Airport"
+ },
+ "EFVA": {
+  "en": "Vaasa Airport"
+ },
+ "EFMA": {
+  "en": "Mariehamn Airport"
+ },
+ "EFPO": {
+  "en": "Pori Airport"
+ },
+ "EFTU": {
+  "en": "Turku Airport"
+ },
+ "EYPA": {
+  "en": "Palanga International Airport"
+ },
+ "EPMB": {
+  "en": "Malbork Królewo Air Base"
+ },
+ "EYKL": {
+  "en": "Klaipėda Airfield"
+ },
+ "UMKK": {
+  "en": "Khrabrovo Airport"
+ },
+ "EYKT": {
+  "en": "Kartena Airfield"
+ },
+ "EPTM": {
+  "en": "Tomaszów Mazowiecki Military Air Base"
+ },
+ "EPLY": {
+  "en": "Leźnica Wielka Air Base"
+ },
+ "EPDE": {
+  "en": "Deblin Military Air Base"
+ },
+ "EPLK": {
+  "en": "Łask Air Base"
+ },
+ "EPMM": {
+  "en": "Minsk Mazowiecki Military Air Base"
+ },
+ "EPRA": {
+  "en": "Warsaw Radom Airport"
+ },
+ "EPLL": {
+  "en": "Łódź Władysław Reymont Airport"
+ },
+ "EPWA": {
+  "en": "Warsaw Chopin Airport"
+ },
+ "EPMO": {
+  "en": "Warsaw Modlin Airport"
+ },
+ "EPKK": {
+  "en": "Kraków John Paul II International Airport"
+ },
+ "LZKZ": {
+  "en": "Košice International Airport"
+ },
+ "EPKT": {
+  "en": "Katowice Wojciech Korfanty International Airport"
+ },
+ "EPRZ": {
+  "en": "Rzeszów-Jasionka Airport"
+ },
+ "LZTT": {
+  "en": "Poprad-Tatry Airport"
+ },
+ "LRTR": {
+  "en": "Timișoara Traian Vuia International Airport"
+ },
+ "LHBP": {
+  "en": "Budapest Liszt Ferenc International Airport"
+ },
+ "LHKE": {
+  "en": "Kecskemét Air Base"
+ },
+ "LRAR": {
+  "en": "Arad International Airport"
+ },
+ "EFOU": {
+  "en": "Oulu Airport"
+ },
+ "EFKE": {
+  "en": "Kemi-Tornio Airport"
+ },
+ "EFRO": {
+  "en": "Rovaniemi Airport"
+ },
+ "EFSI": {
+  "en": "Seinäjoki Airport"
+ },
+ "EFJY": {
+  "en": "Jyväskylä Airport"
+ },
+ "EFKK": {
+  "en": "Kokkola-Pietarsaari Airport"
+ },
+ "EFHF": {
+  "en": "Malmi"
+ },
+ "EEEI": {
+  "en": "Ämari Air Base"
+ },
+ "EFHK": {
+  "en": "Helsinki Vantaa Airport"
+ },
+ "EETN": {
+  "en": "Lennart Meri Tallinn Airport"
+ },
+ "EFTP": {
+  "en": "Tampere-Pirkkala Airport"
+ },
+ "EVRA": {
+  "en": "Riga International Airport"
+ },
+ "EVJA": {
+  "en": "JÅ«rmala Airport"
+ },
+ "EVGA": {
+  "en": "Lielvarde Air Base"
+ },
+ "EYVK": {
+  "en": "Kyviškes Airfield"
+ },
+ "EYKA": {
+  "en": "Kaunas International Airport"
+ },
+ "EYKS": {
+  "en": "S. Darius and S. Girėnas Airfield"
+ },
+ "EYVI": {
+  "en": "Vilnius International Airport"
+ },
+ "EYSA": {
+  "en": "Šiauliai International Airport"
+ },
+ "UKLL": {
+  "en": "Lviv International Airport"
+ },
+ "LRSB": {
+  "en": "Sibiu International Airport"
+ },
+ "LRCL": {
+  "en": "Avram Iancu Cluj International Airport"
+ },
+ "LRBV": {
+  "en": "Brașov-Ghimbav International Airport"
+ },
+ "LRTM": {
+  "en": "Târgu Mureş Transilvania International Airport"
+ },
+ "EFKS": {
+  "en": "Kuusamo Airport"
+ },
+ "EFSO": {
+  "en": "Sodankyla Airport"
+ },
+ "EFJO": {
+  "en": "Joensuu Airport"
+ },
+ "EFKU": {
+  "en": "Kuopio Airport"
+ },
+ "EFSA": {
+  "en": "Savonlinna Airport"
+ },
+ "EFVR": {
+  "en": "Varkaus Airport"
+ },
+ "EFKI": {
+  "en": "Kajaani Airport"
+ },
+ "EFUT": {
+  "en": "Utti Air Base"
+ },
+ "EFPR": {
+  "en": "Helsinki East-Redstone Aerodrome"
+ },
+ "EFLP": {
+  "en": "Lappeenranta Airport"
+ },
+ "EFMI": {
+  "en": "Mikkeli Airport"
+ },
+ "EETU": {
+  "en": "Tartu Airport"
+ },
+ "UMMS": {
+  "en": "Minsk National Airport"
+ },
+ "LRIA": {
+  "en": "Iaşi International Airport"
+ },
+ "LUKK": {
+  "en": "Chişinău International Airport"
+ },
+ "LFCR": {
+  "en": "Rodez–Aveyron Airport"
+ },
+ "LFMU": {
+  "en": "Béziers Vias airport"
+ },
+ "LFMP": {
+  "en": "Perpignan-Rivesaltes (Llabanère) Airport"
+ },
+ "LFBR": {
+  "en": "Aérodrome de Muret - Lherm"
+ },
+ "LFBO": {
+  "en": "Toulouse-Blagnac Airport"
+ },
+ "LFDJ": {
+  "en": "Aérodrome de Pamiers - Les Pujols"
+ },
+ "LFCL": {
+  "en": "Toulouse-Lasbordes Airfield"
+ },
+ "LFBA": {
+  "en": "Agen La Garenne airport"
+ },
+ "LFBE": {
+  "en": "Bergerac Dordogne-Périgord airport"
+ },
+ "LFMK": {
+  "en": "Carcassonne Salvaza Airport"
+ },
+ "LERS": {
+  "en": "Reus Airport"
+ },
+ "LEGE": {
+  "en": "Girona-Costa Brava Airport"
+ },
+ "LEBL": {
+  "en": "Josep Tarradellas Barcelona-El Prat Airport"
+ },
+ "LEPA": {
+  "en": "Palma de Mallorca Airport"
+ },
+ "LEIB": {
+  "en": "Ibiza Airport"
+ },
+ "DAAG": {
+  "en": "Houari Boumediene Airport"
+ },
+ "LFMD": {
+  "en": "Cannes Mandelieu Airport"
+ },
+ "LFML": {
+  "en": "Marseille Provence Airport"
+ },
+ "LFMN": {
+  "en": "Nice-Côte d'Azur Airport"
+ },
+ "LFMA": {
+  "en": "Aix Les Milles airport"
+ },
+ "LFTW": {
+  "en": "Nîmes-Arles-Camargue Airport"
+ },
+ "LFMT": {
+  "en": "Montpellier-Méditerranée Airport"
+ },
+ "LFNR": {
+  "en": "Berre-la-Fare Airfield"
+ },
+ "LFMV": {
+  "en": "Avignon Caumont airport"
+ },
+ "LFNZ": {
+  "en": "Le Mazet De Romanin Airfield"
+ },
+ "LFMC": {
+  "en": "Le Luc-Le Cannet Airfield"
+ },
+ "LFNA": {
+  "en": "Gap-Tallard Airfield"
+ },
+ "LEMH": {
+  "en": "Menorca Airport"
+ },
+ "LESL": {
+  "en": "Sant Lluis Airfield"
+ },
+ "LFKB": {
+  "en": "Bastia-Poretta International airport"
+ },
+ "LFKC": {
+  "en": "Calvi Sainte Catherine Airport"
+ },
+ "LIMJ": {
+  "en": "Genoa Cristoforo Colombo Airport"
+ },
+ "LIRP": {
+  "en": "Pisa International Airport"
+ },
+ "LIRQ": {
+  "en": "Florence Airport, Peretola"
+ },
+ "LFKJ": {
+  "en": "Ajaccio Napoléon Bonaparte airport"
+ },
+ "LIEA": {
+  "en": "Alghero-Fertilia Airport"
+ },
+ "LFKF": {
+  "en": "Figari Sud-Corse Airport"
+ },
+ "LIED": {
+  "en": "Decimomannu Air Base"
+ },
+ "LIEE": {
+  "en": "Cagliari Elmas Airport"
+ },
+ "DTTA": {
+  "en": "Tunis Carthage International Airport"
+ },
+ "DTNH": {
+  "en": "Enfidha - Hammamet International Airport"
+ },
+ "DTTJ": {
+  "en": "Djerba Zarzis International Airport"
+ },
+ "DTMB": {
+  "en": "Monastir Habib Bourguiba International Airport"
+ },
+ "LIPE": {
+  "en": "Bologna Guglielmo Marconi Airport"
+ },
+ "LDPL": {
+  "en": "Pula Airport"
+ },
+ "LIRN": {
+  "en": "Naples International Airport"
+ },
+ "LIRF": {
+  "en": "Rome–Fiumicino Leonardo da Vinci International Airport"
+ },
+ "LIRA": {
+  "en": "Ciampino–G. B. Pastine International Airport"
+ },
+ "LICT": {
+  "en": "Vincenzo Florio Airport Trapani-Birgi"
+ },
+ "LICJ": {
+  "en": "Falcone–Borsellino Airport"
+ },
+ "LMML": {
+  "en": "Malta International Airport"
+ },
+ "HLLT": {
+  "en": "Tripoli International"
+ },
+ "HLLM": {
+  "en": "Mitiga International Airport"
+ },
+ "LDSP": {
+  "en": "Split Saint Jerome Airport"
+ },
+ "LQMO": {
+  "en": "Mostar International Airport"
+ },
+ "LQTZ": {
+  "en": "Tuzla International Airport"
+ },
+ "LDZD": {
+  "en": "Zadar Airport"
+ },
+ "LDDU": {
+  "en": "Dubrovnik Ruđer Bošković Airport"
+ },
+ "LQSA": {
+  "en": "Sarajevo International Airport"
+ },
+ "LQBK": {
+  "en": "Banja Luka International Airport"
+ },
+ "LIBD": {
+  "en": "Bari Karol Wojtyła International Airport"
+ },
+ "LIBR": {
+  "en": "Brindisi Airport"
+ },
+ "LIBN": {
+  "en": "Lecce Galatina Air Base / Galatina Fortunato Cesari Airport"
+ },
+ "LICA": {
+  "en": "Lamezia Terme Sant'Eufemia International Airport"
+ },
+ "LICC": {
+  "en": "Catania-Fontanarossa Airport"
+ },
+ "LYBE": {
+  "en": "Belgrade Nikola Tesla Airport"
+ },
+ "BKPR": {
+  "en": "Priština Adem Jashari International Airport"
+ },
+ "LGKR": {
+  "en": "Corfu Ioannis Kapodistrias International Airport"
+ },
+ "LWSK": {
+  "en": "Skopje International Airport"
+ },
+ "LATI": {
+  "en": "Tirana International Airport Mother Teresa"
+ },
+ "LGKF": {
+  "en": "Kefalonia International Airport \"Anna Pollatou\""
+ },
+ "LGZA": {
+  "en": "Zakynthos International Airport \"Dionysios Solomos\""
+ },
+ "LBLS": {
+  "en": "Lesnovo Airfield"
+ },
+ "LROP": {
+  "en": "Bucharest Henri Coandă International Airport"
+ },
+ "LBGO": {
+  "en": "Gorna Oryahovitsa Airport"
+ },
+ "LRBS": {
+  "en": "Bucharest Băneasa Aurel Vlaicu International Airport"
+ },
+ "LBSF": {
+  "en": "Sofia Airport"
+ },
+ "LBPD": {
+  "en": "Plovdiv International Airport"
+ },
+ "LGTS": {
+  "en": "Thessaloniki Macedonia International Airport"
+ },
+ "LGKV": {
+  "en": "Kavala Alexander the Great International Airport"
+ },
+ "LGMK": {
+  "en": "Mykonos Island National Airport"
+ },
+ "LGAV": {
+  "en": "Athens Eleftherios Venizelos International Airport"
+ },
+ "LGSA": {
+  "en": "Chania International Airport"
+ },
+ "LGIR": {
+  "en": "Heraklion International Nikos Kazantzakis Airport"
+ },
+ "LGSR": {
+  "en": "Santorini International Airport"
+ },
+ "LBWN": {
+  "en": "Varna Airport"
+ },
+ "LBSB": {
+  "en": "Slanchev Bryag (Sunny Beach) Airstrip"
+ },
+ "LBBG": {
+  "en": "Burgas Airport"
+ },
+ "LBWB": {
+  "en": "Balchik Airfield"
+ },
+ "LRCK": {
+  "en": "Mihail Kogălniceanu International Airport"
+ },
+ "LTBR": {
+  "en": "Bursa Yenişehir Airport"
+ },
+ "LTBA": {
+  "en": "İstanbul Atatürk Airport"
+ },
+ "LTBF": {
+  "en": "Balıkesir Airport"
+ },
+ "LTFJ": {
+  "en": "Istanbul Sabiha Gökçen International Airport"
+ },
+ "LTBG": {
+  "en": "Bandırma Airport"
+ },
+ "LTBU": {
+  "en": "Tekirdağ Çorlu Airport"
+ },
+ "LTFD": {
+  "en": "Balıkesir Koca Seyit Airport"
+ },
+ "LTBH": {
+  "en": "Çanakkale Airport"
+ },
+ "LTBO": {
+  "en": "Uşak Airport"
+ },
+ "LTBD": {
+  "en": "Aydın Çıldır Airport"
+ },
+ "LGSM": {
+  "en": "Samos Airport"
+ },
+ "LGKO": {
+  "en": "Kos International Airport \"Ippokratis\""
+ },
+ "LTBS": {
+  "en": "Dalaman International Airport"
+ },
+ "LTFB": {
+  "en": "Selçuk Efes Airport"
+ },
+ "LTAY": {
+  "en": "Çardak Airport"
+ },
+ "LTFE": {
+  "en": "Milas Bodrum International Airport"
+ },
+ "LTBJ": {
+  "en": "Adnan Menderes International Airport"
+ },
+ "LGRP": {
+  "en": "Rhodes International Airport \"Diagoras\""
+ },
+ "DNMM": {
+  "en": "Murtala Muhammed International Airport"
+ },
+ "DXXX": {
+  "en": "Lomé–Tokoin International Airport"
+ },
+ "DNAA": {
+  "en": "Nnamdi Azikiwe International Airport"
+ },
+ "DNPO": {
+  "en": "Port Harcourt International Airport"
+ },
+ "DNKN": {
+  "en": "Mallam Aminu Kano International Airport"
+ },
+ "FZAA": {
+  "en": "Ndjili International Airport"
+ },
+ "FYWH": {
+  "en": "Hosea Kutako International Airport"
+ },
+ "FVFA": {
+  "en": "Victoria Falls International Airport"
+ },
+ "HRZA": {
+  "en": "Kamembe Airport"
+ },
+ "FLSK": {
+  "en": "Simon Mwansa Kapwepwe International Airport"
+ },
+ "FYWB": {
+  "en": "Walvis Bay International Airport"
+ },
+ "FYWE": {
+  "en": "Eros Airport"
+ },
+ "FYOG": {
+  "en": "Oranjemund Airport"
+ },
+ "FACT": {
+  "en": "Cape Town International Airport"
+ },
+ "FAGG": {
+  "en": "George Airport"
+ },
+ "FBSK": {
+  "en": "Sir Seretse Khama International Airport"
+ },
+ "FAPE": {
+  "en": "Chief Dawid Stuurman International Airport"
+ },
+ "FACF": {
+  "en": "St Francis Airfield"
+ },
+ "FALA": {
+  "en": "Lanseria International Airport"
+ },
+ "FAOR": {
+  "en": "O.R. Tambo International Airport"
+ },
+ "FABL": {
+  "en": "Bram Fischer International Airport"
+ },
+ "FAEL": {
+  "en": "King Phalo Airport"
+ },
+ "ENSS": {
+  "en": "Vardø Airport, Svartnes"
+ },
+ "ULMM": {
+  "en": "Emperor Nicholas II Murmansk Airport"
+ },
+ "ULAM": {
+  "en": "Naryan Mar Airport"
+ },
+ "ULLI": {
+  "en": "Pulkovo Airport"
+ },
+ "ULLA": {
+  "en": "Klimovo Airport"
+ },
+ "UKBB": {
+  "en": "Boryspil International Airport"
+ },
+ "UKKK": {
+  "en": "Igor Sikorsky Kyiv International Airport (Zhuliany)"
+ },
+ "UKOO": {
+  "en": "Odesa International Airport"
+ },
+ "UUWW": {
+  "en": "Vnukovo International Airport"
+ },
+ "UUEE": {
+  "en": "Sheremetyevo International Airport"
+ },
+ "UUBC": {
+  "en": "Grabtsevo Airport"
+ },
+ "UUBP": {
+  "en": "Bryansk International Airport"
+ },
+ "UUOB": {
+  "en": "Belgorod International Airport"
+ },
+ "UKDD": {
+  "en": "Dnipro International Airport"
+ },
+ "UKHH": {
+  "en": "Kharkiv International Airport"
+ },
+ "URKA": {
+  "en": "Anapa Vityazevo Airport"
+ },
+ "ULAA": {
+  "en": "Talagi Airport"
+ },
+ "UUDL": {
+  "en": "Golden Ring Yaroslavl International Airport"
+ },
+ "UUDD": {
+  "en": "Domodedovo International Airport"
+ },
+ "UUOO": {
+  "en": "Voronezh International Airport"
+ },
+ "UUOL": {
+  "en": "Lipetsk Airport"
+ },
+ "URKK": {
+  "en": "Krasnodar Pashkovsky International Airport"
+ },
+ "URRP": {
+  "en": "Platov International Airport"
+ },
+ "UWGG": {
+  "en": "Nizhny Novgorod / Strigino International Airport"
+ },
+ "URWW": {
+  "en": "Volgograd International Airport"
+ },
+ "URMT": {
+  "en": "Stavropol Shpakovskoye Airport"
+ },
+ "URWI": {
+  "en": "Elista Airport"
+ },
+ "UWKS": {
+  "en": "Cheboksary Airport"
+ },
+ "UWLL": {
+  "en": "Ulyanovsk Baratayevka Airport"
+ },
+ "UWPS": {
+  "en": "Saransk International Airport"
+ },
+ "UWSG": {
+  "en": "Gagarin International Airport"
+ },
+ "URWA": {
+  "en": "Astrakhan Narimanovo Boris M. Kustodiev International Airport"
+ },
+ "UUYY": {
+  "en": "Syktyvkar Airport"
+ },
+ "USKK": {
+  "en": "Pobedilovo Airport"
+ },
+ "UWWW": {
+  "en": "Kurumoch International Airport"
+ },
+ "UWKD": {
+  "en": "Kazan International Airport"
+ },
+ "UWKE": {
+  "en": "Begishevo Airport"
+ },
+ "UARR": {
+  "en": "Manshuk Mametova International Airport"
+ },
+ "UATG": {
+  "en": "Atyrau International Airport"
+ },
+ "UUYH": {
+  "en": "Ukhta Airport"
+ },
+ "USPP": {
+  "en": "Perm International Airport"
+ },
+ "USII": {
+  "en": "Izhevsk Airport"
+ },
+ "UWUU": {
+  "en": "Ufa International Airport"
+ },
+ "UWOO": {
+  "en": "Orenburg Central Airport"
+ },
+ "UUYS": {
+  "en": "Usinsk Airport"
+ },
+ "UUYP": {
+  "en": "Pechora Airport"
+ },
+ "UWOR": {
+  "en": "Orsk Airport"
+ },
+ "USCM": {
+  "en": "Magnitogorsk International Airport"
+ },
+ "UATT": {
+  "en": "Aktobe International Airport"
+ },
+ "LTAS": {
+  "en": "Zonguldak Çaycuma Airport"
+ },
+ "LTAC": {
+  "en": "Esenboğa International Airport"
+ },
+ "LTAD": {
+  "en": "Etimesgut Air Base"
+ },
+ "LTBQ": {
+  "en": "Cengiz Topel Airport"
+ },
+ "LTAE": {
+  "en": "Akıncı Air Base"
+ },
+ "LTAN": {
+  "en": "Konya Airport"
+ },
+ "LTAI": {
+  "en": "Antalya International Airport"
+ },
+ "LTFC": {
+  "en": "Süleyman Demirel International Airport"
+ },
+ "LCPH": {
+  "en": "Paphos International Airport"
+ },
+ "LCRA": {
+  "en": "RAF Akrotiri"
+ },
+ "LCLK": {
+  "en": "Larnaca International Airport"
+ },
+ "LCGK": {
+  "en": "Geçitkale Airbase"
+ },
+ "LTFG": {
+  "en": "Gazipaşa-Alanya Airport"
+ },
+ "LCEN": {
+  "en": "Ercan International Airport"
+ },
+ "HECA": {
+  "en": "Cairo International Airport"
+ },
+ "HELX": {
+  "en": "Luxor International Airport"
+ },
+ "LTAR": {
+  "en": "Sivas Nuri Demirağ Airport"
+ },
+ "LTFH": {
+  "en": "Samsun-Çarşamba Airport"
+ },
+ "LTCM": {
+  "en": "Sinop Airport"
+ },
+ "LTAW": {
+  "en": "Tokat Airport"
+ },
+ "LTAP": {
+  "en": "Amasya Merzifon Airport"
+ },
+ "LTAL": {
+  "en": "Kastamonu Airport"
+ },
+ "LTCN": {
+  "en": "Kahramanmaraş Airport"
+ },
+ "LTAU": {
+  "en": "Kayseri Erkilet International Airport"
+ },
+ "LTDB": {
+  "en": "Çukurova International Airport"
+ },
+ "LTAG": {
+  "en": "İncirlik Air Base"
+ },
+ "LTAZ": {
+  "en": "Nevşehir Kapadokya Airport"
+ },
+ "LTAF": {
+  "en": "Adana Şakirpaşa Airport"
+ },
+ "LTAJ": {
+  "en": "Gaziantep Oğuzeli International Airport"
+ },
+ "LTDA": {
+  "en": "Hatay Airport"
+ },
+ "OLBA": {
+  "en": "Beirut Rafic Hariri International Airport"
+ },
+ "LLBG": {
+  "en": "Ben Gurion International Airport"
+ },
+ "LLIB": {
+  "en": "Rosh Pina Airport"
+ },
+ "OJAI": {
+  "en": "Queen Alia International Airport"
+ },
+ "OJAM": {
+  "en": "Marka International (Amman Civil) Airport"
+ },
+ "OSDI": {
+  "en": "Damascus International Airport"
+ },
+ "LLHA": {
+  "en": "Uri Michaeli Haifa International Airport"
+ },
+ "OETB": {
+  "en": "Prince Sultan bin Abdulaziz International Airport"
+ },
+ "HESH": {
+  "en": "Sharm El Sheikh International Airport"
+ },
+ "HEGN": {
+  "en": "Hurghada International Airport"
+ },
+ "URSS": {
+  "en": "Sochi International Airport"
+ },
+ "URKG": {
+  "en": "Gelendzhik Airport"
+ },
+ "LTCE": {
+  "en": "Erzurum International Airport"
+ },
+ "LTCG": {
+  "en": "Trabzon International Airport"
+ },
+ "LTCD": {
+  "en": "Erzincan Airport"
+ },
+ "LTCB": {
+  "en": "Ordu–Giresun Airport"
+ },
+ "LTCS": {
+  "en": "Şanlıurfa GAP Airport"
+ },
+ "LTAT": {
+  "en": "Malatya Erhaç Airport"
+ },
+ "LTCJ": {
+  "en": "Batman Airport"
+ },
+ "LTCA": {
+  "en": "Elazığ Airport"
+ },
+ "LTCC": {
+  "en": "Diyarbakır Airport"
+ },
+ "LTCP": {
+  "en": "Adıyaman Airport"
+ },
+ "LTCU": {
+  "en": "Bingöl Airport"
+ },
+ "LTCR": {
+  "en": "Mardin Airport"
+ },
+ "OEAO": {
+  "en": "Al-Ula International Airport"
+ },
+ "OEYN": {
+  "en": "Prince Abdulmohsen Bin Abdulaziz International Airport"
+ },
+ "OEMA": {
+  "en": "Prince Mohammad Bin Abdulaziz Airport"
+ },
+ "URMM": {
+  "en": "Mineralnye Vody Airport"
+ },
+ "URMO": {
+  "en": "Vladikavkaz Beslan International Airport"
+ },
+ "UDYZ": {
+  "en": "Zvartnots International Airport"
+ },
+ "LTCO": {
+  "en": "Ağrı Airport"
+ },
+ "UGSB": {
+  "en": "Alexander Kartveli Batumi International Airport"
+ },
+ "UDYE": {
+  "en": "Erebuni Airport"
+ },
+ "UGTB": {
+  "en": "Tbilisi International Airport"
+ },
+ "LTCF": {
+  "en": "Kars Airport"
+ },
+ "LTCT": {
+  "en": "Iğdır Airport"
+ },
+ "LTCK": {
+  "en": "Muş Airport"
+ },
+ "LTCI": {
+  "en": "Van Ferit Melen Airport"
+ },
+ "LTCV": {
+  "en": "Şırnak Şerafettin Elçi Airport"
+ },
+ "ORER": {
+  "en": "Erbil International Airport"
+ },
+ "ORNI": {
+  "en": "Al Najaf International Airport"
+ },
+ "ORBI": {
+  "en": "Baghdad International Airport / New Al Muthana Air Base"
+ },
+ "OEGS": {
+  "en": "Prince Naif bin Abdulaziz International Airport"
+ },
+ "OEHL": {
+  "en": "Hail International Airport"
+ },
+ "URMG": {
+  "en": "Akhmat Kadyrov Grozny International Airport"
+ },
+ "URML": {
+  "en": "Makhachkala Uytash International Airport"
+ },
+ "UBEE": {
+  "en": "Yevlakh Airport"
+ },
+ "UBBQ": {
+  "en": "Gabala International Airport"
+ },
+ "UBBY": {
+  "en": "Zaqatala International Airport"
+ },
+ "UBBG": {
+  "en": "Ganja International Airport"
+ },
+ "UBBN": {
+  "en": "Nakhchivan International Airport"
+ },
+ "OITR": {
+  "en": "Urmia Airport"
+ },
+ "OITT": {
+  "en": "Tabriz International Airport"
+ },
+ "OITL": {
+  "en": "Ardabil Airport"
+ },
+ "OICS": {
+  "en": "Sanandaj Airport"
+ },
+ "OICC": {
+  "en": "Shahid Ashrafi Esfahani Airport"
+ },
+ "OICI": {
+  "en": "Ilam Airport"
+ },
+ "OIAA": {
+  "en": "Abadan Ayatollah Jami International Airport"
+ },
+ "ORMM": {
+  "en": "Basra International Airport"
+ },
+ "OKDI": {
+  "en": "Udairi Army Air Field"
+ },
+ "OKAS": {
+  "en": "Ali Al Salem Air Base"
+ },
+ "OERK": {
+  "en": "King Khalid International Airport"
+ },
+ "OEPS": {
+  "en": "Prince Sultan Air Base"
+ },
+ "UATE": {
+  "en": "Aktau International Airport"
+ },
+ "UBBB": {
+  "en": "Heydar Aliyev International Airport"
+ },
+ "OINN": {
+  "en": "Nowshahr Airport"
+ },
+ "UBBL": {
+  "en": "Lankaran International Airport"
+ },
+ "OINR": {
+  "en": "Ramsar Airport"
+ },
+ "OIGG": {
+  "en": "Sardar-e-Jangal Airport"
+ },
+ "OIIP": {
+  "en": "Payam International Airport"
+ },
+ "OIIE": {
+  "en": "Imam Khomeini International Airport"
+ },
+ "OIII": {
+  "en": "Mehrabad International Airport"
+ },
+ "OIAW": {
+  "en": "Qasem Soleimani International Airport"
+ },
+ "OIFM": {
+  "en": "Isfahan Shahid Beheshti International Airport"
+ },
+ "OIBB": {
+  "en": "Bushehr Airport"
+ },
+ "OEDF": {
+  "en": "King Fahd International Airport"
+ },
+ "OEJB": {
+  "en": "Jubail Airport"
+ },
+ "OBBI": {
+  "en": "Bahrain International Airport"
+ },
+ "OTBH": {
+  "en": "Al Udeid Air Base"
+ },
+ "OEAH": {
+  "en": "Al-Ahsa International Airport"
+ },
+ "OTHH": {
+  "en": "Hamad International Airport"
+ },
+ "OEBT": {
+  "en": "Ras Sumeira"
+ },
+ "OTBD": {
+  "en": "Doha International Airport"
+ },
+ "UTAK": {
+  "en": "Turkmenbaşy International Airport"
+ },
+ "OINZ": {
+  "en": "Sari Dasht-e Naz International Airport"
+ },
+ "OING": {
+  "en": "Gorgan Airport"
+ },
+ "OIYY": {
+  "en": "Shahid Sadooghi Airport"
+ },
+ "OISS": {
+  "en": "Shiraz Shahid Dastghaib International Airport"
+ },
+ "OISL": {
+  "en": "Lar Airport"
+ },
+ "OIBK": {
+  "en": "Kish International Airport"
+ },
+ "OIKQ": {
+  "en": "Qeshm International Airport"
+ },
+ "OIBP": {
+  "en": "Persian Gulf International Airport"
+ },
+ "OMSJ": {
+  "en": "Sharjah International Airport"
+ },
+ "OMRK": {
+  "en": "Ras Al Khaimah International Airport"
+ },
+ "OMDW": {
+  "en": "Al Maktoum International Airport"
+ },
+ "OMAM": {
+  "en": "Al Dhafra Air Base"
+ },
+ "OMAA": {
+  "en": "Zayed International Airport"
+ },
+ "OMAL": {
+  "en": "Al Ain International Airport"
+ },
+ "OEST": {
+  "en": "Khalfan"
+ },
+ "OMDB": {
+  "en": "Dubai International Airport"
+ },
+ "OIMM": {
+  "en": "Mashhad International Airport"
+ },
+ "OIMB": {
+  "en": "Birjand International Airport"
+ },
+ "OIKB": {
+  "en": "Bandar Abbas International Airport"
+ },
+ "OMFJ": {
+  "en": "Fujairah International Airport"
+ },
+ "OOMS": {
+  "en": "Muscat International Airport"
+ },
+ "HJJJ": {
+  "en": "Juba International Airport"
+ },
+ "HUEN": {
+  "en": "Entebbe International Airport"
+ },
+ "HKEL": {
+  "en": "Eldoret International Airport"
+ },
+ "OEJN": {
+  "en": "King Abdulaziz International Airport"
+ },
+ "OETF": {
+  "en": "Taif International Airport"
+ },
+ "HAAB": {
+  "en": "Addis Ababa Bole International Airport"
+ },
+ "OEBH": {
+  "en": "Bisha Airport"
+ },
+ "OEGN": {
+  "en": "Jizan Regional Airport / King Abdullah bin Abdulaziz Airport"
+ },
+ "OEAB": {
+  "en": "Abha International Airport"
+ },
+ "OENG": {
+  "en": "Najran Domestic Airport"
+ },
+ "HDAM": {
+  "en": "Djibouti-Ambouli Airport"
+ },
+ "OYAA": {
+  "en": "Aden International Airport"
+ },
+ "OEOM": {
+  "en": "Umm Al Melh Border Guards Airport"
+ },
+ "OEAD": {
+  "en": "Aradah"
+ },
+ "OOSA": {
+  "en": "Salalah International Airport"
+ },
+ "HRYR": {
+  "en": "Kigali International Airport"
+ },
+ "HKNW": {
+  "en": "Nairobi Wilson Airport"
+ },
+ "HKKI": {
+  "en": "Kisumu International Airport"
+ },
+ "HKJK": {
+  "en": "Jomo Kenyatta International Airport"
+ },
+ "HTAR": {
+  "en": "Arusha Airport"
+ },
+ "HTKJ": {
+  "en": "Kilimanjaro International Airport"
+ },
+ "HKMO": {
+  "en": "Moi International Airport"
+ },
+ "HTDA": {
+  "en": "Julius Nyerere International Airport"
+ },
+ "HTZA": {
+  "en": "Abeid Amani Karume International Airport"
+ },
+ "FMCZ": {
+  "en": "Dzaoudzi Pamandzi International Airport"
+ },
+ "FMEE": {
+  "en": "Roland Garros Airport"
+ },
+ "FIMP": {
+  "en": "Sir Seewoosagur Ramgoolam International Airport"
+ },
+ "FALE": {
+  "en": "King Shaka International Airport"
+ },
+ "UOOO": {
+  "en": "Alykel International Airport"
+ },
+ "USHS": {
+  "en": "Sovetskiy Airport"
+ },
+ "USSS": {
+  "en": "Koltsovo Airport"
+ },
+ "USCC": {
+  "en": "Kurchatov Chelyabinsk International Airport"
+ },
+ "UAUU": {
+  "en": "Kostanay International Airport"
+ },
+ "UUYW": {
+  "en": "Vorkuta Airport"
+ },
+ "USDD": {
+  "en": "Salekhard Airport"
+ },
+ "USTR": {
+  "en": "Roshchino International Airport"
+ },
+ "USUU": {
+  "en": "Kurgan Airport"
+ },
+ "USHH": {
+  "en": "Khanty Mansiysk Airport"
+ },
+ "UACP": {
+  "en": "Petropavl International Airport"
+ },
+ "UACK": {
+  "en": "Kokshetau International Airport"
+ },
+ "UAKD": {
+  "en": "Zhezkazgan National Airport"
+ },
+ "USMM": {
+  "en": "Nadym Airport"
+ },
+ "USRK": {
+  "en": "Kogalym International Airport"
+ },
+ "USRR": {
+  "en": "Surgut International Airport"
+ },
+ "UNOO": {
+  "en": "Omsk Central Airport"
+ },
+ "UACC": {
+  "en": "Nursultan Nazarbayev International Airport"
+ },
+ "UAKK": {
+  "en": "Sary-Arka Airport"
+ },
+ "USMU": {
+  "en": "Novy Urengoy Airport"
+ },
+ "USRO": {
+  "en": "Noyabrsk Airport"
+ },
+ "USNN": {
+  "en": "Nizhnevartovsk Airport"
+ },
+ "UASP": {
+  "en": "Pavlodar International Airport"
+ },
+ "UAAH": {
+  "en": "Balkhash Airport"
+ },
+ "UMIO": {
+  "en": "Mikhaylovskoye Airport"
+ },
+ "UASS": {
+  "en": "Semei International Airport"
+ },
+ "UASK": {
+  "en": "Oskemen International Airport"
+ },
+ "UNTT": {
+  "en": "Tomsk Kamov Airport"
+ },
+ "UNEE": {
+  "en": "Alexei Leonov Kemerovo International Airport"
+ },
+ "UNNT": {
+  "en": "Novosibirsk Tolmachevo Airport"
+ },
+ "UNBB": {
+  "en": "Barnaul Gherman Titov International Airport"
+ },
+ "UNBG": {
+  "en": "Gorno-Altaysk Airport"
+ },
+ "UOII": {
+  "en": "Igarka Airport"
+ },
+ "UNWW": {
+  "en": "Spichenkovo Airport"
+ },
+ "OIZH": {
+  "en": "Zahedan International Airport"
+ },
+ "UAOO": {
+  "en": "Korkyt Ata International Airport"
+ },
+ "OPQT": {
+  "en": "Quetta International Airport"
+ },
+ "OPKC": {
+  "en": "Jinnah International Airport"
+ },
+ "UAII": {
+  "en": "Shymkent International Airport"
+ },
+ "UTDL": {
+  "en": "Khujand International Airport"
+ },
+ "UTDD": {
+  "en": "Dushanbe International Airport"
+ },
+ "UTDT": {
+  "en": "Bokhtar International Airport"
+ },
+ "OAIX": {
+  "en": "Bagram Airfield"
+ },
+ "OPSK": {
+  "en": "Begum Nusrat Bhutto International Airport Sukkur"
+ },
+ "UCFM": {
+  "en": "Manas"
+ },
+ "UADD": {
+  "en": "Taraz International Airport"
+ },
+ "UCFO": {
+  "en": "Osh"
+ },
+ "OPPS": {
+  "en": "Bacha Khan International Airport"
+ },
+ "OPIS": {
+  "en": "Islamabad International Airport"
+ },
+ "OPFA": {
+  "en": "Faisalabad International Airport"
+ },
+ "OPLA": {
+  "en": "Allama Iqbal International Airport"
+ },
+ "VIAR": {
+  "en": "Sri Guru Ram Das Ji International Airport"
+ },
+ "OPMT": {
+  "en": "Multan International Airport"
+ },
+ "VAUD": {
+  "en": "Maharana Pratap Airport"
+ },
+ "VAAH": {
+  "en": "Sardar Vallabh Patel International Airport"
+ },
+ "UAAA": {
+  "en": "Almaty International Airport"
+ },
+ "ZWSH": {
+  "en": "Kashgar Laining International Airport"
+ },
+ "VIDP": {
+  "en": "Indira Gandhi International Airport"
+ },
+ "VIDN": {
+  "en": "Dehradun Jolly Grant Airport"
+ },
+ "VIJP": {
+  "en": "Jaipur International Airport"
+ },
+ "VAID": {
+  "en": "Devi Ahilya Bai Holkar International Airport"
+ },
+ "VABP": {
+  "en": "Raja Bhoj International Airport"
+ },
+ "VILK": {
+  "en": "Chaudhary Charan Singh International Airport"
+ },
+ "VEKO": {
+  "en": "Khajuraho"
+ },
+ "VNKT": {
+  "en": "Tribhuvan International Airport"
+ },
+ "VEBN": {
+  "en": "Lal Bahadur Shastri International Airport"
+ },
+ "VEPT": {
+  "en": "Jay Prakash Narayan Airport"
+ },
+ "VNBW": {
+  "en": "Gautam Buddha International Airport"
+ },
+ "VERC": {
+  "en": "Birsa Munda Airport"
+ },
+ "VEGY": {
+  "en": "Gaya Airport"
+ },
+ "ZWWW": {
+  "en": "Ürümqi Tianshan International Airport"
+ },
+ "VECC": {
+  "en": "Netaji Subhash Chandra Bose International Airport"
+ },
+ "VABO": {
+  "en": "Vadodara International Airport"
+ },
+ "VABV": {
+  "en": "Bhavnagar Airport"
+ },
+ "VASU": {
+  "en": "Surat International Airport"
+ },
+ "VABB": {
+  "en": "Chhatrapati Shivaji Maharaj International Airport"
+ },
+ "VAJJ": {
+  "en": "Juhu Aerodrome"
+ },
+ "VOGO": {
+  "en": "Goa Dabolim International Airport"
+ },
+ "VOML": {
+  "en": "Mangaluru International Airport"
+ },
+ "VRMM": {
+  "en": "Velana International Airport"
+ },
+ "VAAU": {
+  "en": "Aurangabad Airport"
+ },
+ "VOHY": {
+  "en": "Begumpet Airport"
+ },
+ "VOHS": {
+  "en": "Rajiv Gandhi International Airport"
+ },
+ "VOHB": {
+  "en": "Hubli"
+ },
+ "VOMY": {
+  "en": "Mysore Airport"
+ },
+ "VOBG": {
+  "en": "HAL Airport"
+ },
+ "VOBL": {
+  "en": "Kempegowda International Airport Bengaluru"
+ },
+ "VOCI": {
+  "en": "Cochin International Airport"
+ },
+ "VOTV": {
+  "en": "Thiruvananthapuram International Airport"
+ },
+ "VOCB": {
+  "en": "Coimbatore International Airport"
+ },
+ "VOTR": {
+  "en": "Tiruchirappalli International Airport"
+ },
+ "VOMD": {
+  "en": "Madurai Airport"
+ },
+ "VOCL": {
+  "en": "Calicut International Airport"
+ },
+ "VANP": {
+  "en": "Dr. Babasaheb Ambedkar International Airport"
+ },
+ "VERP": {
+  "en": "Raipur"
+ },
+ "VOBZ": {
+  "en": "Vijayawada International Airport"
+ },
+ "VOTP": {
+  "en": "Tirupati International Airport"
+ },
+ "VOMM": {
+  "en": "Chennai International Airport"
+ },
+ "VCBI": {
+  "en": "Bandaranaike International Colombo Airport"
+ },
+ "VEJH": {
+  "en": "Jharsuguda Airport"
+ },
+ "VEBS": {
+  "en": "Biju Patnaik International Airport"
+ },
+ "VOVZ": {
+  "en": "Vishakhapatnam"
+ },
+ "FJDG": {
+  "en": "Naval Support Facility Diego Garcia"
+ },
+ "UNAA": {
+  "en": "Abakan International Airport"
+ },
+ "UNKM": {
+  "en": "Krasnoyarsk Cheremshanka Airport"
+ },
+ "UNKL": {
+  "en": "Krasnoyarsk International Airport"
+ },
+ "UIBB": {
+  "en": "Bratsk Airport"
+ },
+ "UIII": {
+  "en": "Irkutsk International Airport"
+ },
+ "UIKK": {
+  "en": "Kirensk Airport"
+ },
+ "UITT": {
+  "en": "Ust-Kut Airport"
+ },
+ "UIUU": {
+  "en": "Baikal International Airport"
+ },
+ "ZMUB": {
+  "en": "Buyant-Ukhaa International Airport"
+ },
+ "UERR": {
+  "en": "Mirny Airport"
+ },
+ "UERL": {
+  "en": "Lensk Airport"
+ },
+ "UIAA": {
+  "en": "Chita-Kadala International Airport"
+ },
+ "ZBLA": {
+  "en": "Hulunbuir Hailar Airport"
+ },
+ "ZULS": {
+  "en": "Lhasa Gonggar International Airport"
+ },
+ "VEGT": {
+  "en": "Lokpriya Gopinath Bordoloi International Airport"
+ },
+ "VEAT": {
+  "en": "Agartala - Maharaja Bir Bikram Airport"
+ },
+ "VGHS": {
+  "en": "Hazrat Shahjalal International Airport"
+ },
+ "ZLDH": {
+  "en": "Dunhuang Mogao International Airport"
+ },
+ "VEMN": {
+  "en": "Dibrugarh Airport"
+ },
+ "VELR": {
+  "en": "Lilabari North Lakhimpur Airport"
+ },
+ "VEIM": {
+  "en": "Bir Tikendrajit International Airport"
+ },
+ "ZPLJ": {
+  "en": "Lijiang Sanyi International Airport"
+ },
+ "ZLLL": {
+  "en": "Lanzhou Zhongchuan International Airport"
+ },
+ "ZLXN": {
+  "en": "Xining Caojiabao International Airport"
+ },
+ "ZUUU": {
+  "en": "Chengdu Shuangliu International Airport"
+ },
+ "ZUXC": {
+  "en": "Xichang Qingshan Airport"
+ },
+ "ZPPP": {
+  "en": "Kunming Changshui International Airport"
+ },
+ "ZLIC": {
+  "en": "Yinchuan Hedong International Airport"
+ },
+ "ZLXY": {
+  "en": "Xi'an Xianyang International Airport"
+ },
+ "ZUCK": {
+  "en": "Chongqing Jiangbei International Airport"
+ },
+ "ZUGY": {
+  "en": "Guiyang Longdongbao International Airport"
+ },
+ "ZBHH": {
+  "en": "Hohhot Baita International Airport"
+ },
+ "ZBDS": {
+  "en": "Ordos Ejin Horo International Airport"
+ },
+ "ZBYC": {
+  "en": "Yuncheng Yanhu International Airport"
+ },
+ "ZHYC": {
+  "en": "Yichang Sanxia Airport"
+ },
+ "ZGKL": {
+  "en": "Guilin Liangjiang International Airport"
+ },
+ "ZBSJ": {
+  "en": "Shijiazhuang Zhengding International Airport"
+ },
+ "ZBYN": {
+  "en": "Taiyuan Wusu International Airport"
+ },
+ "ZHCC": {
+  "en": "Zhengzhou Xinzheng International Airport"
+ },
+ "ZGHA": {
+  "en": "Changsha Huanghua International Airport"
+ },
+ "ZSCN": {
+  "en": "Nanchang Changbei International Airport"
+ },
+ "ZHHH": {
+  "en": "Wuhan Tianhe International Airport"
+ },
+ "ZGGG": {
+  "en": "Guangzhou Baiyun International Airport"
+ },
+ "ZGSZ": {
+  "en": "Shenzhen Bao'an International Airport"
+ },
+ "ZBAA": {
+  "en": "Beijing Capital International Airport"
+ },
+ "ZBTJ": {
+  "en": "Tianjin Binhai International Airport"
+ },
+ "ZSJN": {
+  "en": "Jinan Yaoqiang International Airport"
+ },
+ "ZSLY": {
+  "en": "Linyi Qiyang Airport"
+ },
+ "ZSXZ": {
+  "en": "Xuzhou Guanyin International Airport"
+ },
+ "ZSSH": {
+  "en": "Huai'an Lianshui Airport"
+ },
+ "ZSYA": {
+  "en": "Yangzhou Taizhou Airport"
+ },
+ "ZSNJ": {
+  "en": "Nanjing Lukou International Airport"
+ },
+ "ZSOF": {
+  "en": "Hefei Xinqiao International Airport"
+ },
+ "RCFG": {
+  "en": "Matsu Nangan Airport"
+ },
+ "ZSFZ": {
+  "en": "Fuzhou Changle International Airport"
+ },
+ "RCQC": {
+  "en": "Penghu Magong Airport"
+ },
+ "ZSQZ": {
+  "en": "Quanzhou Jinjiang International Airport"
+ },
+ "ZSAM": {
+  "en": "Xiamen Gaoqi International Airport"
+ },
+ "VGEG": {
+  "en": "Shah Amanat International Airport"
+ },
+ "VOPB": {
+  "en": "Veer Savarkar International Airport / INS Utkrosh"
+ },
+ "VYMD": {
+  "en": "Mandalay International Airport"
+ },
+ "VYYY": {
+  "en": "Yangon International Airport"
+ },
+ "WITT": {
+  "en": "Sultan Iskandar Muda International Airport"
+ },
+ "VTCT": {
+  "en": "Mae Fah Luang - Chiang Rai International Airport"
+ },
+ "ZPJH": {
+  "en": "Xishuangbanna Gasa International Airport"
+ },
+ "VTCN": {
+  "en": "Nan Airport"
+ },
+ "VTCC": {
+  "en": "Chiang Mai International Airport"
+ },
+ "VTCL": {
+  "en": "Lampang Airport"
+ },
+ "VTCH": {
+  "en": "Mae Hong Son Airport"
+ },
+ "VTCP": {
+  "en": "Phrae Airport"
+ },
+ "VTPM": {
+  "en": "Mae Sot Airport"
+ },
+ "VTPP": {
+  "en": "Phitsanulok Airport"
+ },
+ "VTBU": {
+  "en": "U-Tapao–Rayong–Pattaya International Airport"
+ },
+ "VTPH": {
+  "en": "Hua Hin Airport"
+ },
+ "VTBD": {
+  "en": "Don Mueang International Airport"
+ },
+ "VTBS": {
+  "en": "Suvarnabhumi Airport"
+ },
+ "VTSM": {
+  "en": "Samui International Airport"
+ },
+ "VTSE": {
+  "en": "Chumphon Airport"
+ },
+ "VTSB": {
+  "en": "Surat Thani Airport"
+ },
+ "VTSF": {
+  "en": "Nakhon Si Thammarat Airport"
+ },
+ "VTSR": {
+  "en": "Ranong Airport"
+ },
+ "VTSS": {
+  "en": "Hat Yai International Airport"
+ },
+ "VTST": {
+  "en": "Trang Airport"
+ },
+ "WMKL": {
+  "en": "Langkawi International Airport"
+ },
+ "VTSP": {
+  "en": "Phuket International Airport"
+ },
+ "VTSG": {
+  "en": "Krabi International Airport"
+ },
+ "WMKA": {
+  "en": "Sultan Abdul Halim Airport"
+ },
+ "WMKB": {
+  "en": "RMAF Butterworth Air Base"
+ },
+ "WMKP": {
+  "en": "Penang International Airport"
+ },
+ "WMKI": {
+  "en": "Sultan Azlan Shah Airport"
+ },
+ "WIMM": {
+  "en": "Kualanamu International Airport"
+ },
+ "WIMK": {
+  "en": "Soewondo Air Force Base"
+ },
+ "VTUD": {
+  "en": "Udon Thani International Airport"
+ },
+ "VTUL": {
+  "en": "Loei Airport"
+ },
+ "VTUI": {
+  "en": "Sakon Nakhon Airport"
+ },
+ "VLVT": {
+  "en": "Wattay International Airport"
+ },
+ "VTUW": {
+  "en": "Nakhon Phanom Airport"
+ },
+ "VTUO": {
+  "en": "Buri Ram Airport"
+ },
+ "VTUK": {
+  "en": "Khon Kaen Airport"
+ },
+ "VTUU": {
+  "en": "Ubon Ratchathani Airport"
+ },
+ "VTUN": {
+  "en": "Khorat Airport"
+ },
+ "VTUQ": {
+  "en": "Nakhon Ratchasima Airport"
+ },
+ "VTUV": {
+  "en": "Roi Et Airport"
+ },
+ "VDPP": {
+  "en": "Phnom Penh International Airport"
+ },
+ "VDSV": {
+  "en": "Sihanouk International Airport"
+ },
+ "WMKC": {
+  "en": "Sultan Ismail Petra Airport"
+ },
+ "WMKE": {
+  "en": "Kerteh Airport"
+ },
+ "WMKN": {
+  "en": "Sultan Mahmud Airport"
+ },
+ "WMSA": {
+  "en": "Sultan Abdul Aziz Shah International Airport"
+ },
+ "WMKD": {
+  "en": "Kuantan Airport"
+ },
+ "WIDD": {
+  "en": "Hang Nadim International Airport"
+ },
+ "WMKJ": {
+  "en": "Senai International Airport"
+ },
+ "WMKK": {
+  "en": "Kuala Lumpur International Airport"
+ },
+ "WSAC": {
+  "en": "Changi Air Base (East)"
+ },
+ "WSSS": {
+  "en": "Singapore Changi Airport"
+ },
+ "WIBB": {
+  "en": "Sultan Syarif Kasim II International Airport / Roesmin Nurjadin AFB"
+ },
+ "WSSL": {
+  "en": "Seletar Airport"
+ },
+ "VVNB": {
+  "en": "Noi Bai International Airport"
+ },
+ "VVDN": {
+  "en": "Da Nang International Airport"
+ },
+ "VVTS": {
+  "en": "Tan Son Nhat International Airport"
+ },
+ "ZGZJ": {
+  "en": "Zhanjiang Wuchuan International Airport"
+ },
+ "ZJHK": {
+  "en": "Haikou Meilan International Airport"
+ },
+ "ZJSY": {
+  "en": "Sanya Phoenix International Airport"
+ },
+ "VVCR": {
+  "en": "Cam Ranh International Airport / Cam Ranh Air Base"
+ },
+ "WBGK": {
+  "en": "Mukah Airport"
+ },
+ "WBGG": {
+  "en": "Kuching International Airport"
+ },
+ "WBGS": {
+  "en": "Sibu Airport"
+ },
+ "VMMC": {
+  "en": "Macau International Airport"
+ },
+ "VHHH": {
+  "en": "Hong Kong International Airport"
+ },
+ "WBKK": {
+  "en": "Kota Kinabalu International Airport"
+ },
+ "WBSB": {
+  "en": "Brunei International Airport"
+ },
+ "WBGR": {
+  "en": "Miri Airport"
+ },
+ "WBKL": {
+  "en": "Labuan Airport"
+ },
+ "WBGB": {
+  "en": "Bintulu Airport"
+ },
+ "WBKS": {
+  "en": "Sandakan Airport"
+ },
+ "WBKW": {
+  "en": "Tawau Airport"
+ },
+ "WAQQ": {
+  "en": "Juwata"
+ },
+ "WAQT": {
+  "en": "Kalimarau Airport"
+ },
+ "WIEE": {
+  "en": "Minangkabau International"
+ },
+ "WIJJ": {
+  "en": "Sultan Taha"
+ },
+ "WILP": {
+  "en": "Muhammad Taufiq Kiemas Airport"
+ },
+ "WIPB": {
+  "en": "Silampari Airport"
+ },
+ "WIPP": {
+  "en": "Sultan Mahmud Badaruddin II Airport"
+ },
+ "WIKT": {
+  "en": "H.A.S. Hanandjoeddin"
+ },
+ "WILL": {
+  "en": "Radin Inten II International Airport"
+ },
+ "WICA": {
+  "en": "Kertajati International Airport"
+ },
+ "WIII": {
+  "en": "Soekarno-Hatta International Airport"
+ },
+ "WICD": {
+  "en": "Cakrabhuwana  Airport"
+ },
+ "WICC": {
+  "en": "Husein Sastranegara International Airport"
+ },
+ "WIRR": {
+  "en": "Budiarto"
+ },
+ "WIHH": {
+  "en": "Halim Perdanakusuma International Airport"
+ },
+ "WIOO": {
+  "en": "Supadio International Airport"
+ },
+ "WAGI": {
+  "en": "Iskandar"
+ },
+ "WARC": {
+  "en": "Ngloram Airport"
+ },
+ "WAHS": {
+  "en": "Achmad Yani"
+ },
+ "WAHQ": {
+  "en": "Adi Soemarmo"
+ },
+ "WAHH": {
+  "en": "Adisutjipto"
+ },
+ "WAGG": {
+  "en": "Tjilik Riwut Airport"
+ },
+ "WAOO": {
+  "en": "Syamsudin Noor International Airport"
+ },
+ "WARR": {
+  "en": "Juanda International Airport"
+ },
+ "WADY": {
+  "en": "Banyuwangi Airport"
+ },
+ "WADD": {
+  "en": "Denpasar I Gusti Ngurah Rai International Airport"
+ },
+ "WALS": {
+  "en": "Aji Pangeran Tumenggung Pranoto International Airport"
+ },
+ "WALL": {
+  "en": "Sultan Aji Muhammad Sulaiman Sepinggan International Airport"
+ },
+ "WAAA": {
+  "en": "Sultan Hasanuddin International Airport"
+ },
+ "WADL": {
+  "en": "Lombok International Airport"
+ },
+ "WATO": {
+  "en": "Komodo Airport"
+ },
+ "YPPD": {
+  "en": "Port Hedland International Airport"
+ },
+ "YPKA": {
+  "en": "Karratha Airport"
+ },
+ "YPEA": {
+  "en": "RAAF Base Pearce"
+ },
+ "YPJT": {
+  "en": "Perth Jandakot Airport"
+ },
+ "YPPH": {
+  "en": "Perth International Airport"
+ },
+ "UEST": {
+  "en": "Tiksi Airport"
+ },
+ "UEMO": {
+  "en": "Olyokminsk Airport"
+ },
+ "UHBB": {
+  "en": "Ignatyevo Airport"
+ },
+ "ZYHB": {
+  "en": "Harbin Taiping International Airport"
+ },
+ "UEEE": {
+  "en": "Platon Oyunsky Yakutsk International Airport"
+ },
+ "UHHH": {
+  "en": "Khabarovsk Novy Airport"
+ },
+ "UHNN": {
+  "en": "Nikolayevsk-na-Amure Airport"
+ },
+ "UHSN": {
+  "en": "Nogliki Airport"
+ },
+ "UHSS": {
+  "en": "Yuzhno-Sakhalinsk International Airport"
+ },
+ "ZYTX": {
+  "en": "Shenyang Taoxian International Airport"
+ },
+ "ZSYT": {
+  "en": "Yantai Penglai International Airport"
+ },
+ "ZSWH": {
+  "en": "Weihai Dashuibo Airport"
+ },
+ "ZYTL": {
+  "en": "Dalian Zhoushuizi International Airport"
+ },
+ "ZSNT": {
+  "en": "Nantong Xingdong International Airport"
+ },
+ "ZSPD": {
+  "en": "Shanghai Pudong International Airport"
+ },
+ "ZSWX": {
+  "en": "Sunan Shuofang International Airport"
+ },
+ "ZSYN": {
+  "en": "Yancheng Nanyang International Airport"
+ },
+ "ZSSS": {
+  "en": "Shanghai Hongqiao International Airport"
+ },
+ "ZSNB": {
+  "en": "Ningbo Lishe International Airport"
+ },
+ "ZSWZ": {
+  "en": "Wenzhou Longwan International Airport"
+ },
+ "RCMT": {
+  "en": "Matsu Beigan Airport"
+ },
+ "RCKH": {
+  "en": "Kaohsiung International Airport"
+ },
+ "RCMQ": {
+  "en": "Taichung International Airport / Ching Chuang Kang Air Base"
+ },
+ "RCFN": {
+  "en": "Taitung Airport"
+ },
+ "RCSS": {
+  "en": "Taipei Songshan International Airport"
+ },
+ "RCTP": {
+  "en": "Taiwan Taoyuan International Airport"
+ },
+ "ZYCC": {
+  "en": "Changchun Longjia International Airport"
+ },
+ "RKSO": {
+  "en": "Osan Air Base"
+ },
+ "RKTP": {
+  "en": "Seosan Air Base"
+ },
+ "RKSI": {
+  "en": "Incheon International Airport"
+ },
+ "RKSS": {
+  "en": "Seoul Gimpo International Airport"
+ },
+ "RKJK": {
+  "en": "Gunsan Airport / Gunsan Air Base"
+ },
+ "RKJB": {
+  "en": "Muan International Airport"
+ },
+ "RKJJ": {
+  "en": "Gwangju Airport"
+ },
+ "RKPC": {
+  "en": "Jeju International Airport"
+ },
+ "RKPD": {
+  "en": "Jeongseok Airport"
+ },
+ "ROIG": {
+  "en": "New Ishigaki Airport"
+ },
+ "RKTY": {
+  "en": "Yecheon Airbase"
+ },
+ "RKNN": {
+  "en": "Gangneung Airport (K-18)"
+ },
+ "RKNY": {
+  "en": "Yangyang International Airport"
+ },
+ "RKTI": {
+  "en": "Jungwon Air Base/Chungju Airport"
+ },
+ "RKNW": {
+  "en": "Wonju Airport / Hoengseong Air Base (K-38/K-46)"
+ },
+ "RKPU": {
+  "en": "Ulsan Airport"
+ },
+ "RKTN": {
+  "en": "Daegu International Airport"
+ },
+ "RKPK": {
+  "en": "Gimhae International Airport"
+ },
+ "RKTH": {
+  "en": "Pohang Airport (G-815/K-3)"
+ },
+ "RKPS": {
+  "en": "Sacheon Airport / Sacheon Air Base"
+ },
+ "RKJY": {
+  "en": "Yeosu Airport"
+ },
+ "RJFT": {
+  "en": "Kumamoto Airport"
+ },
+ "RJFU": {
+  "en": "Nagasaki Airport"
+ },
+ "RJFS": {
+  "en": "Kyushu Saga International Airport"
+ },
+ "RJFK": {
+  "en": "Kagoshima Airport"
+ },
+ "RJFF": {
+  "en": "Fukuoka Airport"
+ },
+ "RODN": {
+  "en": "Kadena Air Base"
+ },
+ "ROAH": {
+  "en": "Naha International Airport"
+ },
+ "UHWW": {
+  "en": "Vladivostok International Airport"
+ },
+ "RJOA": {
+  "en": "Hiroshima Airport"
+ },
+ "RJOM": {
+  "en": "Matsuyama Airport"
+ },
+ "RJOT": {
+  "en": "Takamatsu Airport"
+ },
+ "RJOI": {
+  "en": "Iwakuni Kintaikyo Airport"
+ },
+ "RJFM": {
+  "en": "Miyazaki Airport"
+ },
+ "RJFO": {
+  "en": "Oita Airport"
+ },
+ "RJOK": {
+  "en": "Kochi Ryoma Airport"
+ },
+ "RJBE": {
+  "en": "Kobe Airport"
+ },
+ "RJOO": {
+  "en": "Osaka Itami International Airport"
+ },
+ "RJGG": {
+  "en": "Chubu Centrair International Airport"
+ },
+ "RJBB": {
+  "en": "Kansai International Airport"
+ },
+ "RJCC": {
+  "en": "New Chitose Airport"
+ },
+ "RJCH": {
+  "en": "Hakodate Airport"
+ },
+ "RJSM": {
+  "en": "Misawa Airport / Misawa Air Base"
+ },
+ "RJSS": {
+  "en": "Sendai Airport"
+ },
+ "RJSN": {
+  "en": "Niigata Airport"
+ },
+ "RJTT": {
+  "en": "Tokyo Haneda International Airport"
+ },
+ "RJTY": {
+  "en": "Yokota Air Base"
+ },
+ "RJAA": {
+  "en": "Narita International Airport"
+ },
+ "RPSP": {
+  "en": "Bohol-Panglao International Airport"
+ },
+ "RPLC": {
+  "en": "Clark International Airport / Clark Air Base"
+ },
+ "RPLB": {
+  "en": "Subic Bay International Airport / Naval Air Station Cubi Point"
+ },
+ "RPLL": {
+  "en": "Ninoy Aquino International Airport"
+ },
+ "RPVE": {
+  "en": "Godofredo P. Ramos Airport"
+ },
+ "RPVK": {
+  "en": "Kalibo International Airport"
+ },
+ "RPVB": {
+  "en": "Bacolod-Silay International Airport"
+ },
+ "RPVI": {
+  "en": "Iloilo International Airport"
+ },
+ "WAMG": {
+  "en": "Jalaluddin Airport"
+ },
+ "RPVM": {
+  "en": "Mactan Cebu International Airport"
+ },
+ "RPMD": {
+  "en": "Francisco Bangoy International Airport"
+ },
+ "WAMM": {
+  "en": "Sam Ratulangi International Airport"
+ },
+ "PGSN": {
+  "en": "Saipan International Airport"
+ },
+ "PGUM": {
+  "en": "Antonio B. Won Pat International Airport"
+ },
+ "PGUA": {
+  "en": "Andersen Air Force Base"
+ },
+ "WAFM": {
+  "en": "Andi Jemma Airport"
+ },
+ "WAFD": {
+  "en": "Bua - Palopo Lagaligo Airport"
+ },
+ "WAWW": {
+  "en": "Haluoleo Airport"
+ },
+ "WAWB": {
+  "en": "Betoambari Airport"
+ },
+ "WATT": {
+  "en": "El Tari Airport"
+ },
+ "YBRM": {
+  "en": "Broome International Airport"
+ },
+ "WPOC": {
+  "en": "Oecusse Route of the Sandalwood International Airport"
+ },
+ "WASS": {
+  "en": "Domine Eduard Osok Airport"
+ },
+ "WAPP": {
+  "en": "Pattimura International Airport"
+ },
+ "YPDN": {
+  "en": "Darwin International Airport / RAAF Darwin"
+ },
+ "YPTN": {
+  "en": "Tindal Airport"
+ },
+ "WABB": {
+  "en": "Frans Kaisiepo Airport"
+ },
+ "WABI": {
+  "en": "Douw Aturure Airport"
+ },
+ "WAYY": {
+  "en": "Moses Kilangin"
+ },
+ "WAJJ": {
+  "en": "Dortheys Hiyo Eluay International Airport"
+ },
+ "WAVV": {
+  "en": "Wamena Airport"
+ },
+ "WAKK": {
+  "en": "Mopah International Airport"
+ },
+ "AYMD": {
+  "en": "Madang Airport"
+ },
+ "AYMH": {
+  "en": "Mount Hagen Kagamuga Airport"
+ },
+ "YBCS": {
+  "en": "Cairns International Airport"
+ },
+ "AYNZ": {
+  "en": "Nadzab Tomodachi International Airport"
+ },
+ "AYPY": {
+  "en": "Port Moresby Jacksons International Airport"
+ },
+ "YBTL": {
+  "en": "Townsville Airport / RAAF Base Townsville"
+ },
+ "YBHM": {
+  "en": "Hamilton Island Airport"
+ },
+ "YBMK": {
+  "en": "Mackay Airport"
+ },
+ "YBAS": {
+  "en": "Alice Springs Airport"
+ },
+ "YPPF": {
+  "en": "Adelaide Parafield Airport"
+ },
+ "YPED": {
+  "en": "RAAF Base Edinburgh"
+ },
+ "YPAD": {
+  "en": "Adelaide International Airport"
+ },
+ "YBLP": {
+  "en": "Allansford Airport"
+ },
+ "YMEN": {
+  "en": "Melbourne Essendon Airport"
+ },
+ "YMAV": {
+  "en": "Melbourne Avalon International Airport"
+ },
+ "YMML": {
+  "en": "Melbourne Airport"
+ },
+ "YMMB": {
+  "en": "Melbourne Moorabbin Airport"
+ },
+ "YMAY": {
+  "en": "Albury Airport"
+ },
+ "YSCB": {
+  "en": "Canberra Airport"
+ },
+ "YWSL": {
+  "en": "West Sale Airport"
+ },
+ "YMES": {
+  "en": "RAAF Base East Sale"
+ },
+ "YMLT": {
+  "en": "Launceston Airport"
+ },
+ "YMHB": {
+  "en": "Hobart International Airport"
+ },
+ "YCBG": {
+  "en": "Cambridge Aerodrome"
+ },
+ "UESS": {
+  "en": "Cherskiy Airport"
+ },
+ "UHMP": {
+  "en": "Pevek Airport"
+ },
+ "UHMM": {
+  "en": "Sokol Airport"
+ },
+ "UHPP": {
+  "en": "Yelizovo Airport"
+ },
+ "UHMA": {
+  "en": "Ugolny Yuri Ryktheu Airport"
+ },
+ "AYTK": {
+  "en": "Tokua Airport"
+ },
+ "NWWW": {
+  "en": "La Tontouta International Airport"
+ },
+ "NWWM": {
+  "en": "Nouméa Magenta Airport"
+ },
+ "NFNA": {
+  "en": "Nausori International Airport"
+ },
+ "NFFN": {
+  "en": "Nadi International Airport"
+ },
+ "YBRK": {
+  "en": "Rockhampton Airport"
+ },
+ "YTWB": {
+  "en": "Toowoomba Airport"
+ },
+ "YBBN": {
+  "en": "Brisbane International Airport"
+ },
+ "YAMB": {
+  "en": "RAAF Base Amberley"
+ },
+ "YBOK": {
+  "en": "Oakey Army Aviation Centre"
+ },
+ "YBAF": {
+  "en": "Brisbane Archerfield Airport"
+ },
+ "YBSU": {
+  "en": "Sunshine Coast Airport"
+ },
+ "YCFS": {
+  "en": "Coffs Harbour Airport"
+ },
+ "YBNA": {
+  "en": "Ballina Byron Gateway Airport"
+ },
+ "YBCG": {
+  "en": "Gold Coast Airport"
+ },
+ "YSTW": {
+  "en": "Tamworth Airport"
+ },
+ "YWLM": {
+  "en": "Newcastle Airport"
+ },
+ "YSRI": {
+  "en": "RAAF Base Richmond"
+ },
+ "YSBK": {
+  "en": "Sydney Bankstown Airport"
+ },
+ "YSHW": {
+  "en": "Holsworthy (Military) Airport"
+ },
+ "YSCN": {
+  "en": "Camden Airport"
+ },
+ "YSNW": {
+  "en": "Naval Air Station Nowra - HMAS Albatross"
+ },
+ "YSSY": {
+  "en": "Sydney Kingsford Smith International Airport"
+ },
+ "NZWP": {
+  "en": "RNZAF Base Auckland-Whenuapai"
+ },
+ "NZTG": {
+  "en": "Tauranga Airport"
+ },
+ "NZAA": {
+  "en": "Auckland International Airport"
+ },
+ "NZHN": {
+  "en": "Hamilton International Airport"
+ },
+ "NZNP": {
+  "en": "New Plymouth Airport"
+ },
+ "NZCL": {
+  "en": "Cloudy Bay Airfield"
+ },
+ "NZPM": {
+  "en": "Palmerston North Airport"
+ },
+ "NZWB": {
+  "en": "Woodbourne Airport"
+ },
+ "NZOM": {
+  "en": "Omaka Blenheim Airport"
+ },
+ "NZOH": {
+  "en": "RNZAF Base Ohakea"
+ },
+ "NZWN": {
+  "en": "Wellington International Airport"
+ },
+ "NZNS": {
+  "en": "Nelson Airport"
+ },
+ "NZTK": {
+  "en": "Takaka Airport"
+ },
+ "NZCH": {
+  "en": "Christchurch International Airport"
+ },
+ "NZGS": {
+  "en": "Gisborne Airport"
+ },
+ "NZRO": {
+  "en": "Rotorua Regional Airport"
+ },
+ "NZNR": {
+  "en": "Hawke's Bay Airport"
+ },
+ "NZQN": {
+  "en": "Queenstown Airport"
+ },
+ "NZNV": {
+  "en": "Invercargill Airport"
+ },
+ "NZTI": {
+  "en": "Taieri Aerodrome"
+ },
+ "NZDN": {
+  "en": "Dunedin International Airport"
+ },
+ "MMAA": {
+  "es": "Aeropuerto Internacional de Acapulco",
+  "en": "Acapulco International Airport"
  }
 }
