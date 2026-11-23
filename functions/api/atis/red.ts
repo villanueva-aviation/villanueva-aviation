@@ -2,7 +2,6 @@
 // responde si hay controlador en un aeropuerto y si la red publica su ATIS.
 // Los feeds pesan ~1 MB y cambian cada 15 s: Cloudflare los guarda 60 s.
 // Sin «with { type: "json" }»: el esbuild de wrangler 3 (el que compila las Functions en Cloudflare) no lo entiende.
-import aeropuertos from "../../../public/data/atis/MX.json";
 import { estadoIvao, estadoVatsim, type IvaoWhazzup, type VatsimDatos, type VatsimTransceptores } from "../../../src/features/atis/red.ts";
 
 const json = (cuerpo: unknown, status = 200, extra: Record<string, string> = {}) =>
@@ -25,8 +24,9 @@ export const onRequestGet = async ({ request }: { request: Request }) => {
   const q = new URL(request.url).searchParams;
   const icao = (q.get("icao") ?? "").toUpperCase();
   const red = q.get("red");
-  const ap = /^[A-Z]{4}$/.test(icao) ? aeropuertos.find((a) => a.icao === icao) : undefined;
-  if (!ap || (red !== "ivao" && red !== "vatsim")) return json({ error: "Solicitud inválida" }, 400);
+  const lat = Number(q.get("lat") ?? NaN), lon = Number(q.get("lon") ?? NaN); // Number("") es 0: se exige que vengan
+  const ap = { icao, lat, lon };
+  if (!/^[A-Z]{4}$/.test(icao) || !q.get("lat") || !q.get("lon") || !(Math.abs(lat) <= 90) || !(Math.abs(lon) <= 180) || (red !== "ivao" && red !== "vatsim")) return json({ error: "Solicitud inválida" }, 400);
 
   try {
     const estado = red === "ivao"

@@ -105,3 +105,36 @@ test("estadoVigente: respuesta reciente se usa; vieja se descarta; esperando la 
   // Falló pero lo último es reciente: se usa.
   assert.deepEqual(estadoVigente({ estado, recibidoMs: 50_000, fallo: true }, 60_000), estado);
 });
+
+const KLAX = { icao: "KLAX", lat: 33.9425, lon: -118.408 };
+const PANC = { icao: "PANC", lat: 61.1744, lon: -149.996 };
+const CYVR = { icao: "CYVR", lat: 49.1947, lon: -123.1792 };
+const MGGT = { icao: "MGGT", lat: 14.5833, lon: -90.5275 };
+
+test("VATSIM mundial: LAX_TWR cuenta en KLAX y ANC_TWR en PANC (EE. UU. sin la K)", () => {
+  assert.equal(estadoVatsim({ controllers: [vat("LAX_TWR", 4)], atis: [] }, [], KLAX).atc, true);
+  assert.equal(estadoVatsim({ controllers: [vat("ANC_TWR", 4)], atis: [] }, [], PANC).atc, true);
+  assert.equal(estadoVatsim({ controllers: [vat("SFO_TWR", 4)], atis: [] }, [], KLAX).atc, false);
+});
+
+test("VATSIM mundial: centro LAX_CTR a ~50 NM cuenta en KLAX", () => {
+  const datos = { controllers: [vat("LAX_CTR", 6, { visual_range: 600 })], atis: [] };
+  const trans = [{ callsign: "LAX_CTR", transceivers: [{ latDeg: 34.7, lonDeg: -118.4 }] }];
+  assert.equal(estadoVatsim(datos, trans, KLAX).atc, true);
+});
+
+test("IVAO mundial: CZVR_CTR a ~100 NM cuenta en CYVR; MMFR_CTR cerca de MGGT no", () => {
+  const w = (cs: string, lat: number, lon: number) => ({ clients: { atcs: [ivao(cs, "CTR", { lastTrack: { latitude: lat, longitude: lon } })] } });
+  assert.equal(estadoIvao(w("CZVR_CTR", 50.85, -123.18), CYVR).atc, true);
+  assert.equal(estadoIvao(w("MMFR_CTR", 16.25, -90.5), MGGT).atc, false);
+});
+
+test("mundial: centros vistos en vivo (TOR_CTR en Canadá, KZLA_CTR de IVAO en EE. UU.) cuentan por distancia", () => {
+  const cyyz = { icao: "CYYZ", lat: 43.6772, lon: -79.6306 };
+  const datos = { controllers: [vat("TOR_CTR", 6, { visual_range: 600 })], atis: [] };
+  const trans = [{ callsign: "TOR_CTR", transceivers: [{ latDeg: 44.5, lonDeg: -79.6 }] }];
+  assert.equal(estadoVatsim(datos, trans, cyyz).atc, true);
+  const pos = { latitude: 34.5, longitude: -118.0 };
+  assert.equal(estadoIvao({ clients: { atcs: [ivao("KZLA_CTR", "CTR", { lastTrack: pos })] } }, KLAX).atc, true);
+  assert.equal(estadoIvao({ clients: { atcs: [ivao("KZLA_CTR", "CTR", { lastTrack: pos })] } }, MMGL).atc, false);
+});

@@ -1,6 +1,7 @@
 // Qué dice la red (IVAO o VATSIM) de un aeropuerto: si hay controlador y si publica su ATIS.
 // Lo usa functions/api/atis/red.ts con los feeds públicos, y la página para elegir la fuente.
 // Regla del diseño: ante la duda, hay controlador, para nunca anunciar una pista distinta a la del ATC.
+import { formatoDe } from "./formato.ts";
 import { distanciaNm } from "./radio.ts";
 
 export type Red = "ivao" | "vatsim" | "ninguna";
@@ -20,11 +21,23 @@ const IVAO_ALCANCE: Record<string, number> = { CTR: 150, FSS: 150, APP: 60, DEP:
 const IVAO_PRIORIDAD = ["TWR", "APP", "GND", "DEL"]; // quien transmite el ATIS de voz en Aurora
 const SERVIDOR_VOZ = /\.ivao\.aero\//;
 
-const delAeropuerto = (callsign: string, icao: string) => callsign.startsWith(icao + "_");
-// Por distancia solo cuentan estaciones de la misma región OACI (MM… en México): el centro de Houston
-// en VATSIM publica 600 NM de alcance y no controla Guadalajara.
-// ponytail: las estaciones de EE. UU. no llevan K (HOU_CTR); revisar en el plan 3 con aeropuertos de EE. UU.
-const mismaRegion = (callsign: string, icao: string) => callsign.slice(0, 2) === icao.slice(0, 2);
+// EE. UU. (K, PA, PH, PG) llama a sus estaciones sin la primera letra: LAX_TWR para KLAX, ANC_TWR para PANC.
+const sinPrefijo = (icao: string) => /^(K|PA|PH|PG)/.test(icao) ? icao.slice(1) + "_" : null;
+const delAeropuerto = (callsign: string, icao: string) =>
+  callsign.startsWith(icao + "_") || (!!sinPrefijo(icao) && callsign.startsWith(sinPrefijo(icao)!));
+// Por distancia solo cuentan estaciones de la misma región OACI: el centro de Houston en VATSIM publica
+// 600 NM de alcance y no controla Guadalajara. Regiones de una letra (C, Y, Z, U): compara la primera.
+// En EE. UU. y Canadá un prefijo que no es de 4 letras (HOU_CTR, TOR_CTR) también cuenta, y en EE. UU. los
+// centros KZxx de IVAO; ante la duda, hay controlador (la distancia sigue acotando).
+const REGION_1 = ["C", "Y", "Z", "U"];
+const mismaRegion = (callsign: string, icao: string) => {
+  const pref = callsign.split("_")[0];
+  const eeuu = formatoDe(icao) === "faa";
+  if ((eeuu || icao[0] === "C") && !/^[A-Z]{4}$/.test(pref)) return true;
+  if (eeuu && pref.startsWith("KZ")) return true;
+  const n = REGION_1.includes(icao[0]) ? 1 : 2;
+  return pref.slice(0, n) === icao.slice(0, n);
+};
 
 export function fuente(red: Red, estado: EstadoRed | null): Fuente {
   if (red === "ninguna") return "generado";
