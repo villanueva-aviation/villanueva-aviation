@@ -30,8 +30,7 @@ export function useLectorAtis(): { estado: EstadoLectorAtis; muestra: MuestraAti
         setAeropuertos(l);
         if (l.length === 0) espera = AEROPUERTOS_VACIO_CADA_MS;
       } catch {
-        if (!vivo) return;
-        setAeropuertos(null);
+        // Un fallo suelto no borra la lista: se queda la última buena y se reintenta en 5 s.
         espera = AEROPUERTOS_VACIO_CADA_MS;
       }
       if (vivo) timer = window.setTimeout(leer, espera);

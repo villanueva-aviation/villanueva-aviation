@@ -196,13 +196,14 @@ function Programa() {
   // Cada muestra del lector: qué oye cada COM y cómo suena.
   useEffect(() => {
     const ctx = ctxRef.current;
-    if (!iniciado || !ctx || !aeropuertos) return;
+    if (!iniciado || !ctx) return;
+    const aps = aeropuertos ?? []; // sin lista todavía: ningún canal suena (apagar), no se congela lo último
     const m = muestra;
     const pos = m && m.lat !== null && m.lon !== null && m.aglFt !== null ? { lat: m.lat, lon: m.lon, aglFt: m.aglFt } : null;
     setVistas(canales.current.map((c, i): Vista | null => {
       const com = m?.com[i];
       // Altura infinita: el aeropuerto más cercano en esa frecuencia, sin importar el alcance. El alcance lo decide la mezcla.
-      const s = com && pos ? sintonizado(com, { ...pos, aglFt: Infinity }, aeropuertos) : null;
+      const s = com && pos ? sintonizado(com, { ...pos, aglFt: Infinity }, aps) : null;
       if (!com || !pos || !s) {
         apagar(c);
         return null;
@@ -236,7 +237,7 @@ function Programa() {
       const e = metarDe(s.ap.icao);
       if (e.metar) {
         const nuevo = armarAtis(e.metar, s.ap, { conControlador });
-        if (debeCambiar(c.atis ?? null, nuevo)) cargar(ctx, aeropuertos, c, nuevo);
+        if (debeCambiar(c.atis ?? null, nuevo)) cargar(ctx, aps, c, nuevo);
       }
       // El ATIS nuevo entra al momento si no suena nada, o en la pausa del final del loop si ya suena otro.
       // Uno que llegó tarde de otro aeropuerto (A→B→A rápido) no entra.
@@ -279,7 +280,7 @@ function Programa() {
     <div className="mx-auto max-w-[480px] space-y-4 px-4 py-4">
       <header className="flex items-baseline justify-between gap-3">
         <h1 className="font-display text-base font-bold text-white">ATIS</h1>
-        {sintonizados.length === 0 && <span className="text-xs text-white/60">{estado === "conectado" && delLector?.length === 0 ? T.buscando : T[estado]}</span>}
+        {sintonizados.length === 0 && <span className="text-xs text-white/60">{estado === "conectado" && !delLector?.length ? T.buscando : T[estado]}</span>}
       </header>
 
       <div className="flex gap-2" role="group" aria-label={T.red}>
