@@ -287,6 +287,11 @@ test("METAR raros no lanzan", () => {
   }
 });
 
+test("un grupo de tendencia (TEMPO 3000) no se lee como visibilidad", () => {
+  const a = armarAtis(mtr("EGLL 221450Z 24012KT 09/04 Q1013 TEMPO 3000 RA", hora1), egll);
+  assert.equal(visTexto(a), undefined);
+});
+
 test("latam con millas y altímetro usa las palabras de mx", () => {
   const a = armarAtis(mtr("MROC 221500Z 12004KT 7SM FEW050 25/20 A3001", hora1, { wdir: 120, wspd: 4, visib: 7 }),
     mundo("MROC", "Juan Santamaria International Airport", "Aeropuerto Internacional Juan Santamaría", par("07", "25", 70, 9000)));

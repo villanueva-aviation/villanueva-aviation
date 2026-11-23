@@ -46,7 +46,9 @@ const CAPAS = ["FEW", "SCT", "BKN", "OVC"];
 // Metros del METAR: primer grupo de 4 dígitos suelto después del viento; el sufijo de dirección (4000NE) no se dice.
 function visibMetrica(cuerpo: string): { g: string; sufijo: string } | null {
   const w = /(?:^|\s)(?:\d{3}|VRB)\d{2,3}(?:G\d{2,3})?KT(?:\s\d{3}V\d{3})?(?=\s|$)/.exec(cuerpo);
-  const m = /(?:^|\s)(\d{4})(NE|NW|SE|SW|N|S|E|W)?(?=\s|$)/.exec(w ? cuerpo.slice(w.index + w[0].length) : cuerpo);
+  const desde = w ? cuerpo.slice(w.index + w[0].length) : cuerpo;
+  const antes = desde.split(/\s(?:M?\d{2}\/|[AQ]\d{4}|TEMPO|BECMG|NOSIG)/)[0]; // lo de después (tendencias) no es visibilidad
+  const m = /(?:^|\s)(\d{4})(NE|NW|SE|SW|N|S|E|W)?(?=\s|$)/.exec(antes);
   return m ? { g: m[1], sufijo: m[2] ?? "" } : null;
 }
 
