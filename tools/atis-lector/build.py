@@ -28,7 +28,10 @@ if referencia is None:
 OUT.mkdir(exist_ok=True)
 subprocess.run(
     [str(CSC), "/nologo", "/optimize+", "/target:exe", "/platform:x64", f"/out:{EXE}",
-     f"/reference:{referencia}", str(AQUI / "LectorAtis.cs")],
+     f"/reference:{referencia}",
+     # La lista de aeropuertos que MSFS 2020 contesta va dentro del exe: sigue siendo un solo archivo.
+     f"/resource:{AQUI / 'msfs2020-responden.txt'},msfs2020.txt",
+     str(AQUI / "LectorAtis.cs")],
     check=True,
 )
 print(f"{EXE.name} compilado contra {referencia}")

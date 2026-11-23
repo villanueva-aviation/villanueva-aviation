@@ -36,3 +36,6 @@ __pycache__/
 tools/instructor-lector/out/
 tools/atis-lector/out/
 
+
+# Volcados de aeropuertos de MSFS (grandes, se regeneran)
+atis-volcado/

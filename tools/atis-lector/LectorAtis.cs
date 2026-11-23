@@ -141,7 +141,7 @@ class Aeropuerto : Lugar
     {
         return "{\"icao\": " + Texto(a.Icao) + ", \"nombre\": " + Texto(a.Nombre)
             + ", \"lat\": " + Muestra.N6(a.Lat) + ", \"lon\": " + Muestra.N6(a.Lon)
-            + ", \"region\": " + Texto(a.Region ?? "") + "}";
+            + ", \"region\": " + Texto(a.Region ?? "") + "}"; // MSFS 2020 la manda vacia; el campo se queda (es la forma probada)
     }
 
     public static string JsonVolcado(List<Aeropuerto> lista)
@@ -258,6 +258,38 @@ class Aeropuerto : Lugar
     {
         return ultima == null || Nm(ultima, pos) >= Rebusca;
     }
+}
+
+// MSFS 2020 se cae al pedir los datos de algunos aeropuertos de su propia lista que no los tienen (PKSA solo lo tumba);
+// MSFS 2024 contesta esos con una excepcion. En 2020 solo se piden los que respondieron en el volcado
+// (msfs2020-responden.txt, metido en el exe como recurso msfs2020.txt).
+static class Msfs2020
+{
+    public static readonly HashSet<string> Responden = Cargar();
+
+    static HashSet<string> Cargar()
+    {
+        var r = new HashSet<string>(StringComparer.Ordinal);
+        using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream("msfs2020.txt"))
+        {
+            if (s == null) return r; // sin el recurso, en 2020 no se pide nada
+            using (var sr = new StreamReader(s, Encoding.UTF8))
+            {
+                string l;
+                while ((l = sr.ReadLine()) != null)
+                {
+                    l = l.Trim();
+                    if (l.Length > 0 && l[0] != '#') r.Add(l);
+                }
+            }
+        }
+        return r;
+    }
+
+    public static bool Responde(string icao) { return Responden.Contains(icao); }
+
+    // null = todavia no se sabe que simulador es: no se pide nada.
+    public static bool Pedible(bool? es2024, string icao) { return es2024 == true || (es2024 == false && Responde(icao)); }
 }
 
 class Opciones
@@ -435,8 +467,15 @@ static class LectorAtis
             && Opciones.Leer(new[] { "--max", "7" }).Max == 7
             && Aeropuerto.Resumen(10, 25) == "Llevo 10 de 25 (faltan 15) aeropuertos guardados. Vuelve a ejecutar el mismo comando para continuar.";
         Console.WriteLine(parcial ? "Parcial: OK" : "Parcial: FALLA");
+
+        // MSFS 2020: la lista de los que responden viene dentro del exe; los que lo tumbaron no estan.
+        var r20 = Msfs2020.Responden;
+        var lista2020 = r20.Count == 40347 && Array.TrueForAll(new[] { "MMGL", "SKRG", "EGLL", "KLAX" }, r20.Contains)
+            && !Array.Exists(new[] { "PKSA", "SMCI", "RJX8", "RJX4", "NFVB", "NTAM" }, r20.Contains)
+            && !Msfs2020.Pedible(null, "MMGL") && Msfs2020.Pedible(true, "PKSA") && !Msfs2020.Pedible(false, "PKSA") && Msfs2020.Pedible(false, "MMGL");
+        Console.WriteLine(lista2020 ? "Lista de MSFS 2020: OK" : "Lista de MSFS 2020: FALLA (" + r20.Count + ")");
         return edge && perfil && banderas && puerto && sinSim && forma && vol && ruta
-            && ident && extremos && mmgl && esc && sinAp && cercanos && buscar && volcado && parcial ? 0 : 1;
+            && ident && extremos && mmgl && esc && sinAp && cercanos && buscar && volcado && parcial && lista2020 ? 0 : 1;
     }
 
     // --volcar: sin servidor ni ventana; conecta, pide todos los aeropuertos y escribe los que tienen ATIS.
@@ -785,7 +824,7 @@ static class Sim
     enum Req { Vuelo, Lista } // los pedidos de aeropuerto usan 100, 101...
     const uint PrimerPedido = 100;
     const int MaxAbiertos = 4;
-    const int MaxAbiertosVolcado = 2; // el volcado va despacio: tumbo al simulador a 4 a toda velocidad
+    const int MaxAbiertosVolcado = 2; // el volcado va con calma; lo que tumbaba a MSFS 2020 eran aeropuertos sin datos (Msfs2020), no la carga
     const double EsperaSeg = 10; // un pedido sin respuesta (ICAO raro, excepcion) no traba la cola
 
     // El orden exacto de los campos manda la forma de las estructuras de abajo.
@@ -815,7 +854,7 @@ static class Sim
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     struct PistaFac { public double Lat, Lon, Alt; public float Rumbo, Largo; public int N1, D1, N2, D2; }
 
-    class Pedido { public string Icao; public double Desde; public uint Unico; public Aeropuerto Ap; }
+    class Pedido { public string Icao; public double Desde; public uint Unico, Envio; public Aeropuerto Ap; }
 
     static readonly string[][] Vars =
     {
@@ -853,8 +892,15 @@ static class Sim
             var abierto = true;
             Console.WriteLine("Conectado a MSFS.");
             sim.OnRecvQuit += (s, d) => abierto = false;
-            // Un nombre de variable mal escrito no tumba el lector: sale aqui.
-            sim.OnRecvException += (s, d) => Console.WriteLine("SimConnect: excepcion " + d.dwException + " en el parametro " + d.dwIndex);
+            bool? es2024 = null; // hasta saber cual simulador es, no se pide ningun aeropuerto (Msfs2020)
+            sim.OnRecvOpen += (s, d) =>
+            {
+                es2024 = d.dwApplicationVersionMajor >= 12; // 2020 = 11.x, 2024 = 12.x
+                Console.WriteLine("Simulador: " + d.szApplicationName + " " + d.dwApplicationVersionMajor + "." + d.dwApplicationVersionMinor
+                    + (es2024 == true ? " (MSFS 2024)" : " (MSFS 2020)"));
+                if (es2024 == false && Msfs2020.Responden.Count == 0)
+                    Console.WriteLine("ATIS: falta la lista de aeropuertos de MSFS 2020 dentro del lector; no voy a pedir ninguno.");
+            };
             double ultimo = -1;
             // Aeropuertos: todo se borra en cada conexion (Review Focus 5).
             var mundo = new List<Lugar>();
@@ -950,10 +996,12 @@ static class Sim
                     foreach (var l in Aeropuerto.Cercanos(mundo, pos, Aeropuerto.Radio))
                         if (!cache.ContainsKey(l.Icao)) cola.Enqueue(l.Icao);
                 }
-                while (abiertos.Count < maxAbiertos && cola.Count > 0 && !(volcar != null && Aeropuerto.TopeAlcanzado(nuevos, max)))
+                while (es2024 != null && abiertos.Count < maxAbiertos && cola.Count > 0 && !(volcar != null && Aeropuerto.TopeAlcanzado(nuevos, max)))
                 {
                     var icao = cola.Dequeue();
                     if (cache.ContainsKey(icao)) continue;
+                    // MSFS 2020 se cae con los que no tienen datos: solo los de la lista. No se escribe nada de los saltados.
+                    if (!Msfs2020.Pedible(es2024, icao)) { cache[icao] = null; continue; }
                     cache[icao] = null;
                     var id = siguiente++;
                     abiertos[id] = new Pedido { Icao = icao, Desde = ahora };
@@ -961,7 +1009,11 @@ static class Sim
                     if (volcar != null)
                         try { File.WriteAllText(archivoPedidos, string.Join(" ", EnVuelo(abiertos))); } catch (Exception) { }
                     // Un pedido que falla (MSFS cerrandose, ICAO raro) cuenta como terminado: no ocupa lugar ni tumba la conexion.
-                    try { sim.RequestFacilityData(volcar != null ? Def.Volcado : Def.Aeropuerto, (Req)id, icao, ""); }
+                    try
+                    {
+                        sim.RequestFacilityData(volcar != null ? Def.Volcado : Def.Aeropuerto, (Req)id, icao, "");
+                        abiertos[id].Envio = sim.GetLastSentPacketID(); // para reconocer su excepcion (2024: aeropuerto sin datos)
+                    }
                     catch (Exception e)
                     {
                         Console.WriteLine("ATIS: no pude pedir " + icao + ": " + e.Message);
@@ -988,7 +1040,7 @@ static class Sim
             sim.OnRecvAirportList += (s, d) =>
             {
                 var malos = 0;
-                foreach (var o in d.rgData)
+                foreach (var o in d.rgData ?? new object[0])
                 {
                     try
                     {
@@ -1042,7 +1094,20 @@ static class Sim
                     p.Ap = null;
                 }
             };
-            sim.OnRecvFacilityDataEnd += (s, d) => terminar(d.RequestId, true);
+            sim.OnRecvFacilityDataEnd += (s, d) => terminar(d.RequestId, true); // tras la excepcion de abajo ya no esta abierto: no hace nada
+            // MSFS 2024 contesta con una excepcion al aeropuerto sin datos: se termina ya (sin ATIS), sin esperar a que venza.
+            // Un nombre de variable mal escrito tampoco tumba el lector: sale aqui.
+            sim.OnRecvException += (s, d) =>
+            {
+                foreach (var kv in abiertos)
+                    if (d.dwSendID != 0 && kv.Value.Envio == d.dwSendID) // 0 = SimConnect no sabe de que envio es
+                    {
+                        Console.WriteLine("ATIS: " + kv.Value.Icao + " sin datos en MSFS");
+                        terminar(kv.Key, true); // cambia abiertos: se sale del foreach enseguida
+                        return;
+                    }
+                Console.WriteLine("SimConnect: excepcion " + d.dwException + " en el parametro " + d.dwIndex);
+            };
 
             sim.OnRecvSimobjectData += (s, d) =>
             {
