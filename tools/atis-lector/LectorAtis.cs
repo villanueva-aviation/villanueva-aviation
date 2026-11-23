@@ -58,7 +58,7 @@ class Muestra
 
 class Lugar
 {
-    public string Icao;
+    public string Icao, Region;
     public double Lat, Lon;
 }
 
@@ -135,6 +135,20 @@ class Aeropuerto : Lugar
         return sb.Append(']').ToString();
     }
 
+    // --volcar: [{icao, nombre, lat, lon, region}] de los aeropuertos con ATIS, para armar los nombres hablados.
+    public static string JsonVolcado(List<Aeropuerto> lista)
+    {
+        var sb = new StringBuilder("[");
+        for (var i = 0; i < lista.Count; i++)
+        {
+            var a = lista[i];
+            sb.Append(i > 0 ? ",\n" : "\n").Append("{\"icao\": ").Append(Texto(a.Icao)).Append(", \"nombre\": ").Append(Texto(a.Nombre))
+                .Append(", \"lat\": ").Append(Muestra.N6(a.Lat)).Append(", \"lon\": ").Append(Muestra.N6(a.Lon))
+                .Append(", \"region\": ").Append(Texto(a.Region ?? "")).Append('}');
+        }
+        return sb.Append("\n]").ToString();
+    }
+
     public static double Nm(Lugar a, Lugar b)
     {
         double r = Math.PI / 180;
@@ -167,6 +181,7 @@ class Aeropuerto : Lugar
 class Opciones
 {
     public bool Simulado, SinVentana;
+    public string Volcar; // --volcar <archivo.json>: vuelca los aeropuertos con ATIS y sale
     public string Url = LectorAtis.UrlPrograma;
 
     public static Opciones Leer(string[] args)
@@ -176,6 +191,7 @@ class Opciones
         {
             if (args[i] == "--simulado") o.Simulado = true;
             else if (args[i] == "--sin-ventana") o.SinVentana = true;
+            else if (args[i] == "--volcar" && i + 1 < args.Length) o.Volcar = args[++i];
             else if (args[i] == "--url" && i + 1 < args.Length) o.Url = args[++i];
         }
         return o;
@@ -309,8 +325,29 @@ static class LectorAtis
         var buscar = Aeropuerto.DebeBuscar(aqui, new Lugar { Lat = 20 + 10 / 60.0, Lon = -103 })
             && !Aeropuerto.DebeBuscar(aqui, new Lugar { Lat = 20 + 9 / 60.0, Lon = -103 }) && Aeropuerto.DebeBuscar(null, aqui);
         Console.WriteLine(buscar ? "Buscar cada 10 NM: OK" : "Buscar cada 10 NM: FALLA");
+
+        // --volcar: bandera con archivo y la forma exacta del volcado.
+        var ov = Opciones.Leer(new[] { "--volcar", "v.json" });
+        var vm = Simulado.Mmgl(); vm.Region = "MM";
+        var jv = Aeropuerto.JsonVolcado(new List<Aeropuerto> { vm });
+        var volcado = ov.Volcar == "v.json" && d.Volcar == null && Aeropuerto.JsonVolcado(new List<Aeropuerto>()) == "[\n]"
+            && jv == "[\n{\"icao\": \"MMGL\", \"nombre\": \"Don Miguel Hidalgo Intl\", \"lat\": 20.523342, \"lon\": -103.310108, \"region\": \"MM\"}\n]";
+        Console.WriteLine(volcado ? "Volcado: OK" : "Volcado: FALLA " + jv);
         return edge && perfil && banderas && puerto && sinSim && forma && vol && ruta
-            && ident && extremos && mmgl && esc && sinAp && cercanos && buscar ? 0 : 1;
+            && ident && extremos && mmgl && esc && sinAp && cercanos && buscar && volcado ? 0 : 1;
+    }
+
+    // --volcar: sin servidor ni ventana; conecta, pide todos los aeropuertos y escribe los que tienen ATIS.
+    static int Volcar(string archivo)
+    {
+        if (!Dlls.Preparar())
+        {
+            Console.WriteLine("No encontre las librerias de SimConnect en esta PC.");
+            return 1;
+        }
+        try { Sim.Correr(archivo); }
+        catch (Exception e) { Console.WriteLine("No pude volcar: " + e.Message); return 1; }
+        return 0;
     }
 
     // Lo que pasaba en el lector del instructor: Edge heredaba el puerto y, si el lector se cerraba, nadie podia volver a usarlo.
@@ -402,6 +439,7 @@ static class LectorAtis
         if (args.Length > 0 && args[0] == "--probar") Environment.Exit(Probar());
         Console.Title = "Villanueva Aviation - Lector del ATIS";
         var op = Opciones.Leer(args);
+        if (op.Volcar != null) Environment.Exit(Volcar(op.Volcar));
 
         var escucha = new TcpListener(IPAddress.Loopback, Puerto);
         try { escucha.Start(); }
@@ -675,7 +713,7 @@ static class Sim
     struct Vuelo { [MarshalAs(UnmanagedType.ByValArray, SizeConst = 9)] public double[] Valores; }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void Correr()
+    public static void Correr(string volcar = null)
     {
         using (var senal = new EventWaitHandle(false, EventResetMode.AutoReset))
         using (var sim = new Microsoft.FlightSimulator.SimConnect.SimConnect("Villanueva ATIS", IntPtr.Zero, 0, senal, 0))
@@ -696,6 +734,9 @@ static class Sim
             var abiertos = new Dictionary<uint, Pedido>();  // por RequestID
             var porUnico = new Dictionary<uint, Pedido>();  // por UniqueRequestId del aeropuerto, por si un hijo no trae el RequestID
             var reintentado = new HashSet<string>();         // ya vencieron una vez
+            var regiones = new Dictionary<string, string>(); // region de cada aeropuerto, para el volcado
+            var encolado = false;                            // --volcar: ya se encolo todo el mundo
+            var hechos = 0;
             var siguiente = PrimerPedido;
             Lugar pos = null, buscadoEn = null;
             LectorAtis.PublicarAeropuertos(new List<Aeropuerto>());
@@ -706,6 +747,7 @@ static class Sim
                 if (!abiertos.TryGetValue(id, out p)) return;
                 abiertos.Remove(id);
                 if (p.Unico != 0) porUnico.Remove(p.Unico);
+                if (volcar != null && ++hechos % 1000 == 0) Console.WriteLine("Volcado: " + hechos + " aeropuertos pedidos");
                 if (p.Ap == null || p.Ap.Mhz.Count == 0) return; // queda null en la cache: no se vuelve a pedir
                 cache[p.Icao] = p.Ap;
                 conAtis.Add(p.Ap);
@@ -723,10 +765,19 @@ static class Sim
                         // cercano (asi el aeropuerto de salida no se pierde con el avion parado). A la segunda queda null: no se pide mas.
                         var icao = abiertos[id].Icao;
                         Console.WriteLine("ATIS: " + icao + " no respondio");
-                        if (reintentado.Add(icao)) { cache.Remove(icao); buscadoEn = null; }
+                        if (reintentado.Add(icao))
+                        {
+                            cache.Remove(icao);
+                            if (volcar != null) cola.Enqueue(icao); else buscadoEn = null;
+                        }
                         terminar(id);
                     }
-                if (mundoListo && pos != null && Aeropuerto.DebeBuscar(buscadoEn, pos))
+                if (volcar != null && mundoListo && !encolado)
+                {
+                    encolado = true;
+                    foreach (var l in mundo) cola.Enqueue(l.Icao);
+                }
+                else if (volcar == null && mundoListo && pos != null && Aeropuerto.DebeBuscar(buscadoEn, pos))
                 {
                     buscadoEn = pos;
                     cola.Clear();
@@ -762,6 +813,7 @@ static class Sim
                     {
                         var a = (SC.SIMCONNECT_DATA_FACILITY_AIRPORT)o;
                         mundo.Add(new Lugar { Icao = a.Ident, Lat = a.Latitude, Lon = a.Longitude });
+                        regiones[a.Ident] = a.Region;
                     }
                     catch (Exception) { malos++; }
                 }
@@ -785,7 +837,9 @@ static class Sim
                         var a = (ApFac)o;
                         p.Unico = d.UniqueRequestId;
                         if (p.Unico != 0) porUnico[p.Unico] = p;
-                        p.Ap = new Aeropuerto { Icao = p.Icao, Nombre = (a.Nombre ?? "").Trim(), Lat = a.Lat, Lon = a.Lon, ElevFt = (int)Math.Round(a.Alt * Aeropuerto.PiesPorMetro) };
+                        string region;
+                        regiones.TryGetValue(p.Icao, out region);
+                        p.Ap = new Aeropuerto { Icao = p.Icao, Region = region, Nombre = (a.Nombre ?? "").Trim(), Lat = a.Lat, Lon = a.Lon, ElevFt = (int)Math.Round(a.Alt * Aeropuerto.PiesPorMetro) };
                     }
                     else if (p.Ap == null) return;
                     else if (o is FrecFac)
@@ -839,6 +893,13 @@ static class Sim
             {
                 if (senal.WaitOne(10000)) sim.ReceiveMessage();
                 avanzar();
+                if (volcar != null && encolado && cola.Count == 0 && abiertos.Count == 0)
+                {
+                    conAtis.Sort((x, y) => string.CompareOrdinal(x.Icao, y.Icao));
+                    File.WriteAllText(volcar, Aeropuerto.JsonVolcado(conAtis), new UTF8Encoding(false));
+                    Console.WriteLine("Volcado listo: " + conAtis.Count + " aeropuertos con ATIS de " + mundo.Count + " en " + volcar);
+                    return;
+                }
             }
         }
     }

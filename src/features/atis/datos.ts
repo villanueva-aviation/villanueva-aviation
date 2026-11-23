@@ -19,7 +19,7 @@ export function nombres(nombreOurAirports: string, municipio: string): { es: str
 }
 
 // Nombres que la regla de nombres() no acierta (ciudad distinta o ambigua en OurAirports).
-const NOMBRES_FIJOS: Record<string, { es: string; en: string }> = {
+export const NOMBRES_FIJOS: Record<string, { es: string; en: string }> = {
   MMMX: { es: "Aeropuerto Internacional de la Ciudad de México", en: "Mexico City International Airport" },
   MMAN: { es: "Aeropuerto Internacional del Norte", en: "Del Norte International Airport" },
   MMMZ: { es: "Aeropuerto Internacional de Mazatlán", en: "Mazatlán International Airport" },
