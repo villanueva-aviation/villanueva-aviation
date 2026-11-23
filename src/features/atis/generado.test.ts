@@ -288,6 +288,14 @@ test("METAR raros no lanzan", () => {
       assert.doesNotThrow(() => armarAtis(mtr(raw, hora1, { wdir: "VRB", wspd: 3 }), ap), raw);
     }
   }
+  // Lo que no se entiende no se pierde: va a partes de solo texto.
+  const raw = "EGLL 221450Z 24012KT 9999 R27L/1500 FEW030 09/04 Q998 TEMPO 3000 RA";
+  for (const ap of [egll, { ...egll, icao: "SKBO" }, { ...egll, icao: "KLAX" }]) {
+    const solos = armarAtis(mtr(raw, hora1, { clouds: [{ cover: "FEW", base: 3000 }] }), ap).partes.filter((x) => x.soloTexto).map((x) => x.texto).join(" ");
+    assert.match(solos, /R27L\/1500/, ap.icao);
+    if (ap.icao !== "KLAX") assert.match(solos, /Q998/, ap.icao); // faa no lee la cola del METAR
+    assert.doesNotMatch(solos, /24012KT|9999|FEW030/, ap.icao);
+  }
 });
 
 test("un grupo de tendencia (TEMPO 3000) no se lee como visibilidad", () => {
@@ -332,6 +340,15 @@ test("latam sin nombre: el deletreo en español usa las letras es", () => {
   const p = parte(a, "aeropuerto", "es");
   assert.equal(p?.texto, "Sierra Kilo Romeo Golf.");
   assert.deepEqual(p?.piezas, ["S", "K", "R", "G"].map((l) => ({ idioma: "es", clave: `letra-${l}` })));
+});
+
+test("sin nombre, las cifras del ICAO también se dicen (IL48)", () => {
+  const ap = { ...mundo("IL48", "", "", []), nombreEs: null, nombreEn: null };
+  const p = parte(armarAtis(mtr("IL48 221450Z 24012KT 10SM FEW030 09/04 A2992", hora1), ap), "aeropuerto", "en");
+  assert.equal(p?.texto, "India Lima Four Eight.");
+  assert.deepEqual(claves(p), ["letra-I", "letra-L", "d-4-sigue", "d-8-cierra"]);
+  const es = parte(armarAtisMx(mtr("IL48 221450Z 24012KT 10SM FEW030 09/04 A2992", hora1), ap), "aeropuerto", "es");
+  assert.equal(es?.texto, "India Lima Cuatro Ocho.");
 });
 
 test("todasLasPiezas: ap-XXXX en en siempre y en es solo si hay es", () => {

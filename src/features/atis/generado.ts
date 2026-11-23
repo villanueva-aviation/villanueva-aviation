@@ -42,6 +42,8 @@ const SUFIJO: Record<string, string> = { L: "f-izquierda", R: "f-derecha", C: "f
 const FRACCION: Record<number, string> = { 0.25: "f-cuarto", 0.5: "f-medio", 0.75: "f-tres-cuartos" };
 const DESPEJADO = ["CLR", "SKC", "NSC", "NCD", "CAVOK"];
 const CAPAS = ["FEW", "SCT", "BKN", "OVC"];
+// Grupos del METAR que el ATIS ya dice (viento, variación, visibilidad, nubes, CAVOK...) o que no se dicen (AUTO, COR).
+const CONOCIDO = /^(?:(?:\d{3}|VRB)\d{2,3}(?:G\d{2,3})?(?:KT|MPS)|\d{3}V\d{3}|\d{4}(?:NE|NW|SE|SW|N|S|E|W)?|[PM]?\d+(?:\/\d+)?SM|CAVOK|NSC|NCD|SKC|CLR|AUTO|COR|(?:FEW|SCT|BKN|OVC|VV)(?:\d{3}|\/{3})(?:CB|TCU)?)$/;
 
 // Metros del METAR: primer grupo de 4 dígitos suelto después del viento; el sufijo de dirección (4000NE) no se dice.
 function visibMetrica(cuerpo: string): { g: string; sufijo: string } | null {
@@ -70,6 +72,15 @@ function armarFormato(formato: Formato, metar: Metar, ap: AeropuertoAtis, { conC
   const nsc = metrico && /(?:^|\s)NSC(?=\s|$)/.test(cuerpo);
   const visMetrica = metrico ? visibMetrica(cuerpo) : null;
   const enMillas = !metrico || /SM(?:\s|$)/.test(cuerpo);
+  // Lo que no se entiende entre la hora y la temperatura (o el altímetro): R27L/1500, WS R27... va a solo texto.
+  const raros = (() => {
+    const h = /(?:^|\s)\d{6}Z(?=\s|$)/.exec(cuerpo);
+    if (!h) return [];
+    const wx = new Set((metar.wxString ?? "").split(/\s+/));
+    const ts = cuerpo.slice(h.index + h[0].length, (temps ?? altim)?.index ?? cuerpo.length).split(/\s+/).filter(Boolean);
+    // "1 1/2SM": el entero suelto es parte de la visibilidad.
+    return ts.filter((x, i) => !CONOCIDO.test(x) && !wx.has(x) && !(/^\d+$/.test(x) && /^\d\/\d+SM$/.test(ts[i + 1] ?? "")));
+  })();
 
   const armar = (idioma: Idioma): Parte[] => {
     const partes: Parte[] = [];
@@ -99,9 +110,11 @@ function armarFormato(formato: Formato, metar: Metar, ap: AeropuertoAtis, { conC
 
     const nombre = idioma === "es" ? ap.nombreEs : ap.nombreEn;
     if (nombre) p("aeropuerto", t(`ap-${ap.icao}`, `${nombre}.`));
-    else { // sin pieza del nombre: se deletrea el ICAO en fonético
-      const ls = [...ap.icao.toUpperCase()].filter((c) => /[A-Z]/.test(c));
-      p("aeropuerto", { texto: `${ls.map((c) => F(`letra-${c}`).replace(/\.$/, "")).join(" ")}.`, claves: ls.map((c) => `letra-${c}`) });
+    else { // sin pieza del nombre: se deletrea el ICAO en fonético, con sus cifras (IL48: India Lima Cuatro Ocho)
+      const ls = [...ap.icao.toUpperCase()].filter((c) => /[A-Z0-9]/.test(c));
+      const clave = (c: string, i: number) => /\d/.test(c) ? `d-${c}-${i === ls.length - 1 ? "cierra" : "sigue"}` : `letra-${c}`;
+      const dicho = (c: string) => /\d/.test(c) ? cap(palabraDigito(idioma, c)) : F(`letra-${c}`).replace(/\.$/, "");
+      p("aeropuerto", { texto: `${ls.map(dicho).join(" ")}.`, claves: ls.map(clave) });
     }
     if (!conControlador) p("letra", j("f-informacion", `letra-${letra}`));
     if (hora) {
@@ -177,9 +190,12 @@ function armarFormato(formato: Formato, metar: Metar, ap: AeropuertoAtis, { conC
       if (metrico && altim[1] === "Q") p("altimetro", j("f-qnh", D(altim[2]), "f-hpa"));
       else p("altimetro", j(altim[1] === "A" ? "f-altimetro" : "f-qnh", punto(D(altim[2]))));
     }
+    if (raros.length) solo("observaciones", raros.join(" "));
     if (metrico) {
       if (/(?:^|\s)NOSIG(?=\s|$)/.test(cuerpo)) p("observaciones", j("f-nosig"));
-      const cola = altim ? cuerpo.slice(altim.index + altim[0].length).split(/\s+/).filter((x) => x && x !== "NOSIG") : [];
+      // Lo de después del altímetro (o de la temperatura si no hay altímetro que se entienda, como Q998).
+      const tras = altim ?? temps;
+      const cola = tras ? cuerpo.slice(tras.index + tras[0].length).split(/\s+/).filter((x) => x && x !== "NOSIG") : [];
       if (cola.length) solo("observaciones", cola.join(" "));
     }
     if (formato === "faa") pistaParte();
