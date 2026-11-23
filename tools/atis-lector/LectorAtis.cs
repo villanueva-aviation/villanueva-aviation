@@ -154,6 +154,14 @@ class Aeropuerto : Lugar
     // Archivo parcial del volcado (una linea JSON por ICAO terminado): el elemento del volcado, o {"icao", "atis": false}.
     public static string LineaSinAtis(string icao) { return "{\"icao\": " + Texto(icao) + ", \"atis\": false}"; }
 
+    // ICAO que iban en vuelo cuando se corto la corrida anterior (contenido de .pedidos.txt) y su linea en el parcial.
+    public static List<string> Omitidos(string texto)
+    {
+        return new List<string>((texto ?? "").Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+    }
+
+    public static string LineaOmitida(string icao) { return "{\"icao\": " + Texto(icao) + ", \"atis\": false, \"omitido\": true}"; }
+
     static string Campo(string linea, string clave)
     {
         var m = Regex.Match(linea, "\"" + clave + "\": \"((?:[^\"\\\\]|\\\\.)*)\"");
@@ -415,10 +423,13 @@ static class LectorAtis
         var cargado = Aeropuerto.Cargar(new[]
         {
             Aeropuerto.ElementoVolcado(raro), Aeropuerto.LineaSinAtis("KAAA"), "", "{\"icao\": \"KCUT\", \"nombre\": \"Cor", "basura",
-            Aeropuerto.LineaSinAtis("KXYZ"), Aeropuerto.ElementoVolcado(raro)
+            Aeropuerto.LineaSinAtis("KXYZ"), Aeropuerto.ElementoVolcado(raro), Aeropuerto.LineaOmitida("KOMI")
         });
+        var om = Aeropuerto.Omitidos(" KAAA KBBB\r\n\tKCCC \n");
         var k = cargado.ContainsKey("KXYZ") ? cargado["KXYZ"] : null;
-        var parcial = cargado.Count == 2 && cargado.ContainsKey("KAAA") && cargado["KAAA"] == null && !cargado.ContainsKey("KCUT") && k != null
+        var parcial = cargado.Count == 3 && cargado.ContainsKey("KOMI") && cargado["KOMI"] == null
+            && om.Count == 3 && om[0] == "KAAA" && om[2] == "KCCC" && Aeropuerto.Omitidos("").Count == 0
+            && cargado.ContainsKey("KAAA") && cargado["KAAA"] == null && !cargado.ContainsKey("KCUT") && k != null
             && k.Nombre == raro.Nombre && k.Lat == -33.5 && k.Lon == 20.25 && k.Region == "K1"
             && Aeropuerto.TopeAlcanzado(5000, 5000) && !Aeropuerto.TopeAlcanzado(4999, 5000) && new Opciones().Max == 5000
             && Opciones.Leer(new[] { "--max", "7" }).Max == 7
@@ -860,6 +871,9 @@ static class Sim
             var nuevos = 0;                                  // --volcar: aeropuertos terminados en esta corrida
             var listos = 0;                                  // --volcar: terminados en total (parcial + esta corrida)
             var pedidos = 0;                                 // --volcar: pedidos hechos en esta corrida, para las pausas
+            var vencidos = 0;                                // --volcar: no respondieron ni al reintento; no se guardan, se piden en la proxima
+            var archivoPedidos = volcar + ".pedidos.txt";
+            Action limpiar = () => { try { File.Delete(archivoPedidos); } catch (Exception) { } }; // corte limpio: ya no hay nada en vuelo
             var maxAbiertos = volcar != null ? MaxAbiertosVolcado : MaxAbiertos;
             var siguiente = PrimerPedido;
             Lugar pos = null, buscadoEn = null;
@@ -868,6 +882,16 @@ static class Sim
             {
                 // Retoma lo ya guardado: esos ICAO no se piden otra vez.
                 foreach (var kv in Aeropuerto.Cargar(Aeropuerto.LeerLineas(parcial))) { cache[kv.Key] = kv.Value; listos++; }
+                // Quedaron pedidos en vuelo: la corrida anterior se corto (cierre o caida de MSFS). Se saltan para no repetir el choque.
+                var viejos = File.Exists(archivoPedidos) ? Aeropuerto.Omitidos(File.ReadAllText(archivoPedidos)) : new List<string>();
+                if (viejos.Count > 0)
+                {
+                    foreach (var icao in viejos)
+                        if (!cache.ContainsKey(icao)) { escritor.WriteLine(Aeropuerto.LineaOmitida(icao)); cache[icao] = null; listos++; }
+                    Console.WriteLine("La corrida anterior se corto con estos pedidos en vuelo: " + string.Join(" ", viejos)
+                        + ". Pudieron ser los que cerraron el simulador; los salto (marcados omitido en " + parcial + ").");
+                    limpiar();
+                }
                 if (listos > 0) Console.WriteLine("Retomo el volcado: " + listos + " aeropuertos ya guardados en " + parcial);
             }
 
@@ -911,7 +935,8 @@ static class Sim
                             cache.Remove(icao);
                             if (volcar != null) cola.Enqueue(icao); else buscadoEn = null;
                         }
-                        terminar(id, !primera);
+                        if (!primera) vencidos++;
+                        terminar(id, false); // en --volcar nada se guarda por vencer: se vuelve a pedir en la proxima corrida
                     }
                 if (volcar != null && mundoListo && !encolado)
                 {
@@ -934,14 +959,20 @@ static class Sim
                     abiertos[id] = new Pedido { Icao = icao, Desde = ahora };
                     // Antes de pedir: si el simulador cae, aqui quedan los ICAO que iban en vuelo.
                     if (volcar != null)
-                        try { File.WriteAllText(volcar + ".pedidos.txt", string.Join(" ", EnVuelo(abiertos))); } catch (Exception) { }
+                        try { File.WriteAllText(archivoPedidos, string.Join(" ", EnVuelo(abiertos))); } catch (Exception) { }
                     // Un pedido que falla (MSFS cerrandose, ICAO raro) cuenta como terminado: no ocupa lugar ni tumba la conexion.
                     try { sim.RequestFacilityData(volcar != null ? Def.Volcado : Def.Aeropuerto, (Req)id, icao, ""); }
                     catch (Exception e)
                     {
                         Console.WriteLine("ATIS: no pude pedir " + icao + ": " + e.Message);
                         abiertos.Remove(id);
-                        if (volcar != null) { cache.Remove(icao); abierto = false; } // sin la conexion no hay volcado: se corta y se guarda
+                        if (volcar != null)
+                        {
+                            // No fue culpa del aeropuerto: se vuelve a pedir y no queda como sospechoso.
+                            cache.Remove(icao);
+                            abierto = false;
+                            try { File.WriteAllText(archivoPedidos, string.Join(" ", EnVuelo(abiertos))); } catch (Exception) { }
+                        } // sin la conexion no hay volcado: se corta y se guarda
                         break; // el resto espera al siguiente mensaje; si MSFS se cerro, el ciclo termina
                     }
                     if (volcar != null)
@@ -1044,8 +1075,14 @@ static class Sim
             {
                 if (senal.WaitOne(10000)) sim.ReceiveMessage();
                 avanzar();
-                if (volcar != null && encolado && abiertos.Count == 0)
+                if (volcar != null && abierto && encolado && abiertos.Count == 0)
                 {
+                    if (cola.Count == 0 && vencidos > 0)
+                    {
+                        limpiar();
+                        Console.WriteLine(vencidos + " aeropuertos no respondieron; corre el mismo comando otra vez (no hay archivo final todavia).");
+                        return 1;
+                    }
                     if (cola.Count == 0)
                     {
                         // Todo terminado: el archivo final sale del parcial.
@@ -1054,11 +1091,13 @@ static class Sim
                         foreach (var a in hechos.Values) if (a != null) ats.Add(a);
                         ats.Sort((x, y) => string.CompareOrdinal(x.Icao, y.Icao));
                         File.WriteAllText(volcar, Aeropuerto.JsonVolcado(ats), new UTF8Encoding(false));
+                        limpiar();
                         Console.WriteLine("Volcado listo: " + ats.Count + " aeropuertos con ATIS de " + hechos.Count + " en " + volcar);
                         return 0;
                     }
                     if (Aeropuerto.TopeAlcanzado(nuevos, max))
                     {
+                        limpiar();
                         Console.WriteLine("Llegue al tope de " + max + " aeropuertos nuevos en esta corrida.");
                         Console.WriteLine(Aeropuerto.Resumen(listos, mundo.Count));
                         return 2; // no hay archivo final todavia
