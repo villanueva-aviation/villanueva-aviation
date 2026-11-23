@@ -139,7 +139,13 @@ function Programa() {
     return e;
   };
 
+  // Cambiar de red a mano corta al momento, como cambiar de frecuencia; sin esto la regla nueva esperaría el fin del loop.
   const elegirRed = (r: Red) => {
+    if (r === red) return;
+    for (const c of canales.current) {
+      apagar(c);
+      Object.assign(c, { atis: undefined, buffer: undefined, faltantes: undefined, cargando: null, siguiente: null });
+    }
     setRed(r);
     try {
       localStorage.setItem(CLAVE_RED, r);
