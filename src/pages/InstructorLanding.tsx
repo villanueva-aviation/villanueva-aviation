@@ -63,8 +63,8 @@ export function InstructorLanding() {
             <h2 className="font-display text-2xl font-bold text-white sm:text-3xl">{P.debriefing.titulo}</h2>
             <p className="mt-3 text-white/70">{P.debriefing.texto}</p>
           </div>
-          <figure className={`mt-8 ${marco}`}>
-            <img src={P.debriefing.img} alt={P.debriefing.alt} loading="lazy" className="block w-full" />
+          <figure className={`mx-auto mt-8 w-fit max-w-full ${marco}`}>
+            <img src={P.debriefing.img} alt={P.debriefing.alt} loading="lazy" className="block h-auto max-w-full" />
           </figure>
         </Container>
       </section>
@@ -77,15 +77,17 @@ export function InstructorLanding() {
               <div className={`min-w-0 ${i % 2 ? "md:order-2" : ""}`}>
                 <h3 className="font-display text-xl font-bold text-white sm:text-2xl">{f.titulo}</h3>
                 <p className="mt-3 text-white/70">{f.texto}</p>
-                {f.img.includes("hojas") && (
+                {f.img?.includes("hojas") && (
                   <Link to={ROUTES.hojasInstructor} className="mt-4 inline-flex items-center gap-1 font-semibold text-gold-400 hover:text-gold-300">
                     Ver las hojas <ArrowRight size={14} />
                   </Link>
                 )}
               </div>
-              <figure className={marco}>
-                <img src={f.img} alt={f.alt} loading="lazy" className="block w-full" />
-              </figure>
+              {f.img && (
+                <figure className={`mx-auto w-fit max-w-full ${marco}`}>
+                  <img src={f.img} alt={f.alt} loading="lazy" className="block h-auto max-w-full" />
+                </figure>
+              )}
             </div>
           ))}
         </Container>

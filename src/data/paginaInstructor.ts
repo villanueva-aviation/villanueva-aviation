@@ -43,8 +43,7 @@ export const PAGINA_INSTRUCTOR = {
     {
       titulo: "Checklist por voz",
       texto: "Lee el checklist en voz alta y el instructor revisa en el simulador que de verdad lo hiciste. C172, C152 y Arrow.",
-      img: "/images/instructor-checklist.jpg",
-      alt: "Pantalla del checklist por voz del instructor virtual",
+      // ponytail: sin captura hasta que Erik la saque volando; agregar img/alt ahí
     },
     {
       titulo: "Hojas para imprimir",
