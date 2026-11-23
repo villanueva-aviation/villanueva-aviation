@@ -16,6 +16,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using SC = Microsoft.FlightSimulator.SimConnect; // alias de compilacion: no carga la DLL
 
 class Muestra
 {
@@ -50,6 +51,116 @@ class Muestra
     {
         if (v1 == 0 && v2 == 0 && (rx1 || rx2)) return new[] { double.NaN, double.NaN };
         return new[] { Math.Round(v1) / 100, Math.Round(v2) / 100 };
+    }
+}
+
+// ---- Aeropuertos con ATIS cerca del avion (de MSFS o, en --simulado, MMGL). Sin tipos de SimConnect: --probar los usa. ----
+
+class Lugar
+{
+    public string Icao;
+    public double Lat, Lon;
+}
+
+class Pista
+{
+    public string Ident;
+    public int RumboV, LargoFt;
+}
+
+class Aeropuerto : Lugar
+{
+    public string Nombre;
+    public int ElevFt;
+    public List<double> Mhz = new List<double>();
+    public List<Pista> Pistas = new List<Pista>();
+
+    public const double Radio = 200;   // NM
+    const double Rebusca = 10;         // NM movido antes de volver a buscar
+    public const double PiesPorMetro = 3.28084;
+
+    // Numero 1-36 y designador de MSFS (1 L, 2 R, 3 C; los demas sin letra). Fuera de 1-36 (N, NE...): null.
+    public static string Ident(int numero, int designador)
+    {
+        if (numero < 1 || numero > 36) return null;
+        var letra = designador == 1 ? "L" : designador == 2 ? "R" : designador == 3 ? "C" : "";
+        return numero.ToString("00", CultureInfo.InvariantCulture) + letra;
+    }
+
+    // Los dos extremos de una pista de MSFS: rumbo verdadero del primario y su opuesto; largo en metros -> ft.
+    public static List<Pista> Extremos(float rumbo, float largoM, int n1, int d1, int n2, int d2)
+    {
+        var largo = (int)Math.Round(largoM * PiesPorMetro);
+        var r = new List<Pista>();
+        var a = Ident(n1, d1);
+        var b = Ident(n2, d2);
+        if (a != null) r.Add(new Pista { Ident = a, RumboV = (int)Math.Round(rumbo) % 360, LargoFt = largo });
+        if (b != null) r.Add(new Pista { Ident = b, RumboV = (int)Math.Round((rumbo + 180) % 360) % 360, LargoFt = largo });
+        return r;
+    }
+
+    public static string Texto(string s)
+    {
+        var sb = new StringBuilder("\"");
+        foreach (var c in s)
+        {
+            if (c == '"' || c == '\\') sb.Append('\\').Append(c);
+            else if (c < ' ') sb.Append("\\u").Append(((int)c).ToString("x4"));
+            else sb.Append(c);
+        }
+        return sb.Append('"').ToString();
+    }
+
+    public static string Json(List<Aeropuerto> lista)
+    {
+        var sb = new StringBuilder("[");
+        for (var i = 0; i < lista.Count; i++)
+        {
+            var a = lista[i];
+            if (i > 0) sb.Append(", ");
+            sb.Append("{\"icao\": ").Append(Texto(a.Icao)).Append(", \"nombre\": ").Append(Texto(a.Nombre))
+                .Append(", \"lat\": ").Append(Muestra.N6(a.Lat)).Append(", \"lon\": ").Append(Muestra.N6(a.Lon))
+                .Append(", \"elevFt\": ").Append(a.ElevFt.ToString(CultureInfo.InvariantCulture)).Append(", \"atisMhz\": [");
+            for (var k = 0; k < a.Mhz.Count; k++) sb.Append(k > 0 ? ", " : "").Append(Muestra.N(a.Mhz[k]));
+            sb.Append("], \"pistas\": [");
+            for (var k = 0; k < a.Pistas.Count; k++)
+            {
+                var p = a.Pistas[k];
+                sb.Append(k > 0 ? ", " : "").Append("{\"ident\": ").Append(Texto(p.Ident))
+                    .Append(", \"rumboV\": ").Append(p.RumboV.ToString(CultureInfo.InvariantCulture))
+                    .Append(", \"largoFt\": ").Append(p.LargoFt.ToString(CultureInfo.InvariantCulture)).Append('}');
+            }
+            sb.Append("]}");
+        }
+        return sb.Append(']').ToString();
+    }
+
+    public static double Nm(Lugar a, Lugar b)
+    {
+        double r = Math.PI / 180;
+        var h = Math.Pow(Math.Sin((b.Lat - a.Lat) * r / 2), 2) + Math.Cos(a.Lat * r) * Math.Cos(b.Lat * r) * Math.Pow(Math.Sin((b.Lon - a.Lon) * r / 2), 2);
+        return 2 * 3440.065 * Math.Asin(Math.Min(1, Math.Sqrt(h)));
+    }
+
+    // Los que quedan a nm o menos de pos, el mas cercano primero.
+    public static List<T> Cercanos<T>(List<T> lista, Lugar pos, double nm) where T : Lugar
+    {
+        var dist = new List<double>();
+        var r = new List<T>();
+        foreach (var l in lista)
+        {
+            var d = Nm(pos, l);
+            if (d <= nm) { r.Add(l); dist.Add(d); }
+        }
+        var orden = r.ToArray();
+        Array.Sort(dist.ToArray(), orden);
+        return new List<T>(orden);
+    }
+
+    // Sin busqueda previa o tras moverse 10 NM: buscar otra vez (Review Focus 4).
+    public static bool DebeBuscar(Lugar ultima, Lugar pos)
+    {
+        return ultima == null || Nm(ultima, pos) >= Rebusca;
     }
 }
 
@@ -91,6 +202,27 @@ static class LectorAtis
     static string Estado()
     {
         lock (Candado) return ultima != null && Ahora() - recibida < 2 ? ultima.Json() : Muestra.JsonSinSim;
+    }
+
+    static List<Aeropuerto> conAtis = new List<Aeropuerto>(); // el hilo del simulador la reemplaza, nunca la cambia
+
+    public static void PublicarAeropuertos(List<Aeropuerto> lista)
+    {
+        lock (Candado) conAtis = lista;
+    }
+
+    // Los aeropuertos con ATIS a 200 NM de la ultima posicion; sin simulador o sin posicion, [].
+    static string Aeropuertos()
+    {
+        List<Aeropuerto> lista;
+        Lugar pos;
+        lock (Candado)
+        {
+            if (ultima == null || Ahora() - recibida >= 2) return "[]";
+            lista = conAtis;
+            pos = new Lugar { Lat = ultima.Lat, Lon = ultima.Lon };
+        }
+        return Aeropuerto.Json(Aeropuerto.Cercanos(lista, pos, Aeropuerto.Radio));
     }
 
     // --probar: revisa lo que se puede sin MSFS. Sale con 1 si algo falla.
@@ -136,7 +268,49 @@ static class LectorAtis
         var ruta = a.AglFt == 1500 && b.AglFt > 1500 && b.AglFt < 6000 && b.Lat == a.Lat && f.AglFt == 6000
             && Math.Abs((g.Lat - f.Lat) * 60 - 1) < 1e-6 && g.Lon == f.Lon;
         Console.WriteLine(ruta ? "Ruta simulada: OK" : "Ruta simulada: FALLA");
-        return edge && perfil && banderas && puerto && sinSim && forma && vol && ruta ? 0 : 1;
+
+        // Identificador de pista: 2 cifras + L/R/C; fuera de 1-36, nada.
+        var ident = Aeropuerto.Ident(19, 0) == "19" && Aeropuerto.Ident(9, 1) == "09L" && Aeropuerto.Ident(27, 2) == "27R"
+            && Aeropuerto.Ident(36, 3) == "36C" && Aeropuerto.Ident(37, 0) == null && Aeropuerto.Ident(0, 0) == null && Aeropuerto.Ident(9, 4) == "09";
+        Console.WriteLine(ident ? "Ident de pista: OK" : "Ident de pista: FALLA");
+
+        // Una pista de MSFS da sus dos extremos: rumbo verdadero y el opuesto, largo en ft.
+        var ex = Aeropuerto.Extremos(114.0f, 3538, 11, 2, 29, 1);
+        var extremos = ex.Count == 2 && ex[0].Ident == "11R" && ex[0].RumboV == 114 && ex[0].LargoFt == 11608
+            && ex[1].Ident == "29L" && ex[1].RumboV == 294 && ex[1].LargoFt == 11608
+            && Aeropuerto.Extremos(270.4f, 1000, 27, 0, 40, 0).Count == 1;
+        Console.WriteLine(extremos ? "Extremos de pista: OK" : "Extremos de pista: FALLA");
+
+        // MMGL simulado: la forma exacta del contrato de /aeropuertos.
+        var j = Aeropuerto.Json(new List<Aeropuerto> { Simulado.Mmgl() });
+        var mmgl = j == "[{\"icao\": \"MMGL\", \"nombre\": \"Don Miguel Hidalgo Intl\", \"lat\": 20.523342, \"lon\": -103.310108, " +
+            "\"elevFt\": 5016, \"atisMhz\": [127.9], \"pistas\": [{\"ident\": \"11L\", \"rumboV\": 114, \"largoFt\": 11608}, " +
+            "{\"ident\": \"29R\", \"rumboV\": 294, \"largoFt\": 11608}, {\"ident\": \"11R\", \"rumboV\": 113, \"largoFt\": 13123}, " +
+            "{\"ident\": \"29L\", \"rumboV\": 293, \"largoFt\": 13123}]}]";
+        Console.WriteLine(mmgl ? "Json de aeropuertos: OK" : "Json de aeropuertos: FALLA " + j);
+
+        var esc = Aeropuerto.Texto("a\"b\\c\n") == "\"a\\\"b\\\\c\\u000a\"" &&Aeropuerto.Json(new List<Aeropuerto>()) == "[]";
+        Console.WriteLine(esc ? "Json escapa el nombre: OK" : "Json escapa el nombre: FALLA");
+
+        // Sin simulador ni posicion: lista vacia.
+        var sinAp = Aeropuertos() == "[]";
+        Console.WriteLine(sinAp ? "Aeropuertos sin simulador: OK" : "Aeropuertos sin simulador: FALLA");
+
+        // Solo los de menos de 200 NM, el mas cercano primero (1 grado de latitud = 60 NM).
+        var aqui = new Lugar { Lat = 20, Lon = -103 };
+        var lista = new List<Lugar> {
+            new Lugar { Icao = "LEJ", Lat = 20 + 150 / 60.0, Lon = -103 }, new Lugar { Icao = "FUE", Lat = 20 - 250 / 60.0, Lon = -103 },
+            new Lugar { Icao = "CER", Lat = 20, Lon = -103 + 10 / 60.0 }, new Lugar { Icao = "MED", Lat = 20 - 60 / 60.0, Lon = -103 } };
+        var c = Aeropuerto.Cercanos(lista, aqui, 200);
+        var cercanos = c.Count == 3 && c[0].Icao == "CER" && c[1].Icao == "MED" && c[2].Icao == "LEJ";
+        Console.WriteLine(cercanos ? "Cercanos: OK" : "Cercanos: FALLA");
+
+        // Se vuelve a buscar al moverse 10 NM, no a los 9; sin busqueda previa, si.
+        var buscar = Aeropuerto.DebeBuscar(aqui, new Lugar { Lat = 20 + 10 / 60.0, Lon = -103 })
+            && !Aeropuerto.DebeBuscar(aqui, new Lugar { Lat = 20 + 9 / 60.0, Lon = -103 }) && Aeropuerto.DebeBuscar(null, aqui);
+        Console.WriteLine(buscar ? "Buscar cada 10 NM: OK" : "Buscar cada 10 NM: FALLA");
+        return edge && perfil && banderas && puerto && sinSim && forma && vol && ruta
+            && ident && extremos && mmgl && esc && sinAp && cercanos && buscar ? 0 : 1;
     }
 
     // Lo que pasaba en el lector del instructor: Edge heredaba el puerto y, si el lector se cerraba, nadie podia volver a usarlo.
@@ -315,6 +489,8 @@ static class LectorAtis
                 }
                 else if (partes[0] == "GET" && partes[1].Split('?')[0] == "/muestra")
                     Responder(flujo, "200 OK", extra.ToString(), Estado());
+                else if (partes[0] == "GET" && partes[1].Split('?')[0] == "/aeropuertos")
+                    Responder(flujo, "200 OK", extra.ToString(), Aeropuertos());
                 else
                     Responder(flujo, "404 Not Found", extra.ToString(), null);
             }
@@ -427,9 +603,22 @@ static class Simulado
         return m;
     }
 
+    // MMGL como en MX.json, para /aeropuertos sin MSFS.
+    public static Aeropuerto Mmgl()
+    {
+        var a = new Aeropuerto { Icao = "MMGL", Nombre = "Don Miguel Hidalgo Intl", Lat = 20.523342, Lon = -103.310108, ElevFt = 5016 };
+        a.Mhz.Add(127.9);
+        a.Pistas.Add(new Pista { Ident = "11L", RumboV = 114, LargoFt = 11608 });
+        a.Pistas.Add(new Pista { Ident = "29R", RumboV = 294, LargoFt = 11608 });
+        a.Pistas.Add(new Pista { Ident = "11R", RumboV = 113, LargoFt = 13123 });
+        a.Pistas.Add(new Pista { Ident = "29L", RumboV = 293, LargoFt = 13123 });
+        return a;
+    }
+
     public static void Correr()
     {
         var inicio = LectorAtis.Ahora();
+        LectorAtis.PublicarAeropuertos(new List<Aeropuerto> { Mmgl() });
         while (true)
         {
             LectorAtis.Publicar(En(LectorAtis.Ahora() - inicio));
@@ -442,8 +631,32 @@ static class Simulado
 
 static class Sim
 {
-    enum Def { Vuelo }
-    enum Req { Vuelo }
+    enum Def { Vuelo, Aeropuerto }
+    enum Req { Vuelo, Lista } // los pedidos de aeropuerto usan 100, 101...
+    const uint PrimerPedido = 100;
+    const int MaxAbiertos = 4;
+    const double EsperaSeg = 10; // un pedido sin respuesta (ICAO raro, excepcion) no traba la cola
+
+    // El orden exacto de los campos manda la forma de las estructuras de abajo.
+    static readonly string[] Campos =
+    {
+        "OPEN AIRPORT", "LATITUDE", "LONGITUDE", "ALTITUDE", "NAME", "N_RUNWAYS", "N_FREQUENCIES",
+        "OPEN FREQUENCY", "TYPE", "FREQUENCY", "NAME", "CLOSE FREQUENCY",
+        "OPEN RUNWAY", "LATITUDE", "LONGITUDE", "ALTITUDE", "HEADING", "LENGTH",
+        "PRIMARY_NUMBER", "PRIMARY_DESIGNATOR", "SECONDARY_NUMBER", "SECONDARY_DESIGNATOR", "CLOSE RUNWAY",
+        "CLOSE AIRPORT",
+    };
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    struct ApFac { public double Lat, Lon, Alt; [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string Nombre; public int NPistas, NFrec; }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    struct FrecFac { public int Tipo, Hz; [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)] public string Nombre; }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct PistaFac { public double Lat, Lon, Alt; public float Rumbo, Largo; public int N1, D1, N2, D2; }
+
+    class Pedido { public string Icao; public double Desde; public uint Unico; public Aeropuerto Ap; }
 
     static readonly string[][] Vars =
     {
@@ -473,12 +686,109 @@ static class Sim
             // Un nombre de variable mal escrito no tumba el lector: sale aqui.
             sim.OnRecvException += (s, d) => Console.WriteLine("SimConnect: excepcion " + d.dwException + " en el parametro " + d.dwIndex);
             double ultimo = -1;
+            // Aeropuertos: todo se borra en cada conexion (Review Focus 5).
+            var mundo = new List<Lugar>();
+            var mundoListo = false;
+            // ponytail: cache sin tope (cada aeropuerto se pide una vez por conexion; un vuelo largo junta unos miles de entradas chicas).
+            var cache = new Dictionary<string, Aeropuerto>(); // null = sin ATIS o pedido en curso
+            var conAtis = new List<Aeropuerto>();
+            var cola = new Queue<string>();
+            var abiertos = new Dictionary<uint, Pedido>();  // por RequestID
+            var porUnico = new Dictionary<uint, Pedido>();  // por UniqueRequestId del aeropuerto, por si un hijo no trae el RequestID
+            var siguiente = PrimerPedido;
+            Lugar pos = null, buscadoEn = null;
+            LectorAtis.PublicarAeropuertos(new List<Aeropuerto>());
+
+            Action<uint> terminar = id =>
+            {
+                Pedido p;
+                if (!abiertos.TryGetValue(id, out p)) return;
+                abiertos.Remove(id);
+                if (p.Unico != 0) porUnico.Remove(p.Unico);
+                if (p.Ap == null || p.Ap.Mhz.Count == 0) return; // queda null en la cache: no se vuelve a pedir
+                cache[p.Icao] = p.Ap;
+                conAtis.Add(p.Ap);
+                LectorAtis.PublicarAeropuertos(new List<Aeropuerto>(conAtis));
+            };
+
+            // Tras cada mensaje: vence pedidos colgados, rebusca cada 10 NM y abre hasta 4, el mas cercano primero.
+            Action avanzar = () =>
+            {
+                var ahora = LectorAtis.Ahora();
+                foreach (var id in new List<uint>(abiertos.Keys))
+                    if (ahora - abiertos[id].Desde > EsperaSeg)
+                    {
+                        // Sin respuesta (MSFS cargando, ICAO raro): sale de la cache y se reintenta en la proxima busqueda, a 10 NM.
+                        Console.WriteLine("ATIS: " + abiertos[id].Icao + " no respondio");
+                        cache.Remove(abiertos[id].Icao);
+                        terminar(id);
+                    }
+                if (mundoListo && pos != null && Aeropuerto.DebeBuscar(buscadoEn, pos))
+                {
+                    buscadoEn = pos;
+                    cola.Clear();
+                    foreach (var l in Aeropuerto.Cercanos(mundo, pos, Aeropuerto.Radio))
+                        if (!cache.ContainsKey(l.Icao)) cola.Enqueue(l.Icao);
+                }
+                while (abiertos.Count < MaxAbiertos && cola.Count > 0)
+                {
+                    var icao = cola.Dequeue();
+                    if (cache.ContainsKey(icao)) continue;
+                    cache[icao] = null;
+                    var id = siguiente++;
+                    abiertos[id] = new Pedido { Icao = icao, Desde = ahora };
+                    sim.RequestFacilityData(Def.Aeropuerto, (Req)id, icao, "");
+                }
+            };
+
+            sim.OnRecvAirportList += (s, d) =>
+            {
+                foreach (var o in d.rgData)
+                {
+                    var a = (SC.SIMCONNECT_DATA_FACILITY_AIRPORT)o;
+                    mundo.Add(new Lugar { Icao = a.Ident, Lat = a.Latitude, Lon = a.Longitude });
+                }
+                if (d.dwEntryNumber + 1 >= d.dwOutOf && !mundoListo)
+                {
+                    mundoListo = true;
+                    Console.WriteLine("Aeropuertos en MSFS: " + mundo.Count);
+                }
+            };
+            // Los hijos (frecuencias, pistas) llegan despues de su aeropuerto con el mismo RequestID.
+            sim.OnRecvFacilityData += (s, d) =>
+            {
+                Pedido p;
+                if (!abiertos.TryGetValue(d.UserRequestId, out p) && !porUnico.TryGetValue(d.ParentUniqueRequestId, out p)) return;
+                var o = d.Data[0];
+                if (o is ApFac)
+                {
+                    var a = (ApFac)o;
+                    p.Unico = d.UniqueRequestId;
+                    if (p.Unico != 0) porUnico[p.Unico] = p;
+                    p.Ap = new Aeropuerto { Icao = p.Icao, Nombre = (a.Nombre ?? "").Trim(), Lat = a.Lat, Lon = a.Lon, ElevFt = (int)Math.Round(a.Alt * Aeropuerto.PiesPorMetro) };
+                }
+                else if (p.Ap == null) return;
+                else if (o is FrecFac)
+                {
+                    var f = (FrecFac)o;
+                    var mhz = Math.Round(f.Hz / 1e6, 3);
+                    if (f.Tipo == 1 && !p.Ap.Mhz.Contains(mhz)) p.Ap.Mhz.Add(mhz);
+                }
+                else if (o is PistaFac)
+                {
+                    var r = (PistaFac)o;
+                    p.Ap.Pistas.AddRange(Aeropuerto.Extremos(r.Rumbo, r.Largo, r.N1, r.D1, r.N2, r.D2));
+                }
+            };
+            sim.OnRecvFacilityDataEnd += (s, d) => terminar(d.RequestId);
+
             sim.OnRecvSimobjectData += (s, d) =>
             {
                 // Llegan unas 15-20 por segundo: se publica una cada 250 ms.
                 if (LectorAtis.Ahora() - ultimo < 0.25) return;
                 ultimo = LectorAtis.Ahora();
                 var x = ((Vuelo)d.dwData[0]).Valores;
+                pos = new Lugar { Lat = x[6], Lon = x[7] };
                 bool rx1 = x[2] != 0, rx2 = x[3] != 0;
                 var m = new Muestra { Lat = x[6], Lon = x[7], AglFt = Math.Round(x[8]), Volumen = Muestra.Volumenes(x[4], x[5], rx1, rx2) };
                 m.Mhz[0] = Math.Round(x[0], 3); m.Mhz[1] = Math.Round(x[1], 3);
@@ -491,9 +801,17 @@ static class Sim
             // Cuadro visual con intervalo 4, como el instructor; arriba se filtra a 250 ms.
             sim.RequestDataOnSimObject(Req.Vuelo, Def.Vuelo, Microsoft.FlightSimulator.SimConnect.SimConnect.SIMCONNECT_OBJECT_ID_USER,
                 Microsoft.FlightSimulator.SimConnect.SIMCONNECT_PERIOD.VISUAL_FRAME, Microsoft.FlightSimulator.SimConnect.SIMCONNECT_DATA_REQUEST_FLAG.DEFAULT, 0, 4, 0);
+
+            foreach (var c in Campos) sim.AddToFacilityDefinition(Def.Aeropuerto, c);
+            sim.RegisterFacilityDataDefineStruct<ApFac>(SC.SIMCONNECT_FACILITY_DATA_TYPE.AIRPORT);
+            sim.RegisterFacilityDataDefineStruct<FrecFac>(SC.SIMCONNECT_FACILITY_DATA_TYPE.FREQUENCY);
+            sim.RegisterFacilityDataDefineStruct<PistaFac>(SC.SIMCONNECT_FACILITY_DATA_TYPE.RUNWAY);
+            // La lista del mundo (unos 42 000) llega en paginas, aun en el menu principal.
+            sim.RequestFacilitiesList(SC.SIMCONNECT_FACILITY_LIST_TYPE.AIRPORT, Req.Lista);
             while (abierto)
             {
                 if (senal.WaitOne(10000)) sim.ReceiveMessage();
+                avanzar();
             }
         }
     }

@@ -6,6 +6,9 @@ Flight Simulator 2020 y se lo pasa a la página del ATIS para que suene la
 frecuencia que tienes sintonizada. Solo funciona dentro de tu PC: no manda
 nada a internet.
 
+Ahora encuentra los aeropuertos con ATIS de todo el mundo: le pregunta a
+MSFS por los que tienes a 200 NM y los manda a la página.
+
 REQUISITOS
 - Windows 10 u 11 de 64 bits.
 - Microsoft Flight Simulator 2020.
