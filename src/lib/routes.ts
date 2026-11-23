@@ -68,6 +68,7 @@ export const ROUTES = {
   overlayGratis: "/overlay-gratis",
   eventos: "/eventos",
   resumenHsi: "/resumen-hsi",
+  instructor: "/instructor",
   instructorVirajeEscarpado: "/instructor/viraje-escarpado",
   instructorPrograma: "/instructor/programa",
   atisPrograma: "/atis/programa",
