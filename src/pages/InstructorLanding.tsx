@@ -1,13 +1,71 @@
+import { useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, Clock } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { Container } from "../components/ui/Container";
 import { botonInstructor, PAGINA_INSTRUCTOR as P, PROXIMAMENTE } from "../data/paginaInstructor";
 import { useAuth } from "../features/auth/AuthContext";
+import { RepeticionVuelo } from "../features/instructor/RepeticionVuelo";
+import { CAMPO_PUNTO } from "../features/instructor/recorrido";
+import { grabacionDemo } from "../features/instructor/recorridoDemo";
 import { DISCORD_URL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 
 const marco = "overflow-hidden rounded-2xl border border-white/10 bg-navy-900 shadow-2xl shadow-black/40";
+
+/** Una pantalla del instructor con brillo dorado detrás; llega inclinada y se endereza al bajar (index.css). */
+function Pantalla({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={`relative isolate ${className}`}>
+      <div aria-hidden className="pointer-events-none absolute -inset-10 -z-10 bg-[radial-gradient(closest-side,rgba(212,175,55,0.2),transparent)] blur-2xl" />
+      <figure className={`pantalla-inclinada ${marco}`}>{children}</figure>
+    </div>
+  );
+}
+
+/** La repetición real del vuelo demo, parada en el primer mensaje del instructor dentro de la zona. */
+function DemoVuelo() {
+  const g = useMemo(() => grabacionDemo(), []);
+  const [t, setT] = useState(() => {
+    const zona = g.fases.find((f) => f.fase === "zona");
+    const voz = zona && g.voz.find((v) => v.t >= zona.inicio && v.t <= zona.fin);
+    return voz ? voz.t + 2 : (g.puntos[0]?.[CAMPO_PUNTO.t] ?? 0);
+  });
+  return (
+    <div className="p-4 sm:p-6">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <p className="font-display font-bold text-white">Vuelo de demostración · Virajes a rumbos</p>
+        <span className="rounded-full bg-gold-500/15 px-2 py-0.5 text-xs font-semibold text-gold-300">Toca ▶ o arrastra</span>
+      </div>
+      <RepeticionVuelo grabacion={g} cursorT={t} alMover={setT} idioma="es" />
+    </div>
+  );
+}
+
+/** El menú de lecciones hecho en la página (nítido a cualquier tamaño) con la maniobra gratis abajo. */
+function ListaLecciones() {
+  return (
+    <div className="p-5 sm:p-6">
+      <p className="font-display font-bold text-white">¿Qué quieres practicar hoy?</p>
+      <p className="mt-3 text-[11px] font-semibold uppercase tracking-wider text-gold-400">Lecciones</p>
+      <ol className="mt-2 grid gap-1.5 [mask-image:linear-gradient(to_bottom,black_55%,transparent)]">
+        {PROXIMAMENTE.vfr.slice(0, 7).map((n, i) => (
+          <li key={n} className="flex items-center gap-3 rounded-lg border border-gold-500/35 bg-navy-950/60 px-3 py-2 text-sm font-semibold text-white">
+            <span className="w-4 text-xs tabular-nums text-white/40">{i + 1}</span>
+            {n}
+          </li>
+        ))}
+      </ol>
+      <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-gold-500/60 bg-navy-950/60 px-4 py-3">
+        <div>
+          <p className="font-bold text-white">Viraje escarpado</p>
+          <p className="text-xs text-white/60">360° a 45° de inclinación a cada lado, como en un checkride.</p>
+        </div>
+        <span className="shrink-0 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-bold text-emerald-300">Gratis</span>
+      </div>
+    </div>
+  );
+}
 
 /** Página pública que presenta el instructor virtual y lleva a probar gratis el viraje escarpado (spec 2026-11-23). */
 export function InstructorLanding() {
@@ -34,9 +92,9 @@ export function InstructorLanding() {
             </div>
             <p className="mt-4 text-sm text-white/55">{P.requisitos}</p>
           </div>
-          <figure className={marco}>
+          <Pantalla>
             <img src={P.debriefing.img} alt={P.debriefing.alt} className="block w-full" />
-          </figure>
+          </Pantalla>
         </Container>
       </section>
 
@@ -63,9 +121,9 @@ export function InstructorLanding() {
             <h2 className="font-display text-2xl font-bold text-white sm:text-3xl">{P.debriefing.titulo}</h2>
             <p className="mt-3 text-white/70">{P.debriefing.texto}</p>
           </div>
-          <figure className={`mx-auto mt-8 w-fit max-w-full ${marco}`}>
-            <img src={P.debriefing.img} alt={P.debriefing.alt} loading="lazy" className="block h-auto max-w-full" />
-          </figure>
+          <Pantalla className="mx-auto mt-10 max-w-4xl">
+            <DemoVuelo />
+          </Pantalla>
         </Container>
       </section>
 
@@ -83,10 +141,15 @@ export function InstructorLanding() {
                   </Link>
                 )}
               </div>
+              {f.lecciones && (
+                <Pantalla className="mx-auto w-full max-w-md">
+                  <ListaLecciones />
+                </Pantalla>
+              )}
               {f.img && (
-                <figure className={`mx-auto w-fit max-w-full ${marco}`}>
-                  <img src={f.img} alt={f.alt} loading="lazy" className="block h-auto max-w-full" />
-                </figure>
+                <Pantalla>
+                  <img src={f.img} alt={f.alt} loading="lazy" className="block w-full" />
+                </Pantalla>
               )}
             </div>
           ))}

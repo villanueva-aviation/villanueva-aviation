@@ -29,7 +29,7 @@ export const PAGINA_INSTRUCTOR = {
   ],
   debriefing: {
     titulo: "Tu vuelo, revisado punto por punto",
-    texto: "Así se ve el debriefing: tu ruta sobre el mapa satelital, cada error numerado justo donde ocurrió y el vuelo separado por fases.",
+    texto: "Dale play o arrastra la gráfica: es el vuelo demo completo. Abajo ves los instrumentos en cada momento y lo que te dijo el instructor; las marcas rojas son los errores.",
     img: "/images/instructor-debriefing.jpg",
     alt: "Debriefing de un vuelo de demostración: la ruta sobre un mapa satelital con los errores numerados",
   },
@@ -37,13 +37,12 @@ export const PAGINA_INSTRUCTOR = {
     {
       titulo: "Un programa de lecciones",
       texto: "Las maniobras de la escuela en orden, de familiarización a toques y despegues, con práctica y checkride en cada una.",
-      img: "/images/instructor-programa.jpg",
-      alt: "Menú de lecciones del instructor virtual",
+      lecciones: true,
     },
     {
       titulo: "Checklist por voz",
       texto: "Lee el checklist en voz alta y el instructor revisa en el simulador que de verdad lo hiciste. C172, C152 y Arrow.",
-      // ponytail: sin captura hasta que Erik la saque volando; agregar img/alt ahí
+      // Sin captura hasta que Erik la saque volando: agregar img y alt aquí.
     },
     {
       titulo: "Hojas para imprimir",

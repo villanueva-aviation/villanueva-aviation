@@ -320,3 +320,25 @@ body {
   @page { margin: 14mm; }
   body, body > #root > div { background: #fff !important; }
 }
+
+/* Pantallas de /instructor: llegan inclinadas en 3D y se enderezan al bajar (solo navegadores con scroll-driven animations). */
+@keyframes pantalla-enderezar {
+  from {
+    transform: perspective(1600px) rotateX(16deg) scale(0.94);
+    opacity: 0.5;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .pantalla-inclinada {
+      animation: pantalla-enderezar linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 35%;
+    }
+  }
+}
