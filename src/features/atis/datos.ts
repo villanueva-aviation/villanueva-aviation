@@ -1,10 +1,13 @@
 // Datos de aeropuertos para el ATIS, armados desde OurAirports.
+import { formatoDe } from "./formato.ts";
+
 export type ExtremoPista = { ident: string; rumboV: number; largoFt: number }; // rumboV = rumbo verdadero, grados
 export type AeropuertoAtis = {
-  icao: string; nombreEs: string; nombreEn: string;
+  icao: string; nombreEs: string | null; nombreEn: string | null; nombreSim: string; // nombreSim = nombre en MSFS; los hablados son null si no hay pieza
   lat: number; lon: number; elevFt: number;
   atisMhz: number[]; pistas: ExtremoPista[];
 };
+export type Nombres = Record<string, { es?: string; en: string }>;
 type Fila = Record<string, string>;
 
 // El ATIS real dice la ciudad, no el nombre oficial.
@@ -63,11 +66,21 @@ export function armarAeropuertos(aeropuertos: Fila[], pistas: Fila[], frecuencia
     if (atisMhz.length === 0) continue;
     const n = NOMBRES_FIJOS[a.ident] ?? nombres(a.name, a.municipality || a.name);
     salida.push({
-      icao: a.ident, nombreEs: n.es, nombreEn: n.en,
+      icao: a.ident, nombreEs: n.es, nombreEn: n.en, nombreSim: n.en,
       lat: Number(a.latitude_deg), lon: Number(a.longitude_deg), elevFt: Number(a.elevation_ft) || 0,
       atisMhz,
       pistas: pistas.filter((p) => p.airport_ident === a.ident).flatMap(extremos),
     });
   }
   return salida;
+}
+
+// Pone los nombres hablados; sin nombre quedan null (el ATIS deletrea el ICAO). En mx y latam es cae a en.
+export function conNombres(aps: Omit<AeropuertoAtis, "nombreEs" | "nombreEn">[], nombres: Nombres): AeropuertoAtis[] {
+  return aps.map((a) => {
+    const n = nombres[a.icao];
+    if (!n) return { ...a, nombreEs: null, nombreEn: null };
+    const f = formatoDe(a.icao);
+    return { ...a, nombreEs: n.es ?? (f === "mx" || f === "latam" ? n.en : null), nombreEn: n.en };
+  });
 }

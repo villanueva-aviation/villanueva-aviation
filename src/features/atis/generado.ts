@@ -97,7 +97,12 @@ function armarFormato(formato: Formato, metar: Metar, ap: AeropuertoAtis, { conC
       return j(...trozos);
     };
 
-    p("aeropuerto", t(`ap-${ap.icao}`, `${idioma === "es" ? ap.nombreEs : ap.nombreEn}.`));
+    const nombre = idioma === "es" ? ap.nombreEs : ap.nombreEn;
+    if (nombre) p("aeropuerto", t(`ap-${ap.icao}`, `${nombre}.`));
+    else { // sin pieza del nombre: se deletrea el ICAO en fonético
+      const ls = [...ap.icao.toUpperCase()].filter((c) => /[A-Z]/.test(c));
+      p("aeropuerto", { texto: `${ls.map((c) => F(`letra-${c}`).replace(/\.$/, "")).join(" ")}.`, claves: ls.map((c) => `letra-${c}`) });
+    }
     if (!conControlador) p("letra", j("f-informacion", `letra-${letra}`));
     if (hora) {
       const x = idioma === "es" ? j("f-observacion", D(hora), "f-zulu") : j(D(hora), "f-zulu");

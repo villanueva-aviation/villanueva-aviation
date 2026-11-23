@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { armarAeropuertos, extremos, nombres } from "./datos.ts";
+import { armarAeropuertos, conNombres, extremos, nombres } from "./datos.ts";
 
 const fila11R = {
   le_ident: "11R", he_ident: "29L", length_ft: "13123", closed: "0",
@@ -67,4 +67,16 @@ test("armarAeropuertos: MMMX usa el nombre fijo", () => {
   const r = armarAeropuertos([apt], [], [{ airport_ident: "MMMX", type: "ATIS", frequency_mhz: "127.0" }], "MX");
   assert.equal(r[0].nombreEs, "Aeropuerto Internacional de la Ciudad de México");
   assert.equal(r[0].nombreEn, "Mexico City International Airport");
+  assert.equal(r[0].nombreSim, "Mexico City International Airport");
+});
+
+test("conNombres: llena los nombres, null si falta, y es cae a en en mx y latam", () => {
+  const base = { lat: 0, lon: 0, elevFt: 0, atisMhz: [], pistas: [] };
+  const r = conNombres([
+    { icao: "MMGL", nombreSim: "Sim MMGL", ...base }, { icao: "SKRG", nombreSim: "Sim SKRG", ...base },
+    { icao: "EGLL", nombreSim: "Sim EGLL", ...base }, { icao: "KLAX", nombreSim: "Sim KLAX", ...base },
+  ], { MMGL: { es: "Guadalajara", en: "Guadalajara Intl" }, SKRG: { en: "Rionegro" }, EGLL: { en: "Heathrow" } });
+  assert.deepEqual(r.map((a) => [a.nombreEs, a.nombreEn]),
+    [["Guadalajara", "Guadalajara Intl"], ["Rionegro", "Rionegro"], [null, "Heathrow"], [null, null]]);
+  assert.equal(r[0].nombreSim, "Sim MMGL");
 });

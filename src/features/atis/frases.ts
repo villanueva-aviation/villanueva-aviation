@@ -1,5 +1,5 @@
 // Catálogo de piezas de audio del ATIS: cada clave es un MP3 en public/atis/piezas/{idioma}/{clave}.mp3.
-import type { AeropuertoAtis } from "./datos.ts";
+import type { AeropuertoAtis, Nombres } from "./datos.ts";
 
 export type Idioma = "es" | "en";
 export type Pieza = { idioma: Idioma; clave: string };
@@ -104,16 +104,17 @@ export const palabraDigito = (idioma: Idioma, d: string): string => DIGITOS[idio
 export function textoDePieza(p: Pieza, aeropuertos: AeropuertoAtis[]): string | null {
   if (p.clave.startsWith("ap-")) {
     const a = aeropuertos.find((x) => x.icao === p.clave.slice(3));
-    return a ? `${p.idioma === "es" ? a.nombreEs : a.nombreEn}.` : null;
+    const n = a && (p.idioma === "es" ? a.nombreEs : a.nombreEn);
+    return n ? `${n}.` : null;
   }
   return FRASES[p.idioma][p.clave] ?? null;
 }
 
-export function todasLasPiezas(aeropuertos: AeropuertoAtis[]): Pieza[] {
+export function todasLasPiezas(nombres: Nombres): Pieza[] {
   const piezas: Pieza[] = [];
   for (const idioma of ["es", "en"] as const) {
     for (const clave of Object.keys(FRASES[idioma])) piezas.push({ idioma, clave });
-    for (const icao of new Set(aeropuertos.map((a) => a.icao))) piezas.push({ idioma, clave: `ap-${icao}` });
+    for (const [icao, n] of Object.entries(nombres)) if (idioma === "en" || n.es) piezas.push({ idioma, clave: `ap-${icao}` });
   }
   return piezas;
 }

@@ -7,7 +7,7 @@ import { alcanceNm, debeCambiar, distanciaNm, entraSiguiente, mezclaPorDistancia
 
 const cerca = (a: number, b: number, tol: number) => assert.ok(Math.abs(a - b) <= tol, `${a} vs ${b}`);
 const ap = (icao: string, lat: number, lon: number, atisMhz = [127.9]): AeropuertoAtis =>
-  ({ icao, nombreEs: icao, nombreEn: icao, lat, lon, elevFt: 0, atisMhz, pistas: [] });
+  ({ icao, nombreEs: icao, nombreEn: icao, nombreSim: icao, lat, lon, elevFt: 0, atisMhz, pistas: [] });
 
 test("distanciaNm: un grado de latitud son ~60 NM", () => {
   cerca(distanciaNm({ lat: 0, lon: 0 }, { lat: 1, lon: 0 }), 60.04, 0.05);
@@ -47,6 +47,12 @@ test("sintonizado: gana el más cercano dentro de alcance", () => {
   assert.equal(r.ap.icao, "CERC");
   cerca(r.distNm, 20, 0.1);
   assert.equal(sintonizado(com, { lat: 0, lon: 0, aglFt: 0 }, [lejos, near]), null);
+});
+
+test("sintonizado: 121.933 y 121.935 encuentran el ATIS de 121.935", () => {
+  const x = ap("EGLL", 51.47, -0.45, [121.935]);
+  const pos = { lat: 51.47, lon: -0.45, aglFt: 0 };
+  for (const mhz of [121.933, 121.935]) assert.equal(sintonizado({ mhz, escucha: true, volumen: null }, pos, [x])?.ap.icao, "EGLL");
 });
 
 test("offsetLoop", () => {

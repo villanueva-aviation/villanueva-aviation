@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import type { Metar } from "../../lib/clima.ts";
 import type { AeropuertoAtis } from "./datos.ts";
 import { todasLasPiezas } from "./frases.ts";
+
+const NOMBRES = { MMGL: { es: "x", en: "y" } };
 import { armarAtis, armarAtisMx, letraDe, pistaEnUso, type Atis, type Parte } from "./generado.ts";
 
 const metar: Metar = {
@@ -17,6 +19,7 @@ const metar: Metar = {
 // Una sola pista 11/29, para el texto exacto.
 const ap: AeropuertoAtis = {
   icao: "MMGL", nombreEs: "Aeropuerto Internacional de Guadalajara", nombreEn: "Guadalajara International Airport",
+  nombreSim: "Guadalajara International Airport",
   lat: 20.52, lon: -103.31, elevFt: 5016, atisMhz: [127.9],
   pistas: [{ ident: "11", rumboV: 113, largoFt: 13123 }, { ident: "29", rumboV: 293, largoFt: 13123 }],
 };
@@ -165,7 +168,7 @@ test("una milla, en singular", () => {
   assert.equal(parte(a, "visibilidad", "en")?.texto, "Visibility, one mile.");
   assert.deepEqual(claves(parte(a, "visibilidad")), ["f-visibilidad", "f-milla"]);
   assert.deepEqual(parte(armarAtisMx({ ...metar, visib: "1" }, ap), "visibilidad"), parte(a, "visibilidad"));
-  assert.ok(todasLasPiezas([ap]).some((p) => p.idioma === "en" && p.clave === "f-milla"));
+  assert.ok(todasLasPiezas(NOMBRES).some((p) => p.idioma === "en" && p.clave === "f-milla"));
 });
 
 test("letraDe: misma hora, misma letra; Z vuelve a A", () => {
@@ -178,7 +181,7 @@ test("letraDe: misma hora, misma letra; Z vuelve a A", () => {
 });
 
 test("todas las piezas usadas están en el banco, sin duplicados", () => {
-  const banco = todasLasPiezas([ap]);
+  const banco = todasLasPiezas(NOMBRES);
   const llaves = banco.map((p) => `${p.idioma}/${p.clave}`);
   assert.equal(new Set(llaves).size, llaves.length);
   const casos: Metar[] = [
@@ -218,7 +221,7 @@ const par = (a: string, b: string, rumboA: number, ft: number) => [
 ];
 const hora1 = (26 * 19000 + 1) * 3600;
 const mundo = (icao: string, nombreEn: string, nombreEs: string, pistas: AeropuertoAtis["pistas"]): AeropuertoAtis =>
-  ({ icao, nombreEs, nombreEn, lat: 0, lon: 0, elevFt: 0, atisMhz: [], pistas });
+  ({ icao, nombreEs, nombreEn, nombreSim: nombreEn, lat: 0, lon: 0, elevFt: 0, atisMhz: [], pistas });
 const mtr = (rawOb: string, obsTime: number, extra: Partial<Metar> = {}): Metar => ({
   icaoId: rawOb.split(" ")[0], rawOb, obsTime, wdir: 240, wspd: 12, wgst: null, visib: null, clouds: [],
   wxString: null, temp: 9, dewp: 4, altim: 1013, elev: 0, ...extra,
@@ -301,7 +304,7 @@ test("latam con millas y altímetro usa las palabras de mx", () => {
 
 test("banco de piezas: formatos latam, faa y oaci", () => {
   const aps = ["EGLL", "SKBO", "KLAX"].map((icao) => ({ ...mmgl, icao }));
-  const banco = new Set(todasLasPiezas(aps).map((p) => `${p.idioma}/${p.clave}`));
+  const banco = new Set(todasLasPiezas(Object.fromEntries(aps.map((a) => [a.icao, { es: "x", en: "y" }]))).map((p) => `${p.idioma}/${p.clave}`));
   const casos: [string, string][] = [
     ["EGLL", "EGLL 221450Z 24012G25KT 200V280 4000NE -RA BKN045 09/04 Q1013 NOSIG"],
     ["EGLL", "EGLL 221450Z 24012KT CAVOK 09/04 Q1013 NOSIG"],
@@ -314,4 +317,25 @@ test("banco de piezas: formatos latam, faa y oaci", () => {
       assert.ok(banco.has(`${p.idioma}/${p.clave}`), `${icao} ${p.idioma}/${p.clave}`);
     }
   }
+});
+
+test("sin nombre, el aeropuerto se deletrea en fonético (oaci)", () => {
+  const a = armarAtis(mtr("SKRG 221450Z 24012KT 9999 FEW030 09/04 Q1013", hora1), { ...mundo("SKRG", "", "", []), nombreEs: null, nombreEn: null });
+  const p = parte(a, "aeropuerto", "en");
+  assert.equal(p?.texto, "Sierra Kilo Romeo Golf.");
+  assert.deepEqual(claves(p), ["letra-S", "letra-K", "letra-R", "letra-G"]);
+  assert.ok(p?.piezas.every((x) => x.idioma === "en"));
+});
+
+test("latam sin nombre: el deletreo en español usa las letras es", () => {
+  const a = armarAtis(mtr("SKRG 221450Z 24012KT 9999 FEW030 09/04 Q1013", hora1), { ...mundo("SKRG", "", "", []), nombreEs: null, nombreEn: null });
+  const p = parte(a, "aeropuerto", "es");
+  assert.equal(p?.texto, "Sierra Kilo Romeo Golf.");
+  assert.deepEqual(p?.piezas, ["S", "K", "R", "G"].map((l) => ({ idioma: "es", clave: `letra-${l}` })));
+});
+
+test("todasLasPiezas: ap-XXXX en en siempre y en es solo si hay es", () => {
+  const k = todasLasPiezas({ SKRG: { es: "A", en: "B" }, EGLL: { en: "C" } }).map((p) => `${p.idioma}/${p.clave}`);
+  for (const x of ["es/ap-SKRG", "en/ap-SKRG", "en/ap-EGLL"]) assert.ok(k.includes(x), x);
+  assert.ok(!k.includes("es/ap-EGLL"));
 });

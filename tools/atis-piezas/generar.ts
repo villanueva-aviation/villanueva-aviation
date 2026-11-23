@@ -4,7 +4,7 @@ import { execFile } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { promisify } from "node:util";
 import { textoDePieza, todasLasPiezas, type Idioma } from "../../src/features/atis/frases.ts";
-import type { AeropuertoAtis } from "../../src/features/atis/datos.ts";
+import type { AeropuertoAtis, Nombres } from "../../src/features/atis/datos.ts";
 
 const ejecutar = promisify(execFile);
 const VOCES: Record<Idioma, { voz: string; lang: string }> = {
@@ -54,8 +54,14 @@ async function sintetizar(idioma: Idioma, texto: string, archivo: string) {
   writeFileSync(archivo, audio);
 }
 
-const aeropuertos: AeropuertoAtis[] = JSON.parse(readFileSync("public/data/atis/MX.json", "utf8"));
-const piezas = todasLasPiezas(aeropuertos).filter((p) => !solo || p.clave === solo);
+// nombres.json (mundo) si existe; si no, los nombres de MX.json, con las mismas claves de siempre.
+const leer = (r: string) => JSON.parse(readFileSync(r, "utf8"));
+const nombres: Nombres = existsSync("public/data/atis/nombres.json")
+  ? leer("public/data/atis/nombres.json")
+  : Object.fromEntries((leer("public/data/atis/MX.json") as AeropuertoAtis[]).map((a) => [a.icao, { es: a.nombreEs ?? undefined, en: a.nombreEn! }]));
+const aeropuertos: AeropuertoAtis[] = Object.entries(nombres).map(([icao, n]) =>
+  ({ icao, nombreEs: n.es ?? null, nombreEn: n.en, nombreSim: n.en, lat: 0, lon: 0, elevFt: 0, atisMhz: [], pistas: [] }));
+const piezas = todasLasPiezas(nombres).filter((p) => !solo || p.clave === solo);
 let hechas = 0, saltadas = 0, fallidas = 0;
 for (const p of piezas) {
   const texto = textoDePieza(p, aeropuertos);
