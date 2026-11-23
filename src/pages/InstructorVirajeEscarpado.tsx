@@ -16,6 +16,7 @@ import { ReporteExamen } from "../features/instructor/ReporteExamen";
 import { useIntentoViraje } from "../features/instructor/useIntentoViraje";
 import { ALTURA_SEGURA_AGL } from "../features/instructor/virajeEscarpado";
 import { avisoVoz, textoEspera } from "../features/instructor/voz";
+import { DISCORD_URL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
 
 const CLAVE_SONIDO = "instructor-sonido";
@@ -110,11 +111,19 @@ export function InstructorVirajeEscarpado() {
   return (
     <div>
       <PageHero
-        eyebrow="Gratis · Con tu cuenta · C172"
+        eyebrow="Beta · Gratis · Con tu cuenta · C172"
         title="Instructor virtual: viraje escarpado"
         description="Vuela dos virajes de 360° a 45° en tu simulador y el instructor te califica. En Difícil, con las tolerancias de un checkride: altitud ±100 ft, velocidad ±10 kt, inclinación ±5° y rumbo de salida ±10°. En Fácil y Medio, más amplias para que practiques."
       />
       <Container className="space-y-8 py-12">
+        <p className="rounded-xl border border-gold-500/40 bg-gold-500/10 px-4 py-3 text-sm text-white/80">
+          <span className="mr-2 rounded-full bg-gold-500 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-navy-950">Beta</span>
+          El instructor virtual sigue en desarrollo y lo mejoramos cada semana. Si algo falla o tienes una idea, cuéntanos en el{" "}
+          <a href={DISCORD_URL} target="_blank" rel="noopener noreferrer" className="font-semibold text-gold-400 underline underline-offset-2">
+            Discord
+          </a>
+          .
+        </p>
         <section className="grid gap-4 md:grid-cols-3">
           {[
             ["1. Abre el lector", "Un programa chico que lee tu avión en MSFS 2020. Solo funciona dentro de tu PC."],
