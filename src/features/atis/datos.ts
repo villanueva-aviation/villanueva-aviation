@@ -24,6 +24,7 @@ export const NOMBRES_FIJOS: Record<string, { es: string; en: string }> = {
   MMAN: { es: "Aeropuerto Internacional del Norte", en: "Del Norte International Airport" },
   MMMZ: { es: "Aeropuerto Internacional de Mazatlán", en: "Mazatlán International Airport" },
   MMLO: { es: "Aeropuerto Internacional de Guanajuato", en: "Guanajuato International Airport" },
+  SKRG: { es: "Aeropuerto Internacional José María Córdova", en: "José María Córdova International Airport" }, // la fuente no trae los acentos
 };
 
 // Rumbo inicial de círculo máximo, entero 0–359.

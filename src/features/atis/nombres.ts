@@ -37,6 +37,7 @@ export function nombresAtis(
     const f = formatoDe(icao);
     const habla = f === "mx" || f === "latam";
     if (mx[icao]) salida[icao] = mx[icao];
+    else if (NOMBRES_FIJOS[icao]) salida[icao] = NOMBRES_FIJOS[icao];
     else if (!a) { const n = expandir(nombre); salida[icao] = habla ? { es: aEspanol(n), en: n } : { en: n }; }
     else if (habla && ciudad(icao) && porCiudad.get(ciudad(icao)) === 1) salida[icao] = NOMBRES_FIJOS[icao] ?? nombres(a.name, a.municipality);
     else salida[icao] = habla ? { es: aEspanol(a.name), en: a.name } : { en: a.name };

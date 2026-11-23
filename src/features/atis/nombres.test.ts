@@ -16,7 +16,7 @@ test("latam: la ciudad compartida usa el nombre de OurAirports; sola, la regla d
   const { nombres } = nombresAtis([v("SAEZ"), v("SABE"), v("SKRG")], our);
   assert.deepEqual(nombres.SAEZ, { es: "Aeropuerto Internacional Ministro Pistarini", en: "Ministro Pistarini International Airport" });
   assert.deepEqual(nombres.SABE, { es: "Aeropuerto Jorge Newbery Airpark", en: "Jorge Newbery Airpark" });
-  assert.deepEqual(nombres.SKRG, { es: "Aeropuerto Internacional de Rionegro", en: "Rionegro International Airport" });
+  assert.deepEqual(nombres.SKRG, { es: "Aeropuerto Internacional José María Córdova", en: "José María Córdova International Airport" });
 });
 
 test("un aeropuerto de MX.json conserva sus nombres", () => {
