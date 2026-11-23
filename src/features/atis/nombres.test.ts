@@ -42,3 +42,13 @@ test("repetidos y caracteres", () => {
   const dup = nombresAtis([v("EGLL"), v("EGKK", "Foo")], [...our, { ident: "EGKK", name: "London Heathrow Airport", municipality: "", iso_country: "GB" }]);
   assert.deepEqual(dup.repetidos, ["London Heathrow Airport"]);
 });
+
+test("los de MX.json que faltan en el volcado conservan sus nombres", () => {
+  const r = nombresAtis([v("EGLL")], our, mx);
+  assert.deepEqual(r.nombres.MMGL, mx.MMGL);
+  assert.equal(r.caracteres, "Aeropuerto Internacional de Guadalajara".length + 1 + "Guadalajara International Airport".length + 1 + "London Heathrow Airport".length + 1);
+});
+
+test("una abreviatura heredada del prototipo (toString) no se confunde con una palabra", () => {
+  assert.deepEqual(nombresAtis([v("KZZZ", "toString Intl")], our).nombres.KZZZ, { en: "toString International" });
+});

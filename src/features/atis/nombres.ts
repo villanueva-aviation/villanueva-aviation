@@ -7,7 +7,7 @@ const ABREVIATURAS: Record<string, string> = {
   Intl: "International", Rgnl: "Regional", Muni: "Municipal", AB: "Air Base", Apt: "Airport", Arpt: "Airport",
   Natl: "National", Fld: "Field", Mem: "Memorial",
 };
-const expandir = (s: string) => s.trim().replace(/[A-Za-z]+\.?/g, (w) => ABREVIATURAS[w.replace(/\.$/, "")] ?? w);
+const expandir = (s: string) => s.trim().replace(/[A-Za-z]+\.?/g, (w) => Object.hasOwn(ABREVIATURAS, w.replace(/\.$/, "")) ? ABREVIATURAS[w.replace(/\.$/, "")] : w);
 
 export function nombresAtis(
   volcado: { icao: string; nombre: string }[],
@@ -29,6 +29,9 @@ export function nombresAtis(
     else if (habla && ciudad(icao) && porCiudad.get(ciudad(icao)) === 1) salida[icao] = NOMBRES_FIJOS[icao] ?? nombres(a.name, a.municipality);
     else salida[icao] = habla ? { es: a.name, en: a.name } : { en: a.name };
   }
+
+  // Los de MX.json que faltan en el volcado: su audio ya esta grabado, se quedan.
+  for (const [icao, n] of Object.entries(mx)) salida[icao] ??= n;
 
   const usos = new Map<string, number>();
   let caracteres = 0;
