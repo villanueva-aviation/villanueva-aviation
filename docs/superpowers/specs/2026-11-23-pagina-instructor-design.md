@@ -26,7 +26,7 @@ Erik quiere que el instructor virtual tenga su propio apartado para promocionarl
 
 1. **Gancho.** Etiqueta «Instructor virtual · beta». Título del estilo de «Un instructor que te califica mientras vuelas en MSFS». Subtítulo de una línea: lee tu avión en MSFS 2020, te guía con voz y te califica con las tolerancias de un checkride. Botón principal (ver «El botón»). Una captura real del instructor a un lado.
 2. **Cómo funciona**, en 3 pasos (es una secuencia real, por eso va numerada): abres el lector en tu PC, vuelas el C172 en MSFS 2020 y el instructor te habla y te califica, y al aterrizar te da el debriefing. Los textos salen de los pasos que ya usa la página del viraje escarpado.
-3. **El debriefing en vivo.** El mapa del vuelo de demostración (`grabacionDemo()` de `recorridoDemo.ts`, la misma que usa `/instructor/vuelo/demo`) incrustado en la página: la ruta sobre el mapa satelital, los errores numerados en su punto y las pestañas por fase. Es la pieza que más impresiona. No toca la base de datos.
+3. **El debriefing.** Una captura fija y grande del vuelo de demostración (`/instructor/vuelo/demo`): la ruta sobre el mapa satelital, los errores numerados en su punto y las pestañas por fase. Es la pieza que más impresiona. Decisión de Erik (2026-11-23): captura fija por ahora; el mapa en vivo entra cuando exista `VITE_ARCGIS_KEY`.
 4. **Lo que hace por ti**, en 3 o 4 bloques con capturas reales: la voz que te guía (ES/EN), el checklist por voz (C172, C152 y Arrow), los niveles Fácil/Medio/Difícil y las hojas imprimibles gratis (enlace a `/instructor/hojas`).
 5. **Gratis hoy y lo que viene.**
    - Gratis con tu cuenta: el viraje escarpado en el C172, con práctica y checkride, y las hojas imprimibles.
@@ -69,7 +69,7 @@ Erik quiere que el instructor virtual tenga su propio apartado para promocionarl
 
 - Palabras prohibidas: «instructor certificado», «CFI», «licencia», «certificado», «certified», «curso oficial», «examen de la AFAC», «con IA». No se ve «Garmin».
 - Todo como **beta** (decisión de Erik del 2026-11-23).
-- **Mapa satelital:** `MapaVuelo.tsx` usa Esri World Imagery sin llave «mientras solo entra el fundador»; la spec del 2026-11-10 pide `VITE_ARCGIS_KEY` antes de abrirlo al público. Una página pública con el mapa cuenta como abrirlo al público. La llave la crea y la pone Erik en Cloudflare (no creo cuentas ni pego llaves). Ver «Pendiente de Erik».
+- **Mapa satelital:** la página no carga mosaicos de Esri; el debriefing va como imagen fija en `public/images/`. Sin llave de ArcGIS no se monta `MapaVuelo` en una página pública.
 - Las capturas son pantallas reales del sitio. Las tomo yo en el navegador con el vuelo de demostración y las páginas del instructor; si alguna pantalla necesita a MSFS conectado, se la pido a Erik.
 - Título de la pestaña en `App.tsx` (`TITULOS`), ruta en `ROUTES` y página con carga diferida (`lazy`), como las demás.
 
@@ -78,8 +78,8 @@ Erik quiere que el instructor virtual tenga su propio apartado para promocionarl
 - Diseño visual dentro del sistema actual del sitio (navy/dorado, componentes existentes como `Button`).
 - El texto final de cada bloque, respetando las restricciones de arriba.
 - Cuántas capturas y cuáles.
-- Si el mapa de demostración se monta con `MapaVuelo` directamente o con una versión recortada de `InstructorVuelo`.
 
-## Pendiente de Erik
+## Decisiones de Erik
 
-1. **La llave del mapa:** ¿creas la llave de ArcGIS y la pones en Cloudflare como `VITE_ARCGIS_KEY`, o mientras tanto uso en la página una captura fija del debriefing en lugar del mapa en vivo?
+- 2026-11-23: enfoque A.
+- 2026-11-23: el debriefing va como captura fija mientras no haya llave de ArcGIS.
