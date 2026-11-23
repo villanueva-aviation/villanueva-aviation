@@ -52,7 +52,10 @@ Con la DLL de SimConnect de SimHub, sin volar, en el menú principal del simulad
    - en millas (`10SM`) → millas;
    - `Q1013` → «QNH uno cero uno tres hectopascales»;
    - `A2992` → «altímetro dos nueve nueve dos».
-4. **Ningún aeropuerto se queda mudo por no tener la pieza de su nombre.** Si falta `ap-XXXX`, se dice el código en alfabeto fonético con las piezas `letra-X`, que ya existen («Sierra Kilo Romeo Golf»). En pantalla sale el código.
+4. **Ningún aeropuerto se queda mudo por no tener la pieza de su nombre.**
+   - Idea de Erik (2026-11-22): se dice el **nombre** del aeropuerto, no letra por letra. Por ejemplo, SKRG se dice «José María Córdova» y no «Sierra Kilo Romeo Golf».
+   - Por eso el banco de nombres cubre **todos** los aeropuertos con ATIS del volcado de MSFS (pieza 3), aunque OurAirports no los tenga.
+   - El fonético con las piezas `letra-X`, que ya existen, queda solo como último recurso: un aeropuerto que no está en el volcado, como un aeropuerto add-on que instaló el piloto. En pantalla sale el nombre de MSFS.
 5. La **pantalla** sale en español si el idioma de la computadora empieza con `es`, y en inglés si no.
 
 ## No metas (por ahora)
@@ -75,6 +78,7 @@ Valen las del diseño principal. Además:
 ## Enfoques considerados
 
 - **A. Datos del simulador (elegido por Erik).** El lector le pide a MSFS los aeropuertos cercanos con ATIS. Cubre todo lo que tiene el simulador, con la misma frecuencia que ve el piloto. En contra: el lector crece. Y si el piloto tiene la navegación vieja, su frecuencia puede no coincidir con la que usa el controlador de la red; es raro, y aun así coincide con lo que ve en su simulador.
+  - **Navigraph** (lo preguntó Erik el 2026-11-22): quien tiene la navegación de Navigraph instalada en MSFS ya la recibe por este camino, porque Navigraph reemplaza la navegación del simulador y SimConnect entrega esos datos. La frecuencia coincide con sus cartas de Navigraph sin trabajo extra y sin usar la cuenta de Navigraph del piloto. Si Erik tiene Navigraph, se confirma en la prueba en vivo con un aeropuerto cuya frecuencia ATIS haya cambiado.
 - **B. OurAirports para todo el mundo.** Es lo más fácil, pero se queda en 1,554 aeropuertos, con huecos grandes en Latinoamérica.
 - **C. B ahora y A después.** Sale rápido, pero se construye dos veces.
 
@@ -104,7 +108,7 @@ Valen las del diseño principal. Además:
 ### 2. Página
 
 - Los aeropuertos salen de `GET http://127.0.0.1:8767/aeropuertos`, pedido al conectar y luego cada 30 s, y ya no de `/data/atis/MX.json`. `sintonizado()` no cambia.
-- Cada aeropuerto lleva un **nombre para decir y mostrar** en español e inglés, si está en el archivo de nombres (pieza 3). Si no está, se usa su ICAO y se dice en fonético.
+- Cada aeropuerto lleva un **nombre para decir y mostrar** en español e inglés, si está en el archivo de nombres (pieza 3). Si no está, se muestra el nombre que da MSFS y se dice en fonético (Meta 4).
 - **Formato por prefijo del ICAO** (Meta 2): sale de una función que recibe el ICAO y devuelve `"mx" | "latam" | "faa" | "oaci"`.
   - El ATIS generado se arma con el armador de ese formato.
   - Los idiomas salen del formato: es+en para mx y latam, solo en para faa y oaci.
@@ -120,7 +124,7 @@ Valen las del diseño principal. Además:
     - en **mx y latam**, la regla `nombres()` de `datos.ts` con `municipality`, más `NOMBRES_FIJOS`, solo si en esa ciudad no hay otro aeropuerto con ATIS. Si hay otro (SAEZ y SABE en Buenos Aires), se usa el `name` de OurAirports tal cual, en los dos idiomas;
     - en **faa y oaci**, el `name` de OurAirports tal cual: «London Heathrow Airport», «Los Angeles International Airport», «George Bush Intercontinental Houston Airport». Es único por aeropuerto y se parece a lo que dice el ATIS real;
     - el script avisa de los nombres repetidos que queden, para agregarlos a `NOMBRES_FIJOS`.
-  - Los aeropuertos que OurAirports no tenga quedan fuera y se dicen en fonético.
+  - Los aeropuertos que OurAirports no tenga usan el **nombre de MSFS** del volcado, con las abreviaturas escritas completas («Intl» → «International», «Rgnl» → «Regional», «Muni» → «Municipal», «AB» → «Air Base»; la lista la termina el constructor viendo el volcado). MSFS no pone acentos: se graba así, y los nombres que suenen mal se corrigen en `NOMBRES_FIJOS`.
 - Las piezas `ap-XXXX` se graban con el generador de siempre (Azure F0, Jorge y Christopher), que ahora lee `nombres.json` en vez de MX.json.
   - El script del volcado imprime **cuántos caracteres** suman los nombres.
   - Si pasan de unos 400,000, se graban en dos meses: primero los aeropuertos con ATIS grandes y medianos (`type` de OurAirports), después el resto.
