@@ -1,6 +1,7 @@
 // Arma el ATIS bilingüe de México (texto en pantalla + piezas de audio) a partir de un METAR.
 import { visibilidadSM, type Metar } from "../../lib/clima.ts";
 import type { AeropuertoAtis, ExtremoPista } from "./datos.ts";
+import { formatoDe, type Formato } from "./formato.ts";
 import { FRASES, palabraDigito, type Idioma, type Pieza } from "./frases.ts";
 
 export type TipoParte = "aeropuerto" | "letra" | "hora" | "pista" | "viento" | "visibilidad" | "tiempo" | "nubes"
@@ -42,9 +43,19 @@ const FRACCION: Record<number, string> = { 0.25: "f-cuarto", 0.5: "f-medio", 0.7
 const DESPEJADO = ["CLR", "SKC", "NSC", "NCD", "CAVOK"];
 const CAPAS = ["FEW", "SCT", "BKN", "OVC"];
 
+// Metros del METAR: primer grupo de 4 dígitos suelto después del viento; el sufijo de dirección (4000NE) no se dice.
+function visibMetrica(cuerpo: string): { g: string; sufijo: string } | null {
+  const w = /(?:^|\s)(?:\d{3}|VRB)\d{2,3}(?:G\d{2,3})?KT(?:\s\d{3}V\d{3})?(?=\s|$)/.exec(cuerpo);
+  const m = /(?:^|\s)(\d{4})(NE|NW|SE|SW|N|S|E|W)?(?=\s|$)/.exec(w ? cuerpo.slice(w.index + w[0].length) : cuerpo);
+  return m ? { g: m[1], sufijo: m[2] ?? "" } : null;
+}
+
 // conControlador: hay ATC de la red en el aeropuerto pero sin ATIS. No se dicen letra ni pista (son del ATC),
 // pero la letra se sigue calculando para saber cuándo cambia el METAR.
-export function armarAtisMx(metar: Metar, ap: AeropuertoAtis, { conControlador = false }: { conControlador?: boolean } = {}): Atis {
+// mx: bilingüe, millas y altímetro. latam: es+en, metros y QNH si el METAR los trae. faa: solo en, viento "at", pista al final.
+// oaci: solo en, metros y QNH. Lo que no se entiende va a partes soloTexto; nunca lanza.
+function armarFormato(formato: Formato, metar: Metar, ap: AeropuertoAtis, { conControlador = false }: { conControlador?: boolean } = {}): Atis {
+  const metrico = formato === "latam" || formato === "oaci";
   const letra = letraDe(metar.obsTime);
   const [cuerpo, rmk = ""] = metar.rawOb.split(/\sRMK\s/);
   const grupo = (re: RegExp) => re.exec(cuerpo);
@@ -53,6 +64,10 @@ export function armarAtisMx(metar: Metar, ap: AeropuertoAtis, { conControlador =
   const temps = grupo(/(?:^|\s)(M?\d{2})\/(M?\d{2})?(?=\s|$)/);
   const altim = grupo(/(?:^|\s)([AQ])(\d{4})(?=\s|$)/);
   const pista = conControlador ? null : pistaEnUso(ap.pistas, metar.wdir, metar.wspd);
+  const cavok = metrico && /(?:^|\s)CAVOK(?=\s|$)/.test(cuerpo);
+  const nsc = metrico && /(?:^|\s)NSC(?=\s|$)/.test(cuerpo);
+  const visMetrica = metrico ? visibMetrica(cuerpo) : null;
+  const enMillas = !metrico || /SM(?:\s|$)/.test(cuerpo);
 
   const armar = (idioma: Idioma): Parte[] => {
     const partes: Parte[] = [];
@@ -87,27 +102,40 @@ export function armarAtisMx(metar: Metar, ap: AeropuertoAtis, { conControlador =
       p("hora", { ...x, texto: cap(x.texto) });
     }
 
-    if (pista) {
+    const pistaParte = () => {
+      if (!pista) return;
+      const clave = formato === "faa" ? "f-faa-pista" : "f-pista";
       const m = /^(\d{1,2})([LRC]?)$/.exec(pista.ident);
-      if (!m) solo("pista", `${F("f-pista")} ${pista.ident}.`);
+      if (!m) solo("pista", `${F(clave)} ${pista.ident}.`);
       else {
         const d = D(m[1].padStart(2, "0"));
-        p("pista", m[2] ? j("f-pista", d, SUFIJO[m[2]]) : punto(j("f-pista", d)));
+        p("pista", m[2] ? j(clave, d, SUFIJO[m[2]]) : punto(j(clave, d)));
       }
-    }
+    };
+    if (formato !== "faa") pistaParte();
 
     if (metar.wspd === 0) p("viento", j("f-calma"));
     else if (metar.wspd != null) {
-      const dir = typeof metar.wdir === "number" ? [D(String(metar.wdir).padStart(3, "0")), "f-grados"] : ["f-variable"];
+      const faa = formato === "faa";
+      const dir = typeof metar.wdir === "number" ? [D(String(metar.wdir).padStart(3, "0")), ...(faa ? [] : ["f-grados"])] : ["f-variable"];
       const vel = D(String(metar.wspd));
-      let x = metar.wgst
+      let x = faa
+        ? punto(metar.wgst ? j("f-faa-viento", ...dir, "f-at", vel, "f-rafagas", D(String(metar.wgst))) : j("f-faa-viento", ...dir, "f-at", vel))
+        : metar.wgst
         ? j("f-viento", ...dir, vel, coma(t("f-nudos")), "f-rafagas", D(String(metar.wgst)), "f-nudos")
         : j("f-viento", ...dir, vel, "f-nudos");
       if (variando) x = j(x, t("f-variando", cap(F("f-variando"))), D(variando[1]), "f-y", punto(D(variando[2])));
       p("viento", x);
     }
 
-    if (metar.visib != null) {
+    if (cavok) p("observaciones", j("f-cavok"));
+    else if (visMetrica) {
+      const { g, sufijo } = visMetrica;
+      if (g === "9999") p("visibilidad", j("f-visibilidad", "f-km-o-mas"));
+      else if (Number(g) >= 5000 && Number(g) % 1000 === 0) p("visibilidad", j("f-visibilidad", D(String(Number(g) / 1000)), "f-kilometros"));
+      else p("visibilidad", j("f-visibilidad", D(g), "f-metros"));
+      if (sufijo) solo("visibilidad", `${g}${sufijo}`);
+    } else if (enMillas && metar.visib != null) {
       const s = String(metar.visib);
       const n = visibilidadSM(metar.visib)!; // "1/2" → 0.5, "1 1/2" → 1.5
       if (FRACCION[n]) p("visibilidad", j("f-visibilidad", FRACCION[n]));
@@ -116,13 +144,13 @@ export function armarAtisMx(metar: Metar, ap: AeropuertoAtis, { conControlador =
       else solo("visibilidad", `${s} SM`);
     }
 
-    for (const codigo of (metar.wxString ?? "").split(/\s+/).filter(Boolean)) {
+    if (!cavok) for (const codigo of (metar.wxString ?? "").split(/\s+/).filter(Boolean)) {
       if (F(`wx-${codigo}`)) p("tiempo", j(`wx-${codigo}`));
       else solo("tiempo", codigo);
     }
 
-    const capas = metar.clouds.filter((c) => !DESPEJADO.includes(c.cover));
-    if (capas.length === 0) p("nubes", j("f-despejado"));
+    const capas = cavok ? [] : metar.clouds.filter((c) => !DESPEJADO.includes(c.cover));
+    if (capas.length === 0 && !cavok) p("nubes", j(nsc ? "f-nsc" : "f-despejado"));
     capas.forEach((c, n) => {
       const alt = altura(c.base);
       const cubierta = c.cover === "OVX" ? "VV" : c.cover;
@@ -138,7 +166,16 @@ export function armarAtisMx(metar: Metar, ap: AeropuertoAtis, { conControlador =
       const g = (s: string) => punto(s.startsWith("M") ? j("f-menos", D(s.slice(1))) : D(s));
       p("temperatura", temps[2] ? j("f-temperatura", g(temps[1]), "f-rocio", g(temps[2])) : j("f-temperatura", g(temps[1])));
     }
-    if (altim) p("altimetro", j(altim[1] === "A" ? "f-altimetro" : "f-qnh", punto(D(altim[2]))));
+    if (altim) {
+      if (metrico && altim[1] === "Q") p("altimetro", j("f-qnh", D(altim[2]), "f-hpa"));
+      else p("altimetro", j(altim[1] === "A" ? "f-altimetro" : "f-qnh", punto(D(altim[2]))));
+    }
+    if (metrico) {
+      if (/(?:^|\s)NOSIG(?=\s|$)/.test(cuerpo)) p("observaciones", j("f-nosig"));
+      const cola = altim ? cuerpo.slice(altim.index + altim[0].length).split(/\s+/).filter((x) => x && x !== "NOSIG") : [];
+      if (cola.length) solo("observaciones", cola.join(" "));
+    }
+    if (formato === "faa") pistaParte();
 
     // Observaciones: los grupos conocidos se dicen; lo demás va junto en una sola parte de solo texto.
     const tokens = rmk.split(/\s+/).filter(Boolean);
@@ -154,6 +191,11 @@ export function armarAtisMx(metar: Metar, ap: AeropuertoAtis, { conControlador =
     return partes;
   };
 
-  return { icao: ap.icao, letra, inicioMs: metar.obsTime * 1000, partes: [...armar("es"), ...armar("en")], conControlador };
+  const partes = formato === "mx" || formato === "latam" ? [...armar("es"), ...armar("en")] : armar("en");
+  return { icao: ap.icao, letra, inicioMs: metar.obsTime * 1000, partes, conControlador };
 }
+
+type Opciones = { conControlador?: boolean };
+export const armarAtisMx = (metar: Metar, ap: AeropuertoAtis, o: Opciones = {}): Atis => armarFormato("mx", metar, ap, o);
+export const armarAtis = (metar: Metar, ap: AeropuertoAtis, o: Opciones = {}): Atis => armarFormato(formatoDe(ap.icao), metar, ap, o);
 

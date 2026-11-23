@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import type { Metar } from "../../lib/clima.ts";
 import type { AeropuertoAtis } from "./datos.ts";
 import { todasLasPiezas } from "./frases.ts";
-import { armarAtisMx, letraDe, pistaEnUso, type Atis, type Parte } from "./generado.ts";
+import { armarAtis, armarAtisMx, letraDe, pistaEnUso, type Atis, type Parte } from "./generado.ts";
 
 const metar: Metar = {
   icaoId: "MMGL",
@@ -210,4 +210,103 @@ test("con controlador: sin letra ni pista, y cierra pidiendo confirmar con el co
 
 test("sin opciones: conControlador es false", () => {
   assert.equal(armarAtisMx(metar, ap).conControlador, false);
+});
+
+// Formatos por país (Plan 3).
+const par = (a: string, b: string, rumboA: number, ft: number) => [
+  { ident: a, rumboV: rumboA, largoFt: ft }, { ident: b, rumboV: (rumboA + 180) % 360, largoFt: ft },
+];
+const hora1 = (26 * 19000 + 1) * 3600;
+const mundo = (icao: string, nombreEn: string, nombreEs: string, pistas: AeropuertoAtis["pistas"]): AeropuertoAtis =>
+  ({ icao, nombreEs, nombreEn, lat: 0, lon: 0, elevFt: 0, atisMhz: [], pistas });
+const mtr = (rawOb: string, obsTime: number, extra: Partial<Metar> = {}): Metar => ({
+  icaoId: rawOb.split(" ")[0], rawOb, obsTime, wdir: 240, wspd: 12, wgst: null, visib: null, clouds: [],
+  wxString: null, temp: 9, dewp: 4, altim: 1013, elev: 0, ...extra,
+});
+const egll = mundo("EGLL", "London Heathrow Airport", "Aeropuerto de Londres Heathrow",
+  [...par("09L", "27R", 90, 12802), ...par("09R", "27L", 90, 12008)]);
+const egllM = (cuerpo: string) => mtr(`EGLL 221450Z 24012KT ${cuerpo} 09/04 Q1013 NOSIG`, hora1,
+  { clouds: [{ cover: "FEW", base: 3000 }] });
+const visTexto = (a: Atis) => parte(a, "visibilidad", "en")?.texto;
+
+test("oaci: texto exacto solo en inglés, con metros, QNH y NOSIG", () => {
+  const a = armarAtis(mtr("EGLL 221450Z 24012KT 9999 FEW030 BKN045 09/04 Q1013 NOSIG", hora1,
+    { clouds: [{ cover: "FEW", base: 3000 }, { cover: "BKN", base: 4500 }] }), egll);
+  assert.ok(a.partes.every((p) => p.idioma === "en"));
+  assert.equal(texto(a, "en"),
+    "London Heathrow Airport. Information Bravo. One four five zero zulu weather. Runway in use, two seven right. Wind, two four zero degrees, one two knots. Visibility, one zero kilometers or more. Few clouds at three thousand. Broken, four thousand five hundred. Temperature, zero niner. Dewpoint, zero four. QNH, one zero one three hectopascals. No significant change. Advise on initial contact you have information Bravo.");
+});
+
+test("latam: texto exacto en español y luego inglés", () => {
+  const skbo = mundo("SKBO", "Bogota International Airport", "Aeropuerto Internacional de Bogotá",
+    [...par("14L", "32R", 127, 12467), ...par("14R", "32L", 127, 12468)]);
+  const a = armarAtis(mtr("SKBO 221500Z 33008KT 9999 SCT020 BKN080 15/09 Q1027 NOSIG", (26 * 19000 + 2) * 3600,
+    { wdir: 330, wspd: 8, clouds: [{ cover: "SCT", base: 2000 }, { cover: "BKN", base: 8000 }] }), skbo);
+  assert.equal(texto(a, "es"),
+    "Aeropuerto Internacional de Bogotá. Información Charlie. Observación de las uno cinco cero cero zulú. Pista en uso, tres dos izquierda. Viento, tres tres cero grados, ocho nudos. Visibilidad, diez kilómetros o más. Nubes dispersas a dos mil pies. Fragmentadas a ocho mil pies. Temperatura, uno cinco. Punto de rocío, cero nueve. QNH, uno cero dos siete hectopascales. Sin cambios significativos. Al primer contacto, notifique que tiene la información Charlie.");
+  assert.ok(texto(a, "en").startsWith("Bogota International Airport. Information Charlie."));
+  assert.equal(a.partes.findIndex((p) => p.idioma === "en") > a.partes.findIndex((p) => p.idioma === "es"), true);
+});
+
+test("faa: viento con «at», pista después del altímetro, solo inglés", () => {
+  const klax = mundo("KLAX", "Los Angeles International Airport", "Aeropuerto de Los Ángeles",
+    [...par("25L", "07R", 263, 12923), ...par("25R", "07L", 263, 11095)]);
+  const m = mtr("KLAX 222253Z 25010KT 10SM FEW020 SCT250 19/12 A2992", obsD,
+    { wdir: 250, wspd: 10, visib: "10+", clouds: [{ cover: "FEW", base: 2000 }, { cover: "SCT", base: 25000 }] });
+  const a = armarAtis(m, klax);
+  assert.equal(texto(a, "en"),
+    "Los Angeles International Airport. Information Delta. Two two five three zulu weather. Wind two five zero at one zero. Visibility, one zero miles or more. Few clouds at two thousand. Scattered, two five thousand. Temperature, one niner. Dewpoint, one two. Altimeter, two niner niner two. Landing and departing runway two five left. Advise on initial contact you have information Delta.");
+  const c = armarAtis(m, klax, { conControlador: true });
+  assert.ok(!c.partes.some((p) => p.tipo === "letra" || p.tipo === "pista"));
+  assert.deepEqual(claves(c.partes.at(-1)), ["f-confirme"]);
+});
+
+test("visibilidad en metros (oaci)", () => {
+  assert.equal(visTexto(armarAtis(egllM("8000"), egll)), "Visibility, eight kilometers.");
+  assert.equal(visTexto(armarAtis(egllM("1500"), egll)), "Visibility, one five zero zero meters.");
+  const ne = armarAtis(egllM("4000NE"), egll);
+  assert.equal(visTexto(ne), "Visibility, four zero zero zero meters.");
+  assert.deepEqual(ne.partes.filter((p) => p.soloTexto && p.tipo === "visibilidad").map((p) => p.texto), ["4000NE"]);
+  assert.equal(visTexto(armarAtis(egllM(""), egll)), undefined);
+});
+
+test("CAVOK es una sola parte; NSC dice «No significant cloud.»", () => {
+  const a = armarAtis(mtr("EGLL 221450Z 24012KT CAVOK 09/04 Q1013", hora1), egll);
+  assert.equal(a.partes.filter((p) => p.texto === "CAVOK.").length, 1);
+  assert.ok(!a.partes.some((p) => ["visibilidad", "tiempo", "nubes"].includes(p.tipo)));
+  const n = armarAtis(mtr("EGLL 221450Z 24012KT 9999 NSC 09/04 Q1013", hora1), egll);
+  assert.equal(parte(n, "nubes", "en")?.texto, "No significant cloud.");
+});
+
+test("METAR raros no lanzan", () => {
+  for (const raw of ["EGLL 221450Z VRB03KT 9999 NSC 09/04 Q1013", "EGLL 221450Z 00000KT 9999 M02/M05 Q0998",
+    "EGLL 221450Z 24012KT 9999 09/04 Q998 TEMPO 3000 RA", "EGLL 221450Z"]) {
+    for (const ap of [egll, { ...egll, icao: "SKBO" }, { ...egll, icao: "KLAX" }]) {
+      assert.doesNotThrow(() => armarAtis(mtr(raw, hora1, { wdir: "VRB", wspd: 3 }), ap), raw);
+    }
+  }
+});
+
+test("latam con millas y altímetro usa las palabras de mx", () => {
+  const a = armarAtis(mtr("MROC 221500Z 12004KT 7SM FEW050 25/20 A3001", hora1, { wdir: 120, wspd: 4, visib: 7 }),
+    mundo("MROC", "Juan Santamaria International Airport", "Aeropuerto Internacional Juan Santamaría", par("07", "25", 70, 9000)));
+  assert.equal(parte(a, "visibilidad")?.texto, "Visibilidad, siete millas.");
+  assert.equal(parte(a, "altimetro")?.texto, "Altímetro, tres cero cero uno.");
+});
+
+test("banco de piezas: formatos latam, faa y oaci", () => {
+  const aps = ["EGLL", "SKBO", "KLAX"].map((icao) => ({ ...mmgl, icao }));
+  const banco = new Set(todasLasPiezas(aps).map((p) => `${p.idioma}/${p.clave}`));
+  const casos: [string, string][] = [
+    ["EGLL", "EGLL 221450Z 24012G25KT 200V280 4000NE -RA BKN045 09/04 Q1013 NOSIG"],
+    ["EGLL", "EGLL 221450Z 24012KT CAVOK 09/04 Q1013 NOSIG"],
+    ["SKBO", "SKBO 221500Z 33008KT 8000 NSC 15/09 Q1027 NOSIG"],
+    ["KLAX", "KLAX 222253Z 25010G20KT 10SM FEW020 19/12 A2992"],
+  ];
+  for (const [icao, raw] of casos) {
+    const m = mtr(raw, hora1, { wgst: raw.includes("G") ? 25 : null, visib: 10, clouds: [{ cover: "BKN", base: 4500 }] });
+    for (const p of armarAtis(m, { ...mmgl, icao }).partes.flatMap((x) => x.piezas)) {
+      assert.ok(banco.has(`${p.idioma}/${p.clave}`), `${icao} ${p.idioma}/${p.clave}`);
+    }
+  }
 });

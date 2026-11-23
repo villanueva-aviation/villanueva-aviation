@@ -32,7 +32,7 @@ const RMK_NUBE: Record<string, [string, string]> = {
 
 const CIENTOS_ES = ["cien", "doscientos", "trescientos", "cuatrocientos", "quinientos", "seiscientos", "setecientos", "ochocientos", "novecientos"];
 
-const FIJAS: Record<string, [string, string | null]> = {
+const FIJAS: Record<string, [string | null, string | null]> = {
   "f-informacion": ["Información", "Information"],
   "f-observacion": ["Observación de las", null],
   "f-zulu": ["zulú.", "zulu weather."],
@@ -69,6 +69,14 @@ const FIJAS: Record<string, [string, string | null]> = {
   "f-altimetro": ["Altímetro,", "Altimeter,"],
   "f-qnh": ["QNH,", "QNH,"],
   "f-confirme": ["Confirme pista y QNH con el controlador.", "Confirm runway and QNH with the controller."],
+  "f-km-o-mas": ["diez kilómetros o más.", "one zero kilometers or more."],
+  "f-kilometros": ["kilómetros.", "kilometers."],
+  "f-metros": ["metros.", "meters."],
+  "f-cavok": ["CAVOK.", "CAVOK."],
+  "f-nsc": ["Sin nubes significativas.", "No significant cloud."],
+  "f-hpa": ["hectopascales.", "hectopascals."],
+  "f-nosig": ["Sin cambios significativos.", "No significant change."],
+  "f-faa-viento": [null, "Wind"], "f-at": [null, "at"], "f-faa-pista": [null, "Landing and departing runway"],
   "f-cierre": ["Al primer contacto, notifique que tiene la información", "Advise on initial contact you have information"],
 };
 
