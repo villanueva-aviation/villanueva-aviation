@@ -25,6 +25,16 @@ export const NOMBRES_FIJOS: Record<string, { es: string; en: string }> = {
   MMMZ: { es: "Aeropuerto Internacional de Mazatlán", en: "Mazatlán International Airport" },
   MMLO: { es: "Aeropuerto Internacional de Guanajuato", en: "Guanajuato International Airport" },
   SKRG: { es: "Aeropuerto Internacional José María Córdova", en: "José María Córdova International Airport" }, // la fuente no trae los acentos
+  // Del volcado mundial: la regla o la fuente daban ciudad equivocada, sin acentos o un nombre que no se dice.
+  SKBO: { es: "Aeropuerto Internacional El Dorado de Bogotá", en: "Bogotá El Dorado International Airport" },
+  SPJC: { es: "Aeropuerto Internacional Jorge Chávez", en: "Jorge Chávez International Airport" },
+  SACO: { es: "Aeropuerto Internacional de Córdoba", en: "Córdoba International Airport" },
+  SVCB: { es: "Aeropuerto de Ciudad Bolívar", en: "Ciudad Bolívar Airport" },
+  SAWG: { es: "Aeropuerto Internacional de Río Gallegos", en: "Río Gallegos International Airport" },
+  MGGT: { es: "Aeropuerto Internacional La Aurora", en: "La Aurora International Airport" },
+  SVPR: { es: "Aeropuerto Internacional Manuel Carlos Piar", en: "Manuel Carlos Piar International Airport" },
+  SAEZ: { es: "Aeropuerto Internacional de Ezeiza", en: "Ezeiza International Airport" },
+  SABE: { es: "Aeroparque Jorge Newbery", en: "Jorge Newbery Airfield" },
 };
 
 // Rumbo inicial de círculo máximo, entero 0–359.

@@ -21,6 +21,10 @@ export function aEspanol(n: string): string {
   return `Aeropuerto ${m ? m[1] : n}`;
 }
 
+// La voz lee raro "/" y los paréntesis: "Foo / Bar (Baz)" -> "Foo, Bar Baz".
+export const paraVoz = (s: string) =>
+  s.replace(/\s*\/\s*/g, ", ").replace(/[()]/g, " ").replace(/\s+/g, " ").replace(/\s+,/g, ",").replace(/,+/g, ",").replace(/^,\s*|,\s*$/g, "").trim();
+
 export function nombresAtis(
   volcado: { icao: string; nombre: string }[],
   ourAirports: Record<string, string>[],
@@ -36,11 +40,13 @@ export function nombresAtis(
     const a = our.get(icao);
     const f = formatoDe(icao);
     const habla = f === "mx" || f === "latam";
-    if (mx[icao]) salida[icao] = mx[icao];
-    else if (NOMBRES_FIJOS[icao]) salida[icao] = NOMBRES_FIJOS[icao];
-    else if (!a) { const n = expandir(nombre); salida[icao] = habla ? { es: aEspanol(n), en: n } : { en: n }; }
-    else if (habla && ciudad(icao) && porCiudad.get(ciudad(icao)) === 1) salida[icao] = NOMBRES_FIJOS[icao] ?? nombres(a.name, a.municipality);
-    else salida[icao] = habla ? { es: aEspanol(a.name), en: a.name } : { en: a.name };
+    let n: { es?: string; en: string };
+    if (mx[icao]) { salida[icao] = mx[icao]; continue; } // ya grabados: tal cual
+    else if (NOMBRES_FIJOS[icao]) n = NOMBRES_FIJOS[icao];
+    else if (!a) { const e = expandir(nombre); n = habla ? { es: aEspanol(e), en: e } : { en: e }; }
+    else if (habla && ciudad(icao) && porCiudad.get(ciudad(icao)) === 1) n = nombres(a.name, a.municipality);
+    else n = habla ? { es: aEspanol(a.name), en: a.name } : { en: a.name };
+    salida[icao] = n.es === undefined ? { en: paraVoz(n.en) } : { es: paraVoz(n.es), en: paraVoz(n.en) };
   }
 
   // Los de MX.json que faltan en el volcado: su audio ya esta grabado, se quedan.

@@ -9,7 +9,7 @@
   "en": "Kodiak Airport"
  },
  "PHNG": {
-  "en": "Kaneohe Bay MCAS (Marion E. Carl Field) Airport"
+  "en": "Kaneohe Bay MCAS Marion E. Carl Field Airport"
  },
  "PHLI": {
   "en": "Lihue Airport"
@@ -75,7 +75,7 @@
   "en": "Allen Army Airfield"
  },
  "CYXY": {
-  "en": "Whitehorse / Erik Nielsen International Airport"
+  "en": "Whitehorse, Erik Nielsen International Airport"
  },
  "PAJN": {
   "en": "Juneau International Airport"
@@ -87,7 +87,7 @@
   "en": "Campbell River Airport"
  },
  "CYQQ": {
-  "en": "Comox Valley International Airport / CFB Comox"
+  "en": "Comox Valley International Airport, CFB Comox"
  },
  "CYCD": {
   "en": "Nanaimo Airport"
@@ -96,10 +96,10 @@
   "en": "Fort Nelson Airport"
  },
  "CYXS": {
-  "en": "Prince George (International) Airport"
+  "en": "Prince George International Airport"
  },
  "CYXJ": {
-  "en": "Fort St John / North Peace Regional Airport"
+  "en": "Fort St John, North Peace Regional Airport"
  },
  "CYXX": {
   "en": "Abbotsford International Airport"
@@ -129,7 +129,7 @@
   "en": "Boundary Bay Airport"
  },
  "KNUW": {
-  "en": "Whidbey Island Naval Air Station (Ault Field)"
+  "en": "Whidbey Island Naval Air Station Ault Field"
  },
  "KPAE": {
   "en": "Seattle Paine Field International Airport"
@@ -171,7 +171,7 @@
   "en": "Gray Army Air Field"
  },
  "KSLE": {
-  "en": "Salem-Willamette Valley Airport/McNary Field"
+  "en": "Salem-Willamette Valley Airport, McNary Field"
  },
  "KEUG": {
   "en": "Eugene Airport"
@@ -294,7 +294,7 @@
   "en": "Yellowknife International Airport"
  },
  "CZVL": {
-  "en": "Edmonton / Villeneuve Airport"
+  "en": "Edmonton, Villeneuve Airport"
  },
  "CYQF": {
   "en": "Red Deer Regional Airport"
@@ -306,7 +306,7 @@
   "en": "Edmonton International Airport"
  },
  "CYBW": {
-  "en": "Calgary / Springbank Airport"
+  "en": "Calgary, Springbank Airport"
  },
  "CYQL": {
   "en": "Lethbridge County Airport"
@@ -357,13 +357,13 @@
   "en": "Thompson Airport"
  },
  "CJS7": {
-  "en": "Carman (South) Airport"
+  "en": "Carman South Airport"
  },
  "CYPG": {
-  "en": "Portage-la-Prairie / Southport Airport"
+  "en": "Portage-la-Prairie, Southport Airport"
  },
  "CTN6": {
-  "en": "Treherne (South Norfolk Airpark) Airport"
+  "en": "Treherne South Norfolk Airpark Airport"
  },
  "KBIS": {
   "en": "Bismarck Municipal Airport"
@@ -375,13 +375,13 @@
   "en": "Grand Forks International Airport"
  },
  "CYWG": {
-  "en": "Winnipeg / James Armstrong Richardson International Airport"
+  "en": "Winnipeg, James Armstrong Richardson International Airport"
  },
  "CYQK": {
   "en": "Kenora Airport"
  },
  "CYAV": {
-  "en": "Winnipeg / St. Andrews Airport"
+  "en": "Winnipeg, St. Andrews Airport"
  },
  "KSTC": {
   "en": "Saint Cloud Regional Airport"
@@ -393,7 +393,7 @@
   "en": "Sioux Lookout Airport"
  },
  "KANE": {
-  "en": "Anoka County-Blaine (Janes Field) Airport"
+  "en": "Anoka County-Blaine Janes Field Airport"
  },
  "KMIC": {
   "en": "Crystal Airport"
@@ -432,7 +432,7 @@
   "en": "Van Nuys Airport"
  },
  "KNLC": {
-  "en": "Lemoore Naval Air Station (Reeves Field) Airport"
+  "en": "Lemoore Naval Air Station Reeves Field Airport"
  },
  "KPSP": {
   "en": "Palm Springs International Airport"
@@ -450,10 +450,10 @@
   "en": "Long Beach International Airport"
  },
  "KBUR": {
-  "en": "Hollywood Burbank/Bob Hope Airport"
+  "en": "Hollywood Burbank, Bob Hope Airport"
  },
  "KNTD": {
-  "en": "Point Mugu Naval Air Station (Naval Base Ventura Co)"
+  "en": "Point Mugu Naval Air Station Naval Base Ventura Co"
  },
  "KTOA": {
   "en": "Zamperini Field"
@@ -477,7 +477,7 @@
   "en": "Southern California Logistics Airport"
  },
  "KPMD": {
-  "en": "Palmdale Regional Airport / USAF Plant 42 Airport"
+  "en": "Palmdale Regional Airport, USAF Plant 42 Airport"
  },
  "KEMT": {
   "en": "San Gabriel Valley Airport"
@@ -529,7 +529,7 @@
   "en": "Harry Reid International Airport"
  },
  "KNYL": {
-  "en": "Yuma International Airport / Marine Corps Air Station Yuma"
+  "en": "Yuma International Airport, Marine Corps Air Station Yuma"
  },
  "MMML": {
   "es": "Aeropuerto Internacional de Mexicali",
@@ -581,7 +581,7 @@
   "en": "Phoenix Sky Harbor International Airport"
  },
  "KFHU": {
-  "en": "Sierra Vista Municipal Airport / Libby Army Air Field"
+  "en": "Sierra Vista Municipal Airport, Libby Army Air Field"
  },
  "KIWA": {
   "en": "Mesa Gateway Airport"
@@ -634,7 +634,7 @@
   "en": "Northern Colorado Regional Airport"
  },
  "KASE": {
-  "en": "Aspen-Pitkin County Airport (Sardy Field)"
+  "en": "Aspen-Pitkin County Airport Sardy Field"
  },
  "KFMN": {
   "en": "Four Corners Regional Airport"
@@ -652,7 +652,7 @@
   "en": "Double Eagle II Airport"
  },
  "KBIF": {
-  "en": "Biggs Army Air Field (Fort Bliss)"
+  "en": "Biggs Army Air Field Fort Bliss"
  },
  "KELP": {
   "en": "El Paso International Airport"
@@ -740,13 +740,13 @@
   "en": "Wiley Post Airport"
  },
  "KSPS": {
-  "en": "Wichita Falls Municipal Airport / Sheppard Air Force Base"
+  "en": "Wichita Falls Municipal Airport, Sheppard Air Force Base"
  },
  "KLAW": {
   "en": "Lawton Fort Sill Regional Airport"
  },
  "KGRK": {
-  "en": "Killeen Regional Airport / Robert Gray Army Airfield"
+  "en": "Killeen Regional Airport, Robert Gray Army Airfield"
  },
  "KABI": {
   "en": "Abilene Regional Airport"
@@ -796,7 +796,7 @@
   "en": "Sioux Falls Regional Airport"
  },
  "KSUX": {
-  "en": "Sioux Gateway Airport / Brigadier General Bud Day Field"
+  "en": "Sioux Gateway Airport, Brigadier General Bud Day Field"
  },
  "KSTJ": {
   "en": "Rosecrans Memorial Airport"
@@ -850,7 +850,7 @@
   "en": "Ardmore Municipal Airport"
  },
  "KNFW": {
-  "en": "NAS Fort Worth JRB / Carswell Field"
+  "en": "NAS Fort Worth JRB, Carswell Field"
  },
  "KTYR": {
   "en": "Tyler Pounds Regional Airport"
@@ -868,7 +868,7 @@
   "en": "Dallas Fort Worth International Airport"
  },
  "KAFW": {
-  "en": "Perot Field/Fort Worth Alliance Airport"
+  "en": "Perot Field, Fort Worth Alliance Airport"
  },
  "KFWS": {
   "en": "Fort Worth Spinks Airport"
@@ -883,7 +883,7 @@
   "en": "Waco Regional Airport"
  },
  "KTXK": {
-  "en": "Texarkana Regional Airport (Webb Field)"
+  "en": "Texarkana Regional Airport Webb Field"
  },
  "KADS": {
   "en": "Addison Airport"
@@ -946,7 +946,7 @@
   "en": "Dubuque Regional Airport"
  },
  "KMSP": {
-  "en": "Minneapolis–Saint Paul International Airport / Wold–Chamberlain Field"
+  "en": "Minneapolis–Saint Paul International Airport, Wold–Chamberlain Field"
  },
  "KSTP": {
   "en": "Saint Paul Downtown Holman Field"
@@ -985,7 +985,7 @@
   "en": "Columbia Regional Airport"
  },
  "KLIT": {
-  "en": "Bill & Hillary Clinton National Airport/Adams Field"
+  "en": "Bill & Hillary Clinton National Airport, Adams Field"
  },
  "KBBG": {
   "en": "Branson Airport"
@@ -1076,8 +1076,8 @@
   "en": "Tuxtla Gutiérrez International Airport"
  },
  "MGGT": {
-  "es": "Aeropuerto Internacional de Guatemala City",
-  "en": "Guatemala City International Airport"
+  "es": "Aeropuerto Internacional La Aurora",
+  "en": "La Aurora International Airport"
  },
  "MMTP": {
   "es": "Aeropuerto Internacional de Tapachula",
@@ -1090,7 +1090,7 @@
   "en": "Sault Ste Marie Airport"
  },
  "CYTS": {
-  "en": "Timmins/Victor M. Power"
+  "en": "Timmins, Victor M. Power"
  },
  "CYSB": {
   "en": "Sudbury Airport"
@@ -1105,10 +1105,10 @@
   "en": "Quebec Jean Lesage International Airport"
  },
  "CYHU": {
-  "en": "Montréal / Saint-Hubert Metropolitan Airport"
+  "en": "Montréal, Saint-Hubert Metropolitan Airport"
  },
  "CYUL": {
-  "en": "Montreal / Pierre Elliott Trudeau International Airport"
+  "en": "Montreal, Pierre Elliott Trudeau International Airport"
  },
  "CYMX": {
   "en": "Montreal Mirabel International Airport"
@@ -1117,7 +1117,7 @@
   "en": "Saguenay-Bagotville Airport"
  },
  "CYRC": {
-  "en": "Chicoutimi/Saint-Honoré Aerodrome"
+  "en": "Chicoutimi, Saint-Honoré Aerodrome"
  },
  "CYWK": {
   "en": "Wabush Airport"
@@ -1180,7 +1180,7 @@
   "en": "Decatur Airport"
  },
  "KGYY": {
-  "en": "Gary/Chicago International Airport"
+  "en": "Gary, Chicago International Airport"
  },
  "KCMI": {
   "en": "University of Illinois Willard Airport"
@@ -1231,10 +1231,10 @@
   "en": "Evansville Regional Airport"
  },
  "KHOP": {
-  "en": "Campbell Army Airfield (Fort Campbell)"
+  "en": "Campbell Army Airfield Fort Campbell"
  },
  "KBLV": {
-  "en": "Scott AFB/Midamerica Airport"
+  "en": "Scott AFB, Midamerica Airport"
  },
  "KMDH": {
   "en": "Southern Illinois Airport"
@@ -1261,13 +1261,13 @@
   "en": "Frederick W. Smith International Airport"
  },
  "KMGM": {
-  "en": "Montgomery Regional (Dannelly Field) Airport"
+  "en": "Montgomery Regional Dannelly Field Airport"
  },
  "KGTR": {
   "en": "Golden Triangle Regional Airport"
  },
  "KMEI": {
-  "en": "Key Field / Meridian Regional Airport"
+  "en": "Key Field, Meridian Regional Airport"
  },
  "KMXF": {
   "en": "Maxwell Air Force Base"
@@ -1318,10 +1318,10 @@
   "en": "Selfridge Air National Guard Base Airport"
  },
  "KJXN": {
-  "en": "Jackson County Airport/Reynolds Field"
+  "en": "Jackson County Airport, Reynolds Field"
  },
  "KAZO": {
-  "en": "Kalamazoo/Battle Creek International Airport"
+  "en": "Kalamazoo, Battle Creek International Airport"
  },
  "CYQG": {
   "en": "Windsor International Airport"
@@ -1396,7 +1396,7 @@
   "en": "Cincinnati Municipal Airport Lunken Field"
  },
  "KHTS": {
-  "en": "Tri-State Airport / Milton J. Ferguson Field"
+  "en": "Tri-State Airport, Milton J. Ferguson Field"
  },
  "KLEX": {
   "en": "Blue Grass Airport"
@@ -1405,7 +1405,7 @@
   "en": "DeKalb Peachtree Airport"
  },
  "KCHA": {
-  "en": "Chattanooga Metropolitan Airport (Lovell Field)"
+  "en": "Chattanooga Metropolitan Airport Lovell Field"
  },
  "KFTY": {
   "en": "Fulton County Airport Brown Field"
@@ -1561,7 +1561,7 @@
   "en": "Charlotte Douglas International Airport"
  },
  "KTRI": {
-  "en": "Tri-Cities Regional TN/VA Airport"
+  "en": "Tri-Cities Regional TN, VA Airport"
  },
  "KUZA": {
   "en": "Rock Hill - York County Airport"
@@ -1621,7 +1621,7 @@
   "en": "Space Coast Regional Airport"
  },
  "KNIP": {
-  "en": "Jacksonville Naval Air Station (Towers Field)"
+  "en": "Jacksonville Naval Air Station Towers Field"
  },
  "KDAB": {
   "en": "Daytona Beach International Airport"
@@ -1727,13 +1727,13 @@
   "en": "Griffiss International Airport"
  },
  "KBGM": {
-  "en": "Greater Binghamton/Edwin A Link field"
+  "en": "Greater Binghamton, Edwin A Link field"
  },
  "CYGK": {
   "en": "Kingston Norman Rogers Airport"
  },
  "KRDG": {
-  "en": "Reading Regional Airport (Carl A Spaatz Field)"
+  "en": "Reading Regional Airport Carl A Spaatz Field"
  },
  "KELM": {
   "en": "Elmira Corning Regional Airport"
@@ -1754,7 +1754,7 @@
   "en": "Phillips Army Air Field"
  },
  "KAVP": {
-  "en": "Wilkes-Barre/Scranton International Airport"
+  "en": "Wilkes-Barre, Scranton International Airport"
  },
  "KFDK": {
   "en": "Frederick Municipal Airport"
@@ -1775,7 +1775,7 @@
   "en": "Richmond International Airport"
  },
  "KBWI": {
-  "en": "Baltimore/Washington International Thurgood Marshall Airport"
+  "en": "Baltimore, Washington International Thurgood Marshall Airport"
  },
  "KADW": {
   "en": "Joint Base Andrews"
@@ -1799,7 +1799,7 @@
   "en": "Martin State Airport"
  },
  "KNGU": {
-  "en": "Norfolk Naval Station (Chambers Field)"
+  "en": "Norfolk Naval Station Chambers Field"
  },
  "KBKT": {
   "en": "Allen C Perkinson Blackstone Army Air Field"
@@ -1808,16 +1808,16 @@
   "en": "Davison Army Air Field"
  },
  "KESN": {
-  "en": "Easton Airport / Newnam Field"
+  "en": "Easton Airport, Newnam Field"
  },
  "KDOV": {
-  "en": "Dover Civil Air Terminal/Dover Air Force Base"
+  "en": "Dover Civil Air Terminal, Dover Air Force Base"
  },
  "KDCA": {
   "en": "Ronald Reagan Washington National Airport"
  },
  "KNKT": {
-  "en": "Cherry Point MCAS / Cunningham Field/"
+  "en": "Cherry Point MCAS, Cunningham Field"
  },
  "KILM": {
   "en": "Wilmington International Airport"
@@ -1838,7 +1838,7 @@
   "en": "Lynden Pindling International Airport"
  },
  "KCEF": {
-  "en": "Westover Metropolitan Airport / Westover Air Reserve Base"
+  "en": "Westover Metropolitan Airport, Westover Air Reserve Base"
  },
  "KALB": {
   "en": "Albany International Airport"
@@ -1850,7 +1850,7 @@
   "en": "Worcester Regional Airport"
  },
  "KASH": {
-  "en": "Nashua Airport / Boire Field"
+  "en": "Nashua Airport, Boire Field"
  },
  "KSWF": {
   "en": "New York Stewart International Airport"
@@ -1958,7 +1958,7 @@
   "en": "CFB Shearwater Heliport"
  },
  "CYHZ": {
-  "en": "Halifax / Stanfield International Airport"
+  "en": "Halifax, Stanfield International Airport"
  },
  "MMCZ": {
   "es": "Aeropuerto Internacional de Cozumel",
@@ -1992,8 +1992,8 @@
   "en": "San Pedro Sula International Airport"
  },
  "MSLP": {
-  "es": "Aeropuerto de San Salvador (San Luis Talpa)",
-  "en": "San Salvador (San Luis Talpa) Airport"
+  "es": "Aeropuerto de San Salvador San Luis Talpa",
+  "en": "San Salvador San Luis Talpa Airport"
  },
  "MSSS": {
   "es": "Aeropuerto Internacional de San Salvador",
@@ -2012,8 +2012,8 @@
   "en": "Liberia International Airport"
  },
  "MROC": {
-  "es": "Aeropuerto Internacional de San José (Alajuela)",
-  "en": "San José (Alajuela) International Airport"
+  "es": "Aeropuerto Internacional de San José Alajuela",
+  "en": "San José Alajuela International Airport"
  },
  "MWCR": {
   "en": "Owen Roberts International Airport"
@@ -2175,8 +2175,8 @@
   "en": "Tame Airport"
  },
  "SKBO": {
-  "es": "Aeropuerto Internacional de Bogota",
-  "en": "Bogota International Airport"
+  "es": "Aeropuerto Internacional El Dorado de Bogotá",
+  "en": "Bogotá El Dorado International Airport"
  },
  "MDCY": {
   "es": "Aeropuerto Internacional de Samana",
@@ -2309,12 +2309,12 @@
   "en": "A.N.R. Robinson International Airport"
  },
  "SVPR": {
-  "es": "Aeropuerto Internacional de Guyana City",
-  "en": "Guyana City International Airport"
+  "es": "Aeropuerto Internacional Manuel Carlos Piar",
+  "en": "Manuel Carlos Piar International Airport"
  },
  "SVCB": {
-  "es": "Aeropuerto de Ciudad Bolivar",
-  "en": "Ciudad Bolivar Airport"
+  "es": "Aeropuerto de Ciudad Bolívar",
+  "en": "Ciudad Bolívar Airport"
  },
  "SBBV": {
   "en": "Atlas Brasil Cantanhede International Airport"
@@ -2344,8 +2344,8 @@
   "en": "Pataz Airport"
  },
  "SPJC": {
-  "es": "Aeropuerto Internacional Jorge Chavez",
-  "en": "Jorge Chavez International"
+  "es": "Aeropuerto Internacional Jorge Chávez",
+  "en": "Jorge Chávez International Airport"
  },
  "SPSO": {
   "es": "Aeropuerto Internacional de Pisco",
@@ -2406,8 +2406,8 @@
   "en": "San Miguel de Tucumán International Airport"
  },
  "SACO": {
-  "es": "Aeropuerto Internacional de Cordoba",
-  "en": "Cordoba International Airport"
+  "es": "Aeropuerto Internacional de Córdoba",
+  "en": "Córdoba International Airport"
  },
  "SAVT": {
   "es": "Aeropuerto de Rawson",
@@ -2422,8 +2422,8 @@
   "en": "El Calafate International Airport"
  },
  "SAWG": {
-  "es": "Aeropuerto Internacional de Rio Gallegos",
-  "en": "Rio Gallegos International Airport"
+  "es": "Aeropuerto Internacional de Río Gallegos",
+  "en": "Río Gallegos International Airport"
  },
  "SAWH": {
   "es": "Aeropuerto Internacional de Ushuaia",
@@ -2463,7 +2463,7 @@
   "en": "Bauru Airport"
  },
  "SBBE": {
-  "en": "Val de Cans/Júlio Cezar Ribeiro International Airport"
+  "en": "Val de Cans, Júlio Cezar Ribeiro International Airport"
  },
  "SBBR": {
   "en": "Presidente Juscelino Kubitschek International Airport"
@@ -2502,13 +2502,13 @@
   "en": "Eurico de Aguiar Salles International Airport"
  },
  "SBSG": {
-  "en": "Rio Grande do Norte/São Gonçalo do Amarante–Governador Aluízio Alves International Airport"
+  "en": "Rio Grande do Norte, São Gonçalo do Amarante–Governador Aluízio Alves International Airport"
  },
  "SBNT": {
   "en": "Natal Air Force Base"
  },
  "SBRF": {
-  "en": "Recife/Guararapes - Gilberto Freyre International Airport"
+  "en": "Recife, Guararapes - Gilberto Freyre International Airport"
  },
  "SGAS": {
   "es": "Aeropuerto Internacional de Asunción",
@@ -2527,12 +2527,12 @@
   "en": "Carmelo International Airport"
  },
  "SAEZ": {
-  "es": "Aeropuerto de Buenos Aires (Ezeiza)",
-  "en": "Buenos Aires (Ezeiza) Airport"
+  "es": "Aeropuerto Internacional de Ezeiza",
+  "en": "Ezeiza International Airport"
  },
  "SABE": {
-  "es": "Aeropuerto de Buenos Aires",
-  "en": "Buenos Aires Airport"
+  "es": "Aeroparque Jorge Newbery",
+  "en": "Jorge Newbery Airfield"
  },
  "SADP": {
   "es": "Aeropuerto de El Palomar",
@@ -2587,7 +2587,7 @@
   "en": "Campo de Marte Airport"
  },
  "SBGR": {
-  "en": "São Paulo/Guarulhos–Governor André Franco Montoro International Airport"
+  "en": "São Paulo, Guarulhos–Governor André Franco Montoro International Airport"
  },
  "SBTA": {
   "en": "Base de Aviação de Taubaté"
@@ -2617,7 +2617,7 @@
   "en": "Rio de Janeiro Galeão – Tom Jobim International Airport"
  },
  "EGYP": {
-  "en": "Mount Pleasant Airport / RAF Mount Pleasant"
+  "en": "Mount Pleasant Airport, RAF Mount Pleasant"
  },
  "BIKF": {
   "en": "Keflavik International Airport"
@@ -2986,7 +2986,7 @@
   "en": "Bardufoss Airport"
  },
  "ENEV": {
-  "en": "Harstad/Narvik Airport"
+  "en": "Harstad, Narvik Airport"
  },
  "ENAN": {
   "en": "Andøya Airport, Andenes"
@@ -3169,13 +3169,13 @@
   "en": "Brussels Airport"
  },
  "EHKD": {
-  "en": "De Kooy Airfield / Den Helder Naval Air Station"
+  "en": "De Kooy Airfield, Den Helder Naval Air Station"
  },
  "EDLV": {
-  "en": "Weeze (Niederrhein) Airport"
+  "en": "Weeze Niederrhein Airport"
  },
  "EBAW": {
-  "en": "Antwerp International Airport (Deurne)"
+  "en": "Antwerp International Airport Deurne"
  },
  "LFSG": {
   "en": "Épinal Mirecourt Airport"
@@ -3286,7 +3286,7 @@
   "en": "Kristiansand Airport"
  },
  "EKKA": {
-  "en": "Midtjyllands Airport / Air Base Karup"
+  "en": "Midtjyllands Airport, Air Base Karup"
  },
  "EKYT": {
   "en": "Aalborg Airport"
@@ -3466,7 +3466,7 @@
   "en": "Dresden Airport"
  },
  "EDDP": {
-  "en": "Leipzig/Halle Airport"
+  "en": "Leipzig, Halle Airport"
  },
  "EDDB": {
   "en": "Berlin Brandenburg Airport"
@@ -3553,7 +3553,7 @@
   "en": "Darłówo Naval Air Base"
  },
  "EPOK": {
-  "en": "Oksywie Air Base / Gdynia-Kosakowo Airfield"
+  "en": "Oksywie Air Base, Gdynia-Kosakowo Airfield"
  },
  "EPGD": {
   "en": "Gdańsk Lech Wałęsa Airport"
@@ -3802,7 +3802,7 @@
   "en": "Béziers Vias airport"
  },
  "LFMP": {
-  "en": "Perpignan-Rivesaltes (Llabanère) Airport"
+  "en": "Perpignan-Rivesaltes Llabanère Airport"
  },
  "LFBR": {
   "en": "Aérodrome de Muret - Lherm"
@@ -3982,7 +3982,7 @@
   "en": "Brindisi Airport"
  },
  "LIBN": {
-  "en": "Lecce Galatina Air Base / Galatina Fortunato Cesari Airport"
+  "en": "Lecce Galatina Air Base, Galatina Fortunato Cesari Airport"
  },
  "LICA": {
   "en": "Lamezia Terme Sant'Eufemia International Airport"
@@ -4054,7 +4054,7 @@
   "en": "Varna Airport"
  },
  "LBSB": {
-  "en": "Slanchev Bryag (Sunny Beach) Airstrip"
+  "en": "Slanchev Bryag Sunny Beach Airstrip"
  },
  "LBBG": {
   "en": "Burgas Airport"
@@ -4204,7 +4204,7 @@
   "en": "Boryspil International Airport"
  },
  "UKKK": {
-  "en": "Igor Sikorsky Kyiv International Airport (Zhuliany)"
+  "en": "Igor Sikorsky Kyiv International Airport Zhuliany"
  },
  "UKOO": {
   "en": "Odesa International Airport"
@@ -4255,7 +4255,7 @@
   "en": "Platov International Airport"
  },
  "UWGG": {
-  "en": "Nizhny Novgorod / Strigino International Airport"
+  "en": "Nizhny Novgorod, Strigino International Airport"
  },
  "URWW": {
   "en": "Volgograd International Airport"
@@ -4435,7 +4435,7 @@
   "en": "Queen Alia International Airport"
  },
  "OJAM": {
-  "en": "Marka International (Amman Civil) Airport"
+  "en": "Marka International Amman Civil Airport"
  },
  "OSDI": {
   "en": "Damascus International Airport"
@@ -4546,7 +4546,7 @@
   "en": "Al Najaf International Airport"
  },
  "ORBI": {
-  "en": "Baghdad International Airport / New Al Muthana Air Base"
+  "en": "Baghdad International Airport, New Al Muthana Air Base"
  },
  "OEGS": {
   "en": "Prince Naif bin Abdulaziz International Airport"
@@ -4759,7 +4759,7 @@
   "en": "Bisha Airport"
  },
  "OEGN": {
-  "en": "Jizan Regional Airport / King Abdullah bin Abdulaziz Airport"
+  "en": "Jizan Regional Airport, King Abdullah bin Abdulaziz Airport"
  },
  "OEAB": {
   "en": "Abha International Airport"
@@ -5308,7 +5308,7 @@
   "en": "Shah Amanat International Airport"
  },
  "VOPB": {
-  "en": "Veer Savarkar International Airport / INS Utkrosh"
+  "en": "Veer Savarkar International Airport, INS Utkrosh"
  },
  "VYMD": {
   "en": "Mandalay International Airport"
@@ -5470,13 +5470,13 @@
   "en": "Kuala Lumpur International Airport"
  },
  "WSAC": {
-  "en": "Changi Air Base (East)"
+  "en": "Changi Air Base East"
  },
  "WSSS": {
   "en": "Singapore Changi Airport"
  },
  "WIBB": {
-  "en": "Sultan Syarif Kasim II International Airport / Roesmin Nurjadin AFB"
+  "en": "Sultan Syarif Kasim II International Airport, Roesmin Nurjadin AFB"
  },
  "WSSL": {
   "en": "Seletar Airport"
@@ -5500,7 +5500,7 @@
   "en": "Sanya Phoenix International Airport"
  },
  "VVCR": {
-  "en": "Cam Ranh International Airport / Cam Ranh Air Base"
+  "en": "Cam Ranh International Airport, Cam Ranh Air Base"
  },
  "WBGK": {
   "en": "Mukah Airport"
@@ -5572,7 +5572,7 @@
   "en": "Soekarno-Hatta International Airport"
  },
  "WICD": {
-  "en": "Cakrabhuwana  Airport"
+  "en": "Cakrabhuwana Airport"
  },
  "WICC": {
   "en": "Husein Sastranegara International Airport"
@@ -5713,7 +5713,7 @@
   "en": "Kaohsiung International Airport"
  },
  "RCMQ": {
-  "en": "Taichung International Airport / Ching Chuang Kang Air Base"
+  "en": "Taichung International Airport, Ching Chuang Kang Air Base"
  },
  "RCFN": {
   "en": "Taitung Airport"
@@ -5740,7 +5740,7 @@
   "en": "Seoul Gimpo International Airport"
  },
  "RKJK": {
-  "en": "Gunsan Airport / Gunsan Air Base"
+  "en": "Gunsan Airport, Gunsan Air Base"
  },
  "RKJB": {
   "en": "Muan International Airport"
@@ -5761,16 +5761,16 @@
   "en": "Yecheon Airbase"
  },
  "RKNN": {
-  "en": "Gangneung Airport (K-18)"
+  "en": "Gangneung Airport K-18"
  },
  "RKNY": {
   "en": "Yangyang International Airport"
  },
  "RKTI": {
-  "en": "Jungwon Air Base/Chungju Airport"
+  "en": "Jungwon Air Base, Chungju Airport"
  },
  "RKNW": {
-  "en": "Wonju Airport / Hoengseong Air Base (K-38/K-46)"
+  "en": "Wonju Airport, Hoengseong Air Base K-38, K-46"
  },
  "RKPU": {
   "en": "Ulsan Airport"
@@ -5782,10 +5782,10 @@
   "en": "Gimhae International Airport"
  },
  "RKTH": {
-  "en": "Pohang Airport (G-815/K-3)"
+  "en": "Pohang Airport G-815, K-3"
  },
  "RKPS": {
-  "en": "Sacheon Airport / Sacheon Air Base"
+  "en": "Sacheon Airport, Sacheon Air Base"
  },
  "RKJY": {
   "en": "Yeosu Airport"
@@ -5854,7 +5854,7 @@
   "en": "Hakodate Airport"
  },
  "RJSM": {
-  "en": "Misawa Airport / Misawa Air Base"
+  "en": "Misawa Airport, Misawa Air Base"
  },
  "RJSS": {
   "en": "Sendai Airport"
@@ -5875,10 +5875,10 @@
   "en": "Bohol-Panglao International Airport"
  },
  "RPLC": {
-  "en": "Clark International Airport / Clark Air Base"
+  "en": "Clark International Airport, Clark Air Base"
  },
  "RPLB": {
-  "en": "Subic Bay International Airport / Naval Air Station Cubi Point"
+  "en": "Subic Bay International Airport, Naval Air Station Cubi Point"
  },
  "RPLL": {
   "en": "Ninoy Aquino International Airport"
@@ -5944,7 +5944,7 @@
   "en": "Pattimura International Airport"
  },
  "YPDN": {
-  "en": "Darwin International Airport / RAAF Darwin"
+  "en": "Darwin International Airport, RAAF Darwin"
  },
  "YPTN": {
   "en": "Tindal Airport"
@@ -5983,7 +5983,7 @@
   "en": "Port Moresby Jacksons International Airport"
  },
  "YBTL": {
-  "en": "Townsville Airport / RAAF Base Townsville"
+  "en": "Townsville Airport, RAAF Base Townsville"
  },
  "YBHM": {
   "en": "Hamilton Island Airport"
@@ -6112,7 +6112,7 @@
   "en": "Sydney Bankstown Airport"
  },
  "YSHW": {
-  "en": "Holsworthy (Military) Airport"
+  "en": "Holsworthy Military Airport"
  },
  "YSCN": {
   "en": "Camden Airport"

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { aEspanol, nombresAtis } from "./nombres.ts";
+import { aEspanol, nombresAtis, paraVoz } from "./nombres.ts";
 
 const our = [
   { ident: "SAEZ", name: "Ministro Pistarini International Airport", municipality: "Buenos Aires", iso_country: "AR" },
@@ -12,11 +12,30 @@ const our = [
 const mx = { MMGL: { es: "Aeropuerto Internacional de Guadalajara", en: "Guadalajara International Airport" } };
 const v = (icao: string, nombre = "x") => ({ icao, nombre });
 
-test("latam: la ciudad compartida usa el nombre de OurAirports; sola, la regla de la ciudad", () => {
-  const { nombres } = nombresAtis([v("SAEZ"), v("SABE"), v("SKRG")], our);
-  assert.deepEqual(nombres.SAEZ, { es: "Aeropuerto Internacional Ministro Pistarini", en: "Ministro Pistarini International Airport" });
-  assert.deepEqual(nombres.SABE, { es: "Aeropuerto Jorge Newbery Airpark", en: "Jorge Newbery Airpark" });
+test("latam: la ciudad compartida usa el nombre de OurAirports; sola, la regla de la ciudad; los fijos mandan", () => {
+  const our2 = [...our,
+    { ident: "SAZA", name: "Ciudad Foo International Airport", municipality: "Buenos Aires", iso_country: "AR" },
+    { ident: "SAZB", name: "Bar Airpark", municipality: "Buenos Aires", iso_country: "AR" },
+    { ident: "SAZC", name: "Baz Airport", municipality: "Tandil", iso_country: "AR" }];
+  const { nombres } = nombresAtis([v("SAEZ"), v("SABE"), v("SKRG"), v("SAZA"), v("SAZB"), v("SAZC")], our2);
+  assert.deepEqual(nombres.SAZA, { es: "Aeropuerto Internacional Ciudad Foo", en: "Ciudad Foo International Airport" });
+  assert.deepEqual(nombres.SAZB, { es: "Aeropuerto Bar Airpark", en: "Bar Airpark" });
+  assert.deepEqual(nombres.SAZC, { es: "Aeropuerto de Tandil", en: "Tandil Airport" });
+  assert.deepEqual(nombres.SAEZ, { es: "Aeropuerto Internacional de Ezeiza", en: "Ezeiza International Airport" });
+  assert.deepEqual(nombres.SABE, { es: "Aeroparque Jorge Newbery", en: "Jorge Newbery Airfield" });
   assert.deepEqual(nombres.SKRG, { es: "Aeropuerto Internacional José María Córdova", en: "José María Córdova International Airport" });
+});
+
+test("nombres para la voz: sin «/» ni paréntesis; MX.json no se toca", () => {
+  assert.equal(paraVoz("Foo / Bar (Baz) Airport"), "Foo, Bar Baz Airport");
+  assert.equal(paraVoz("Foo Airport (Bar), X"), "Foo Airport Bar, X");
+  assert.equal(paraVoz("Foo/Bar"), "Foo, Bar");
+  const our2 = [...our, { ident: "SKZZ", name: "Foo / Bar (Baz) Airport", municipality: "Cali", iso_country: "CO" },
+    { ident: "SKZY", name: "Otro Airport", municipality: "Cali", iso_country: "CO" }];
+  assert.deepEqual(nombresAtis([v("SKZZ"), v("SKZY")], our2).nombres.SKZZ, { es: "Aeropuerto Foo, Bar Baz", en: "Foo, Bar Baz Airport" });
+  assert.deepEqual(nombresAtis([v("EGZZ", "Foo/Bar (Intl)")], our).nombres.EGZZ, { en: "Foo, Bar International" });
+  const raro = { MMZZ: { es: "Aeropuerto (raro)", en: "Odd / Airport" } };
+  assert.deepEqual(nombresAtis([v("MMZZ")], our, raro).nombres.MMZZ, raro.MMZZ);
 });
 
 test("un aeropuerto de MX.json conserva sus nombres", () => {
