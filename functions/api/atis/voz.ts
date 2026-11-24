@@ -54,7 +54,10 @@ export async function responderVoz(q: URLSearchParams, env: Env, deps: Deps): Pr
   if (!env.AZURE_SPEECH_KEY || !env.AZURE_SPEECH_REGION) return texto("Voz no disponible", 503);
 
   let audio: ArrayBuffer;
-  try { audio = await deps.sintetizar(vivo.texto, env); } catch { return texto("Voz no disponible", 503); }
+  // El motivo (p. ej. «Azure 401») ayuda a diagnosticar desde afuera; nunca lleva la clave.
+  try { audio = await deps.sintetizar(vivo.texto, env); } catch (e) {
+    return texto(`Voz no disponible (${e instanceof Error ? e.message : "error"})`, 503);
+  }
   const r = new Response(audio, { headers: { "content-type": "audio/mpeg", "cache-control": "public, max-age=10800" } });
   // El audio ya se pagó: si la caché falla, se devuelve igual (un 500 haría que la página lo pague otra vez).
   try { await deps.cache.put(llave, r.clone()); } catch { /* sin caché esta vez */ }
