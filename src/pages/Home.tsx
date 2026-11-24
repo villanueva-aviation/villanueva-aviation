@@ -14,6 +14,7 @@ import { FondoHero } from "../features/home/FondoHero";
 import { FLOTA, TOTAL_AVIONES, fotoFlota } from "../data/flota";
 import { SECCIONES } from "../data/secciones";
 import { PAGINA_INSTRUCTOR } from "../data/paginaInstructor";
+import { DemoVuelo, Pantalla } from "../features/instructor/DemoVuelo";
 
 // Uno por categoría: el primer vuelo, el salto a multimotor y el turbohélice.
 const ADELANTO_FLOTA = ["c152", "seneca", "c90"].map((clave) =>
@@ -61,6 +62,33 @@ export function Home() {
         </div>
       </section>
 
+      {/* LO NUEVO: INSTRUCTOR VIRTUAL */}
+      <section className="relative overflow-hidden border-t border-gold-500/20 py-20 md:py-28">
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_75%_50%,rgba(212,175,55,0.08),transparent)]" />
+        <Container className="relative">
+          <div className="grid items-center gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+            <div>
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-gold-400">
+                <span className="rounded-full bg-gold-500 px-2 py-0.5 text-[10px] font-bold tracking-wider text-navy-950">Nuevo</span>
+                Lo nuevo en Villanueva
+              </p>
+              <h2 className="mt-4 font-display text-3xl font-bold leading-tight text-white text-balance sm:text-4xl">{PAGINA_INSTRUCTOR.titulo}</h2>
+              <p className="mt-5 text-white/70">{PAGINA_INSTRUCTOR.subtitulo}</p>
+              <p className="mt-3 text-sm text-white/50">La pantalla es el debriefing de un vuelo de demostración: se reproduce sola, y puedes arrastrarla o pausarla.</p>
+              <div className="mt-8">
+                <Button to={ROUTES.instructor} variant="primary" className="group">
+                  Conoce el instructor
+                  <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+                </Button>
+              </div>
+            </div>
+            <Pantalla>
+              <DemoVuelo autoplay />
+            </Pantalla>
+          </div>
+        </Container>
+      </section>
+
       {/* LAS CUATRO SECCIONES */}
       <section className="border-t border-white/10 py-20 md:py-28">
         <Container>
@@ -95,28 +123,6 @@ export function Home() {
                 </Link>
               </Reveal>
             ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* INSTRUCTOR VIRTUAL */}
-      <section className="border-t border-white/10 py-20 md:py-28">
-        <Container>
-          <div className="grid items-center gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-400">{PAGINA_INSTRUCTOR.eyebrow}</p>
-              <h2 className="mt-4 font-display text-3xl font-bold leading-tight text-white text-balance sm:text-4xl">{PAGINA_INSTRUCTOR.titulo}</h2>
-              <p className="mt-5 text-white/70">{PAGINA_INSTRUCTOR.subtitulo}</p>
-              <div className="mt-8">
-                <Button to={ROUTES.instructor} variant="primary" className="group">
-                  Conoce el instructor
-                  <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-0.5" />
-                </Button>
-              </div>
-            </div>
-            <Reveal className="overflow-hidden rounded-3xl border border-white/10 bg-navy-900 shadow-2xl shadow-black/40">
-              <img src={PAGINA_INSTRUCTOR.debriefing.img} alt={PAGINA_INSTRUCTOR.debriefing.alt} loading="lazy" className="block w-full" />
-            </Reveal>
           </div>
         </Container>
       </section>

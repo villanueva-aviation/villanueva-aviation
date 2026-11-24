@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { CalendarClock, ClipboardCheck, Compass, Globe, GraduationCap, LogOut, MessageSquareText, Plane, User, Users } from "lucide-react";
-import { NAV_LINKS, ROUTES } from "../../lib/routes";
+import { esNuevo, NAV_LINKS, ROUTES } from "../../lib/routes";
 import { rutaEnOtroIdioma } from "../../lib/idioma";
 import { useAuth } from "../../features/auth/AuthContext";
 import { usePendientesFundador } from "../../features/admin/usePendientesFundador";
@@ -35,7 +35,7 @@ function ProfileControl({
     return (
       <Link
         to={ROUTES.ingresar}
-        className="hidden rounded-full border border-white/25 px-4 py-2 font-display text-xs font-semibold text-white/85 transition-colors duration-200 hover:border-gold-500/50 hover:text-gold-400 lg:inline-flex"
+        className="hidden whitespace-nowrap rounded-full border border-white/25 px-4 py-2 font-display text-xs font-semibold text-white/85 transition-colors duration-200 hover:border-gold-500/50 hover:text-gold-400 lg:inline-flex"
       >
         Iniciar sesión
       </Link>
@@ -188,12 +188,12 @@ export function Navbar() {
           <nav className="hidden items-center xl:flex">
             {NAV_LINKS.filter((link) => !("soloMenus" in link)).map((link, i) => (
               <div key={link.to} className="flex items-center">
-                {i > 0 && <span className="mx-1 h-4 w-px bg-white/10" />}
+                {i > 0 && <span className="mx-0.5 h-4 w-px bg-white/10 2xl:mx-1" />}
                 <NavLink
                   to={link.to}
                   end={link.to === "/"}
                   className={({ isActive }) =>
-                    `group relative flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-2 font-sans text-sm font-light transition-all duration-200 ${
+                    `group relative flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-2 2xl:px-3.5 font-sans text-sm font-light transition-all duration-200 ${
                       isActive
                         ? "border-gold-500/40 bg-gold-500/10 text-gold-400 shadow-[0_0_16px_rgba(212,175,55,0.25)]"
                         : "border-transparent text-white/70 hover:border-white/10 hover:bg-white/5 hover:text-white"
@@ -202,7 +202,7 @@ export function Navbar() {
                 >
                   {({ isActive }) => (
                     <>
-                      {isActive && (
+                      {(isActive || esNuevo(link)) && (
                         <span className="relative flex h-1.5 w-1.5">
                           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold-400 opacity-75" />
                           <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-gold-400" />
@@ -218,6 +218,7 @@ export function Navbar() {
                         }
                       />
                       {link.label}
+                      {esNuevo(link) && <span className="rounded-full bg-gold-500 px-1.5 py-px font-sans text-[10px] font-bold uppercase tracking-wider text-navy-950 shadow-[0_0_10px_rgba(212,175,55,0.5)]">Nuevo</span>}
                     </>
                   )}
                 </NavLink>

@@ -1,6 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import { CalendarClock, ClipboardCheck, Compass, GraduationCap, LogOut, MessageSquareText, Plane, User, Users } from "lucide-react";
-import { NAV_LINKS, ROUTES } from "../../lib/routes";
+import { esNuevo, NAV_LINKS, ROUTES } from "../../lib/routes";
 import { DISCORD_URL } from "../../lib/constants";
 import { useAuth } from "../../features/auth/AuthContext";
 import type { usePendientesFundador } from "../../features/admin/usePendientesFundador";
@@ -81,6 +81,7 @@ export function MobileMenu({
             >
               <link.icon size={18} strokeWidth={1.75} className="text-gold-500/70" />
               {link.label}
+              {esNuevo(link) && <span className="rounded-full bg-gold-500 px-1.5 py-px font-sans text-[10px] font-bold uppercase tracking-wider text-navy-950 shadow-[0_0_10px_rgba(212,175,55,0.5)]">Nuevo</span>}
             </NavLink>
           ))}
         </nav>

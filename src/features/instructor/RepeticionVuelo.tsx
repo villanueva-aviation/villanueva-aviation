@@ -21,13 +21,26 @@ const T = {
 export const mmss = (seg: number) => `${Math.floor(Math.max(0, seg) / 60)}:${String(Math.floor(Math.max(0, seg) % 60)).padStart(2, "0")}`;
 
 /** El perfil del vuelo es la barra de la repetición: se arrastra o se reproduce, y abajo van los instrumentos de ese instante. */
-export function RepeticionVuelo({ grabacion, cursorT, alMover, idioma }: { grabacion: Grabacion; cursorT: number; alMover: (t: number) => void; idioma: Idioma }) {
+export function RepeticionVuelo({
+  grabacion,
+  cursorT,
+  alMover,
+  idioma,
+  velInicial = 0,
+}: {
+  grabacion: Grabacion;
+  cursorT: number;
+  alMover: (t: number) => void;
+  idioma: Idioma;
+  /** 4 = arranca reproduciendo a ×4. */
+  velInicial?: 0 | 4;
+}) {
   const t = T[idioma];
   const ps = grabacion.puntos;
   const t0 = ps[0]?.[C.t] ?? 0;
   const t1 = ps[ps.length - 1]?.[C.t] ?? 1;
   const dur = t1 - t0 || 1;
-  const [vel, setVel] = useState<0 | (typeof VELOCIDADES)[number]>(0);
+  const [vel, setVel] = useState<0 | (typeof VELOCIDADES)[number]>(velInicial);
   const [ultimaVel, setUltimaVel] = useState<(typeof VELOCIDADES)[number]>(4);
   const cursor = useRef(cursorT);
   cursor.current = cursorT;

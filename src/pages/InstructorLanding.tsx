@@ -1,46 +1,12 @@
-import { useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check, Clock } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { Container } from "../components/ui/Container";
 import { botonInstructor, PAGINA_INSTRUCTOR as P, PROXIMAMENTE } from "../data/paginaInstructor";
 import { useAuth } from "../features/auth/AuthContext";
-import { RepeticionVuelo } from "../features/instructor/RepeticionVuelo";
-import { CAMPO_PUNTO } from "../features/instructor/recorrido";
-import { grabacionDemo } from "../features/instructor/recorridoDemo";
+import { DemoVuelo, Pantalla } from "../features/instructor/DemoVuelo";
 import { DISCORD_URL } from "../lib/constants";
 import { ROUTES } from "../lib/routes";
-
-const marco = "overflow-hidden rounded-2xl border border-white/10 bg-navy-900 shadow-2xl shadow-black/40";
-
-/** Una pantalla del instructor con brillo dorado detrás; llega inclinada y se endereza al bajar (index.css). */
-function Pantalla({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return (
-    <div className={`relative isolate ${className}`}>
-      <div aria-hidden className="pointer-events-none absolute -inset-10 -z-10 bg-[radial-gradient(closest-side,rgba(212,175,55,0.2),transparent)] blur-2xl" />
-      <figure className={`pantalla-inclinada ${marco}`}>{children}</figure>
-    </div>
-  );
-}
-
-/** La repetición real del vuelo demo, parada en el primer mensaje del instructor dentro de la zona. */
-function DemoVuelo() {
-  const g = useMemo(() => grabacionDemo(), []);
-  const [t, setT] = useState(() => {
-    const zona = g.fases.find((f) => f.fase === "zona");
-    const voz = zona && g.voz.find((v) => v.t >= zona.inicio && v.t <= zona.fin);
-    return voz ? voz.t + 2 : (g.puntos[0]?.[CAMPO_PUNTO.t] ?? 0);
-  });
-  return (
-    <div className="p-4 sm:p-6">
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <p className="font-display font-bold text-white">Vuelo de demostración · Virajes a rumbos</p>
-        <span className="rounded-full bg-gold-500/15 px-2 py-0.5 text-xs font-semibold text-gold-300">Toca ▶ o arrastra</span>
-      </div>
-      <RepeticionVuelo grabacion={g} cursorT={t} alMover={setT} idioma="es" />
-    </div>
-  );
-}
 
 /** El menú de lecciones hecho en la página (nítido a cualquier tamaño) con la maniobra gratis abajo. */
 function ListaLecciones() {

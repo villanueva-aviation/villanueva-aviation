@@ -1,4 +1,4 @@
-import { BookOpen, Info, ClipboardCheck, Compass, Download, GraduationCap, Home, Plane, PlaneTakeoff, Route, Sparkles, UserCircle, Users, Warehouse, Waypoints } from "lucide-react";
+import { BookOpen, Info, ClipboardCheck, Compass, Download, GraduationCap, Headset, Home, Plane, PlaneTakeoff, Route, Sparkles, UserCircle, Users, Warehouse, Waypoints } from "lucide-react";
 
 export const ROUTES = {
   home: "/",
@@ -93,6 +93,8 @@ export const NAV_LINKS = [
   { label: "Vuela", to: ROUTES.vuela, icon: PlaneTakeoff },
   { label: "Hangar", to: ROUTES.hangar, icon: Warehouse },
   { label: "Aprende", to: ROUTES.aprende, icon: GraduationCap },
+  // «Nuevo» se quita sola el 1 de enero (hora de México).
+  { label: "Instructor", to: ROUTES.instructor, icon: Headset, nuevoHasta: "2027-01-01T00:00:00-06:00" },
   { label: "Comunidad", to: ROUTES.comunidad, icon: Users },
   { label: "Contenido Exclusivo", to: ROUTES.contenidoExclusivo, icon: Sparkles },
   // Fuera de la barra superior: aparecen en el menú móvil y en el pie. Lo de cadete (Mi Formación, Tracker...) vive en CADET_TABS.
@@ -103,6 +105,9 @@ export const NAV_LINKS = [
   { label: "Asesorías", to: ROUTES.asesorias, icon: Compass, soloMenus: true },
   { label: "Quiénes somos", to: ROUTES.quienesSomos, icon: Info, soloMenus: true },
 ];
+
+/** La etiqueta «Nuevo» de una pestaña sigue hasta su fecha `nuevoHasta`. */
+export const esNuevo = (link: { nuevoHasta?: string }, ahora = Date.now()): boolean => !!link.nuevoHasta && ahora < Date.parse(link.nuevoHasta);
 
 export const CADET_TABS = [
   { label: "Mi Formación", to: ROUTES.miFormacion, icon: Compass },
