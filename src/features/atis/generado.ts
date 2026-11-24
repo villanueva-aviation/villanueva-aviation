@@ -7,7 +7,8 @@ import { FRASES, palabraDigito, type Idioma, type Pieza } from "./frases.ts";
 export type TipoParte = "aeropuerto" | "letra" | "hora" | "pista" | "viento" | "visibilidad" | "tiempo" | "nubes"
   | "temperatura" | "altimetro" | "observaciones" | "cierre";
 export type Parte = { tipo: TipoParte; idioma: Idioma; texto: string; piezas: Pieza[]; soloTexto?: boolean };
-export type Atis = { icao: string; letra: string; inicioMs: number; partes: Parte[]; conControlador: boolean }; // partes es primero, luego en
+// deRed: la letra y la pista son las del ATIS de texto de la red (IVAO/VATSIM), leído con las piezas.
+export type Atis = { icao: string; letra: string; inicioMs: number; partes: Parte[]; conControlador: boolean; deRed?: boolean }; // partes es primero, luego en
 
 const ALFABETO = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -58,16 +59,19 @@ function visibMetrica(cuerpo: string): { g: string; sufijo: string } | null {
 // pero la letra se sigue calculando para saber cuándo cambia el METAR.
 // mx: bilingüe, millas y altímetro. latam: es+en, metros y QNH si el METAR los trae. faa: solo en, viento "at", pista al final.
 // oaci: solo en, metros y QNH. Lo que no se entiende va a partes soloTexto; nunca lanza.
-function armarFormato(formato: Formato, metar: Metar, ap: AeropuertoAtis, { conControlador = false }: { conControlador?: boolean } = {}): Atis {
+function armarFormato(formato: Formato, metar: Metar, ap: AeropuertoAtis, { conControlador = false, deRed }: Opciones = {}): Atis {
   const metrico = formato === "latam" || formato === "oaci";
-  const letra = letraDe(metar.obsTime);
+  const letra = deRed?.letra ?? letraDe(metar.obsTime);
   const [cuerpo, rmk = ""] = metar.rawOb.split(/\sRMK\s/);
   const grupo = (re: RegExp) => re.exec(cuerpo);
   const hora = grupo(/\b\d{2}(\d{4})Z\b/)?.[1];
   const variando = grupo(/(?:^|\s)(\d{3})V(\d{3})(?=\s|$)/);
   const temps = grupo(/(?:^|\s)(M?\d{2})\/(M?\d{2})?(?=\s|$)/);
   const altim = grupo(/(?:^|\s)([AQ])(\d{4})(?=\s|$)/);
-  const pista = conControlador ? null : pistaEnUso(ap.pistas, metar.wdir, metar.wspd);
+  // La pista de la red aunque MSFS no la tenga (solo se dice su ident); si la red no la publica, no se dice.
+  const pista = conControlador ? null
+    : deRed ? (deRed.pista ? ap.pistas.find((x) => x.ident === deRed.pista) ?? { ident: deRed.pista, rumboV: 0, largoFt: 0 } : null)
+    : pistaEnUso(ap.pistas, metar.wdir, metar.wspd);
   const cavok = metrico && /(?:^|\s)CAVOK(?=\s|$)/.test(cuerpo);
   const nsc = metrico && /(?:^|\s)NSC(?=\s|$)/.test(cuerpo);
   const visMetrica = metrico ? visibMetrica(cuerpo) : null;
@@ -215,10 +219,10 @@ function armarFormato(formato: Formato, metar: Metar, ap: AeropuertoAtis, { conC
   };
 
   const partes = formato === "mx" || formato === "latam" ? [...armar("es"), ...armar("en")] : armar("en");
-  return { icao: ap.icao, letra, inicioMs: metar.obsTime * 1000, partes, conControlador };
+  return { icao: ap.icao, letra, inicioMs: metar.obsTime * 1000, partes, conControlador, ...(deRed ? { deRed: true } : {}) };
 }
 
-type Opciones = { conControlador?: boolean };
+type Opciones = { conControlador?: boolean; deRed?: { letra: string; pista: string | null } };
 export const armarAtisMx = (metar: Metar, ap: AeropuertoAtis, o: Opciones = {}): Atis => armarFormato("mx", metar, ap, o);
 export const armarAtis = (metar: Metar, ap: AeropuertoAtis, o: Opciones = {}): Atis => armarFormato(formatoDe(ap.icao), metar, ap, o);
 

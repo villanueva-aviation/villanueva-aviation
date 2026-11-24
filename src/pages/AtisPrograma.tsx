@@ -7,7 +7,7 @@ import { conNombres, type AeropuertoAtis, type Nombres } from "../features/atis/
 import { LETRAS } from "../features/atis/frases";
 import { armarAtis, type Atis } from "../features/atis/generado";
 import { cargarAudio, RadioAtis } from "../features/atis/motorAudio";
-import { estadoVigente, fuente, type EntradaRed, type EstadoRed, type Fuente, type Red } from "../features/atis/red";
+import { datosDeRed, estadoVigente, fuente, type EntradaRed, type EstadoRed, type Fuente, type Red } from "../features/atis/red";
 import { alcanceNm, debeCambiar, entraSiguiente, mezclaPorDistancia, offsetLoop, PAUSA_LOOP_SEG, sintonizado, type Mezcla } from "../features/atis/radio";
 import { useLectorAtis } from "../features/atis/useLectorAtis";
 import { consultarMetar, type Metar } from "../lib/clima";
@@ -16,6 +16,7 @@ import { FOUNDER_EMAIL } from "../lib/constants";
 const METAR_CADA_MS = 60_000;
 const RED_CADA_MS = 60_000;
 const CLAVE_RED = "atis-red";
+const CLAVE_LEER = "atis-leer-red";
 const REDES: Red[] = ["ivao", "vatsim", "ninguna"];
 const NOMBRE_RED: Record<Red, string> = { ivao: "IVAO", vatsim: "VATSIM", ninguna: "" };
 
@@ -25,6 +26,15 @@ function leerRed(): Red {
     return r === "ivao" || r === "vatsim" ? r : "ninguna";
   } catch {
     return "ninguna";
+  }
+}
+
+// Leer en voz el ATIS de texto de la red: apagado de inicio (con Altitude o vPilot se oirían dos ATIS a la vez).
+function leerVozGuardado(): boolean {
+  try {
+    return localStorage.getItem(CLAVE_LEER) === "1";
+  } catch {
+    return false;
   }
 }
 
@@ -44,6 +54,7 @@ const TEXTOS = {
     atisDe: (n: string) => `ATIS de ${n}`, sinLetraAviso: "Generado sin letra: hay controlador en línea",
     generado: (h: string) => `Generado con el METAR de las ${h}Z`, cliente: "Escúchalo en tu cliente", soloTexto: "Solo en texto",
     faltaAudio: "Falta audio:", informacion: "Información", sinLetra: "Sin letra", soloSim: "Solo para simulación",
+    leerVoz: "Leer en voz el ATIS de la red", leido: "Leído con la voz del programa",
   },
   en: {
     "sin-lector": "Open the ATIS reader", "sin-simulador": "Waiting for MSFS", conectado: "Tune an airport's ATIS frequency",
@@ -53,6 +64,7 @@ const TEXTOS = {
     atisDe: (n: string) => `${n} ATIS`, sinLetraAviso: "Generated without letter: a controller is online",
     generado: (h: string) => `Generated from the ${h}Z METAR`, cliente: "Listen in your client", soloTexto: "Text only",
     faltaAudio: "Missing audio:", informacion: "Information", sinLetra: "No letter", soloSim: "For simulation only",
+    leerVoz: "Read the network ATIS aloud", leido: "Read aloud by the program",
   },
 };
 const T = en ? TEXTOS.en : TEXTOS.es;
@@ -73,7 +85,7 @@ type Vista = {
 type PreguntaRed = EntradaRed & { pedidoMs: number };
 type EntradaMetar = { metar: Metar | null; pedidoMs: number; viejo: boolean };
 
-const clave = (a: Atis) => `${a.icao}-${a.letra}-${a.conControlador ? "atc" : "gen"}`;
+const clave = (a: Atis) => `${a.icao}-${a.letra}-${a.conControlador ? "atc" : a.deRed ? "red" : "gen"}`;
 const nombreLetra = (l: string) => (/^[A-Z]$/.test(l) ? LETRAS[l.charCodeAt(0) - 65] : l);
 const duracion = (b: AudioBuffer) => b.duration - PAUSA_LOOP_SEG;
 const horaMetar = (a: Atis) => new Date(a.inicioMs).toISOString().slice(11, 16).replace(":", "");
@@ -112,6 +124,7 @@ function Programa() {
   const [iniciado, setIniciado] = useState(false);
   const [silenciado, setSilenciado] = useState(false);
   const [red, setRed] = useState<Red>(leerRed);
+  const [leerVoz, setLeerVoz] = useState(leerVozGuardado);
   const [vistas, setVistas] = useState<(Vista | null)[]>([null, null]);
   const ctxRef = useRef<AudioContext | null>(null);
   const canales = useRef<Canal[]>([]);
@@ -165,18 +178,29 @@ function Programa() {
   };
 
   // Cambiar de red a mano corta al momento, como cambiar de frecuencia; sin esto la regla nueva esperaría el fin del loop.
-  const elegirRed = (r: Red) => {
-    if (r === red) return;
+  const cortar = () => {
     for (const c of canales.current) {
       apagar(c);
       Object.assign(c, { atis: undefined, buffer: undefined, faltantes: undefined, cargando: null, siguiente: null });
     }
-    setRed(r);
+  };
+  const guardar = (k: string, v: string) => {
     try {
-      localStorage.setItem(CLAVE_RED, r);
+      localStorage.setItem(k, v);
     } catch {
       // Sin localStorage se elige otra vez la próxima.
     }
+  };
+  const elegirRed = (r: Red) => {
+    if (r === red) return;
+    cortar();
+    setRed(r);
+    guardar(CLAVE_RED, r);
+  };
+  const cambiarLeerVoz = (v: boolean) => {
+    cortar();
+    setLeerVoz(v);
+    guardar(CLAVE_LEER, v ? "1" : "0");
   };
 
   const cargar = (ctx: AudioContext, aps: AeropuertoAtis[], c: Canal, atis: Atis) => {
@@ -228,7 +252,9 @@ function Programa() {
         return { ...base, atis: null, faltantes: [], avisoMetar: null, origen: null, atisRed: null, avisoRed: T.consultando };
       }
       const origen = fuente(red, vigente);
-      if (origen === "cliente") {
+      // Con el interruptor, el ATIS de texto de la red se lee con las piezas: su letra y su pista, el METAR de aviationweather.
+      const deRed = origen === "cliente" && leerVoz ? datosDeRed(vigente!.atis!) : null;
+      if (origen === "cliente" && !deRed) {
         apagar(c); // la red ya da su ATIS por voz en el cliente del piloto
         return { ...base, atis: null, faltantes: [], avisoMetar: null, origen, atisRed: vigente!.atis, avisoRed };
       }
@@ -236,13 +262,14 @@ function Programa() {
 
       const e = metarDe(s.ap.icao);
       if (e.metar) {
-        const nuevo = armarAtis(e.metar, s.ap, { conControlador });
+        const nuevo = armarAtis(e.metar, s.ap, { conControlador, deRed: deRed ?? undefined });
         if (debeCambiar(c.atis ?? null, nuevo)) cargar(ctx, aps, c, nuevo);
       }
       // El ATIS nuevo entra al momento si no suena nada, o en la pausa del final del loop si ya suena otro.
       // Uno que llegó tarde de otro aeropuerto (A→B→A rápido) no entra.
       // Uno que llegó tarde con la regla vieja de la red (se conectó o se fue un controlador) tampoco.
-      if (c.siguiente && (c.siguiente.atis.icao !== s.ap.icao || c.siguiente.atis.conControlador !== conControlador)) c.siguiente = null;
+      if (c.siguiente && (c.siguiente.atis.icao !== s.ap.icao || c.siguiente.atis.conControlador !== conControlador
+        || !!c.siguiente.atis.deRed !== !!deRed)) c.siguiente = null;
       const sig = c.siguiente;
       if (sig && entraSiguiente(c.sonando, Date.now(), c.faseMs, duracion(c.buffer ?? sig.buffer))) {
         Object.assign(c, sig, { siguiente: null });
@@ -254,16 +281,16 @@ function Programa() {
       }
       if (silenciado) apagar(c);
       // Si ya suena, el cambio de regla entra en la pausa del loop; si no, solo arranca el ATIS de la regla actual.
-      else if (c.atis?.icao === s.ap.icao && (c.sonando || c.atis.conControlador === conControlador)) {
+      else if (c.atis?.icao === s.ap.icao && (c.sonando || (c.atis.conControlador === conControlador && !!c.atis.deRed === !!deRed))) {
         if (c.sonando) c.radio.ajustar(mezcla);
         else tocar(c, c.atis.inicioMs, mezcla);
       }
       const atis = c.atis?.icao === s.ap.icao ? c.atis : null;
       const avisoMetar = !e.viejo ? null : e.metar ? T.metarViejo : T.sinMetar;
-      return { ...base, atis, faltantes: atis ? c.faltantes! : [], avisoMetar, origen, atisRed: null, avisoRed };
+      return { ...base, atis, faltantes: atis ? c.faltantes! : [], avisoMetar, origen, atisRed: deRed ? vigente!.atis : null, avisoRed };
     }));
     // metarDe y cargar solo tocan refs; la muestra llega cada segundo.
-  }, [muestra, iniciado, aeropuertos, silenciado, red]);
+  }, [muestra, iniciado, aeropuertos, silenciado, red, leerVoz]);
 
   const empezar = () => {
     if (ctxRef.current) return ctxRef.current;
@@ -297,6 +324,13 @@ function Programa() {
         ))}
       </div>
 
+      {red !== "ninguna" && (
+        <label className="flex items-center gap-2 text-xs text-white/70">
+          <input type="checkbox" checked={leerVoz} onChange={(e) => cambiarLeerVoz(e.target.checked)} className="accent-gold-500" />
+          {T.leerVoz}
+        </label>
+      )}
+
       {!iniciado && <Button onClick={empezar} className="w-full">{T.empezar}</Button>}
 
       {sintonizados.length > 0 && vistas.map((v, i) => v && (
@@ -318,7 +352,7 @@ function Programa() {
           {v.origen === "cliente" && v.atisRed && (
             <div className="space-y-1 rounded border border-white/10 p-2">
               {v.atisRed.lineas.map((l, j) => <p key={j} className="text-white/85">{l}</p>)}
-              <span className="inline-block rounded border border-gold-500/40 px-1 text-[10px] uppercase tracking-wide text-gold-200">{T.cliente}</span>
+              <span className="inline-block rounded border border-gold-500/40 px-1 text-[10px] uppercase tracking-wide text-gold-200">{v.atis?.deRed ? T.leido : T.cliente}</span>
             </div>
           )}
           {v.atis && (["es", "en"] as const).map((idioma) => (

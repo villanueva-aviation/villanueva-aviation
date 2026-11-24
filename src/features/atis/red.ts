@@ -47,6 +47,17 @@ const LOCAL_NM = 10;
 const localCerca = (callsign: string, lat: number, lon: number, ap: Ap) =>
   !prefijoOaci(callsign) && distanciaNm({ lat, lon }, ap) < LOCAL_NM;
 
+// Letra y pista del ATIS de texto de la red, para leerlo con las piezas. null: no trae letra que se entienda.
+// La letra: la que publica la red (IVAO revision, VATSIM atis_code) o «INFORMATION ALPHA» (la inicial de la palabra).
+// La pista: la primera que se nombra (casi siempre la de llegada): ARR RWY 01, LANDING RUNWAY 24R, RWY IN USE 9.
+export function datosDeRed(atis: NonNullable<EstadoRed["atis"]>): { letra: string; pista: string | null } | null {
+  const texto = atis.lineas.join(" ").toUpperCase();
+  const letra = /^[A-Z]$/.exec((atis.letra ?? "").toUpperCase())?.[0] ?? /\bINFO(?:RMATION)?\s+([A-Z])[A-Z]*\b/.exec(texto)?.[1];
+  if (!letra) return null;
+  const pista = /\b(?:RWYS?|RUNWAYS?)\s+(?:IN\s+USE\s+)?(\d{1,2}[LRC]?)\b/.exec(texto)?.[1];
+  return { letra, pista: pista?.replace(/^\d(?!\d)/, "0$&") ?? null }; // RWY 9 → 09
+}
+
 export function fuente(red: Red, estado: EstadoRed | null): Fuente {
   if (red === "ninguna") return "generado";
   if (!estado) return "sin-letra";

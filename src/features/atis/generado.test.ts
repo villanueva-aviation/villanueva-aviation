@@ -356,3 +356,18 @@ test("todasLasPiezas: ap-XXXX en en siempre y en es solo si hay es", () => {
   for (const x of ["es/ap-SKRG", "en/ap-SKRG", "en/ap-EGLL"]) assert.ok(k.includes(x), x);
   assert.ok(!k.includes("es/ap-EGLL"));
 });
+
+test("deRed: letra y pista del controlador, aunque MSFS no tenga esa pista", () => {
+  const skrg = mundo("SKRG", "José María Córdova International Airport", "Aeropuerto Internacional José María Córdova",
+    [...par("18", "36", 180, 11483)]);
+  const m = mtr("SKRG 240100Z VRB02KT 9999 SCT013 18/17 Q1024", hora1, { wdir: "VRB", wspd: 2, clouds: [{ cover: "SCT", base: 1300 }] });
+  const a = armarAtis(m, skrg, { deRed: { letra: "A", pista: "01" } });
+  assert.equal(a.letra, "A");
+  assert.equal(a.deRed, true);
+  assert.equal(a.conControlador, false);
+  assert.equal(parte(a, "letra", "es")?.texto, "Información Alfa.");
+  assert.match(parte(a, "pista", "en")!.texto, /zero one/);
+  assert.match(parte(a, "cierre", "en")!.texto, /Alfa|Alpha/);
+  assert.equal(armarAtis(m, skrg, { deRed: { letra: "A", pista: null } }).partes.some((p) => p.tipo === "pista"), false);
+  assert.equal(armarAtis(m, skrg).deRed, undefined);
+});

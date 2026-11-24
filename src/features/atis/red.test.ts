@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { estadoIvao, estadoVatsim, estadoVigente, fuente, type IvaoAtc, type VatsimEstacion } from "./red.ts";
+import { datosDeRed, estadoIvao, estadoVatsim, estadoVigente, fuente, type IvaoAtc, type VatsimEstacion } from "./red.ts";
 
 const MMGL = { icao: "MMGL", lat: 20.5218, lon: -103.3112 };
 
@@ -164,4 +164,16 @@ test("mundial: torres con prefijo raro cuentan a menos de 10 NM (SY_TWR en YSSY,
   const fai = (lat: number) => ({ clients: { atcs: [ivao("FAI_TWR", "TWR", { lastTrack: { latitude: lat, longitude: -147.85 } })] } });
   assert.equal(estadoIvao(fai(64.82), pafa).atc, true);
   assert.equal(estadoIvao(fai(65.3), pafa).atc, false); // ~29 NM
+});
+
+test("datosDeRed: letra y pista del ATIS de texto de IVAO en SKRG", () => {
+  const lineas = ["Jose Mar?a Cordova ATIS Information ALPHA recorded at 0122z SKRG 240100Z VRB02KT 9999 SCT013 18/17 Q1024 ARR RWY 01 DEP RWY 01 TL FL190 TA 18000ft CONFIRM ATIS INFO ALPHA on initial contact"];
+  assert.deepEqual(datosDeRed({ lineas, letra: "A" }), { letra: "A", pista: "01" });
+});
+
+test("datosDeRed: sin letra publicada la saca de INFORMATION; pistas de una cifra y con lado", () => {
+  assert.deepEqual(datosDeRed({ lineas: ["EGLL ARR ATIS", "LANDING RWY 09L"], letra: null }), null);
+  assert.deepEqual(datosDeRed({ lineas: ["KLAX ATIS INFO BRAVO 1453Z.", "LANDING RUNWAYS 24R AND 25L"], letra: null }), { letra: "B", pista: "24R" });
+  assert.deepEqual(datosDeRed({ lineas: ["information charlie runway in use 9"], letra: "" }), { letra: "C", pista: "09" });
+  assert.deepEqual(datosDeRed({ lineas: ["EGLL ATIS D", "TRANSITION-LEVEL FL 70"], letra: "D" }), { letra: "D", pista: null });
 });
