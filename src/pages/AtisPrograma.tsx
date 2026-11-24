@@ -193,7 +193,7 @@ function Programa() {
     if (Date.now() - e.pedidoMs >= REAL_CADA_MS) {
       const entrada = e;
       entrada.pedidoMs = Date.now();
-      fetch(`/api/atis/real?icao=${icao}`)
+      fetch(`/api/atis/real?icao=${icao}`, { signal: AbortSignal.timeout(10_000) }) // colgada cuenta como falla
         .then((res) => (res.ok ? (res.json() as Promise<EntradaDatis[]>) : Promise.reject(new Error(String(res.status)))))
         .then((entradas) => Object.assign(entrada, { entradas, fallo: false }), () => { entrada.fallo = true; });
     }

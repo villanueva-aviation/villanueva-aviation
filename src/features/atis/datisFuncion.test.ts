@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { armarDatis, vivosDe, type EntradaDatis } from "./datis.ts";
 import { onRequestGet as real } from "../../../functions/api/atis/real.ts";
 import { responderVoz } from "../../../functions/api/atis/voz.ts";
+import { bajarDatis } from "./fuenteDatis.ts";
 
 const muestra: EntradaDatis[] = JSON.parse(readFileSync(new URL("./datis.muestra.json", import.meta.url), "utf8"));
 const kjfk = muestra.find((e) => e.airport === "KJFK")!;
@@ -63,4 +64,20 @@ test("voz: sin secretos o con Azure caído 503", async () => {
   assert.equal((await responderVoz(q({}), {}, deps)).status, 503);
   const roto = { ...deps, sintetizar: async () => { throw new Error("Azure 500"); } };
   assert.equal((await responderVoz(q({}), ENV, roto)).status, 503);
+});
+
+test("voz: si la caché falla al guardar, igual devuelve el audio ya pagado", async () => {
+  const { deps, llamadas } = armar();
+  const r = await responderVoz(q({}), ENV, { ...deps, cache: { ...deps.cache, put: async () => { throw new Error("caché caída"); } } });
+  assert.equal(r.status, 200);
+  assert.equal(r.headers.get("content-type"), "audio/mpeg");
+  assert.equal(llamadas(), 1);
+});
+
+test("bajarDatis: la consulta a atis.info lleva tiempo límite", async () => {
+  const f = globalThis.fetch;
+  let senal: unknown;
+  globalThis.fetch = (async (_u: unknown, init?: RequestInit) => { senal = init?.signal; return new Response("[]"); }) as typeof fetch;
+  try { await bajarDatis(); } finally { globalThis.fetch = f; }
+  assert.ok(senal instanceof AbortSignal);
 });

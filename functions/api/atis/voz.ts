@@ -56,7 +56,8 @@ export async function responderVoz(q: URLSearchParams, env: Env, deps: Deps): Pr
   let audio: ArrayBuffer;
   try { audio = await deps.sintetizar(vivo.texto, env); } catch { return texto("Voz no disponible", 503); }
   const r = new Response(audio, { headers: { "content-type": "audio/mpeg", "cache-control": "public, max-age=10800" } });
-  await deps.cache.put(llave, r.clone());
+  // El audio ya se pagó: si la caché falla, se devuelve igual (un 500 haría que la página lo pague otra vez).
+  try { await deps.cache.put(llave, r.clone()); } catch { /* sin caché esta vez */ }
   return r;
 }
 
