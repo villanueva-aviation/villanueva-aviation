@@ -52,16 +52,16 @@ export function leerDatis(e: EntradaDatis): DatisLeido {
 
 const MIN_MS = 60_000;
 
-// La hora HHMM Zulu más reciente que no esté en el futuro.
+// La hora HHMM Zulu más reciente; hasta 5 min en el futuro cuenta como hoy (reloj atrasado).
 export function emitidoMs(time: string, ahoraMs: number): number {
   const d = new Date(ahoraMs);
   const t = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), +time.slice(0, 2), +time.slice(2, 4));
-  return t > ahoraMs ? t - 24 * 60 * MIN_MS : t;
+  return t > ahoraMs + 5 * MIN_MS ? t - 24 * 60 * MIN_MS : t;
 }
 
-// Vigente si se emitió hace 90 minutos o menos.
+// Vigente si se emitió hace menos de 90 minutos.
 export function vigenteDatis(e: EntradaDatis, ahoraMs: number): boolean {
-  return ahoraMs - emitidoMs(e.time, ahoraMs) <= 90 * MIN_MS;
+  return ahoraMs - emitidoMs(e.time, ahoraMs) < 90 * MIN_MS;
 }
 
 export function datisPara(entradas: EntradaDatis[], nombreFrec: string | null): EntradaDatis | null {

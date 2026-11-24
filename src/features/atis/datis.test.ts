@@ -53,6 +53,9 @@ test("vigenteDatis: 89 min sí, 91 no; 2350 emitido visto a las 0010 del día si
   const base = Date.UTC(2026, 10, 24, 4, 51);
   assert.equal(vigenteDatis(e, base + 89 * 60_000), true);
   assert.equal(vigenteDatis(e, base + 91 * 60_000), false);
+  assert.equal(vigenteDatis(e, base + 90 * 60_000), false);
+  assert.equal(vigenteDatis(e, base + 90 * 60_000 - 1000), true);
+  assert.equal(vigenteDatis(e, base - 2 * 60_000), true); // emitido 2 min "en el futuro"
   const noche = { ...KJFK, time: "2350" };
   const visto = Date.UTC(2026, 10, 25, 0, 10);
   assert.equal(emitidoMs("2350", visto), Date.UTC(2026, 10, 24, 23, 50));
