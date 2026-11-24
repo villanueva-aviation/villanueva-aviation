@@ -3,6 +3,7 @@ import type { Metar, Nube } from "../../lib/clima.ts";
 import type { AeropuertoAtis } from "./datos.ts";
 import { armarAtis, type Atis, type Parte } from "./generado.ts";
 import { hablado } from "./hablado.ts";
+import { TOLERANCIA_MHZ } from "./radio.ts";
 
 export type EntradaDatis = {
   airport: string;
@@ -127,6 +128,12 @@ export function armarDatis(e: EntradaDatis, ap: AeropuertoAtis | null, ahoraMs: 
   let n = 0;
   for (const p of partes) if (p.vivo) p.piezas = [{ idioma: "en", clave: `vivo-${n}`, url: urlVoz(e.airport, e.type, n++, huella(p.vivo)) }];
   return { ...base, partes, real: true, huella: huella(e.datis) };
+}
+
+// Nombre que MSFS le da a esa frecuencia ATIS del aeropuerto (p. ej. "ATIS DEP"); null si no está o el lector no lo mandó.
+export function nombreFrecuencia(ap: AeropuertoAtis, mhz: number): string | null {
+  const i = ap.atisMhz.findIndex((m) => Math.abs(m - mhz) < TOLERANCIA_MHZ + 1e-9);
+  return (i >= 0 && ap.atisNombres?.[i]) || null;
 }
 
 export function vivosDe(atis: Atis): { n: number; texto: string; h: string }[] {

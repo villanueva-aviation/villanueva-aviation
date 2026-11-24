@@ -8,7 +8,7 @@ const AEROPUERTOS_CADA_MS = 30_000;
 const AEROPUERTOS_VACIO_CADA_MS = 5_000;
 
 export type MuestraAtis = { sim: string | null; com: Com[]; lat: number | null; lon: number | null; aglFt: number | null };
-export type AeropuertoSim = { icao: string; nombre: string; lat: number; lon: number; elevFt: number; atisMhz: number[]; pistas: { ident: string; rumboV: number; largoFt: number }[] };
+export type AeropuertoSim = { icao: string; nombre: string; lat: number; lon: number; elevFt: number; atisMhz: number[]; atisNombres?: string[]; pistas: { ident: string; rumboV: number; largoFt: number }[] };
 export type EstadoLectorAtis = "sin-lector" | "sin-simulador" | "conectado";
 
 // Lee el lector ATIS cada segundo. Sin lector, la muestra queda en null.

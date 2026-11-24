@@ -7,7 +7,7 @@ export type Posicion = { lat: number; lon: number; aglFt: number };
 export type Mezcla = { voz: number; ruido: number; tremolo: number }; // ganancias; tremolo = profundidad (0 = ninguno)
 
 const RADIO_TIERRA_NM = 3440.065;
-const TOLERANCIA_MHZ = 0.005; // 5 kHz
+export const TOLERANCIA_MHZ = 0.005; // 5 kHz
 export const PAUSA_LOOP_SEG = 2; // silencio al final de cada vuelta del loop (cargarAudio lo deja en el buffer)
 const rad = (g: number) => (g * Math.PI) / 180;
 

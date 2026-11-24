@@ -74,6 +74,7 @@ class Aeropuerto : Lugar
     public string Nombre;
     public int ElevFt;
     public List<double> Mhz = new List<double>();
+    public List<string> Nombres = new List<string>(); // nombre de cada frecuencia ATIS, alineado con Mhz
     public List<Pista> Pistas = new List<Pista>();
 
     public const double Radio = 200;   // NM
@@ -123,6 +124,8 @@ class Aeropuerto : Lugar
                 .Append(", \"lat\": ").Append(Muestra.N6(a.Lat)).Append(", \"lon\": ").Append(Muestra.N6(a.Lon))
                 .Append(", \"elevFt\": ").Append(a.ElevFt.ToString(CultureInfo.InvariantCulture)).Append(", \"atisMhz\": [");
             for (var k = 0; k < a.Mhz.Count; k++) sb.Append(k > 0 ? ", " : "").Append(Muestra.N(a.Mhz[k]));
+            sb.Append("], \"atisNombres\": [");
+            for (var k = 0; k < a.Nombres.Count; k++) sb.Append(k > 0 ? ", " : "").Append(Texto(a.Nombres[k]));
             sb.Append("], \"pistas\": [");
             for (var k = 0; k < a.Pistas.Count; k++)
             {
@@ -426,7 +429,7 @@ static class LectorAtis
         // MMGL simulado: la forma exacta del contrato de /aeropuertos.
         var j = Aeropuerto.Json(new List<Aeropuerto> { Simulado.Mmgl() });
         var mmgl = j == "[{\"icao\": \"MMGL\", \"nombre\": \"Don Miguel Hidalgo Intl\", \"lat\": 20.523342, \"lon\": -103.310108, " +
-            "\"elevFt\": 5016, \"atisMhz\": [127.9], \"pistas\": [{\"ident\": \"11L\", \"rumboV\": 114, \"largoFt\": 11608}, " +
+            "\"elevFt\": 5016, \"atisMhz\": [127.9], \"atisNombres\": [\"ATIS\"], \"pistas\": [{\"ident\": \"11L\", \"rumboV\": 114, \"largoFt\": 11608}, " +
             "{\"ident\": \"29R\", \"rumboV\": 294, \"largoFt\": 11608}, {\"ident\": \"11R\", \"rumboV\": 113, \"largoFt\": 13123}, " +
             "{\"ident\": \"29L\", \"rumboV\": 293, \"largoFt\": 13123}]}]";
         Console.WriteLine(mmgl ? "Json de aeropuertos: OK" : "Json de aeropuertos: FALLA " + j);
@@ -810,7 +813,7 @@ static class Simulado
     public static Aeropuerto Mmgl()
     {
         var a = new Aeropuerto { Icao = "MMGL", Nombre = "Don Miguel Hidalgo Intl", Lat = 20.523342, Lon = -103.310108, ElevFt = 5016 };
-        a.Mhz.Add(127.9);
+        a.Mhz.Add(127.9); a.Nombres.Add("ATIS");
         a.Pistas.Add(new Pista { Ident = "11L", RumboV = 114, LargoFt = 11608 });
         a.Pistas.Add(new Pista { Ident = "29R", RumboV = 294, LargoFt = 11608 });
         a.Pistas.Add(new Pista { Ident = "11R", RumboV = 113, LargoFt = 13123 });
@@ -1096,7 +1099,7 @@ static class Sim
                     {
                         var f = (FrecFac)o;
                         var mhz = Math.Round(f.Hz / 1e6, 3);
-                        if (f.Tipo == 1 && !p.Ap.Mhz.Contains(mhz)) p.Ap.Mhz.Add(mhz);
+                        if (f.Tipo == 1 && !p.Ap.Mhz.Contains(mhz)) { p.Ap.Mhz.Add(mhz); p.Ap.Nombres.Add((f.Nombre ?? "").Trim()); }
                     }
                     else if (o is PistaFac)
                     {

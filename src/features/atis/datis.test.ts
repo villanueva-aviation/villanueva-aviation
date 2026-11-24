@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { armarDatis, datisPara, emitidoMs, huella, leerDatis, metarDeTexto, urlVoz, vigenteDatis, vivosDe, type EntradaDatis } from "./datis.ts";
+import { armarDatis, datisPara, emitidoMs, huella, leerDatis, nombreFrecuencia, metarDeTexto, urlVoz, vigenteDatis, vivosDe, type EntradaDatis } from "./datis.ts";
 import type { AeropuertoAtis } from "./datos.ts";
 
 const muestra: EntradaDatis[] = JSON.parse(
@@ -136,4 +136,13 @@ test("armarDatis: un código de tiempo sin pieza (-SN) va a voz en vivo", () => 
   const a = armarDatis(e, null, AHORA);
   const t = a.partes.find((p) => p.tipo === "tiempo")!;
   assert.ok(t.vivo && !t.soloTexto); assert.equal(t.texto, "-SN");
+});
+
+test("nombreFrecuencia: el nombre que MSFS le da a la frecuencia, con tolerancia de 5 kHz", () => {
+  const ap: AeropuertoAtis = { icao: "KXYZ", nombreEs: null, nombreEn: null, nombreSim: "X", lat: 0, lon: 0, elevFt: 0, atisMhz: [127.9, 128.075], atisNombres: ["ATIS ARR", "ATIS DEP"], pistas: [] };
+  assert.equal(nombreFrecuencia(ap, 128.075), "ATIS DEP");
+  assert.equal(nombreFrecuencia(ap, 127.9), "ATIS ARR");
+  assert.equal(nombreFrecuencia(ap, 128.08), "ATIS DEP");
+  assert.equal(nombreFrecuencia(ap, 121.5), null);
+  assert.equal(nombreFrecuencia({ ...ap, atisNombres: undefined }, 128.075), null);
 });

@@ -5,7 +5,7 @@ export type ExtremoPista = { ident: string; rumboV: number; largoFt: number }; /
 export type AeropuertoAtis = {
   icao: string; nombreEs: string | null; nombreEn: string | null; nombreSim: string; // nombreSim = nombre en MSFS; los hablados son null si no hay pieza
   lat: number; lon: number; elevFt: number;
-  atisMhz: number[]; pistas: ExtremoPista[];
+  atisMhz: number[]; atisNombres?: string[]; pistas: ExtremoPista[];
 };
 export type Nombres = Record<string, { es?: string; en: string }>;
 type Fila = Record<string, string>;
