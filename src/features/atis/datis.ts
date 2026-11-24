@@ -80,10 +80,10 @@ export function datisPara(entradas: EntradaDatis[], nombreFrec: string | null): 
 export type PreguntaReal = { entradas: EntradaDatis[] | null; fallo: boolean };
 
 // El D-ATIS que suena en esa frecuencia. "esperando": silencio hasta la primera respuesta.
-// null: no hay uno vigente o la fuente falló; suena el generado.
+// Si la fuente falla, sigue la última respuesta buena hasta que vence (90 min).
+// null: no hay uno vigente, o falló sin respuesta previa; suena el generado.
 export function datisVigente(q: PreguntaReal, nombreFrec: string | null, ahoraMs: number): EntradaDatis | null | "esperando" {
-  if (q.fallo) return null;
-  if (!q.entradas) return "esperando";
+  if (!q.entradas) return q.fallo ? null : "esperando";
   const e = datisPara(q.entradas, nombreFrec);
   return e && vigenteDatis(e, ahoraMs) ? e : null;
 }

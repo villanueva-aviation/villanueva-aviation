@@ -72,12 +72,13 @@ test("datisPara: combined gana; DEP en el nombre da dep; otro nombre o null da a
   assert.equal(datisPara([], null), null);
 });
 
-test("datisVigente: esperando sin respuesta; falla o viejo da null; vigente da la entrada de esa frecuencia", () => {
+test("datisVigente: esperando sin respuesta; falla sin respuesta previa o viejo da null; vigente da la entrada de esa frecuencia", () => {
   const ahora = Date.UTC(2026, 10, 24, 5, 0);
   const arr = { ...KJFK, type: "arr" as const }, dep = { ...KJFK, type: "dep" as const };
   assert.equal(datisVigente({ entradas: null, fallo: false }, null, ahora), "esperando");
   assert.equal(datisVigente({ entradas: null, fallo: true }, null, ahora), null);
-  assert.equal(datisVigente({ entradas: [KJFK], fallo: true }, null, ahora), null);
+  assert.equal(datisVigente({ entradas: [KJFK], fallo: true }, null, ahora), KJFK); // falla con respuesta previa: sigue la previa
+  assert.equal(datisVigente({ entradas: [KJFK], fallo: true }, null, ahora + 90 * 60_000), null); // hasta que vence
   assert.equal(datisVigente({ entradas: [], fallo: false }, null, ahora), null);
   assert.equal(datisVigente({ entradas: [arr, dep], fallo: false }, "ATIS DEP", ahora), dep);
   assert.equal(datisVigente({ entradas: [KJFK], fallo: false }, null, ahora + 90 * 60_000), null);

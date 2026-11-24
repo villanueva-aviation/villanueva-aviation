@@ -186,7 +186,7 @@ function Programa() {
     return e;
   };
 
-  // El D-ATIS de EE. UU., igual que la red: la primera vez y cada 60 s; guarda la última respuesta y si falló.
+  // El D-ATIS de EE. UU., igual que la red: la primera vez y cada 60 s; guarda la última respuesta buena (una falla no la borra) y si falló.
   const realDe = (icao: string): PreguntaRealPagina => {
     let e = reales.current.get(icao);
     if (!e) reales.current.set(icao, (e = { entradas: null, pedidoMs: 0, fallo: false }));
@@ -235,6 +235,8 @@ function Programa() {
       (r) => {
         if (c.cargando !== k) return; // ya se sintonizó otra cosa
         c.cargando = null;
+        // Un reintento que no consiguió más voz en vivo no se cambia: dejaría el mismo audio y recortaría la pausa del loop.
+        if (c.atis && clave(c.atis) === k && r.faltantes.length >= c.faltantes!.length) return;
         c.siguiente = { atis, ...r };
       },
       () => { if (c.cargando === k) c.cargando = null; },
