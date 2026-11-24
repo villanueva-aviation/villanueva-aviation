@@ -37,6 +37,11 @@ const FIJAS: Record<string, [string | null, string | null]> = {
   "f-observacion": ["Observación de las", null],
   "f-zulu": ["zulú.", "zulu weather."],
   "f-pista": ["Pista en uso,", "Runway in use,"],
+  // Del ATIS de texto de la red: llegada y salida distintas, nivel y altitud de transición.
+  "f-pista-llegada": ["Pista para aterrizajes,", "Landing runway,"],
+  "f-pista-salida": ["Pista para despegues,", "Departure runway,"],
+  "f-nivel-transicion": ["Nivel de transición, nivel de vuelo", "Transition level, flight level"],
+  "f-altitud-transicion": ["Altitud de transición,", "Transition altitude,"],
   "f-derecha": ["derecha.", "right."], "f-izquierda": ["izquierda.", "left."], "f-central": ["central.", "center."],
   "f-viento": ["Viento,", "Wind,"],
   "f-grados": ["grados,", "degrees,"],

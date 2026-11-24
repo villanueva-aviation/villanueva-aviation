@@ -166,14 +166,17 @@ test("mundial: torres con prefijo raro cuentan a menos de 10 NM (SY_TWR en YSSY,
   assert.equal(estadoIvao(fai(65.3), pafa).atc, false); // ~29 NM
 });
 
-test("datosDeRed: letra y pista del ATIS de texto de IVAO en SKRG", () => {
+test("datosDeRed: letra, pista, TL y TA del ATIS de texto de IVAO en SKRG", () => {
   const lineas = ["Jose Mar?a Cordova ATIS Information ALPHA recorded at 0122z SKRG 240100Z VRB02KT 9999 SCT013 18/17 Q1024 ARR RWY 01 DEP RWY 01 TL FL190 TA 18000ft CONFIRM ATIS INFO ALPHA on initial contact"];
-  assert.deepEqual(datosDeRed({ lineas, letra: "A" }), { letra: "A", pista: "01" });
+  assert.deepEqual(datosDeRed({ lineas, letra: "A" }), { letra: "A", pista: "01", salida: null, tl: "190", taFt: 18000 });
 });
 
-test("datosDeRed: sin letra publicada la saca de INFORMATION; pistas de una cifra y con lado", () => {
-  assert.deepEqual(datosDeRed({ lineas: ["EGLL ARR ATIS", "LANDING RWY 09L"], letra: null }), null);
-  assert.deepEqual(datosDeRed({ lineas: ["KLAX ATIS INFO BRAVO 1453Z.", "LANDING RUNWAYS 24R AND 25L"], letra: null }), { letra: "B", pista: "24R" });
-  assert.deepEqual(datosDeRed({ lineas: ["information charlie runway in use 9"], letra: "" }), { letra: "C", pista: "09" });
-  assert.deepEqual(datosDeRed({ lineas: ["EGLL ATIS D", "TRANSITION-LEVEL FL 70"], letra: "D" }), { letra: "D", pista: null });
+test("datosDeRed: llegada y salida distintas; sin letra publicada la saca de INFORMATION", () => {
+  assert.deepEqual(datosDeRed({ lineas: ["ARR RWY 01 DEP RWY 19"], letra: "B" }), { letra: "B", pista: "01", salida: "19", tl: null, taFt: null });
+  assert.deepEqual(datosDeRed({ lineas: ["DEPARTURE RUNWAY 27L ARRIVAL RUNWAY 27R"], letra: "C" }), { letra: "C", pista: "27R", salida: "27L", tl: null, taFt: null });
+  assert.equal(datosDeRed({ lineas: ["EGLL ARR ATIS", "LANDING RWY 09L"], letra: null }), null);
+  assert.deepEqual(datosDeRed({ lineas: ["KLAX ATIS INFO BRAVO 1453Z.", "LANDING RUNWAYS 24R AND 25L"], letra: null }),
+    { letra: "B", pista: "24R", salida: null, tl: null, taFt: null });
+  assert.deepEqual(datosDeRed({ lineas: ["information charlie runway in use 9"], letra: "" }), { letra: "C", pista: "09", salida: null, tl: null, taFt: null });
+  assert.deepEqual(datosDeRed({ lineas: ["EGLL ATIS D", "TRANSITION-LEVEL FL 70"], letra: "D" }), { letra: "D", pista: null, salida: null, tl: "70", taFt: null });
 });

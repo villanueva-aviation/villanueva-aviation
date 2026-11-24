@@ -361,14 +361,15 @@ test("deRed: letra y pista del controlador, aunque MSFS no tenga esa pista", () 
   const skrg = mundo("SKRG", "José María Córdova International Airport", "Aeropuerto Internacional José María Córdova",
     [...par("18", "36", 180, 11483)]);
   const m = mtr("SKRG 240100Z VRB02KT 9999 SCT013 18/17 Q1024", hora1, { wdir: "VRB", wspd: 2, clouds: [{ cover: "SCT", base: 1300 }] });
-  const a = armarAtis(m, skrg, { deRed: { letra: "A", pista: "01" } });
+  const red = { letra: "A", pista: "01", salida: null, tl: null, taFt: null };
+  const a = armarAtis(m, skrg, { deRed: red });
   assert.equal(a.letra, "A");
   assert.equal(a.deRed, true);
   assert.equal(a.conControlador, false);
   assert.equal(parte(a, "letra", "es")?.texto, "Información Alfa.");
   assert.match(parte(a, "pista", "en")!.texto, /zero one/);
   assert.match(parte(a, "cierre", "en")!.texto, /Alfa|Alpha/);
-  assert.equal(armarAtis(m, skrg, { deRed: { letra: "A", pista: null } }).partes.some((p) => p.tipo === "pista"), false);
+  assert.equal(armarAtis(m, skrg, { deRed: { ...red, pista: null } }).partes.some((p) => p.tipo === "pista"), false);
   assert.equal(armarAtis(m, skrg).deRed, undefined);
 });
 
@@ -376,4 +377,20 @@ test("la voz en español dice «Eco»; la pantalla sigue diciendo «Echo»", () 
   assert.equal(textoDePieza({ idioma: "es", clave: "letra-E" }, []), "Eco.");
   assert.equal(textoDePieza({ idioma: "en", clave: "letra-E" }, []), "Echo.");
   assert.equal(FRASES.es["letra-E"], "Echo.");
+});
+
+test("deRed: llegada y salida distintas, nivel y altitud de transición", () => {
+  const skrg = mundo("SKRG", "José María Córdova International Airport", "Aeropuerto Internacional José María Córdova",
+    [...par("01", "19", 0, 11483)]);
+  const m = mtr("SKRG 240100Z VRB02KT 9999 SCT013 18/17 Q1024", hora1, { wdir: "VRB", wspd: 2, clouds: [{ cover: "SCT", base: 1300 }] });
+  const a = armarAtis(m, skrg, { deRed: { letra: "E", pista: "01", salida: "19", tl: "190", taFt: 18000 } });
+  const pistas = (i: "es" | "en") => a.partes.filter((p) => p.tipo === "pista" && p.idioma === i).map((p) => p.texto);
+  assert.deepEqual(pistas("es"), ["Pista para aterrizajes, cero uno.", "Pista para despegues, uno nueve.",
+    "Nivel de transición, nivel de vuelo uno nueve cero.", "Altitud de transición, uno ocho mil pies."]);
+  assert.deepEqual(pistas("en"), ["Landing runway, zero one.", "Departure runway, one niner.",
+    "Transition level, flight level one niner zero.", "Transition altitude, one eight thousand."]);
+  // Sin red: no se dice nivel ni altitud de transición.
+  assert.equal(armarAtis(m, skrg).partes.filter((p) => p.tipo === "pista").length, 2);
+  const piezas = new Set(todasLasPiezas({ SKRG: { es: "x", en: "y" } }).map((p) => `${p.idioma}/${p.clave}`));
+  for (const p of a.partes.flatMap((x) => x.piezas)) assert.ok(piezas.has(`${p.idioma}/${p.clave}`), p.clave);
 });

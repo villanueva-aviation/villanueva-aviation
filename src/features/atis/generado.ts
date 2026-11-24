@@ -1,6 +1,7 @@
 // Arma el ATIS bilingüe de México (texto en pantalla + piezas de audio) a partir de un METAR.
 import { visibilidadSM, type Metar } from "../../lib/clima.ts";
 import type { AeropuertoAtis, ExtremoPista } from "./datos.ts";
+import type { DatosRed } from "./red.ts";
 import { formatoDe, type Formato } from "./formato.ts";
 import { FRASES, palabraDigito, type Idioma, type Pieza } from "./frases.ts";
 
@@ -126,15 +127,23 @@ function armarFormato(formato: Formato, metar: Metar, ap: AeropuertoAtis, { conC
       p("hora", { ...x, texto: cap(x.texto) });
     }
 
-    const pistaParte = () => {
-      if (!pista) return;
-      const clave = formato === "faa" ? "f-faa-pista" : "f-pista";
-      const m = /^(\d{1,2})([LRC]?)$/.exec(pista.ident);
-      if (!m) solo("pista", `${F(clave)} ${pista.ident}.`);
+    const unaPista = (clave: string, ident: string) => {
+      const m = /^(\d{1,2})([LRC]?)$/.exec(ident);
+      if (!m) solo("pista", `${F(clave)} ${ident}.`);
       else {
         const d = D(m[1].padStart(2, "0"));
         p("pista", m[2] ? j(clave, d, SUFIJO[m[2]]) : punto(j(clave, d)));
       }
+    };
+    const pistaParte = () => {
+      if (pista && deRed?.salida) {
+        unaPista("f-pista-llegada", pista.ident);
+        unaPista("f-pista-salida", deRed.salida);
+      } else if (pista) unaPista(formato === "faa" ? "f-faa-pista" : "f-pista", pista.ident);
+      // Nivel y altitud de transición: solo los que publica el controlador.
+      if (deRed?.tl) p("pista", j("f-nivel-transicion", punto(D(deRed.tl))));
+      const ta = deRed?.taFt ? altura(deRed.taFt) : null;
+      if (ta) p("pista", j("f-altitud-transicion", ta)); // altura() ya cierra con punto («mil pies.»)
     };
     if (formato !== "faa") pistaParte();
 
@@ -222,7 +231,7 @@ function armarFormato(formato: Formato, metar: Metar, ap: AeropuertoAtis, { conC
   return { icao: ap.icao, letra, inicioMs: metar.obsTime * 1000, partes, conControlador, ...(deRed ? { deRed: true } : {}) };
 }
 
-type Opciones = { conControlador?: boolean; deRed?: { letra: string; pista: string | null } };
+type Opciones = { conControlador?: boolean; deRed?: DatosRed };
 export const armarAtisMx = (metar: Metar, ap: AeropuertoAtis, o: Opciones = {}): Atis => armarFormato("mx", metar, ap, o);
 export const armarAtis = (metar: Metar, ap: AeropuertoAtis, o: Opciones = {}): Atis => armarFormato(formatoDe(ap.icao), metar, ap, o);
 

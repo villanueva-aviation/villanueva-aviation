@@ -47,15 +47,26 @@ const LOCAL_NM = 10;
 const localCerca = (callsign: string, lat: number, lon: number, ap: Ap) =>
   !prefijoOaci(callsign) && distanciaNm({ lat, lon }, ap) < LOCAL_NM;
 
-// Letra y pista del ATIS de texto de la red, para leerlo con las piezas. null: no trae letra que se entienda.
+export type DatosRed = { letra: string; pista: string | null; salida: string | null; tl: string | null; taFt: number | null };
+
+// Lo que se lee del ATIS de texto de la red, para decirlo con las piezas. null: no trae letra que se entienda.
 // La letra: la que publica la red (IVAO revision, VATSIM atis_code) o «INFORMATION ALPHA» (la inicial de la palabra).
-// La pista: la primera que se nombra (casi siempre la de llegada): ARR RWY 01, LANDING RUNWAY 24R, RWY IN USE 9.
-export function datosDeRed(atis: NonNullable<EstadoRed["atis"]>): { letra: string; pista: string | null } | null {
+// pista: la de llegada (ARR RWY 01, LANDING RUNWAY 24R) o, si no la dice, la primera que se nombra (RWY IN USE 9).
+// salida: la de salida solo si es otra (DEP RWY 19). tl: TL FL190, TRANSITION LEVEL 70. taFt: TA 18000FT.
+const PISTA = String.raw`(?:RWYS?|RUNWAYS?)\s+(?:IN\s+USE\s+)?(\d{1,2}[LRC]?)\b`;
+const LLEGADA = new RegExp(String.raw`\b(?:ARR(?:IVALS?)?|LANDING|LDG)\s+` + PISTA);
+const SALIDA = new RegExp(String.raw`\b(?:DEP(?:ARTURES?)?|DEPARTING|TAKE-?OFF|TKOF)\s+` + PISTA);
+const CUALQUIERA = new RegExp(String.raw`\b` + PISTA);
+export function datosDeRed(atis: NonNullable<EstadoRed["atis"]>): DatosRed | null {
   const texto = atis.lineas.join(" ").toUpperCase();
   const letra = /^[A-Z]$/.exec((atis.letra ?? "").toUpperCase())?.[0] ?? /\bINFO(?:RMATION)?\s+([A-Z])[A-Z]*\b/.exec(texto)?.[1];
   if (!letra) return null;
-  const pista = /\b(?:RWYS?|RUNWAYS?)\s+(?:IN\s+USE\s+)?(\d{1,2}[LRC]?)\b/.exec(texto)?.[1];
-  return { letra, pista: pista?.replace(/^\d(?!\d)/, "0$&") ?? null }; // RWY 9 → 09
+  const id = (re: RegExp) => re.exec(texto)?.[1].replace(/^\d(?!\d)/, "0$&") ?? null; // RWY 9 → 09
+  const pista = id(LLEGADA) ?? id(CUALQUIERA);
+  const salida = id(SALIDA);
+  const tl = /\b(?:TL|TRANS(?:ITION)?[\s-]+LEVEL)\s*:?\s*(?:FL\s*)?(\d{2,3})\b/.exec(texto)?.[1] ?? null;
+  const ta = /\b(?:TA|TRANS(?:ITION)?[\s-]+ALT(?:ITUDE)?)\s*:?\s*(\d{3,5})\s*(?:FT|FEET)?\b/.exec(texto)?.[1];
+  return { letra, pista, salida: salida && salida !== pista ? salida : null, tl, taFt: ta ? Number(ta) : null };
 }
 
 export function fuente(red: Red, estado: EstadoRed | null): Fuente {
