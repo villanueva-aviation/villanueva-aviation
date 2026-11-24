@@ -17,6 +17,7 @@ const Academia = lazy(() => import("./pages/Academia").then((m) => ({ default: m
 const AcademiaModulo = lazy(() => import("./pages/AcademiaModulo").then((m) => ({ default: m.AcademiaModulo })));
 const ExamenTipo = lazy(() => import("./pages/ExamenTipo").then((m) => ({ default: m.ExamenTipo })));
 const HojasInstructor = lazy(() => import("./pages/HojasInstructor").then((m) => ({ default: m.HojasInstructor })));
+const InstructorLanding = lazy(() => import("./pages/InstructorLanding").then((m) => ({ default: m.InstructorLanding })));
 const GuiaEstudioPdf = lazy(() => import("./pages/GuiaEstudioPdf").then((m) => ({ default: m.GuiaEstudioPdf })));
 const MiFormacion = lazy(() => import("./pages/MiFormacion").then((m) => ({ default: m.MiFormacion })));
 const Tracker = lazy(() => import("./pages/Tracker").then((m) => ({ default: m.Tracker })));
@@ -114,6 +115,7 @@ const TITULOS: Record<string, string> = {
   [ROUTES.aeropuertoMMPR]: "Puerto Vallarta MMPR: guía de radio, salida y llegada para tu simulador — Villanueva Aviation",
   [ROUTES.eventos]: "Eventos de IVAO y VATSIM en español, en grupo — Villanueva Aviation",
   [ROUTES.instructorVirajeEscarpado]: "Instructor virtual: viraje escarpado del C172 — Villanueva Aviation",
+  [ROUTES.instructor]: "Instructor virtual (beta) — Villanueva Aviation",
   [ROUTES.instructorPrograma]: "Instructor virtual — Villanueva Aviation",
   [ROUTES.atisPrograma]: "ATIS — Villanueva Aviation",
   [ROUTES.instructorRepaso]: "Repaso general — Villanueva Aviation",
@@ -328,6 +330,7 @@ function RoutedContent() {
           <Route path={ROUTES.aeropuertoMMPR} element={<AeropuertoMMPR />} />
           <Route path={ROUTES.overlayGratis} element={<OverlayGratis />} />
           <Route path={ROUTES.hojasInstructor} element={<HojasInstructor />} />
+          <Route path={ROUTES.instructor} element={<InstructorLanding />} />
           <Route path={ROUTES.eventos} element={<Eventos />} />
           <Route path={ROUTES.resumenHsi} element={<ResumenHsi />} />
           <Route

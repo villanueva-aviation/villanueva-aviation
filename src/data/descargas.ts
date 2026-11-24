@@ -38,8 +38,8 @@ export const RECURSOS_DESCARGAS: RecursoDescarga[] = [
   {
     id: "instructor-lector",
     categoria: "Herramientas",
-    nombre: "Instructor virtual con voz",
-    descripcion: "El instructor virtual de MSFS 2020 en su propia ventana, con voz. Gratis, no necesita SimHub.",
+    nombre: "Instructor virtual con voz (beta)",
+    descripcion: "El instructor virtual de MSFS 2020 en su propia ventana, con voz. Versión beta: lo seguimos mejorando. Gratis, no necesita SimHub.",
     version: "v1.5.1",
     fecha: "2026-11-08",
     imagen: "/images/descargas-simhub-c172.jpg",
