@@ -101,13 +101,16 @@ export const FRASES: Record<Idioma, Record<string, string>> = { es: catalogo("es
 // Palabra hablada de un dígito, sin puntuación (para el texto en pantalla).
 export const palabraDigito = (idioma: Idioma, d: string): string => DIGITOS[idioma][Number(d)];
 
+// Lo que la voz en español dice distinto de lo que se escribe: «Echo» lo lee «echo» (hecho); en radio se dice «eco».
+const VOZ_ES: Record<string, string> = { "letra-E": "Eco." };
+
 export function textoDePieza(p: Pieza, aeropuertos: AeropuertoAtis[]): string | null {
   if (p.clave.startsWith("ap-")) {
     const a = aeropuertos.find((x) => x.icao === p.clave.slice(3));
     const n = a && (p.idioma === "es" ? a.nombreEs : a.nombreEn);
     return n ? `${n}.` : null;
   }
-  return FRASES[p.idioma][p.clave] ?? null;
+  return (p.idioma === "es" ? VOZ_ES[p.clave] : undefined) ?? FRASES[p.idioma][p.clave] ?? null;
 }
 
 export function todasLasPiezas(nombres: Nombres): Pieza[] {

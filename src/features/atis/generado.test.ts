@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Metar } from "../../lib/clima.ts";
 import type { AeropuertoAtis } from "./datos.ts";
-import { todasLasPiezas } from "./frases.ts";
+import { FRASES, textoDePieza, todasLasPiezas } from "./frases.ts";
 
 const NOMBRES = { MMGL: { es: "x", en: "y" } };
 import { armarAtis, armarAtisMx, letraDe, pistaEnUso, type Atis, type Parte } from "./generado.ts";
@@ -370,4 +370,10 @@ test("deRed: letra y pista del controlador, aunque MSFS no tenga esa pista", () 
   assert.match(parte(a, "cierre", "en")!.texto, /Alfa|Alpha/);
   assert.equal(armarAtis(m, skrg, { deRed: { letra: "A", pista: null } }).partes.some((p) => p.tipo === "pista"), false);
   assert.equal(armarAtis(m, skrg).deRed, undefined);
+});
+
+test("la voz en español dice «Eco»; la pantalla sigue diciendo «Echo»", () => {
+  assert.equal(textoDePieza({ idioma: "es", clave: "letra-E" }, []), "Eco.");
+  assert.equal(textoDePieza({ idioma: "en", clave: "letra-E" }, []), "Echo.");
+  assert.equal(FRASES.es["letra-E"], "Echo.");
 });
