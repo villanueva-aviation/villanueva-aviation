@@ -26,6 +26,8 @@ export default defineConfig({
     port: Number(process.env.PORT) || 5173,
     // En producción lo atiende functions/api/wx/[tipo].ts (Cloudflare Pages); aquí lo imitamos.
     proxy: {
+      // La función de redes del ATIS vive en Cloudflare; en local se usa la del sitio publicado.
+      "/api/atis": { target: "https://villanueva-aviation.pages.dev", changeOrigin: true },
       "/api/wx": {
         target: "https://aviationweather.gov",
         changeOrigin: true,
