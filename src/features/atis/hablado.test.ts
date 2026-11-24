@@ -21,6 +21,7 @@ test("hablado: puntuación suelta, alturas, N/S/E/W y números", () => {
   assert.equal(hablado("DEPG RWY 3R ;."), "Departing runway three right.");
   assert.equal(hablado("N OF ARPT, RNAV RWY 9 3000 FT."), "North of airport, R NAV runway nine three thousand feet.");
   assert.equal(hablado("TWY S CLSD."), "Taxiway Sierra closed.");
+  assert.equal(hablado("RNAV X 33L, DEP 24L."), "R NAV X three three left, departure two four left.");
 });
 test("hablado: en las 89 entradas de la muestra no queda ninguna contracción de la lista", () => {
   for (const e of muestra) for (const o of leerDatis(e).resto) {

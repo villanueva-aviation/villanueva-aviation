@@ -81,7 +81,7 @@ export function hablado(texto: string): string {
     const T = t.toUpperCase();
     if (T === "," || T === ".") { sal.push(T); return; }
     const antes = modo;
-    const esPista = (antes === "pistas" && PISTAS.test(T)) || /^d{1,2}[LRC]$/.test(T) /* 24L suelto es siempre una pista */, esCalle = antes === "calles" && /^[A-Z]\d{0,2}$/.test(T);
+    const esPista = (antes === "pistas" && PISTAS.test(T)) || /^\d{1,2}[LRC]$/.test(T) /* 24L suelto es siempre una pista */, esCalle = antes === "calles" && /^[A-Z]\d{0,2}$/.test(T);
     if (/^(RWYS?|RYS?)$/.test(T)) modo = "pistas";
     else if (/^(TWYS?|TXY)$/.test(T)) modo = "calles";
     else if (T !== "AND" && !esPista && !esCalle) modo = "";
