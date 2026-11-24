@@ -2,7 +2,7 @@
 import type { Metar, Nube } from "../../lib/clima.ts";
 import type { AeropuertoAtis } from "./datos.ts";
 import { armarAtis, type Atis, type Parte } from "./generado.ts";
-import { hablado } from "./hablado.ts";
+import { hablado, habladoMetar } from "./hablado.ts";
 import { TOLERANCIA_MHZ } from "./radio.ts";
 
 export type EntradaDatis = {
@@ -106,8 +106,9 @@ export function metarDeTexto(icao: string, emitido: number, cuerpo: string): Met
   const alt = /(?:^|\s)A(\d{4})(?=\s|$)/.exec(cuerpo);
   const grados = (x?: string) => (x ? (x.startsWith("M") ? -Number(x.slice(1)) : Number(x)) : null);
   const clouds = ts.flatMap<Nube>((x) => {
-    const m = /^(FEW|SCT|BKN|OVC|VV)(\d{3})(CB|TCU)?$/.exec(x);
-    if (m) return [{ cover: m[1], base: Number(m[2]) * 100, type: m[3] ?? null }];
+    const m = /^(FEW|SCT|BKN|OVC|VV)(\d{3}|\/{3})(CB|TCU)?$/.exec(x);
+    // SCT///: la capa sin altura se guarda (va a solo texto); si se tirara, quedaría «Sky clear».
+    if (m) return [{ cover: m[1], base: m[2] === "///" ? null : Number(m[2]) * 100, type: m[3] ?? null }];
     return /^(?:CLR|SKC|NSC|NCD)$/.test(x) ? [{ cover: x, base: null }] : [];
   });
   const wx = ts.filter((x) => /^(?:[-+]|VC)?(?:MI|PR|BC|DR|BL|SH|TS|FZ)?(?:DZ|RA|SN|SG|IC|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PY|PO|SQ|FC|SS|DS)+$/.test(x));
@@ -122,6 +123,9 @@ export function metarDeTexto(icao: string, emitido: number, cuerpo: string): Met
   };
 }
 
+// Grupos que solo trae un METAR (viento, visibilidad, capa de nubes): marcan la oración del clima.
+const GRUPO_METAR = /(?:^|\s)(?:(?:\d{3}|VRB)\d{2,3}(?:G\d{2,3})?KT|[PM]?\d+(?:\/\d+)?SM|(?:FEW|SCT|BKN|OVC|VV)(?:\d{3}|\/{3})|CLR|SKC)(?=[\s.,]|$)/;
+
 export const urlVoz = (icao: string, tipo: string, n: number, h: string) => `/api/atis/voz?icao=${icao}&tipo=${tipo}&n=${n}&h=${h}`;
 
 // Lo que ya tiene piezas se dice con piezas; el resto (oraciones del D-ATIS y lo que el armado no pudo decir) va en vivo.
@@ -133,10 +137,24 @@ export function armarDatis(e: EntradaDatis, ap: AeropuertoAtis | null, ahoraMs: 
   const metar = metarDeTexto(e.airport, inicioMs, l.metar ?? "");
   const { deRed: _, ...base } = armarAtis(metar, apReal, { deRed: { letra: l.letra, pista: null, salida: null, tl: null, taFt: null } });
   const parte = (tipo: Parte["tipo"], texto: string): Parte => ({ tipo, idioma: "en", texto, vivo: hablado(texto), piezas: [] });
-  const nuevas = [...l.resto.map((o) => parte("avisos", o))];
-  const rmk: Parte[] = l.rmk ? [{ tipo: "observaciones", idioma: "en", texto: l.rmk, piezas: [], soloTexto: true }] : [];
+  const soloTexto = (tipo: Parte["tipo"], texto: string): Parte => ({ tipo, idioma: "en", texto, piezas: [], soloTexto: true });
+  // Lo que el armado del METAR no dijo con piezas: con regla (visibilidad, RVR, tiempo) va en vivo; sin regla, solo en texto.
+  const delMetar = (p: Parte): Parte[] => {
+    if (!p.soloTexto) return [p];
+    const vivos: Parte[] = [], sinRegla: string[] = [];
+    for (const g of p.tipo === "observaciones" ? p.texto.split(/\s+/) : [p.texto]) {
+      const v = habladoMetar(g);
+      if (v) vivos.push({ tipo: p.tipo, idioma: "en", texto: g, piezas: [], vivo: v }); else sinRegla.push(g);
+    }
+    return sinRegla.length ? [...vivos, soloTexto(p.tipo, sinRegla.join(" "))] : vivos;
+  };
+  // Sin altímetro no se reconoce el METAR: la oración del clima queda en texto (hablado la leería mal).
+  const nuevas = l.resto.map((o) => (!l.metar && GRUPO_METAR.test(o) ? soloTexto("observaciones", o) : parte("avisos", o)));
+  const rmk: Parte[] = l.rmk ? [soloTexto("observaciones", l.rmk)] : [];
   const cierre = base.partes.at(-1)!;
-  const partes = [...base.partes.slice(0, -1).map((p) => (p.soloTexto ? parte(p.tipo, p.texto) : p)), ...nuevas, ...rmk, cierre];
+  // Sin grupo de nubes (o sin METAR) no se dice «Sky clear»: el ATIS real solo lo dice con CLR/SKC.
+  const clima = base.partes.slice(0, -1).filter((p) => metar.clouds.length || p.tipo !== "nubes");
+  const partes = [...clima.flatMap(delMetar), ...nuevas, ...rmk, cierre];
   let n = 0;
   for (const p of partes) if (p.vivo) p.piezas = [{ idioma: "en", clave: `vivo-${n}`, url: urlVoz(e.airport, e.type, n++, huella(p.vivo)) }];
   return { ...base, partes, real: true, huella: huella(e.datis) };

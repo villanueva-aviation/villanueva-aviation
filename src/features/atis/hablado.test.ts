@@ -29,3 +29,6 @@ test("hablado: en las 89 entradas de la muestra no queda ninguna contracción de
     assert.deepEqual(fuera, [], `${e.airport}: ${o}`);
   }
 });
+test("hablado: THSD y HND son miles y cientos", () => {
+  assert.equal(hablado("RWY 28C ARR PLAN TO H/S OF TWY Z, 9 THSD 6 HND TEN FT AVBL."), "Runway two eight center arrival plan to H S of taxiway Zulu, nine thousand six hundred ten feet available.");
+});

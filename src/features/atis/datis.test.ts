@@ -158,3 +158,45 @@ test("nombreFrecuencia: el nombre que MSFS le da a la frecuencia, con tolerancia
   assert.equal(nombreFrecuencia(ap, 121.5), null);
   assert.equal(nombreFrecuencia({ ...ap, atisNombres: undefined }, 128.075), null);
 });
+
+const conClima = (clima: string) => ({ ...KJFK, datis: KJFK.datis.replace("35011G22KT 10SM BKN095 BKN120 11/M01 A3008", clima) });
+const vivosTexto = (e: EntradaDatis) => vivosDe(armarDatis(e, null, AHORA)).map((v) => v.texto).join(" ");
+
+test("armarDatis: visibilidad con fracción y RVR se dicen como en un ATIS real", () => {
+  const a = armarDatis(conClima("35011KT 1 1/2SM R04R/2000V3000FT BR OVC004 11/10 A3008"), null, AHORA);
+  const vis = a.partes.find((p) => p.tipo === "visibilidad")!;
+  assert.equal(vis.vivo, "Visibility one and one half."); assert.equal(vis.soloTexto, undefined);
+  assert.ok(a.partes.some((p) => p.vivo === "Runway four right R V R two thousand variable three thousand."));
+  const m = armarDatis(conClima("35011KT M1/4SM FG VV002 11/10 A3008"), null, AHORA);
+  assert.equal(m.partes.find((p) => p.tipo === "visibilidad")!.vivo, "Visibility less than one quarter.");
+});
+
+test("armarDatis: un grupo del METAR sin regla queda solo en texto, nunca en vivo", () => {
+  const e = conClima("35011KT 1 1/2SM R04R/2000V3000FT XX9 BR OVC004 11/10 A3008");
+  const a = armarDatis(e, null, AHORA);
+  assert.ok(a.partes.some((p) => p.soloTexto && p.texto === "XX9"));
+  assert.ok(!/xx9/i.test(vivosTexto(e)));
+});
+
+test("armarDatis: sin altímetro no inventa «Sky clear» y el clima crudo no va en vivo", () => {
+  const e = { ...KJFK, datis: "JFK ATIS INFO H 0451Z. 27010KT 10SM BKN010 OVC020 12/10 ALTIMETER MISSING. RWY 27 IN USE. ...ADVS YOU HAVE INFO H." };
+  const a = armarDatis(e, null, AHORA);
+  assert.ok(!a.partes.some((p) => p.tipo === "nubes" || p.piezas.some((x) => x.clave === "f-despejado")));
+  assert.ok(a.partes.some((p) => p.soloTexto && p.texto.includes("BKN010")));
+  assert.ok(!/kt|bkn|ovc/i.test(vivosTexto(e)), vivosTexto(e));
+  assert.ok(vivosTexto(e).includes("Runway two seven in use."));
+});
+
+test("armarDatis: una capa sin altura (SCT///) no se vuelve «Sky clear»", () => {
+  const a = armarDatis(conClima("35011KT 10SM SCT/// 11/M01 A3008"), null, AHORA);
+  assert.ok(!a.partes.some((p) => p.piezas.some((x) => x.clave === "f-despejado")));
+  assert.ok(a.partes.some((p) => p.tipo === "nubes" && p.soloTexto));
+});
+
+test("armarDatis: las 89 entradas dan los mismos vivos en la página (ap con pistas) y en la Function (ap null)", () => {
+  assert.equal(muestra.length, 89);
+  for (const e of muestra) {
+    const ap = { ...AP_KJFK, icao: e.airport };
+    assert.deepEqual(vivosDe(armarDatis(e, null, AHORA + 50_000)), vivosDe(armarDatis(e, ap, AHORA)), `${e.airport} ${e.type}`);
+  }
+});

@@ -22,7 +22,7 @@ export const CONTRACCIONES: Record<string, string> = {
   LDG: "landing", RGT: "right", BYD: "beyond", HAZD: "hazardous", IMDT: "immediately", OPS: "operations", SPD: "speed",
   SHRT: "short", MULT: "multiple", STD: "standard", RBCK: "readback", CTL: "control", CL: "centerline", CTN: "caution",
   TXG: "taxiing", COMB: "combined", "U/S": "unserviceable", RWY: "runway", RWYS: "runways", RY: "runway", RYS: "runways",
-  "&": "and",
+  THSD: "thousand", HND: "hundred", "&": "and",
 };
 
 // Siglas que se dicen letra por letra (o con su forma propia); el resto de siglas se queda en minúsculas.
@@ -69,6 +69,30 @@ function palabra(T: string, sig: string | undefined): string {
   if (T.length === 1) return T;
   if (/^[A-Z]+\d+$/.test(T)) return T; // identificadores como D4 o S5 se quedan como están
   return T.toLowerCase();
+}
+
+// Grupos del METAR que el armado no dice con piezas, dichos como en un ATIS real de la FAA.
+const VIS = /^(?:(\d+) )?([PM])?(\d+)(?:\/(2|4|8|16))? ?SM$/; // 1 1/2SM, M1/4SM, 1/8 SM
+const RVR = /^R(\d{2})([LRC])?\/([PM])?(\d{4})(?:V([PM])?(\d{4}))?FT$/; // R04R/2000V3000FT
+const PREFIJO: Record<string, string> = { M: "less than ", P: "more than " };
+const FRACCION: Record<string, [string, string]> = { 2: ["half", "halves"], 4: ["quarter", "quarters"], 8: ["eighth", "eighths"], 16: ["sixteenth", "sixteenths"] };
+
+// null: no hay regla para ese grupo; se queda solo en texto (nunca va a Azure algo sin regla).
+export function habladoMetar(grupo: string): string | null {
+  const T = grupo.trim().toUpperCase();
+  const v = VIS.exec(T);
+  if (v) {
+    const [, entero, pre, num, den] = v;
+    const cuanto = den ? `${digitos(num)} ${FRACCION[den][num === "1" ? 0 : 1]}` : digitos(num);
+    return `Visibility ${pre ? PREFIJO[pre] : ""}${entero ? digitos(entero) + " and " : ""}${cuanto}.`;
+  }
+  const r = RVR.exec(T);
+  if (r) {
+    const [, pi, lado, p1, v1, p2, v2] = r;
+    const valor = (p: string | undefined, x: string) => (p ? PREFIJO[p] : "") + numero(String(+x));
+    return `Runway ${digitos(String(+pi))}${lado ? " " + LADO[lado] : ""} R V R ${valor(p1, v1)}${v2 ? " variable " + valor(p2, v2) : ""}.`;
+  }
+  return T in TIEMPO ? hablado(T) : null;
 }
 
 export function hablado(texto: string): string {
