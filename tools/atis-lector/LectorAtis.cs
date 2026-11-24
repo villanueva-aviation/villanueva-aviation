@@ -919,6 +919,7 @@ static class Sim
             // Aeropuertos: todo se borra en cada conexion (Review Focus 5).
             var mundo = new List<Lugar>();
             var mundoListo = false;
+            var paquetesLista = 0u;
             // ponytail: cache sin tope (cada aeropuerto se pide una vez por conexion; un vuelo largo junta unos miles de entradas chicas).
             var cache = new Dictionary<string, Aeropuerto>(); // null = sin ATIS o pedido en curso
             var conAtis = new List<Aeropuerto>();
@@ -1065,7 +1066,9 @@ static class Sim
                     catch (Exception) { malos++; }
                 }
                 if (malos > 0) Console.WriteLine("ATIS: " + malos + " aeropuertos ilegibles en la lista");
-                if (d.dwEntryNumber + 1 >= d.dwOutOf && !mundoListo)
+                // Se cuentan los paquetes: MSFS 2024 numera dwEntryNumber salteado (0, 3, 4, ..., 68, 69, ..., 367 de 68) y el
+                // «entry + 1 >= outOf» daba la lista por completa con 24 811 de 83 934 aeropuertos.
+                if (++paquetesLista >= d.dwOutOf && !mundoListo)
                 {
                     mundoListo = true;
                     Console.WriteLine("Aeropuertos en MSFS: " + mundo.Count);
