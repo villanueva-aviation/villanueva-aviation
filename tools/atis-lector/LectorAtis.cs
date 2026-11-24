@@ -318,6 +318,16 @@ static class LectorAtis
 {
     const int Puerto = 8767;
     static readonly string[] Origenes = { "https://villanueva-aviation.pages.dev", "http://localhost:5180" };
+    // Tambien las vistas previas de Cloudflare (https://<rama>.villanueva-aviation.pages.dev), para probar una rama.
+    static bool OrigenPermitido(string o)
+    {
+        if (o == null) return false;
+        if (Array.IndexOf(Origenes, o) >= 0) return true;
+        const string sufijo = ".villanueva-aviation.pages.dev";
+        if (!o.StartsWith("https://") || !o.EndsWith(sufijo)) return false;
+        var sub = o.Substring(8, o.Length - 8 - sufijo.Length);
+        return sub.Length > 0 && System.Text.RegularExpressions.Regex.IsMatch(sub, "^[a-z0-9-]+$");
+    }
     static readonly Stopwatch Reloj = Stopwatch.StartNew();
     static readonly object Candado = new object();
     static Muestra ultima;
@@ -474,8 +484,12 @@ static class LectorAtis
             && !Array.Exists(new[] { "PKSA", "SMCI", "RJX8", "RJX4", "NFVB", "NTAM" }, r20.Contains)
             && !Msfs2020.Pedible(null, "MMGL") && Msfs2020.Pedible(true, "PKSA") && !Msfs2020.Pedible(false, "PKSA") && Msfs2020.Pedible(false, "MMGL");
         Console.WriteLine(lista2020 ? "Lista de MSFS 2020: OK" : "Lista de MSFS 2020: FALLA (" + r20.Count + ")");
+        var origenes = OrigenPermitido("https://villanueva-aviation.pages.dev") && OrigenPermitido("https://programa-atis.villanueva-aviation.pages.dev")
+            && !OrigenPermitido("https://x.villanueva-aviation.pages.dev.malo.com") && !OrigenPermitido("http://programa-atis.villanueva-aviation.pages.dev")
+            && !OrigenPermitido("https://a.b.villanueva-aviation.pages.dev") && !OrigenPermitido("https://villanueva-aviation.pages.dev.evil") && !OrigenPermitido(null);
+        Console.WriteLine(origenes ? "Origenes: OK" : "Origenes: FALLA");
         return edge && perfil && banderas && puerto && sinSim && forma && vol && ruta
-            && ident && extremos && mmgl && esc && sinAp && cercanos && buscar && volcado && parcial && lista2020 ? 0 : 1;
+            && ident && extremos && mmgl && esc && sinAp && cercanos && buscar && volcado && parcial && lista2020 && origenes ? 0 : 1;
     }
 
     // --volcar: sin servidor ni ventana; conecta, pide todos los aeropuertos y escribe los que tienen ATIS.
@@ -667,7 +681,7 @@ static class LectorAtis
                     if (l.StartsWith("Origin:", StringComparison.OrdinalIgnoreCase)) origen = l.Substring(7).Trim();
 
                 var extra = new StringBuilder();
-                if (origen != null && Array.IndexOf(Origenes, origen) >= 0)
+                if (OrigenPermitido(origen))
                     extra.Append("Access-Control-Allow-Origin: ").Append(origen).Append("\r\nVary: Origin\r\n");
 
                 if (partes[0] == "OPTIONS")
