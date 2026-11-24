@@ -6,10 +6,10 @@ import { formatoDe, type Formato } from "./formato.ts";
 import { FRASES, palabraDigito, type Idioma, type Pieza } from "./frases.ts";
 
 export type TipoParte = "aeropuerto" | "letra" | "hora" | "pista" | "viento" | "visibilidad" | "tiempo" | "nubes"
-  | "temperatura" | "altimetro" | "observaciones" | "cierre";
-export type Parte = { tipo: TipoParte; idioma: Idioma; texto: string; piezas: Pieza[]; soloTexto?: boolean };
+  | "temperatura" | "altimetro" | "observaciones" | "avisos" | "cierre";
+export type Parte = { tipo: TipoParte; idioma: Idioma; texto: string; piezas: Pieza[]; soloTexto?: boolean; vivo?: string }; // vivo: texto normalizado que se manda a Azure
 // deRed: la letra y la pista son las del ATIS de texto de la red (IVAO/VATSIM), leído con las piezas.
-export type Atis = { icao: string; letra: string; inicioMs: number; partes: Parte[]; conControlador: boolean; deRed?: boolean }; // partes es primero, luego en
+export type Atis = { icao: string; letra: string; inicioMs: number; partes: Parte[]; conControlador: boolean; deRed?: boolean; real?: boolean; huella?: string }; // real: D-ATIS de EE. UU., huella = del texto completo; partes es primero, luego en
 
 const ALFABETO = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 

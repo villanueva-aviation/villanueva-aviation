@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { datisPara, emitidoMs, huella, leerDatis, vigenteDatis, type EntradaDatis } from "./datis.ts";
+import { armarDatis, datisPara, emitidoMs, huella, leerDatis, metarDeTexto, urlVoz, vigenteDatis, vivosDe, type EntradaDatis } from "./datis.ts";
+import type { AeropuertoAtis } from "./datos.ts";
 
 const muestra: EntradaDatis[] = JSON.parse(
   readFileSync(new URL("./datis.muestra.json", import.meta.url), "utf8"),
@@ -73,4 +74,66 @@ test("datisPara: combined gana; DEP en el nombre da dep; otro nombre o null da a
 
 test("huella: estable y distinta con un carácter de diferencia", () => {
   assert.equal(huella("ABC"), huella("ABC")); assert.notEqual(huella("ABC"), huella("ABD")); assert.match(huella("x"), /^[0-9a-f]{8}$/);
+});
+
+const AP_KJFK: AeropuertoAtis = { icao: "KJFK", nombreEs: null, nombreEn: "John F. Kennedy International Airport", nombreSim: "John F Kennedy Intl",
+  lat: 40.64, lon: -73.78, elevFt: 13, atisMhz: [115.4], pistas: [{ ident: "31L", rumboV: 314, largoFt: 14511 }, { ident: "31R", rumboV: 314, largoFt: 8400 }] };
+const AHORA = Date.parse("2026-11-24T05:30:00Z");
+
+test("metarDeTexto: viento, visibilidad, temperatura y altímetro", () => {
+  const m = metarDeTexto("KJFK", Date.parse("2026-11-24T04:51:00Z"), "35011G22KT 1 1/2SM -SN BKN095 11/M01 A3008");
+  assert.equal(m.rawOb, "KJFK 240451Z 35011G22KT 1 1/2SM -SN BKN095 11/M01 A3008");
+  assert.equal(m.wdir, 350); assert.equal(m.wspd, 11); assert.equal(m.wgst, 22);
+  assert.equal(m.visib, "1 1/2"); assert.equal(m.wxString, "-SN");
+  assert.deepEqual(m.clouds, [{ cover: "BKN", base: 9500, type: null }]);
+  assert.equal(m.temp, 11); assert.equal(m.dewp, -1);
+  assert.ok(Math.abs(m.altim! - 1018.6) < 0.1);
+  assert.equal(metarDeTexto("KJFK", 0, "VRB03KT 10SM CLR 11/05 A3008").wdir, "VRB");
+});
+
+test("armarDatis KJFK: letra y hora de la fuente, clima con piezas, avisos en vivo antes del cierre", () => {
+  const a = armarDatis(KJFK, AP_KJFK, AHORA);
+  assert.equal(a.letra, "H"); assert.equal(a.real, true); assert.equal(a.huella, huella(KJFK.datis));
+  assert.equal("deRed" in a, false);
+  assert.ok(a.partes.find((p) => p.tipo === "letra")!.piezas.some((x) => x.clave === "letra-H"));
+  assert.ok(a.partes.some((p) => p.tipo === "aeropuerto" && p.piezas[0].clave === "ap-KJFK"));
+  assert.ok(a.partes.some((p) => p.tipo === "viento" && !p.vivo && p.piezas.length > 0));
+  const vivos = vivosDe(a);
+  assert.equal(vivos[0].texto, "Approach in use I L S runway three one right, visual approach runway three one left.");
+  assert.equal(a.partes.at(-1)!.tipo, "cierre");
+  assert.ok(!a.partes.some((p) => p.tipo === "pista" && !p.vivo)); // la pista no se dice dos veces
+  for (const p of a.partes.filter((x) => x.vivo)) assert.equal(p.piezas[0].url, urlVoz("KJFK", "combined", vivos.find((v) => v.texto === p.vivo)!.n, huella(p.vivo!)));
+  assert.deepEqual(vivos.map((v) => v.n), vivos.map((_, i) => i));
+});
+
+test("armarDatis: con ap null da los mismos vivos que con ap", () => {
+  assert.deepEqual(vivosDe(armarDatis(KJFK, null, AHORA)), vivosDe(armarDatis(KJFK, AP_KJFK, AHORA)));
+});
+
+test("armarDatis: el RMK queda solo en texto y nada más", () => {
+  const a = armarDatis(deLaMuestra("KLAX", "combined"), null, AHORA);
+  const solo = a.partes.filter((p) => p.soloTexto);
+  assert.equal(solo.length, 1);
+  assert.equal(solo[0].tipo, "observaciones"); assert.equal(solo[0].texto, "AO2 SLP213 T01720106");
+  const i = a.partes.indexOf(solo[0]);
+  assert.equal(a.partes[i + 1].tipo, "cierre");
+  assert.ok(a.partes.slice(0, i).some((p) => p.tipo === "avisos" && p.vivo));
+});
+
+test("armarDatis: las 89 entradas arman sin lanzar y ninguna parte con contenido queda soloTexto salvo el RMK", () => {
+  assert.equal(muestra.length, 89);
+  for (const e of muestra) {
+    const a = armarDatis(e, null, AHORA);
+    const rmk = leerDatis(e).rmk;
+    for (const p of a.partes) if (p.soloTexto) assert.ok(p.tipo === "observaciones" && p.texto === rmk, `${e.airport} ${e.type}: ${p.tipo} ${p.texto}`);
+    assert.equal(a.partes.at(-1)!.tipo, "cierre");
+    assert.ok(a.partes.every((p) => p.vivo || p.piezas.length > 0 || p.soloTexto), `${e.airport} ${e.type}: parte vacía`);
+  }
+});
+
+test("armarDatis: un código de tiempo sin pieza (-SN) va a voz en vivo", () => {
+  const e = { ...KJFK, datis: KJFK.datis.replace("10SM BKN095", "10SM -SN BKN095") };
+  const a = armarDatis(e, null, AHORA);
+  const t = a.partes.find((p) => p.tipo === "tiempo")!;
+  assert.ok(t.vivo && !t.soloTexto); assert.equal(t.texto, "-SN");
 });

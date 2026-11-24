@@ -61,5 +61,5 @@ export function entraSiguiente(sonando: boolean, ahoraMs: number, faseMs: number
 
 export function debeCambiar(actual: Atis | null, nuevo: Atis): boolean {
   return !actual || actual.icao !== nuevo.icao || actual.letra !== nuevo.letra || actual.conControlador !== nuevo.conControlador
-    || !!actual.deRed !== !!nuevo.deRed;
+    || !!actual.deRed !== !!nuevo.deRed || !!actual.real !== !!nuevo.real || actual.huella !== nuevo.huella;
 }

@@ -2,7 +2,8 @@
 import type { AeropuertoAtis, Nombres } from "./datos.ts";
 
 export type Idioma = "es" | "en";
-export type Pieza = { idioma: Idioma; clave: string };
+// url: la voz en vivo sale de esa URL y no de /atis/piezas/.
+export type Pieza = { idioma: Idioma; clave: string; url?: string };
 
 const DIGITOS: Record<Idioma, string[]> = {
   es: ["cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve"],

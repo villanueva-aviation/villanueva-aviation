@@ -76,6 +76,10 @@ test("debeCambiar", () => {
   assert.equal(debeCambiar(a, { ...a, letra: "B" }), true);
   assert.equal(debeCambiar(a, { ...a, icao: "MMMX" }), true);
   assert.equal(debeCambiar(a, { ...a, conControlador: true }), true); // se conecta o se va un controlador
+  const r = { ...a, real: true, huella: "aaaaaaaa" };
+  assert.equal(debeCambiar(r, { ...r }), false);
+  assert.equal(debeCambiar(r, { ...r, huella: "bbbbbbbb" }), true); // misma letra, otro texto
+  assert.equal(debeCambiar(a, r), true);
 });
 
 test("pausaTras", () => {
