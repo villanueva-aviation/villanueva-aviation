@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { armarDatis, datisPara, emitidoMs, huella, leerDatis, nombreFrecuencia, metarDeTexto, urlVoz, vigenteDatis, vivosDe, type EntradaDatis } from "./datis.ts";
+import { armarDatis, datisPara, datisVigente, emitidoMs, huella, leerDatis, nombreFrecuencia, metarDeTexto, urlVoz, vigenteDatis, vivosDe, type EntradaDatis } from "./datis.ts";
 import type { AeropuertoAtis } from "./datos.ts";
 
 const muestra: EntradaDatis[] = JSON.parse(
@@ -70,6 +70,17 @@ test("datisPara: combined gana; DEP en el nombre da dep; otro nombre o null da a
   assert.equal(datisPara([arr, dep], "DTW_ATIS"), arr);
   assert.equal(datisPara([arr, dep], null), arr);
   assert.equal(datisPara([], null), null);
+});
+
+test("datisVigente: esperando sin respuesta; falla o viejo da null; vigente da la entrada de esa frecuencia", () => {
+  const ahora = Date.UTC(2026, 10, 24, 5, 0);
+  const arr = { ...KJFK, type: "arr" as const }, dep = { ...KJFK, type: "dep" as const };
+  assert.equal(datisVigente({ entradas: null, fallo: false }, null, ahora), "esperando");
+  assert.equal(datisVigente({ entradas: null, fallo: true }, null, ahora), null);
+  assert.equal(datisVigente({ entradas: [KJFK], fallo: true }, null, ahora), null);
+  assert.equal(datisVigente({ entradas: [], fallo: false }, null, ahora), null);
+  assert.equal(datisVigente({ entradas: [arr, dep], fallo: false }, "ATIS DEP", ahora), dep);
+  assert.equal(datisVigente({ entradas: [KJFK], fallo: false }, null, ahora + 90 * 60_000), null);
 });
 
 test("huella: estable y distinta con un carácter de diferencia", () => {

@@ -76,6 +76,18 @@ export function datisPara(entradas: EntradaDatis[], nombreFrec: string | null): 
   return entradas.find((e) => e.type === tipo) ?? null;
 }
 
+// Lo que la página guarda de /api/atis/real por aeropuerto. entradas null: la primera respuesta no ha llegado.
+export type PreguntaReal = { entradas: EntradaDatis[] | null; fallo: boolean };
+
+// El D-ATIS que suena en esa frecuencia. "esperando": silencio hasta la primera respuesta.
+// null: no hay uno vigente o la fuente falló; suena el generado.
+export function datisVigente(q: PreguntaReal, nombreFrec: string | null, ahoraMs: number): EntradaDatis | null | "esperando" {
+  if (q.fallo) return null;
+  if (!q.entradas) return "esperando";
+  const e = datisPara(q.entradas, nombreFrec);
+  return e && vigenteDatis(e, ahoraMs) ? e : null;
+}
+
 // FNV-1a de 32 bits en hex (síncrono: lo usan la página y la Function).
 export function huella(texto: string): string {
   let h = 0x811c9dc5;

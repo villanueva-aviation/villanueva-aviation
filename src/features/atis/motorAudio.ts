@@ -26,11 +26,12 @@ export function pausaTras(textoHablado: string): number {
 // Caché de la sesión: url → muestras mono ya recortadas (null = falló; no se guarda, se reintenta).
 const cache = new Map<string, Promise<Float32Array | null>>();
 
-const urlDe = (p: Pieza) => `/atis/piezas/${p.idioma}/${encodeURIComponent(p.clave)}.mp3`;
+const ESPERA_VIVO_MS = 8000; // lo que se espera la voz en vivo antes de armar sin ella
+const urlDe = (p: Pieza) => p.url ?? `/atis/piezas/${p.idioma}/${encodeURIComponent(p.clave)}.mp3`;
 
-async function cargarPieza(ctx: AudioContext, url: string): Promise<Float32Array | null> {
+async function cargarPieza(ctx: AudioContext, url: string, vivo: boolean): Promise<Float32Array | null> {
   try {
-    const r = await fetch(url);
+    const r = await fetch(url, vivo ? { signal: AbortSignal.timeout(ESPERA_VIVO_MS) } : undefined);
     if (!r.ok) return null;
     const audio = await ctx.decodeAudioData(await r.arrayBuffer());
     // Mezcla a mono.
@@ -50,10 +51,11 @@ async function cargarPieza(ctx: AudioContext, url: string): Promise<Float32Array
   }
 }
 
-function piezaEnCache(ctx: AudioContext, url: string): Promise<Float32Array | null> {
+function piezaEnCache(ctx: AudioContext, pieza: Pieza): Promise<Float32Array | null> {
+  const url = urlDe(pieza);
   let p = cache.get(url);
   if (!p) {
-    p = cargarPieza(ctx, url).then((m) => {
+    p = cargarPieza(ctx, url, !!pieza.url).then((m) => {
       if (!m) cache.delete(url);
       return m;
     });
@@ -64,7 +66,7 @@ function piezaEnCache(ctx: AudioContext, url: string): Promise<Float32Array | nu
 
 export async function cargarAudio(ctx: AudioContext, atis: Atis, aeropuertos: AeropuertoAtis[]): Promise<{ buffer: AudioBuffer; faltantes: string[] }> {
   const piezas = atis.partes.filter((p) => !p.soloTexto).flatMap((p) => p.piezas);
-  const datos = await Promise.all(piezas.map((p) => piezaEnCache(ctx, urlDe(p))));
+  const datos = await Promise.all(piezas.map((p) => piezaEnCache(ctx, p)));
   const sr = ctx.sampleRate;
   const faltantes: string[] = [];
 
@@ -77,7 +79,8 @@ export async function cargarAudio(ctx: AudioContext, atis: Atis, aeropuertos: Ae
       return;
     }
     const sig = piezas.slice(i + 1).find((_, j) => datos[i + 1 + j]); // siguiente pieza que sí suena
-    const pausa = sig && sig.idioma !== p.idioma ? PAUSA_ENTRE_IDIOMAS_SEG : pausaTras(textoDePieza(p, aeropuertos) ?? "");
+    // La voz en vivo es una oración entera: después lleva la pausa de fin de oración.
+    const pausa = sig && sig.idioma !== p.idioma ? PAUSA_ENTRE_IDIOMAS_SEG : pausaTras(p.url ? "." : textoDePieza(p, aeropuertos) ?? "");
     tramos.push({ muestras: m, pausa });
   });
   // La última pieza no lleva pausa: entre vueltas quedan exactamente los 2 s de cola.

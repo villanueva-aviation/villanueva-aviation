@@ -4,6 +4,8 @@ import { Button } from "../components/ui/Button";
 import { useAuth } from "../features/auth/AuthContext";
 import { ACCESO_ATIS } from "../features/atis/acceso";
 import { conNombres, type AeropuertoAtis, type Nombres } from "../features/atis/datos";
+import { armarDatis, datisVigente, nombreFrecuencia, type EntradaDatis, type PreguntaReal } from "../features/atis/datis";
+import { formatoDe } from "../features/atis/formato";
 import { LETRAS } from "../features/atis/frases";
 import { armarAtis, type Atis } from "../features/atis/generado";
 import { cargarAudio, RadioAtis } from "../features/atis/motorAudio";
@@ -15,6 +17,8 @@ import { FOUNDER_EMAIL } from "../lib/constants";
 
 const METAR_CADA_MS = 60_000;
 const RED_CADA_MS = 60_000;
+const REAL_CADA_MS = 60_000;
+const REINTENTO_MS = 15_000; // reintento de la voz en vivo que no llegó
 const CLAVE_RED = "atis-red";
 const CLAVE_LEER = "atis-leer-red";
 const REDES: Red[] = ["ivao", "vatsim", "ninguna"];
@@ -55,6 +59,7 @@ const TEXTOS = {
     generado: (h: string) => `Generado con el METAR de las ${h}Z`, cliente: "Escúchalo en tu cliente", soloTexto: "Solo en texto",
     faltaAudio: "Falta audio:", informacion: "Información", sinLetra: "Sin letra", soloSim: "Solo para simulación",
     leerVoz: "Leer en voz el ATIS de la red", leido: "Leído con la voz del programa",
+    real: "ATIS real (D-ATIS)", consultandoReal: "Consultando el D-ATIS…",
   },
   en: {
     "sin-lector": "Open the ATIS reader", "sin-simulador": "Waiting for MSFS", conectado: "Tune an airport's ATIS frequency",
@@ -65,6 +70,7 @@ const TEXTOS = {
     generado: (h: string) => `Generated from the ${h}Z METAR`, cliente: "Listen in your client", soloTexto: "Text only",
     faltaAudio: "Missing audio:", informacion: "Information", sinLetra: "No letter", soloSim: "For simulation only",
     leerVoz: "Read the network ATIS aloud", leido: "Read aloud by the program",
+    real: "Real ATIS (D-ATIS)", consultandoReal: "Checking the D-ATIS…",
   },
 };
 const T = en ? TEXTOS.en : TEXTOS.es;
@@ -76,16 +82,18 @@ type Canal = Partial<Cargado> & {
   siguiente: Cargado | null; // ATIS nuevo esperando el fin del loop
   faseMs: number; // hora de la fase 0 del loop que suena
   sonando: boolean;
+  reintentoMs: number; // hora del último intento de cargar
 };
-// origen: de dónde sale lo que se ve; null mientras llega la primera respuesta de la red.
+// origen: de dónde sale lo que se ve («real»: D-ATIS); null mientras llega la primera respuesta de la red.
 type Vista = {
   icao: string; titulo: string; distNm: number; senal: Senal; atis: Atis | null; faltantes: string[]; avisoMetar: string | null;
-  origen: Fuente | null; atisRed: EstadoRed["atis"]; avisoRed: string | null;
+  origen: Fuente | "real" | null; atisRed: EstadoRed["atis"]; avisoRed: string | null;
 };
 type PreguntaRed = EntradaRed & { pedidoMs: number };
 type EntradaMetar = { metar: Metar | null; pedidoMs: number; viejo: boolean };
+type PreguntaRealPagina = PreguntaReal & { pedidoMs: number };
 
-const clave = (a: Atis) => `${a.icao}-${a.letra}-${a.conControlador ? "atc" : a.deRed ? "red" : "gen"}`;
+const clave = (a: Atis) => `${a.icao}-${a.letra}-${a.conControlador ? "atc" : a.deRed ? "red" : a.real ? `real-${a.huella}` : "gen"}`;
 const nombreLetra = (l: string) => (/^[A-Z]$/.test(l) ? LETRAS[l.charCodeAt(0) - 65] : l);
 const duracion = (b: AudioBuffer) => b.duration - PAUSA_LOOP_SEG;
 const horaMetar = (a: Atis) => new Date(a.inicioMs).toISOString().slice(11, 16).replace(":", "");
@@ -130,6 +138,7 @@ function Programa() {
   const canales = useRef<Canal[]>([]);
   const metares = useRef(new Map<string, EntradaMetar>());
   const redes = useRef(new Map<string, PreguntaRed>());
+  const reales = useRef(new Map<string, PreguntaRealPagina>());
 
   useEffect(() => {
     fetch("/data/atis/nombres.json").then((r) => r.json()).then(setNombres).catch(() => setNombres({}));
@@ -177,6 +186,20 @@ function Programa() {
     return e;
   };
 
+  // El D-ATIS de EE. UU., igual que la red: la primera vez y cada 60 s; guarda la última respuesta y si falló.
+  const realDe = (icao: string): PreguntaRealPagina => {
+    let e = reales.current.get(icao);
+    if (!e) reales.current.set(icao, (e = { entradas: null, pedidoMs: 0, fallo: false }));
+    if (Date.now() - e.pedidoMs >= REAL_CADA_MS) {
+      const entrada = e;
+      entrada.pedidoMs = Date.now();
+      fetch(`/api/atis/real?icao=${icao}`)
+        .then((res) => (res.ok ? (res.json() as Promise<EntradaDatis[]>) : Promise.reject(new Error(String(res.status)))))
+        .then((entradas) => Object.assign(entrada, { entradas, fallo: false }), () => { entrada.fallo = true; });
+    }
+    return e;
+  };
+
   // Cambiar de red a mano corta al momento, como cambiar de frecuencia; sin esto la regla nueva esperaría el fin del loop.
   const cortar = () => {
     for (const c of canales.current) {
@@ -207,6 +230,7 @@ function Programa() {
     const k = clave(atis);
     if (c.cargando === k || (c.siguiente && clave(c.siguiente.atis) === k)) return;
     c.cargando = k;
+    c.reintentoMs = Date.now();
     cargarAudio(ctx, atis, aps).then(
       (r) => {
         if (c.cargando !== k) return; // ya se sintonizó otra cosa
@@ -259,17 +283,27 @@ function Programa() {
         return { ...base, atis: null, faltantes: [], avisoMetar: null, origen, atisRed: vigente!.atis, avisoRed };
       }
       const conControlador = origen === "sin-letra";
+      // Donde sonaría el generado, en EE. UU. suena el D-ATIS vigente de esa frecuencia; mientras llega su primera respuesta, silencio.
+      const datis = origen === "generado" && formatoDe(s.ap.icao) === "faa"
+        ? datisVigente(realDe(s.ap.icao), nombreFrecuencia(s.ap, com.mhz), Date.now()) : null;
+      if (datis === "esperando") {
+        apagar(c);
+        return { ...base, atis: null, faltantes: [], avisoMetar: null, origen: null, atisRed: null, avisoRed: T.consultandoReal };
+      }
+      const real = !!datis;
 
       const e = metarDe(s.ap.icao);
-      if (e.metar) {
-        const nuevo = armarAtis(e.metar, s.ap, { conControlador, deRed: deRed ?? undefined });
-        if (debeCambiar(c.atis ?? null, nuevo)) cargar(ctx, aps, c, nuevo);
-      }
+      const nuevo = datis ? armarDatis(datis, s.ap, Date.now())
+        : e.metar ? armarAtis(e.metar, s.ap, { conControlador, deRed: deRed ?? undefined }) : null;
+      if (nuevo && debeCambiar(c.atis ?? null, nuevo)) cargar(ctx, aps, c, nuevo);
+      // Suena este mismo ATIS sin parte de su voz en vivo: cada 15 s se vuelve a cargar; entra en la pausa del loop como siguiente.
+      else if (nuevo && !c.cargando && !c.siguiente && c.faltantes?.some((f) => f.startsWith("vivo-"))
+        && Date.now() - c.reintentoMs >= REINTENTO_MS) cargar(ctx, aps, c, nuevo);
       // El ATIS nuevo entra al momento si no suena nada, o en la pausa del final del loop si ya suena otro.
       // Uno que llegó tarde de otro aeropuerto (A→B→A rápido) no entra.
       // Uno que llegó tarde con la regla vieja de la red (se conectó o se fue un controlador) tampoco.
       if (c.siguiente && (c.siguiente.atis.icao !== s.ap.icao || c.siguiente.atis.conControlador !== conControlador
-        || !!c.siguiente.atis.deRed !== !!deRed)) c.siguiente = null;
+        || !!c.siguiente.atis.deRed !== !!deRed || !!c.siguiente.atis.real !== real)) c.siguiente = null;
       const sig = c.siguiente;
       if (sig && entraSiguiente(c.sonando, Date.now(), c.faseMs, duracion(c.buffer ?? sig.buffer))) {
         Object.assign(c, sig, { siguiente: null });
@@ -281,13 +315,13 @@ function Programa() {
       }
       if (silenciado) apagar(c);
       // Si ya suena, el cambio de regla entra en la pausa del loop; si no, solo arranca el ATIS de la regla actual.
-      else if (c.atis?.icao === s.ap.icao && (c.sonando || (c.atis.conControlador === conControlador && !!c.atis.deRed === !!deRed))) {
+      else if (c.atis?.icao === s.ap.icao && (c.sonando || (c.atis.conControlador === conControlador && !!c.atis.deRed === !!deRed && !!c.atis.real === real))) {
         if (c.sonando) c.radio.ajustar(mezcla);
         else tocar(c, c.atis.inicioMs, mezcla);
       }
       const atis = c.atis?.icao === s.ap.icao ? c.atis : null;
-      const avisoMetar = !e.viejo ? null : e.metar ? T.metarViejo : T.sinMetar;
-      return { ...base, atis, faltantes: atis ? c.faltantes! : [], avisoMetar, origen, atisRed: deRed ? vigente!.atis : null, avisoRed };
+      const avisoMetar = real || !e.viejo ? null : e.metar ? T.metarViejo : T.sinMetar;
+      return { ...base, atis, faltantes: atis ? c.faltantes! : [], avisoMetar, origen: real ? "real" : origen, atisRed: deRed ? vigente!.atis : null, avisoRed };
     }));
     // metarDe y cargar solo tocan refs; la muestra llega cada segundo.
   }, [muestra, iniciado, aeropuertos, silenciado, red, leerVoz]);
@@ -296,7 +330,7 @@ function Programa() {
     if (ctxRef.current) return ctxRef.current;
     const ctx = new AudioContext();
     ctxRef.current = ctx;
-    canales.current = [0, 1].map(() => ({ radio: new RadioAtis(ctx), cargando: null, siguiente: null, faseMs: 0, sonando: false }));
+    canales.current = [0, 1].map(() => ({ radio: new RadioAtis(ctx), cargando: null, siguiente: null, faseMs: 0, sonando: false, reintentoMs: 0 }));
     setIniciado(true);
     return ctx;
   };
@@ -343,6 +377,7 @@ function Programa() {
           </h2>
           {v.origen === "cliente" ? <p className="text-xs text-white/50">{T.atisDe(NOMBRE_RED[red])}</p>
             : v.atis?.conControlador ? <p className="text-xs text-white/50">{T.sinLetraAviso}</p>
+            : v.atis?.real ? <p className="text-xs text-white/50">{T.real}</p>
             : v.atis && <p className="text-xs text-white/50">{T.generado(horaMetar(v.atis))}</p>}
           <p className="text-white/70">
             {v.distNm.toFixed(1)} NM · {T.senal}: <span className={COLOR_SENAL[v.senal]}>{T[v.senal]}</span>
@@ -357,15 +392,21 @@ function Programa() {
           )}
           {v.atis && (["es", "en"] as const).map((idioma) => (
             <div key={idioma} className="space-y-1 rounded border border-white/10 p-2">
-              {v.atis!.partes.filter((p) => p.idioma === idioma).map((p, j) => (
-                <p key={j} className={p.soloTexto ? "text-white/40" : "text-white/85"}>
-                  {p.texto}
-                  {p.soloTexto && <span className="ml-2 rounded border border-white/15 px-1 text-[10px] uppercase tracking-wide">{T.soloTexto}</span>}
-                </p>
-              ))}
+              {v.atis!.partes.filter((p) => p.idioma === idioma).map((p, j) => {
+                // La voz en vivo que no llegó se ve como «Solo en texto».
+                const mudo = p.soloTexto || (!!p.vivo && p.piezas.some((x) => v.faltantes.includes(x.clave)));
+                return (
+                  <p key={j} className={mudo ? "text-white/40" : "text-white/85"}>
+                    {p.texto}
+                    {mudo && <span className="ml-2 rounded border border-white/15 px-1 text-[10px] uppercase tracking-wide">{T.soloTexto}</span>}
+                  </p>
+                );
+              })}
             </div>
           ))}
-          {v.faltantes.length > 0 && <p className="text-gold-300">{T.faltaAudio} {v.faltantes.join(", ")}</p>}
+          {v.faltantes.some((f) => !f.startsWith("vivo-")) && (
+            <p className="text-gold-300">{T.faltaAudio} {v.faltantes.filter((f) => !f.startsWith("vivo-")).join(", ")}</p>
+          )}
         </section>
       ))}
 
