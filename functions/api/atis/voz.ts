@@ -20,6 +20,8 @@ const sintetizar = async (texto: string, env: Env): Promise<ArrayBuffer> => {
       "Ocp-Apim-Subscription-Key": env.AZURE_SPEECH_KEY!,
       "Content-Type": "application/ssml+xml",
       "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+      // Azure exige User-Agent; el fetch de Cloudflare no manda uno y Azure responde 400.
+      "User-Agent": "villanueva-atis",
     },
     body: ssml,
   });
