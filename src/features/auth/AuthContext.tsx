@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabaseClient";
+import { olvidarOrigen, origenGuardado, recordarOrigen, refParaCuenta } from "../../lib/origen";
 
 interface CadetUser {
   id: string;
@@ -22,6 +23,21 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/** Pega a la cuenta recién creada el `?ref=` con el que llegó la persona (solo una vez). */
+let marcando = false;
+function marcarOrigen(session: Session | null) {
+  const ref = session && refParaCuenta(origenGuardado(), session.user.created_at, session.user.user_metadata?.ref, Date.now());
+  if (!ref || marcando) return;
+  marcando = true;
+  // Fuera del callback de onAuthStateChange: llamar a supabase ahí dentro puede trabar la sesión.
+  setTimeout(() => {
+    supabase.auth.updateUser({ data: { ref } }).then(({ error }) => {
+      if (!error) olvidarOrigen();
+      marcando = false;
+    });
+  }, 0);
+}
+
 function toCadetUser(session: Session | null): CadetUser | null {
   const email = session?.user?.email;
   if (!email || !session?.user?.id) return null;
@@ -35,14 +51,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    recordarOrigen(window.location.search);
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
+      marcarOrigen(data.session);
     });
 
     const { data: subscription } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
       setLoading(false);
+      marcarOrigen(nextSession);
     });
 
     return () => subscription.subscription.unsubscribe();
