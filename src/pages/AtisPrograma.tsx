@@ -83,6 +83,7 @@ type Canal = Partial<Cargado> & {
   faseMs: number; // hora de la fase 0 del loop que suena
   sonando: boolean;
   reintentoMs: number; // hora del último intento de cargar
+  mhz?: number; // frecuencia que oía en la muestra anterior
 };
 // origen: de dónde sale lo que se ve («real»: D-ATIS); null mientras llega la primera respuesta de la red.
 type Vista = {
@@ -102,6 +103,12 @@ function apagar(c: Canal) {
   if (!c.sonando) return;
   c.radio.detener();
   c.sonando = false;
+}
+
+// Corte total del canal: lo que suena, lo que carga y lo que esperaba el fin del loop.
+function vaciar(c: Canal) {
+  apagar(c);
+  Object.assign(c, { atis: undefined, buffer: undefined, faltantes: undefined, cargando: null, siguiente: null });
 }
 
 // Sintonía nueva: clic, el loop donde va según faseMs (la hora del METAR), y la mezcla (detener() dejó la voz en 0).
@@ -202,10 +209,7 @@ function Programa() {
 
   // Cambiar de red a mano corta al momento, como cambiar de frecuencia; sin esto la regla nueva esperaría el fin del loop.
   const cortar = () => {
-    for (const c of canales.current) {
-      apagar(c);
-      Object.assign(c, { atis: undefined, buffer: undefined, faltantes: undefined, cargando: null, siguiente: null });
-    }
+    for (const c of canales.current) vaciar(c);
   };
   const guardar = (k: string, v: string) => {
     try {
@@ -260,6 +264,9 @@ function Programa() {
       }
       const mezcla = mezclaPorDistancia(s.distNm, alcanceNm(pos.aglFt), com.volumen);
       if (c.atis && c.atis.icao !== s.ap.icao) apagar(c); // otra frecuencia: corte
+      // Otra frecuencia del mismo aeropuerto (KATL 119.65 llegadas → 125.55 salidas): corte al momento, como en el radio.
+      else if (c.mhz !== undefined && c.mhz !== com.mhz) vaciar(c);
+      c.mhz = com.mhz;
       const titulo = s.ap.nombreEs === null && s.ap.nombreEn === null ? `${s.ap.icao} · ${s.ap.nombreSim}` : s.ap.icao;
       const base = { icao: s.ap.icao, titulo, distNm: s.distNm, senal: senalDe(mezcla) };
       const actual = c.atis?.icao === s.ap.icao ? c.atis : null;
