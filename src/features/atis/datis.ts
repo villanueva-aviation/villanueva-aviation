@@ -69,10 +69,20 @@ export function vigenteDatis(e: EntradaDatis, ahoraMs: number): boolean {
   return ahoraMs - emitidoMs(e.time, ahoraMs) < 90 * MIN_MS;
 }
 
-export function datisPara(entradas: EntradaDatis[], nombreFrec: string | null): EntradaDatis | null {
+// Frecuencia ATIS de salidas real de los aeropuertos con ATIS de llegadas y salidas aparte (FAA, ciclo 29-oct-2026,
+// vía AirNav). MSFS 2020 les pone el mismo nombre a las dos (p. ej. «KATL»), así que el nombre no basta.
+const ATIS_SALIDAS: Record<string, number> = {
+  KATL: 125.55, KCLE: 132.375, KCLT: 132.1, KCVG: 135.3, KDEN: 134.025, KDFW: 135.925, KDTW: 118.125,
+  KMCO: 120.525, KMIA: 133.675, KMSP: 120.8, KPHL: 135.925, KPIT: 135.9, KTPA: 128.475,
+};
+
+export function datisPara(entradas: EntradaDatis[], nombreFrec: string | null, mhz?: number): EntradaDatis | null {
   const combinada = entradas.find((e) => e.type === "combined");
   if (combinada) return combinada;
-  const tipo = nombreFrec?.toUpperCase().includes("DEP") ? "dep" : "arr";
+  const salidas = entradas[0] && ATIS_SALIDAS[entradas[0].airport];
+  const esSalidas = (salidas !== undefined && mhz !== undefined && Math.abs(mhz - salidas) < TOLERANCIA_MHZ + 1e-9)
+    || !!nombreFrec?.toUpperCase().includes("DEP");
+  const tipo = esSalidas ? "dep" : "arr";
   return entradas.find((e) => e.type === tipo) ?? null;
 }
 
@@ -82,9 +92,9 @@ export type PreguntaReal = { entradas: EntradaDatis[] | null; fallo: boolean };
 // El D-ATIS que suena en esa frecuencia. "esperando": silencio hasta la primera respuesta.
 // Si la fuente falla, sigue la última respuesta buena hasta que vence (90 min).
 // null: no hay uno vigente, o falló sin respuesta previa; suena el generado.
-export function datisVigente(q: PreguntaReal, nombreFrec: string | null, ahoraMs: number): EntradaDatis | null | "esperando" {
+export function datisVigente(q: PreguntaReal, nombreFrec: string | null, ahoraMs: number, mhz?: number): EntradaDatis | null | "esperando" {
   if (!q.entradas) return q.fallo ? null : "esperando";
-  const e = datisPara(q.entradas, nombreFrec);
+  const e = datisPara(q.entradas, nombreFrec, mhz);
   return e && vigenteDatis(e, ahoraMs) ? e : null;
 }
 

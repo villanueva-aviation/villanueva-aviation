@@ -72,6 +72,16 @@ test("datisPara: combined gana; DEP en el nombre da dep; otro nombre o null da a
   assert.equal(datisPara([], null), null);
 });
 
+test("datisPara: en los 13 aeropuertos con ATIS aparte, la frecuencia real de salidas da dep aunque MSFS no lo diga en el nombre", () => {
+  const arr = { ...KJFK, airport: "KATL", type: "arr" as const }, dep = { ...KJFK, airport: "KATL", type: "dep" as const };
+  assert.equal(datisPara([arr, dep], "KATL", 125.55), dep); // MSFS 2020 llama «KATL» a las dos
+  assert.equal(datisPara([arr, dep], "KATL", 119.65), arr);
+  const dtw = [{ ...arr, airport: "KDTW" }, { ...dep, airport: "KDTW" }];
+  assert.equal(datisPara(dtw, "KDTW", 118.125), dtw[1]);
+  assert.equal(datisPara(dtw, "KDTW", 133.675), dtw[0]);
+  assert.equal(datisVigente({ entradas: [arr, dep], fallo: false }, "KATL", Date.UTC(2026, 10, 24, 5, 40), 125.55), dep); // la página pasa los MHz
+});
+
 test("datisVigente: esperando sin respuesta; falla sin respuesta previa o viejo da null; vigente da la entrada de esa frecuencia", () => {
   const ahora = Date.UTC(2026, 10, 24, 5, 0);
   const arr = { ...KJFK, type: "arr" as const }, dep = { ...KJFK, type: "dep" as const };

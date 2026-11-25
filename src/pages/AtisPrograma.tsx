@@ -287,7 +287,7 @@ function Programa() {
       const conControlador = origen === "sin-letra";
       // Donde sonaría el generado, en EE. UU. suena el D-ATIS vigente de esa frecuencia; mientras llega su primera respuesta, silencio.
       const datis = origen === "generado" && formatoDe(s.ap.icao) === "faa"
-        ? datisVigente(realDe(s.ap.icao), nombreFrecuencia(s.ap, com.mhz), Date.now()) : null;
+        ? datisVigente(realDe(s.ap.icao), nombreFrecuencia(s.ap, com.mhz), Date.now(), com.mhz) : null;
       if (datis === "esperando") {
         apagar(c);
         return { ...base, atis: null, faltantes: [], avisoMetar: null, origen: null, atisRed: null, avisoRed: T.consultandoReal };
