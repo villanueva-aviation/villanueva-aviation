@@ -26,9 +26,9 @@ export default defineConfig({
     port: Number(process.env.PORT) || 5173,
     // En producción lo atiende functions/api/wx/[tipo].ts (Cloudflare Pages); aquí lo imitamos.
     proxy: {
-      // Las funciones del ATIS viven en Cloudflare (/api/atis/red corre aquí arriba). /api/atis/real y /api/atis/voz no
-      // existen en producción hasta el merge: en local se usa la vista previa de la rama programa-atis.
-      "/api/atis": { target: "https://programa-atis.villanueva-aviation.pages.dev", changeOrigin: true },
+      // Las funciones del ATIS viven en Cloudflare (/api/atis/red corre aquí arriba); en local se usa el sitio publicado.
+      // Para probar una rama antes del merge, apunta aquí a su vista previa (https://<rama>.villanueva-aviation.pages.dev).
+      "/api/atis": { target: "https://villanueva-aviation.pages.dev", changeOrigin: true },
       "/api/wx": {
         target: "https://aviationweather.gov",
         changeOrigin: true,
