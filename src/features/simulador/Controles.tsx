@@ -1,9 +1,10 @@
 // Entrada del piloto: teclado en window, ratón con Pointer Lock sobre la vista 3D y palancas táctiles.
-import { useRef, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import type { Sim } from "./bucle.ts";
 import { MANTENER } from "./mandos.ts";
 
 type Accion = (f: (s: Sim) => Sim, avisar?: boolean) => void;
+const CLAVE_GUIA = "simulador-guia";
 
 /**
  * Palanca táctil: devuelve x, y de −1 a 1 (y + = arriba). Al soltar, los ejes con `regresa` vuelven a 0
@@ -86,15 +87,76 @@ export function PalancasTactiles({ sim, accion, teclas }: { sim: Sim; accion: Ac
   );
 }
 
-export function AyudaTeclas() {
+const MANDOS: { mando: string; hace: string; teclado: string; raton: string; celular: string }[] = [
+  { mando: "Colectivo", hace: "Sube o baja: más colectivo, más potencia.", teclado: "Re Pág / Av Pág", raton: "Rueda", celular: "Palanca izquierda ↕" },
+  { mando: "Cíclico adelante / atrás", hace: "La velocidad: adelante baja la nariz y acelera; atrás frena.", teclado: "↑ / ↓ (se queda donde lo dejas)", raton: "Mover adelante / atrás", celular: "Palanca derecha ↕" },
+  { mando: "Cíclico a los lados", hace: "Inclina y vira.", teclado: "← / → (al soltar se nivela)", raton: "Mover a los lados", celular: "Palanca derecha ↔" },
+  { mando: "Pedales", hace: "Giran la nariz en estacionario y centran la bola.", teclado: "Z / X", raton: "Botón derecho + mover", celular: "Palanca izquierda ↔" },
+];
+
+/** Cómo se vuela el H135 en el simulador: mandos, primer vuelo y piloto automático. Abierta hasta que la cierras. */
+export function GuiaControles() {
+  const [abierta, setAbierta] = useState(() => {
+    try {
+      return localStorage.getItem(CLAVE_GUIA) !== "0";
+    } catch {
+      return true;
+    }
+  });
   return (
-    <details className="rounded-lg border border-[#1f2b3d] bg-[#0a1220] p-2 text-xs text-[#c9d4e3]">
-      <summary className="cursor-pointer font-bold text-white">Controles</summary>
-      <ul className="mt-1 grid gap-0.5">
-        <li><b>Teclado:</b> flechas = cíclico (adelante/atrás se queda puesto), Re Pág / Av Pág = colectivo, Z / X = pedales, C = centrar el cíclico.</li>
-        <li><b>Ratón:</b> clic en la vista 3D para tomar el mando. Mover = cíclico, rueda = colectivo, botón derecho + mover = pedales. Esc suelta el ratón.</li>
-        <li><b>Celular:</b> palanca izquierda = colectivo (arriba y abajo) y pedales (a los lados); derecha = cíclico.</li>
-        <li><b>Piloto automático:</b> mover un mando desconecta ese eje y avisa en ámbar.</li>
+    <details
+      open={abierta}
+      onToggle={(ev) => {
+        const si = (ev.currentTarget as HTMLDetailsElement).open;
+        setAbierta(si);
+        try {
+          localStorage.setItem(CLAVE_GUIA, si ? "1" : "0");
+        } catch {
+          /* sin almacenamiento: no pasa nada */
+        }
+      }}
+      className="rounded-lg border border-[#1f2b3d] bg-[#0a1220] p-3 text-xs text-[#c9d4e3]"
+    >
+      <summary className="cursor-pointer text-sm font-bold text-white">Cómo controlar el helicóptero</summary>
+      <div className="mt-2 overflow-x-auto">
+        <table className="w-full border-collapse text-left">
+          <thead className="text-[10px] uppercase tracking-wide text-[#7d8da3]">
+            <tr>
+              <th className="py-1 pr-2">Mando</th>
+              <th className="py-1 pr-2">Qué hace</th>
+              <th className="py-1 pr-2">Teclado</th>
+              <th className="py-1 pr-2">Ratón</th>
+              <th className="py-1">Celular</th>
+            </tr>
+          </thead>
+          <tbody>
+            {MANDOS.map((m) => (
+              <tr key={m.mando} className="border-t border-[#1f2b3d] align-top">
+                <td className="py-1.5 pr-2 font-bold text-white">{m.mando}</td>
+                <td className="py-1.5 pr-2">{m.hace}</td>
+                <td className="py-1.5 pr-2 text-[#4cc9f0]">{m.teclado}</td>
+                <td className="py-1.5 pr-2 text-[#4cc9f0]">{m.raton}</td>
+                <td className="py-1.5 text-[#4cc9f0]">{m.celular}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-2">
+        <b className="text-white">Ratón:</b> haz clic en la vista 3D para tomar el mando; Esc lo suelta. <b className="text-white">C</b> centra el cíclico. El teclado funciona siempre.
+      </p>
+      <h3 className="mt-3 font-bold text-white">Tu primer vuelo</h3>
+      <ol className="mt-1 list-decimal space-y-0.5 pl-4">
+        <li>Sube el colectivo (Re Pág) hasta que el helicóptero despegue y suba. En Guadalajara hace falta casi tres cuartos.</li>
+        <li>Empuja el cíclico (↑) un poco: la nariz baja y acelera. Para crucero, entre 80 y 110 kt.</li>
+        <li>Para nivelar, baja el colectivo (Av Pág) poco a poco hasta que la VS marque 0.</li>
+        <li>Vira con ← →. Al soltar, el helicóptero vuelve a nivelarse.</li>
+      </ol>
+      <h3 className="mt-3 font-bold text-white">Piloto automático</h3>
+      <ul className="mt-1 space-y-0.5">
+        <li><b className="text-[#3ddc84]">AP</b> lo enciende. <b className="text-[#3ddc84]">HDG</b> sigue el rumbo de la perilla HDG. <b className="text-[#3ddc84]">NAV</b> sigue el curso del VOR (CRS) o del GPS; <b className="text-[#3ddc84]">APR</b> lo sigue más fino.</li>
+        <li><b className="text-[#3ddc84]">ALT</b> mantiene la altitud. <b className="text-[#3ddc84]">VS</b> sube o baja al régimen de la perilla VS. <b className="text-[#3ddc84]">ALT.A</b> va a ALT SEL y ahí se nivela. <b className="text-[#3ddc84]">IAS</b> sostiene la velocidad.</li>
+        <li>Si mueves un mando con el AP puesto, se desconecta ese eje y sale un aviso en ámbar.</li>
       </ul>
     </details>
   );

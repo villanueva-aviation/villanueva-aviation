@@ -1,6 +1,7 @@
 // Elegir país, VOR o aeropuerto, empezar en la plataforma o en el aire, y el viento.
 import { useEffect, useMemo, useState } from "react";
 import { aNm, rumbo } from "../home/navGeo.ts";
+import { GuiaControles } from "./Controles";
 import { buscar, cargarPais, type AeropuertoSim, type DatosPais, type Pais, type Vor } from "./datos.ts";
 import type { Viento } from "./modelo.ts";
 
@@ -157,7 +158,10 @@ export function ElegirLugar({ onElegir }: { onElegir: (e: Eleccion) => void }) {
           </section>
         </div>
       )}
-      <p className="mt-6 text-xs text-[#7d8da3]">Solo para simulación. No sirve para navegación real.</p>
+      <div className="mt-6">
+        <GuiaControles />
+      </div>
+      <p className="mt-4 text-xs text-[#7d8da3]">Solo para simulación. No sirve para navegación real.</p>
     </div>
   );
 }

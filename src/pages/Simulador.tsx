@@ -3,7 +3,7 @@
 import { memo, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../lib/routes";
-import { AyudaTeclas, PalancasTactiles } from "../features/simulador/Controles";
+import { GuiaControles, PalancasTactiles } from "../features/simulador/Controles";
 import { useControles } from "../features/simulador/useControles";
 import { ElegirLugar, type Eleccion } from "../features/simulador/ElegirLugar";
 import { HsiSim } from "../features/simulador/HsiSim";
@@ -45,6 +45,21 @@ export function Simulador() {
   const vista = useRef<HTMLDivElement>(null);
   const { capturado, capturar } = useControles(teclas, accion, vista);
   const [pestana, setPestana] = useState<"ap" | "radios" | "mapa">("ap");
+  const [verMapa, setVerMapa] = useState(() => {
+    try {
+      return localStorage.getItem("simulador-mapa") !== "0";
+    } catch {
+      return true;
+    }
+  });
+  const cambiarMapa = () => {
+    setVerMapa(!verMapa);
+    try {
+      localStorage.setItem("simulador-mapa", verMapa ? "0" : "1");
+    } catch {
+      /* sin almacenamiento: no pasa nada */
+    }
+  };
 
   if (!eleccion || !sim || !arranque) {
     return (
@@ -131,9 +146,12 @@ export function Simulador() {
         {/* Laptop: todo a la derecha. Celular: pestañas. */}
         <div className="hidden content-start gap-2 lg:grid">
           {panelAp}
-          {mapa}
+          <button type="button" onClick={cambiarMapa} aria-expanded={verMapa} className="flex items-center justify-between rounded-md border border-[#1f2b3d] bg-[#0a1220] px-3 py-1.5 text-xs font-bold text-white hover:border-[#4cc9f0]">
+            <span>Mapa de navegación</span>
+            <span className="text-[#4cc9f0]">{verMapa ? "Ocultar ▲" : "Mostrar ▼"}</span>
+          </button>
+          {verMapa && mapa}
           {radios}
-          <AyudaTeclas />
         </div>
         <div className="grid gap-2 lg:hidden">
           <div className="grid grid-cols-3 gap-1" role="tablist">
@@ -144,8 +162,10 @@ export function Simulador() {
             ))}
           </div>
           {pestana === "ap" ? panelAp : pestana === "radios" ? radios : mapa}
-          <AyudaTeclas />
         </div>
+      </div>
+      <div className="mx-auto max-w-[1400px] px-4 pb-4">
+        <GuiaControles />
       </div>
       <footer className="px-4 pb-6 text-center text-[11px] text-[#7d8da3]">
         Solo para simulación · Elevación: Mapzen/AWS Terrain Tiles · Navegación: OurAirports
