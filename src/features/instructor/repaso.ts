@@ -1,5 +1,6 @@
 // Lección 13, repaso general: sorteo de maniobras, zona de trabajo y la lección de rampa a rampa. Puro, para poder probarlo.
 import { esC172, type Muestra } from "./evaluador.ts";
+import { anulaPorAp, MOTIVO_AP } from "./simWeb.ts";
 import { AVIONES_VOZ, type AvionVoz } from "../../data/checklistVozAviones.ts";
 import type { Aeropuerto } from "./aeropuertoSim.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
@@ -376,6 +377,7 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
   }
   // MSFS se cerró o se colgó en el aire: al volver el avión aparece en otro lado y no se puede seguir el vuelo.
   if (previo && !previo.enTierra && m.t - previo.t > HUECO_AIRE_SEG) return { estado: { ...e, etapa: "invalido", motivo: t.hueco }, decir: [] };
+  if (anulaPorAp(m, e.modo)) return { estado: { ...e, etapa: "invalido", motivo: MOTIVO_AP[idioma] }, decir: [] };
   const vuelo = avanzarVuelo(e.vuelo, m, a);
   if (vuelo.fase === "invalido") return anular({ ...e, vuelo }, vuelo.motivo ?? "", idioma);
   const nuevos = vuelo.eventos.slice(e.vuelo.eventos.length);

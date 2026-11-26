@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ACCESO_REPASO, LECCIONES, LECCIONES_IFR, REPASO, claveLeccion, estadoLeccion, leccionDe, leccionIfrDe, lineaEjercicios } from "./lecciones.ts";
+import { ACCESO_REPASO, LECCIONES, LECCIONES_IFR, REPASO, claveLeccion, estadoLeccion, estadoLeccionWeb, leccionDe, leccionIfrDe, lineaEjercicios } from "./lecciones.ts";
 import { LECCIONES_GUARDADAS } from "./reglasIntentos.ts";
 
 test("14 lecciones en el orden de la escuela", () => {
@@ -97,4 +97,13 @@ test("el briefing IFR cuenta los ejercicios de cada lección", () => {
   assert.equal(lineaEjercicios(l4, false, "en"), "3 practice exercises, with tips.");
   assert.equal(lineaEjercicios(l4, true, "es"), "Es 1 ejercicio calificado, sin consejos.");
   assert.equal(lineaEjercicios(l2, true, "en"), "2 graded legs: one normal intercept and one passed route, without telling you which. No tips.");
+});
+
+test("simulador web: IFR 1 abierta con cuenta; 2 a 5 con Exclusivo o fundador; 6 próximamente", () => {
+  const nadie = { fundador: false, exclusivo: false };
+  assert.equal(estadoLeccionWeb(LECCIONES_IFR[0], nadie), "abierta");
+  assert.equal(estadoLeccionWeb(LECCIONES_IFR[1], nadie), "candado");
+  assert.equal(estadoLeccionWeb(LECCIONES_IFR[1], { fundador: false, exclusivo: true }), "abierta");
+  assert.equal(estadoLeccionWeb(LECCIONES_IFR[4], { fundador: true, exclusivo: false }), "abierta");
+  assert.equal(estadoLeccionWeb(LECCIONES_IFR[5], { fundador: true, exclusivo: true }), "proximamente");
 });

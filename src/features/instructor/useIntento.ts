@@ -5,6 +5,8 @@ import type { ContextoArmado, DefManiobra, ResultadoComun } from "./maniobras.ts
 import type { IntentoManiobra } from "./reglasIntentos.ts";
 import type { IntentoSesion, Modo } from "./sesion.ts";
 import { useLector } from "./useLector.ts";
+import { useFuenteMuestras } from "./fuenteMuestras.ts";
+import { anulaPorAp, MOTIVO_AP, TITULO_SIM_WEB } from "./simWeb.ts";
 import { sugerirNivel, type Nivel } from "./nivel.ts";
 
 const CLAVE_NIVEL = "instructor-nivel";
@@ -37,6 +39,7 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
   const defRef = useRef(def);
   defRef.current = def;
   // Cada lote del lector entra a la evaluación; avanzar ignora las muestras repetidas.
+  const fuente = useFuenteMuestras();
   const { estado, muestra, aeropuerto, vors, continuarDesde } = useLector((lote) => {
     setEv((e: unknown) => (e ? lote.reduce((x, m) => defRef.current.avanzar(x, m), e) : e));
     op.current.alLote?.(lote);
@@ -81,12 +84,12 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
     async (r: ResultadoComun, m: Modo): Promise<string | null> => {
       const d = defRef.current;
       setGuardado({ id: null, error: null, guardando: true });
-      const res = await guardarIntento({ maniobra: d.id, avion: d.avion, modo: m, resultado: r, detalle: d.paraGuardar(r), sesionId: op.current.sesionId });
+      const res = await guardarIntento({ maniobra: d.id, avion: fuente ? TITULO_SIM_WEB : d.avion, modo: m, resultado: r, detalle: d.paraGuardar(r), sesionId: op.current.sesionId });
       setGuardado({ ...res, guardando: false });
       if (res.id) cargarIntentos();
       return res.id;
     },
-    [cargarIntentos],
+    [cargarIntentos, fuente],
   );
 
   useEffect(() => {
@@ -116,6 +119,13 @@ export function useIntento(def: DefManiobra, opciones: Opciones = {}) {
   }, [ev, muestra, modo, arma, def, nivel]);
 
   const fase = ev ? def.fase(ev) : null;
+  // Simulador web, checkride: el AP que mueve el helicóptero anula el intento en curso (no se guarda).
+  // El simulador manda una muestra por lote, así que basta con la última.
+  useEffect(() => {
+    if (!muestra || !fase || fase === "terminado" || fase === "invalido" || !anulaPorAp(muestra, modoIntento)) return;
+    setEv(null);
+    setAnulado(MOTIVO_AP.es);
+  }, [muestra, fase, modoIntento]);
   // Un intento armado que todavía no empieza toma el modo y el nivel nuevos (p. ej. al pasar al checkride); uno empezado conserva los suyos.
   useEffect(() => {
     if (fase !== "armado") return;

@@ -62,6 +62,13 @@ export function estadoLeccion(leccion: Leccion, acceso: { fundador: boolean; exc
   return ok ? "abierta" : "candado";
 }
 
+/** En el simulador web (spec 2026-11-25): la IFR 1 es gratis con cuenta; las demás, con Exclusivo (o fundador). */
+export function estadoLeccionWeb(leccion: Leccion, acceso: { fundador: boolean; exclusivo: boolean }): "abierta" | "candado" | "proximamente" {
+  if (!leccion.disponible) return "proximamente";
+  if (leccion.programa === "ifr" && leccion.numero === 1) return "abierta";
+  return acceso.fundador || acceso.exclusivo ? "abierta" : "candado";
+}
+
 /** El valor de `maniobra` en intentos_maniobra para la lección entera. */
 export const claveLeccion = (x: Leccion) => (x.programa === "ifr" ? `ifr-${x.numero}` : x.numero === REPASO ? "repaso-general" : `leccion-${x.numero}`);
 

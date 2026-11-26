@@ -13,6 +13,7 @@ import {
 import { LECCIONES, REPASO, leccionIfrDe } from "./lecciones.ts";
 import { avionDe, avionParaGuardar, conSenal, entradaDe, instruirEnRampa, nombreHecha, ponerVor } from "./repaso.ts";
 import { elegirVor } from "./vorSim.ts";
+import { MOTIVO_AP, TITULO_SIM_WEB } from "./simWeb.ts";
 
 test("una lección de maniobra la vuela 5 veces; el repaso sortea 4", () => {
   assert.deepEqual(maniobrasDe(LECCIONES[6]), Array(5).fill("vuelo-lento"));
@@ -518,4 +519,18 @@ test("IFR sin instrucción en tierra: al despegar, «Sintoniza…» también dic
   assert.ok(es.decir.includes("Sintoniza 117.50 en NAV1, GDL, y sube a 9,000 pies. Arriba de 1,000 pies sobre el terreno empezamos."), es.decir.join(" | "));
   const en = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr", 9000), VOR), vueloIfr().slice(0, 2600), { idioma: "en" });
   assert.ok(en.decir.includes("Tune 117.50 on NAV1, GDL, and climb to 9,000 feet. We start above 1,000 feet above the ground."), en.decir.join(" | "));
+});
+
+test("simulador web: el AP que mueve el helicóptero anula el checkride, no la práctica ni MSFS", () => {
+  const web = (ap: (m: Muestra) => boolean, titulo = TITULO_SIM_WEB) => vueloIfr().map((m) => ({ ...m, titulo, autopiloto: ap(m) }));
+  const enVuelo = (m: Muestra) => m.agl > 1000;
+  const ck = correr(ponerVor(crearRepaso("checkride", IFR, 2, "ifr"), VOR), web(enVuelo));
+  assert.equal(ck.e.etapa, "invalido");
+  assert.equal(ck.e.motivo, MOTIVO_AP.es);
+  const ckEn = correr(ponerVor(crearRepaso("checkride", IFR, 2, "ifr"), VOR), web(enVuelo), { idioma: "en" });
+  assert.equal(ckEn.e.motivo, MOTIVO_AP.en);
+  assert.notEqual(correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr"), VOR), web(enVuelo)).e.etapa, "invalido");
+  assert.notEqual(correr(ponerVor(crearRepaso("checkride", IFR, 2, "ifr"), VOR), web(enVuelo, "Cessna Skyhawk G1000 Asobo")).e.etapa, "invalido");
+  // En tierra (antes de despegar) no cuenta.
+  assert.notEqual(correr(ponerVor(crearRepaso("checkride", IFR, 2, "ifr"), VOR), web((m) => m.enTierra)).e.etapa, "invalido");
 });

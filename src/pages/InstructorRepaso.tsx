@@ -13,7 +13,7 @@ import { guardarIntento, guardarRecorrido } from "../features/instructor/intento
 import { cerrarGrabacion, crearGrabador, grabarMuestra, grabarVoz } from "../features/instructor/recorrido";
 import { DebriefingMapa } from "../features/instructor/DebriefingMapa";
 import type { ManiobraId, ResultadoComun } from "../features/instructor/maniobras";
-import { claveLeccion, estadoLeccion, leccionDe, leccionIfrDe, lineaEjercicios } from "../features/instructor/lecciones";
+import { claveLeccion, estadoLeccion, estadoLeccionWeb, leccionDe, leccionIfrDe, lineaEjercicios } from "../features/instructor/lecciones";
 import {
   altitudEspera, entradaDicha, generarTramo, inventarEspera, ladoDicho, redondear10, referenciaTramo, rutaEspera, tipoDicho, tramosDe, type DatosEspera, type Ejercicio,
   type Lado, type Llegada, type TipoTramo, type Tramo,
@@ -42,6 +42,7 @@ import {
 import type { IntentoSesion, Modo } from "../features/instructor/sesion";
 import { useChecklistVoz } from "../features/instructor/useChecklistVoz";
 import { useIntento } from "../features/instructor/useIntento";
+import { useFuenteMuestras } from "../features/instructor/fuenteMuestras";
 import { SelectorNivel } from "../features/instructor/SelectorNivel";
 import { Explicacion } from "../features/instructor/ExplicacionInstructor";
 import { NOMBRE_NIVEL } from "../features/instructor/nivel";
@@ -115,6 +116,7 @@ const T = {
       "Al final escuchas el debriefing por fases.",
     ],
     abreMsfs: "Abre MSFS 2020",
+    conectadoWeb: "Conectado al simulador web",
     etapaIfr: { salida: "Subiendo: sintoniza el VOR", maniobra: "Ejercicios", "fuera-de-zona": "Sin señal del VOR" } as Partial<Record<EtapaRepaso, string>>,
     ejercicio: (n: number, de: number) => `Ejercicio ${n} de ${de}`,
     siguienteIfr: "Siguiente ejercicio",
@@ -201,6 +203,7 @@ const T = {
       "At the end you hear the debriefing by phase.",
     ],
     abreMsfs: "Open MSFS 2020",
+    conectadoWeb: "Connected to the web simulator",
     etapaIfr: { salida: "Climbing: tune the VOR", maniobra: "Exercises", "fuera-de-zona": "No VOR signal" } as Partial<Record<EtapaRepaso, string>>,
     ejercicio: (n: number, de: number) => `Exercise ${n} of ${de}`,
     siguienteIfr: "Next exercise",
@@ -254,8 +257,11 @@ function leerIdioma(): Idioma {
 }
 
 /** Una lección del programa: vuelo completo con checklist por voz, sus maniobras (o el sorteo del repaso) y debriefing por fases. */
-export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr" }) {
-  const numero = useParams().numero;
+export function InstructorRepaso({ programa = "vfr", numero: numeroFijo }: { programa?: "vfr" | "ifr"; numero?: string }) {
+  const params = useParams();
+  const numero = numeroFijo ?? params.numero;
+  // Dentro del simulador web: sus muestras, su regla de acceso y sin reanudar (la posición no se recupera).
+  const web = !!useFuenteMuestras();
   const ifr = programa === "ifr";
   const leccion = ifr ? leccionIfrDe(numero) : leccionDe(numero);
   const menuRuta = ifr ? ROUTES.instructorIfr : ROUTES.instructorPrograma;
@@ -670,7 +676,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
       // Sin almacenamiento (o lleno): la lección sigue, solo no se puede reanudar.
     }
   }, [claveReanudar, sesionId]);
-  const conLeccion = !!repaso;
+  const conLeccion = !!repaso && !web;
   useEffect(() => {
     if (!conLeccion) return;
     const id = window.setInterval(guardarParaReanudar, 5000);
@@ -681,6 +687,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     };
   }, [conLeccion, guardarParaReanudar]);
   const [aMedias, setAMedias] = useState(() => {
+    if (web) return null;
     try {
       return leerReanudable(localStorage.getItem(CLAVE_REANUDAR), claveReanudar, Date.now());
     } catch {
@@ -772,7 +779,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
     reiniciar();
   };
 
-  const acceso = leccion ? estadoLeccion(leccion, { fundador: user?.email === FOUNDER_EMAIL, exclusivo: hasAccess }) : "proximamente";
+  const acceso = leccion ? (web ? estadoLeccionWeb : estadoLeccion)(leccion, { fundador: user?.email === FOUNDER_EMAIL, exclusivo: hasAccess }) : "proximamente";
   if (!leccion || acceso !== "abierta") {
     return (
       <div className="mx-auto max-w-xl space-y-4 px-4 py-8 text-white">
@@ -785,7 +792,7 @@ export function InstructorRepaso({ programa = "vfr" }: { programa?: "vfr" | "ifr
   const cabecera = (
     <header className="flex items-baseline justify-between gap-3">
       <h1 className="font-display text-base font-bold text-white">{t.titulo(leccion.nombre[idioma], nombreAvion)}</h1>
-      <span className={`text-xs ${COLOR_ESTADO[estado]}`}>{ifr && estado === "sin-simulador" ? t.abreMsfs : t.estado[estado]}</span>
+      <span className={`text-xs ${COLOR_ESTADO[estado]}`}>{web ? t.conectadoWeb : ifr && estado === "sin-simulador" ? t.abreMsfs : t.estado[estado]}</span>
     </header>
   );
 
