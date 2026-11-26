@@ -1,9 +1,32 @@
 // Teclado en window y ratón con Pointer Lock sobre la vista 3D.
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import type { Sim } from "./bucle.ts";
-import { aplicarRaton, MANTENER } from "./mandos.ts";
+import { aplicarRaton, MANTENER, traducir, type Asignacion } from "./mandos.ts";
 
-const TECLAS_SIM = new Set(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "KeyZ", "KeyX", "KeyC"]);
+// Asignación del teclado elegida: la comparten la guía y el teclado, y se recuerda en este navegador.
+const CLAVE_ASIG = "simulador-teclas";
+let asignacion: Asignacion = (() => {
+  try {
+    return localStorage.getItem(CLAVE_ASIG) === "wasd" ? "wasd" : "flechas";
+  } catch {
+    return "flechas";
+  }
+})();
+const oyentesAsig = new Set<() => void>();
+export function elegirAsignacion(a: Asignacion) {
+  asignacion = a;
+  try {
+    localStorage.setItem(CLAVE_ASIG, a);
+  } catch {
+    /* sin almacenamiento: no pasa nada */
+  }
+  for (const o of oyentesAsig) o();
+}
+export const useAsignacion = () =>
+  useSyncExternalStore(
+    (o) => (oyentesAsig.add(o), () => oyentesAsig.delete(o)),
+    () => asignacion,
+  );
 const esCampo = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName) || t.getAttribute("role") === "spinbutton");
 
 type Accion = (f: (s: Sim) => Sim, avisar?: boolean) => void;
@@ -13,13 +36,17 @@ export function useControles(teclas: Set<string>, accion: Accion, vista: { curre
   const [capturado, setCapturado] = useState(false);
   useEffect(() => {
     const abajo = (ev: KeyboardEvent) => {
-      if (esCampo(ev.target)) return;
-      if (TECLAS_SIM.has(ev.code)) {
+      if (esCampo(ev.target) || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      const k = traducir(ev.code, asignacion);
+      if (k) {
         ev.preventDefault();
-        teclas.add(ev.code);
+        teclas.add(k);
       }
     };
-    const arriba = (ev: KeyboardEvent) => teclas.delete(ev.code);
+    const arriba = (ev: KeyboardEvent) => {
+      const k = traducir(ev.code, asignacion);
+      if (k) teclas.delete(k);
+    };
     const fuera = () => {
       for (const k of [...teclas]) if (k !== MANTENER) teclas.delete(k);
     };

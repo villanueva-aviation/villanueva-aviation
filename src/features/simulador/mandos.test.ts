@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { H135 } from "./ficha.ts";
-import { aObjetivos, aplicarRaton, avanzarTeclado, MANTENER, tocados, type Mandos } from "./mandos.ts";
+import { aObjetivos, aplicarRaton, avanzarTeclado, MANTENER, tocados, traducir, type Mandos } from "./mandos.ts";
 
 const cerca = (a: number, b: number) => assert.ok(Math.abs(a - b) < 1e-6, `${a} != ${b}`);
 const m0: Mandos = { cx: 0, cy: 0, colectivo: 0.5, pedales: 0 };
@@ -65,4 +65,18 @@ test("tocados marca solo el eje que cambió", () => {
   assert.deepEqual(tocados(m0, { ...m0, colectivo: 0.502 }), { lat: false, lon: false, col: true, ped: false });
   assert.deepEqual(tocados(m0, { ...m0 }), { lat: false, lon: false, col: false, ped: false });
   assert.deepEqual(tocados(m0, { ...m0, cy: -0.05, colectivo: 0.6 }), { lat: false, lon: true, col: true, ped: false });
+});
+
+test("asignación WASD: W S A D R F Q E C llevan a las teclas clásicas", () => {
+  const pares = [["KeyW", "ArrowUp"], ["KeyS", "ArrowDown"], ["KeyA", "ArrowLeft"], ["KeyD", "ArrowRight"], ["KeyR", "PageUp"], ["KeyF", "PageDown"], ["KeyQ", "KeyZ"], ["KeyE", "KeyX"], ["KeyC", "KeyC"]];
+  for (const [de, a] of pares) assert.equal(traducir(de, "wasd"), a, de);
+  // Con WASD las flechas y Re Pág no hacen nada (no se mezclan las dos asignaciones).
+  assert.equal(traducir("ArrowUp", "wasd"), null);
+  assert.equal(traducir("PageUp", "wasd"), null);
+});
+
+test("asignación clásica: solo flechas, Re Pág / Av Pág, Z, X y C", () => {
+  for (const k of ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "KeyZ", "KeyX", "KeyC"]) assert.equal(traducir(k, "flechas"), k);
+  assert.equal(traducir("KeyW", "flechas"), null);
+  assert.equal(traducir("KeyQ", "flechas"), null);
 });

@@ -1,7 +1,8 @@
 // Entrada del piloto: teclado en window, ratón con Pointer Lock sobre la vista 3D y palancas táctiles.
 import { useRef, useState, type ReactNode } from "react";
 import type { Sim } from "./bucle.ts";
-import { MANTENER } from "./mandos.ts";
+import { MANTENER, type Asignacion } from "./mandos.ts";
+import { elegirAsignacion, useAsignacion } from "./useControles";
 
 type Accion = (f: (s: Sim) => Sim, avisar?: boolean) => void;
 const CLAVE_GUIA = "simulador-guia";
@@ -87,15 +88,26 @@ export function PalancasTactiles({ sim, accion, teclas }: { sim: Sim; accion: Ac
   );
 }
 
-const MANDOS: { mando: string; hace: string; teclado: string; raton: string; celular: string }[] = [
-  { mando: "Colectivo", hace: "Sube o baja: más colectivo, más potencia.", teclado: "Re Pág / Av Pág", raton: "Rueda", celular: "Palanca izquierda ↕" },
-  { mando: "Cíclico adelante / atrás", hace: "La velocidad: adelante baja la nariz y acelera; atrás frena.", teclado: "↑ / ↓ (se queda donde lo dejas)", raton: "Mover adelante / atrás", celular: "Palanca derecha ↕" },
-  { mando: "Cíclico a los lados", hace: "Inclina y vira.", teclado: "← / → (al soltar se nivela)", raton: "Mover a los lados", celular: "Palanca derecha ↔" },
-  { mando: "Pedales", hace: "Giran la nariz en estacionario y centran la bola.", teclado: "Z / X", raton: "Botón derecho + mover", celular: "Palanca izquierda ↔" },
+// Nombre de cada tecla en las dos asignaciones (ver `traducir` en mandos.ts).
+const NOMBRES: Record<Asignacion, { sube: string; baja: string; adelante: string; atras: string; lados: string; pedales: string }> = {
+  flechas: { sube: "Re Pág", baja: "Av Pág", adelante: "↑", atras: "↓", lados: "← / →", pedales: "Z / X" },
+  wasd: { sube: "R", baja: "F", adelante: "W", atras: "S", lados: "A / D", pedales: "Q / E" },
+};
+const OPCIONES: { a: Asignacion; texto: string }[] = [
+  { a: "flechas", texto: "Flechas y Re Pág" },
+  { a: "wasd", texto: "WASD (laptop)" },
+];
+const mandos = (k: (typeof NOMBRES)[Asignacion]) => [
+  { mando: "Colectivo", hace: "Sube o baja: más colectivo, más potencia.", teclado: `${k.sube} / ${k.baja}`, raton: "Rueda", celular: "Palanca izquierda ↕" },
+  { mando: "Cíclico adelante / atrás", hace: "La velocidad: adelante baja la nariz y acelera; atrás frena.", teclado: `${k.adelante} / ${k.atras} (se queda donde lo dejas)`, raton: "Mover adelante / atrás", celular: "Palanca derecha ↕" },
+  { mando: "Cíclico a los lados", hace: "Inclina y vira.", teclado: `${k.lados} (al soltar se nivela)`, raton: "Mover a los lados", celular: "Palanca derecha ↔" },
+  { mando: "Pedales", hace: "Giran la nariz en estacionario y centran la bola.", teclado: k.pedales, raton: "Botón derecho + mover", celular: "Palanca izquierda ↔" },
 ];
 
 /** Cómo se vuela el H135 en el simulador: mandos, primer vuelo y piloto automático. Abierta hasta que la cierras. */
 export function GuiaControles() {
+  const asig = useAsignacion();
+  const k = NOMBRES[asig];
   const [abierta, setAbierta] = useState(() => {
     try {
       return localStorage.getItem(CLAVE_GUIA) !== "0";
@@ -118,6 +130,21 @@ export function GuiaControles() {
       className="rounded-lg border border-[#1f2b3d] bg-[#0a1220] p-3 text-xs text-[#c9d4e3]"
     >
       <summary className="cursor-pointer text-sm font-bold text-white">Cómo controlar el helicóptero</summary>
+      <div className="mt-2 flex flex-wrap items-center gap-2" role="radiogroup" aria-label="Asignación del teclado">
+        <span className="text-[#7d8da3]">Teclado:</span>
+        {OPCIONES.map((o) => (
+          <button
+            key={o.a}
+            type="button"
+            role="radio"
+            aria-checked={asig === o.a}
+            onClick={() => elegirAsignacion(o.a)}
+            className={`rounded-md border px-2.5 py-1 font-bold ${asig === o.a ? "border-[#4cc9f0] bg-[#4cc9f0]/15 text-white" : "border-[#1f2b3d] text-[#9fb0c6] hover:border-[#4cc9f0]"}`}
+          >
+            {o.texto}
+          </button>
+        ))}
+      </div>
       <div className="mt-2 overflow-x-auto">
         <table className="w-full border-collapse text-left">
           <thead className="text-[10px] uppercase tracking-wide text-[#7d8da3]">
@@ -130,7 +157,7 @@ export function GuiaControles() {
             </tr>
           </thead>
           <tbody>
-            {MANDOS.map((m) => (
+            {mandos(k).map((m) => (
               <tr key={m.mando} className="border-t border-[#1f2b3d] align-top">
                 <td className="py-1.5 pr-2 font-bold text-white">{m.mando}</td>
                 <td className="py-1.5 pr-2">{m.hace}</td>
@@ -147,10 +174,10 @@ export function GuiaControles() {
       </p>
       <h3 className="mt-3 font-bold text-white">Tu primer vuelo</h3>
       <ol className="mt-1 list-decimal space-y-0.5 pl-4">
-        <li>Sube el colectivo (Re Pág) hasta que el helicóptero despegue y suba. En Guadalajara hace falta casi tres cuartos.</li>
-        <li>Empuja el cíclico (↑) un poco: la nariz baja y acelera. Para crucero, entre 80 y 110 kt.</li>
-        <li>Para nivelar, baja el colectivo (Av Pág) poco a poco hasta que la VS marque 0.</li>
-        <li>Vira con ← →. Al soltar, el helicóptero vuelve a nivelarse.</li>
+        <li>Sube el colectivo ({k.sube}) hasta que el helicóptero despegue y suba. En Guadalajara hace falta casi tres cuartos.</li>
+        <li>Empuja el cíclico ({k.adelante}) un poco: la nariz baja y acelera. Para crucero, entre 80 y 110 kt.</li>
+        <li>Para nivelar, baja el colectivo ({k.baja}) poco a poco hasta que la VS marque 0.</li>
+        <li>Vira con {k.lados}. Al soltar, el helicóptero vuelve a nivelarse.</li>
       </ol>
       <h3 className="mt-3 font-bold text-white">Piloto automático</h3>
       <ul className="mt-1 space-y-0.5">

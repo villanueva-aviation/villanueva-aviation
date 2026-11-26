@@ -8,6 +8,17 @@ export type Teclas = Set<string>; // KeyboardEvent.code
 /** Tecla ficticia: el ratón o las palancas táctiles mandan, así que el cíclico y los pedales no vuelven solos al centro. */
 export const MANTENER = "Mantener";
 
+/** Dos asignaciones del teclado: la clásica y WASD (para laptops sin Re Pág / Av Pág). */
+export type Asignacion = "flechas" | "wasd";
+const CLASICAS = new Set(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "KeyZ", "KeyX", "KeyC"]);
+const WASD: Record<string, string> = { KeyW: "ArrowUp", KeyS: "ArrowDown", KeyA: "ArrowLeft", KeyD: "ArrowRight", KeyR: "PageUp", KeyF: "PageDown", KeyQ: "KeyZ", KeyE: "KeyX", KeyC: "KeyC" };
+
+/** La tecla clásica que corresponde a `codigo` en la asignación elegida (la que lee avanzarTeclado), o null si no es del simulador. */
+export function traducir(codigo: string, a: Asignacion): string | null {
+  if (a === "wasd") return WASD[codigo] ?? null;
+  return CLASICAS.has(codigo) ? codigo : null;
+}
+
 const clamp = (v: number, a = -1, b = 1) => Math.min(b, Math.max(a, v));
 const alCentro = (v: number, d: number) => (v > 0 ? Math.max(0, v - d) : Math.min(0, v + d));
 
