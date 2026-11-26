@@ -52,8 +52,8 @@ export function Navegador(props: {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-[#1f2b3d] bg-[#0a1220]">
-      <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label="Mapa de navegación con el rumbo hacia arriba">
+    <div className="relative overflow-hidden rounded-lg border border-[#1f2b3d] bg-[#0b1a14]">
+      <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full lg:h-[32vh]" role="img" aria-label="Mapa de navegación con el rumbo hacia arriba">
         <rect width={W} height={H} fill="#0b1a14" />
         <circle cx={CENTRO.x} cy={CENTRO.y} r={pxPorNm * rango} fill="none" stroke="#ffffff22" />
         <circle cx={CENTRO.x} cy={CENTRO.y} r={(pxPorNm * rango) / 2} fill="none" stroke="#ffffff14" />

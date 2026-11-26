@@ -27,6 +27,7 @@ const VERTEX = /* glsl */ `
 `;
 const FRAGMENT = /* glsl */ `
   uniform float altAvion;
+  uniform float avisos;
   uniform vec3 niebla;
   uniform float densidad;
   varying float vAlt;
@@ -39,8 +40,10 @@ const FRAGMENT = /* glsl */ `
     c = mix(c, vec3(0.95, 0.95, 0.97), smoothstep(3800.0, 4300.0, vAlt));
     if (vAlt < 1.0) c = vec3(0.12, 0.25, 0.45);
     // Terreno cerca o por encima del helicóptero.
-    if (vAlt > altAvion) c = mix(c, vec3(0.85, 0.10, 0.10), 0.75);
-    else if (vAlt > altAvion - 304.8) c = mix(c, vec3(0.90, 0.75, 0.10), 0.6);
+    if (avisos > 0.5) {
+      if (vAlt > altAvion) c = mix(c, vec3(0.85, 0.10, 0.10), 0.75);
+      else if (vAlt > altAvion - 304.8) c = mix(c, vec3(0.90, 0.75, 0.10), 0.6);
+    }
     float luz = 0.35 + 0.65 * max(dot(normalize(vNormal), normalize(vec3(0.4, 0.8, 0.3))), 0.0);
     c *= luz;
     float f = 1.0 - exp(-pow(vDist * densidad, 2.0));
@@ -55,6 +58,7 @@ export class Terreno {
   private materiales = new Map<number, THREE.ShaderMaterial>();
   readonly uniforms = {
     altAvion: { value: 0 },
+    avisos: { value: 0 }, // 1 = colores de terreno cercano; apagados cerca del suelo (despegue y aterrizaje)
     niebla: { value: new THREE.Color(0.62, 0.74, 0.86) },
     densidad: { value: 1 / 120_000 },
   };
@@ -118,6 +122,7 @@ export class Terreno {
     }
     const debajo = this.alturaEn(lat, lon);
     this.plano.visible = debajo === null;
+    this.uniforms.avisos.value = altFt - (debajo ?? this.aeropuerto?.elevFt ?? 0) > 500 ? 1 : 0;
     this.plano.position.y = (this.aeropuerto?.elevFt ?? 0) * M_POR_FT;
     const centro = this.local(lat, lon);
     this.plano.position.x = centro.x;

@@ -25,7 +25,10 @@ export function Perilla(props: {
     let v = p.valor + pasos * p.paso;
     if (p.circular) v = ((v % 360) + 360) % 360 || 360;
     else v = Math.min(p.max ?? Infinity, Math.max(p.min ?? -Infinity, v));
-    p.onCambio(Math.round(v * 1000) / 1000);
+    v = Math.round(v * 1000) / 1000;
+    // Varios clics antes del siguiente render se suman.
+    ultimo.current = { ...p, valor: v };
+    p.onCambio(v);
   };
 
   // La rueda necesita un listener no pasivo para que la página no se desplace.

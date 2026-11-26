@@ -114,16 +114,16 @@ export function Simulador() {
             ref={vista}
             onClick={() => !tactil && !capturado && capturar()}
             onContextMenu={(ev) => ev.preventDefault()}
-            className={`relative aspect-video overflow-hidden rounded-lg border-4 border-[#1a1f27] bg-black ${tactil ? "" : "cursor-crosshair"}`}
+            className={`relative aspect-video w-full overflow-hidden rounded-lg lg:mx-auto lg:max-w-[calc(54vh*16/9)] border-4 border-[#1a1f27] bg-black ${tactil ? "" : "cursor-crosshair"}`}
           >
             <Vista3D leer={leerEstado} aeropuerto={eleccion.aeropuerto} terrenoRef={terrenoRef} />
             <Pfd e={e} ap={sim.ap} sel={sim.sel} decl={decl} />
             {!tactil && !capturado && (
-              <span className="pointer-events-none absolute bottom-12 left-1/2 -translate-x-1/2 rounded bg-black/60 px-2 py-1 text-xs">Clic aquí para volar con el ratón · teclado siempre activo</span>
+              <span className="pointer-events-none absolute top-10 left-1/2 -translate-x-1/2 rounded bg-black/60 px-2 py-1 text-xs">Clic aquí para volar con el ratón · teclado siempre activo</span>
             )}
             {sim.pausa && <span className="absolute inset-0 grid place-items-center bg-black/40 font-display text-xl font-bold">En pausa</span>}
           </div>
-          <div className="aspect-[600/340] overflow-hidden rounded-lg border-4 border-[#1a1f27]">{hsi}</div>
+          <div className="aspect-[600/340] overflow-hidden rounded-lg border-4 border-[#1a1f27] bg-black lg:aspect-auto lg:h-[36vh]">{hsi}</div>
           {tactil && <PalancasTactiles sim={sim} accion={accion} teclas={teclas} />}
           {botones}
         </div>
