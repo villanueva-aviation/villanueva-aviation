@@ -59,8 +59,9 @@ export function guiaGps(pos: Posicion, destino: { lat: number; lon: number }, cu
   return { curso: cursoDesde, xtkNm: -aLaDerecha, distNm: Math.hypot(p.x, p.y) };
 }
 
+/** El curso de la guía es verdadero, como en `guiaGps`. */
 export function guiaVor(l: LecturaNav, obs: number): Guia {
-  return { curso: obs, xtkNm: l.distNm * Math.sin(l.desvGrados * RAD), distNm: l.distNm };
+  return { curso: (obs + l.vor.decl + 360) % 360, xtkNm: l.distNm * Math.sin(l.desvGrados * RAD), distNm: l.distNm };
 }
 
 /** Puntos de la barra del HSI: VOR 1 punto = 2°, GPS 1 punto = 0.4 NM, acotado a ±5. */

@@ -74,3 +74,12 @@ test("guiaGps: 1 NM al este de una línea al norte → curso a la izquierda", ()
   cerca(g.distNm, 10, 0.1);
   assert.equal(g.curso, 360);
 });
+
+test("guiaVor da el curso verdadero (OBS + declinación) y el xtk con el signo de la barra", async () => {
+  const { guiaVor } = await import("./radios.ts");
+  const v = vor({ decl: 5 });
+  const l = recibirNav(117.5, 85, enRadial(v, 95, 10), [v])!;
+  const g = guiaVor(l, 85);
+  assert.equal(g.curso, 90);
+  cerca(g.xtkNm, -10 * Math.sin((5 * Math.PI) / 180), 0.05);
+});
