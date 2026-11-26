@@ -59,7 +59,9 @@ export async function responderVoz(q: URLSearchParams, env: Env, deps: Deps): Pr
   try {
     if (cs !== null) {
       const est = (await deps.bajarVatsim()).find((e) => e.callsign === cs);
-      const atis = est && armarVatsim(icao, atisRedDe(est), null, Date.now());
+      const red = est && atisRedDe(est);
+      // El tipo de la consulta debe ser el de la estación: si no, la misma parte se sintetizaría con tres llaves.
+      const atis = red && red.tipo === tipo && armarVatsim(icao, red, null, Date.now());
       vivo = atis && vivosDe(atis)[n];
     } else {
       const entrada = (await deps.bajar()).find((e) => e.airport === icao && e.type === tipo);

@@ -118,6 +118,14 @@ test("voz vatsim: estación ausente, h ajeno o texto de más de 1200 caracteres 
   assert.equal(llamadas(), 0);
 });
 
+test("voz vatsim: un tipo que no es el de la estación 404 sin sintetizar (la misma parte no se paga tres veces)", async () => {
+  const { deps, llamadas } = armar();
+  assert.equal((await responderVoz(qv({ tipo: "dep" }), ENV, deps)).status, 404);
+  assert.equal((await responderVoz(qv({ tipo: "combined" }), ENV, deps)).status, 404);
+  assert.equal(llamadas(), 0);
+  assert.equal((await responderVoz(qv({}), ENV, deps)).status, 200); // arr: el de KCVG_A_ATIS
+});
+
 test("voz vatsim: feed caído 502; cs raro o ausente 400", async () => {
   const { deps } = armar();
   const r = await responderVoz(qv({}), ENV, { ...deps, bajarVatsim: async () => { throw new Error("VATSIM 500"); } });
