@@ -28,7 +28,7 @@ export default defineConfig({
     proxy: {
       // Las funciones del ATIS viven en Cloudflare (/api/atis/red corre aquí arriba); en local se usa el sitio publicado.
       // Para probar una rama antes del merge, apunta aquí a su vista previa (https://<rama>.villanueva-aviation.pages.dev).
-      "/api/atis": { target: "https://villanueva-aviation.pages.dev", changeOrigin: true },
+      "/api/atis": { target: "https://programa-atis.villanueva-aviation.pages.dev", changeOrigin: true },
       "/api/wx": {
         target: "https://aviationweather.gov",
         changeOrigin: true,
