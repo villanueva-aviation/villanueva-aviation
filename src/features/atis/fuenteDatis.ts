@@ -1,5 +1,6 @@
 // Baja el feed no oficial del D-ATIS de EE. UU. (una sola consulta con todos los aeropuertos); Cloudflare lo guarda 60 s.
 import type { EntradaDatis } from "./datis.ts";
+import type { VatsimDatos } from "./red.ts";
 
 export async function bajarDatis(): Promise<EntradaDatis[]> {
   // cf (caché de Cloudflare) no existe en el RequestInit estándar; fuera de Cloudflare se ignora.
@@ -12,4 +13,17 @@ export async function bajarDatis(): Promise<EntradaDatis[]> {
   const datos = await r.json();
   if (!Array.isArray(datos)) throw new Error("atis.info: formato inesperado");
   return datos as EntradaDatis[];
+}
+
+// Las estaciones ATIS del feed de VATSIM, para la función de voz (mismas reglas: 60 s de caché, 5 s de tiempo límite).
+export async function bajarVatsim(): Promise<VatsimDatos["atis"]> {
+  const r = await fetch("https://data.vatsim.net/v3/vatsim-data.json", {
+    headers: { "user-agent": "VillanuevaAviation/1.0 (+https://villanueva-aviation.pages.dev)" },
+    cf: { cacheTtl: 60, cacheEverything: true },
+    signal: AbortSignal.timeout(5000),
+  } as RequestInit);
+  if (!r.ok) throw new Error(`VATSIM ${r.status}`);
+  const datos = (await r.json()) as VatsimDatos;
+  if (!Array.isArray(datos?.atis)) throw new Error("VATSIM: formato inesperado");
+  return datos.atis;
 }

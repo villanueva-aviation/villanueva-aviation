@@ -1,10 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { armarDatis, vivosDe, type EntradaDatis } from "./datis.ts";
+import { armarDatis, armarVatsim, vivosDe, type EntradaDatis } from "./datis.ts";
+import { atisRedDe, type VatsimEstacion } from "./red.ts";
 import { onRequestGet as real } from "../../../functions/api/atis/real.ts";
 import { responderVoz } from "../../../functions/api/atis/voz.ts";
-import { bajarDatis } from "./fuenteDatis.ts";
+import { bajarDatis, bajarVatsim } from "./fuenteDatis.ts";
 
 const muestra: EntradaDatis[] = JSON.parse(readFileSync(new URL("./datis.muestra.json", import.meta.url), "utf8"));
 const kjfk = muestra.find((e) => e.airport === "KJFK")!;
@@ -33,6 +34,7 @@ const armar = () => {
   let llamadas = 0; const textos: string[] = [];
   const deps = {
     bajar: async () => muestra,
+    bajarVatsim: async (): Promise<VatsimEstacion[]> => vatsim,
     sintetizar: async (t: string) => { llamadas++; textos.push(t); return new Uint8Array([1, 2, 3]).buffer; },
     cache: { match: async (k: string) => almacen.get(k)?.clone(), put: async (k: string, r: Response) => { almacen.set(k, r); } },
   };
@@ -79,5 +81,62 @@ test("bajarDatis: la consulta a atis.info lleva tiempo límite", async () => {
   let senal: unknown;
   globalThis.fetch = (async (_u: unknown, init?: RequestInit) => { senal = init?.signal; return new Response("[]"); }) as typeof fetch;
   try { await bajarDatis(); } finally { globalThis.fetch = f; }
+  assert.ok(senal instanceof AbortSignal);
+});
+
+const vatsim: VatsimEstacion[] = JSON.parse(readFileSync(new URL("./vatsim.muestra.json", import.meta.url), "utf8")).atis;
+const cvgA = vatsim.find((e) => e.callsign === "KCVG_A_ATIS")!;
+const vivosCvg = vivosDe(armarVatsim("KCVG", atisRedDe(cvgA), null, Date.now())!);
+const qv = (o: Record<string, string>) => new URLSearchParams({ icao: "KCVG", tipo: "arr", n: "1", h: vivosCvg[1].h, red: "vatsim", cs: "KCVG_A_ATIS", ...o });
+
+test("voz vatsim: n y h de armarVatsim dan audio/mpeg con ese texto", async () => {
+  const { deps, textos } = armar();
+  const r = await responderVoz(qv({}), ENV, deps);
+  assert.equal(r.status, 200);
+  assert.equal(r.headers.get("content-type"), "audio/mpeg");
+  assert.deepEqual(textos, [vivosCvg[1].texto]);
+});
+
+test("voz vatsim: callsign de otro aeropuerto 404 sin bajar el feed ni sintetizar", async () => {
+  const { deps, llamadas } = armar();
+  let bajadas = 0;
+  const r = await responderVoz(qv({ icao: "KCVG", cs: "KJFK_ATIS" }), ENV, { ...deps, bajarVatsim: async () => { bajadas++; return vatsim; } });
+  assert.equal(r.status, 404);
+  assert.equal(bajadas, 0);
+  assert.equal(llamadas(), 0);
+});
+
+test("voz vatsim: estación ausente, h ajeno o texto de más de 1200 caracteres 404 sin sintetizar", async () => {
+  const { deps, llamadas } = armar();
+  assert.equal((await responderVoz(qv({ cs: "KCVG_ATIS" }), ENV, deps)).status, 404);
+  assert.equal((await responderVoz(qv({ h: "deadbeef" }), ENV, deps)).status, 404);
+  assert.equal((await responderVoz(qv({ h: vivos[0].h }), ENV, deps)).status, 404); // huella del D-ATIS de KJFK
+  const largo = { ...cvgA, text_atis: [...cvgA.text_atis!, "X ".repeat(500)] };
+  const conLargo = { ...deps, bajarVatsim: async () => vatsim.map((e) => (e === cvgA ? largo : e)) };
+  assert.equal((await responderVoz(qv({}), ENV, conLargo)).status, 404);
+  assert.equal(llamadas(), 0);
+});
+
+test("voz vatsim: feed caído 502; cs raro o ausente 400", async () => {
+  const { deps } = armar();
+  const r = await responderVoz(qv({}), ENV, { ...deps, bajarVatsim: async () => { throw new Error("VATSIM 500"); } });
+  assert.equal(r.status, 502);
+  assert.equal(await r.text(), "VATSIM no disponible");
+  for (const cs of ["", "KCVG-A-ATIS", "kcvg_a_atis", "KC", "KCVG_A_ATIS&x"]) assert.equal((await responderVoz(qv({ cs }), ENV, deps)).status, 400, cs);
+});
+
+test("voz vatsim: no comparte la caché con el D-ATIS de atis.info", async () => {
+  const { deps } = armar();
+  const llaves: string[] = [];
+  await responderVoz(qv({}), ENV, { ...deps, cache: { ...deps.cache, put: async (k: string) => { llaves.push(k); } } });
+  assert.deepEqual(llaves, [`https://cache.local/atis-voz/KCVG/arr/vatsim/KCVG_A_ATIS/${vivosCvg[1].h}`]);
+});
+
+test("bajarVatsim: la consulta a VATSIM lleva tiempo límite y devuelve .atis", async () => {
+  const f = globalThis.fetch;
+  let senal: unknown, url: unknown;
+  globalThis.fetch = (async (u: unknown, init?: RequestInit) => { url = u; senal = init?.signal; return new Response(JSON.stringify({ controllers: [], atis: [cvgA] })); }) as typeof fetch;
+  try { assert.deepEqual(await bajarVatsim(), [cvgA]); } finally { globalThis.fetch = f; }
+  assert.equal(url, "https://data.vatsim.net/v3/vatsim-data.json");
   assert.ok(senal instanceof AbortSignal);
 });
