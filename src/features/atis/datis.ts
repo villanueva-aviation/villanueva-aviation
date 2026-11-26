@@ -3,6 +3,7 @@ import type { Metar, Nube } from "../../lib/clima.ts";
 import type { AeropuertoAtis } from "./datos.ts";
 import { armarAtis, type Atis, type Parte } from "./generado.ts";
 import { hablado, habladoMetar } from "./hablado.ts";
+import type { AtisRed } from "./red.ts";
 import { TOLERANCIA_MHZ } from "./radio.ts";
 
 export type EntradaDatis = {
@@ -24,7 +25,7 @@ export type DatisLeido = {
 };
 
 const ENCABEZADO = /^\s*\w{3} (?:ATIS|ARR|DEP) INFO ([A-Z]) (\d{4})Z( SPECIAL)?\./;
-const CIERRE = /\.{0,3}\s*ADVS YOU HAVE INFO [A-Z]\.?\s*$/;
+const CIERRE = /\.*\s*ADVS YOU HAVE INFO [A-Z]\.?\s*$/;
 const ALTIMETRO = /\bA\d{4}\b/;
 
 export function leerDatis(e: EntradaDatis): DatisLeido {
@@ -76,13 +77,17 @@ const ATIS_SALIDAS: Record<string, number> = {
   KMCO: 120.525, KMIA: 133.675, KMSP: 120.8, KPHL: 135.925, KPIT: 135.9, KTPA: 128.475,
 };
 
+// La frecuencia sintonizada es la del ATIS de salidas: coincide con la real de salidas o MSFS la llama «DEP».
+export function esFrecuenciaSalidas(icao: string, mhz: number | undefined, nombreFrec: string | null): boolean {
+  const salidas = ATIS_SALIDAS[icao];
+  return (salidas !== undefined && mhz !== undefined && Math.abs(mhz - salidas) < TOLERANCIA_MHZ + 1e-9)
+    || !!nombreFrec?.toUpperCase().includes("DEP");
+}
+
 export function datisPara(entradas: EntradaDatis[], nombreFrec: string | null, mhz?: number): EntradaDatis | null {
   const combinada = entradas.find((e) => e.type === "combined");
   if (combinada) return combinada;
-  const salidas = entradas[0] && ATIS_SALIDAS[entradas[0].airport];
-  const esSalidas = (salidas !== undefined && mhz !== undefined && Math.abs(mhz - salidas) < TOLERANCIA_MHZ + 1e-9)
-    || !!nombreFrec?.toUpperCase().includes("DEP");
-  const tipo = esSalidas ? "dep" : "arr";
+  const tipo = esFrecuenciaSalidas(entradas[0]?.airport ?? "", mhz, nombreFrec) ? "dep" : "arr";
   return entradas.find((e) => e.type === tipo) ?? null;
 }
 
@@ -136,11 +141,13 @@ export function metarDeTexto(icao: string, emitido: number, cuerpo: string): Met
 // Grupos que solo trae un METAR (viento, visibilidad, capa de nubes): marcan la oración del clima.
 const GRUPO_METAR = /(?:^|\s)(?:(?:\d{3}|VRB)\d{2,3}(?:G\d{2,3})?KT|[PM]?\d+(?:\/\d+)?SM|(?:FEW|SCT|BKN|OVC|VV)(?:\d{3}|\/{3})|CLR|SKC)(?=[\s.,]|$)/;
 
-export const urlVoz = (icao: string, tipo: string, n: number, h: string) => `/api/atis/voz?icao=${icao}&tipo=${tipo}&n=${n}&h=${h}`;
+// cs: callsign de la estación de VATSIM; sin él es el D-ATIS de atis.info.
+export const urlVoz = (icao: string, tipo: string, n: number, h: string, cs?: string) =>
+  `/api/atis/voz?icao=${icao}&tipo=${tipo}&n=${n}&h=${h}${cs ? `&red=vatsim&cs=${cs}` : ""}`;
 
 // Lo que ya tiene piezas se dice con piezas; el resto (oraciones del D-ATIS y lo que el armado no pudo decir) va en vivo.
 // Con ap null se usa un aeropuerto mínimo: la Function obtiene las mismas partes en vivo que la página.
-export function armarDatis(e: EntradaDatis, ap: AeropuertoAtis | null, ahoraMs: number): Atis {
+export function armarDatis(e: EntradaDatis, ap: AeropuertoAtis | null, ahoraMs: number, cs?: string): Atis {
   const l = leerDatis(e);
   const inicioMs = emitidoMs(e.time, ahoraMs);
   const apReal = ap ?? { icao: e.airport, nombreEs: null, nombreEn: null, nombreSim: e.airport, lat: 0, lon: 0, elevFt: 0, atisMhz: [], pistas: [] };
@@ -166,8 +173,27 @@ export function armarDatis(e: EntradaDatis, ap: AeropuertoAtis | null, ahoraMs: 
   const clima = base.partes.slice(0, -1).filter((p) => metar.clouds.length || p.tipo !== "nubes");
   const partes = [...clima.flatMap(delMetar), ...nuevas, ...rmk, cierre];
   let n = 0;
-  for (const p of partes) if (p.vivo) p.piezas = [{ idioma: "en", clave: `vivo-${n}`, url: urlVoz(e.airport, e.type, n++, huella(p.vivo)) }];
+  for (const p of partes) if (p.vivo) p.piezas = [{ idioma: "en", clave: `vivo-${n}`, url: urlVoz(e.airport, e.type, n++, huella(p.vivo), cs) }];
   return { ...base, partes, real: true, huella: huella(e.datis) };
+}
+
+// ATIS de texto de VATSIM en EE. UU. como D-ATIS: la única regla de «se puede leer» (página y función de voz).
+// Pide letra, hora «HHMMZ.» (puede haber espacios antes del punto), altímetro y a lo más 1200 caracteres.
+const HORA_VATSIM = /(\d{4})Z\s*\./;
+export function entradaDeVatsim(icao: string, est: AtisRed): EntradaDatis | null {
+  const texto = est.lineas.join(" ");
+  const h = HORA_VATSIM.exec(texto);
+  if (!est.letra || !/^[A-Z]$/.test(est.letra) || !h || texto.length > 1200 || !ALTIMETRO.test(texto)) return null;
+  const cuerpo = texto.slice(h.index + h[0].length).trim();
+  return { airport: icao, type: est.tipo, code: est.letra, time: h[1], updatedAt: "", datis: `${icao.slice(1)} ATIS INFO ${est.letra} ${h[1]}Z. ${cuerpo}` };
+}
+
+// El ATIS de VATSIM armado como el D-ATIS; las URLs de voz llevan el callsign para que la función lo vuelva a bajar.
+export function armarVatsim(icao: string, est: AtisRed, ap: AeropuertoAtis | null, ahoraMs: number): Atis | null {
+  const e = entradaDeVatsim(icao, est);
+  if (!e) return null;
+  const { real: _, ...a } = armarDatis(e, ap, ahoraMs, est.callsign);
+  return { ...a, deRed: true };
 }
 
 // Nombre que MSFS le da a esa frecuencia ATIS del aeropuerto (p. ej. "ATIS DEP"); null si no está o el lector no lo mandó.

@@ -1,8 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { armarDatis, datisPara, datisVigente, emitidoMs, huella, leerDatis, nombreFrecuencia, metarDeTexto, urlVoz, vigenteDatis, vivosDe, type EntradaDatis } from "./datis.ts";
+import { armarDatis, armarVatsim, datisPara, datisVigente, emitidoMs, entradaDeVatsim, esFrecuenciaSalidas, huella, leerDatis, nombreFrecuencia, metarDeTexto, urlVoz, vigenteDatis, vivosDe, type EntradaDatis } from "./datis.ts";
 import type { AeropuertoAtis } from "./datos.ts";
+import type { AtisRed, VatsimEstacion } from "./red.ts";
 
 const muestra: EntradaDatis[] = JSON.parse(
   readFileSync(new URL("./datis.muestra.json", import.meta.url), "utf8"),
@@ -209,4 +210,90 @@ test("armarDatis: las 89 entradas dan los mismos vivos en la página (ap con pis
     const ap = { ...AP_KJFK, icao: e.airport };
     assert.deepEqual(vivosDe(armarDatis(e, null, AHORA + 50_000)), vivosDe(armarDatis(e, ap, AHORA)), `${e.airport} ${e.type}`);
   }
+});
+
+// Muestra del feed de VATSIM: 34 estaciones de EE. UU. (K…, PH…) y 4 de otros países.
+type EstacionMuestra = VatsimEstacion & { frequency?: string };
+const vatsim: EstacionMuestra[] = JSON.parse(readFileSync(new URL("./vatsim.muestra.json", import.meta.url), "utf8")).atis;
+const icaoDe = (cs: string) => cs.split("_")[0];
+const usa = vatsim.filter((x) => /^(?:K|PH)/.test(icaoDe(x.callsign)));
+const porCs = (cs: string) => {
+  const x = vatsim.find((v) => v.callsign === cs);
+  assert.ok(x, `${cs} no está en la muestra`);
+  return x;
+};
+const est = (x: EstacionMuestra): AtisRed => {
+  const mhz = Number(x.frequency);
+  return {
+    callsign: x.callsign,
+    tipo: x.callsign.endsWith("_A_ATIS") ? "arr" : x.callsign.endsWith("_D_ATIS") ? "dep" : "combined",
+    mhz: x.frequency && !Number.isNaN(mhz) ? mhz : null,
+    lineas: x.text_atis ?? [],
+    letra: x.atis_code ?? null,
+  };
+};
+
+test("entradaDeVatsim: las 34 estaciones de EE. UU. de la muestra se pueden leer y su encabezado queda como D-ATIS", () => {
+  assert.equal(usa.length, 34);
+  for (const x of usa) {
+    const e = entradaDeVatsim(icaoDe(x.callsign), est(x));
+    assert.ok(e, x.callsign);
+    assert.match(e!.datis, /^\w{3} ATIS INFO [A-Z] \d{4}Z\. /);
+    assert.equal(leerDatis(e!).letra, x.atis_code);
+  }
+});
+
+test("entradaDeVatsim: KBZN «0256Z .» y Boston «INFORMATION Y. 0254Z.» dan hora y cuerpo con el METAR", () => {
+  const bzn = entradaDeVatsim("KBZN", est(porCs("KBZN_ATIS")))!;
+  assert.equal(bzn.time, "0256");
+  assert.match(leerDatis(bzn).metar!, /^16004KT 9SM/);
+  const bos = entradaDeVatsim("KBOS", est(porCs("KBOS_ATIS")))!;
+  assert.equal(bos.time, "0254");
+  assert.deepEqual({ ...bos, datis: "" }, { airport: "KBOS", type: "combined", code: "Y", time: "0254", updatedAt: "", datis: "" });
+  assert.match(bos.datis, /^BOS ATIS INFO Y 0254Z\. 02006KT 10SM /);
+  assert.equal(entradaDeVatsim("KCVG", est(porCs("KCVG_D_ATIS")))!.type, "dep");
+});
+
+test("entradaDeVatsim: sin letra, sin hora con punto, sin altímetro o con más de 1200 caracteres da null", () => {
+  const base = est(porCs("KJFK_ATIS"));
+  assert.ok(entradaDeVatsim("KJFK", base));
+  assert.equal(entradaDeVatsim("KJFK", { ...base, letra: null }), null);
+  assert.equal(entradaDeVatsim("KJFK", { ...base, lineas: ["JFK ATIS INFO G 0251Z EXPECT ILS"] }), null);
+  assert.equal(entradaDeVatsim("KJFK", { ...base, lineas: [base.lineas.join(" ").replace(/\bA\d{4}\b/, "")] }), null);
+  assert.equal(entradaDeVatsim("KJFK", { ...base, lineas: [base.lineas.join(" ") + " X".repeat(700)] }), null);
+  assert.equal(entradaDeVatsim("UIII", est(porCs("UIII_ATIS"))), null); // «0300Z EXPECT»: sin punto
+});
+
+test("armarVatsim: ningún cierre «..ADVS YOU HAVE INFO X» queda como aviso en vivo; URLs con red=vatsim y cs", () => {
+  for (const x of usa) {
+    const a = armarVatsim(icaoDe(x.callsign), est(x), null, AHORA)!;
+    assert.ok(a.deRed && !a.real && a.huella, x.callsign);
+    assert.equal("real" in a, false);
+    for (const p of a.partes) {
+      assert.doesNotMatch(p.vivo ?? "", /you have info/i, x.callsign);
+      for (const pz of p.piezas) if (pz.url) assert.match(pz.url, new RegExp(`&red=vatsim&cs=${x.callsign}$`));
+    }
+  }
+  assert.equal(armarVatsim("UIII", est(porCs("UIII_ATIS")), null, AHORA), null);
+});
+
+test("armarVatsim: con ap null da los mismos vivos que con ap con pistas, en las 34 estaciones", () => {
+  for (const x of usa) {
+    const icao = icaoDe(x.callsign);
+    assert.deepEqual(vivosDe(armarVatsim(icao, est(x), null, AHORA + 50_000)!), vivosDe(armarVatsim(icao, est(x), { ...AP_KJFK, icao }, AHORA)!), x.callsign);
+  }
+});
+
+test("datisPara sigue igual con esFrecuenciaSalidas (KATL 125.55 dep, 119.65 arr)", () => {
+  assert.equal(esFrecuenciaSalidas("KATL", 125.55, "KATL"), true);
+  assert.equal(esFrecuenciaSalidas("KATL", 125.553, null), true); // dentro de la tolerancia
+  assert.equal(esFrecuenciaSalidas("KATL", 119.65, "KATL"), false);
+  assert.equal(esFrecuenciaSalidas("KATL", undefined, null), false);
+  assert.equal(esFrecuenciaSalidas("KJFK", 125.55, "ATIS DEP"), true); // el nombre basta
+  assert.equal(esFrecuenciaSalidas("KJFK", 128.725, "ATIS"), false);
+});
+
+test("urlVoz: sin cs como en el plan 4; con cs agrega red=vatsim y cs", () => {
+  assert.equal(urlVoz("KJFK", "combined", 0, "abc"), "/api/atis/voz?icao=KJFK&tipo=combined&n=0&h=abc");
+  assert.equal(urlVoz("KJFK", "combined", 0, "abc", "KJFK_ATIS"), "/api/atis/voz?icao=KJFK&tipo=combined&n=0&h=abc&red=vatsim&cs=KJFK_ATIS");
 });

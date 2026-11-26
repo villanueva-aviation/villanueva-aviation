@@ -8,6 +8,8 @@ export type Red = "ivao" | "vatsim" | "ninguna";
 export type EstadoRed = { atc: boolean; atis: { lineas: string[]; letra: string | null } | null };
 export type Fuente = "cliente" | "sin-letra" | "generado";
 
+// Una estación ATIS de la red ya convertida: tipo por el callsign (_A_ATIS / _D_ATIS), MHz del feed.
+export type AtisRed = { callsign: string; tipo: "combined" | "arr" | "dep"; mhz: number | null; lineas: string[]; letra: string | null };
 export type VatsimEstacion = { callsign: string; facility: number; visual_range: number; text_atis: string[] | null; atis_code?: string | null };
 export type VatsimDatos = { controllers: VatsimEstacion[]; atis: VatsimEstacion[] };
 export type VatsimTransceptores = { callsign: string; transceivers: { latDeg: number; lonDeg: number }[] }[];
