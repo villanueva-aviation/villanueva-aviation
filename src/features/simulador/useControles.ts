@@ -65,7 +65,9 @@ export function useControles(teclas: Set<string>, accion: Accion, vista: { curre
   }, [teclas, accion, vista]);
   const capturar = () => {
     try {
-      void vista.current?.requestPointerLock?.();
+      // En navegadores nuevos devuelve una promesa que se rechaza si no se permite (o si se pide justo después de Esc).
+      const r: unknown = vista.current?.requestPointerLock?.();
+      if (r instanceof Promise) r.catch(() => {});
     } catch {
       /* el navegador no deja: se sigue con teclado */
     }
