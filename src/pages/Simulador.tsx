@@ -1,6 +1,6 @@
 // /simulador: H135 en el navegador, gratis y sin cuenta. Cabina de laptop (vista 3D + PFD arriba, HSI abajo,
 // paneles a la derecha) y de celular (vista 3D, HSI, palancas táctiles y pestañas).
-import { memo, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../lib/routes";
 import { GuiaControles, PalancasTactiles, PosicionMandos } from "../features/simulador/Controles";
@@ -48,6 +48,7 @@ export function Simulador() {
   // Cada vuelo nuevo (elegir lugar o Reiniciar) empieza también la lección desde cero: si no, volver a la
   // plataforma de golpe parecería un aterrizaje.
   const [vuelo, setVuelo] = useState(0);
+  const cambiarLugar = useCallback(() => setEleccion(null), []);
   const volar = (el: Eleccion) => {
     setEleccion(el);
     setVuelo((v) => v + 1);
@@ -183,7 +184,7 @@ export function Simulador() {
             <span className="text-[#4cc9f0]">{verInstructor ? "Ocultar ▲" : "Mostrar ▼"}</span>
           </button>
           <div hidden={!verInstructor} className="border-t border-[#1f2b3d] p-3 lg:max-h-[45vh] lg:overflow-y-auto">
-            <PanelInstructor key={vuelo} enElAire={!!eleccion.enElAire} onCambiarLugar={() => setEleccion(null)} />
+            <PanelInstructor key={vuelo} enElAire={!!eleccion.enElAire} onCambiarLugar={cambiarLugar} />
           </div>
         </section>
         {/* Laptop: todo a la derecha. Celular: pestañas. */}

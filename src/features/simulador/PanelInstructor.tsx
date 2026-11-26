@@ -1,6 +1,6 @@
 // El instructor IFR dentro del simulador web: elegir lección, pedir cuenta o Exclusivo, y la lección misma
 // (la página del instructor de MSFS, que aquí lee las muestras del simulador).
-import { lazy, Suspense, useState } from "react";
+import { lazy, memo, Suspense, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { estadoLeccionWeb, LECCIONES_IFR } from "../instructor/lecciones";
@@ -24,8 +24,9 @@ function leccionInicial(param: string | null): number | null {
   }
 }
 
-export function PanelInstructor({ enElAire, onCambiarLugar }: { enElAire: boolean; onCambiarLugar: () => void }) {
-  const [params] = useSearchParams();
+/** memo: la cabina se vuelve a pintar 30 veces por segundo y la lección no tiene por qué. */
+export const PanelInstructor = memo(function PanelInstructor({ enElAire, onCambiarLugar }: { enElAire: boolean; onCambiarLugar: () => void }) {
+  const [params, setParams] = useSearchParams();
   const [n, setN] = useState(() => leccionInicial(params.get("leccion")));
   const { user, loading } = useAuth();
   const { hasAccess } = usePremiumAccess();
@@ -36,6 +37,16 @@ export function PanelInstructor({ enElAire, onCambiarLugar }: { enElAire: boolea
   const elegir = (v: string) => {
     const x = v ? Number(v) : null;
     setN(x);
+    // La URL sigue a la elección: el panel se vuelve a montar en cada vuelo y lee ?leccion= primero.
+    setParams(
+      (p) => {
+        const q = new URLSearchParams(p);
+        if (x) q.set("leccion", String(x));
+        else q.delete("leccion");
+        return q;
+      },
+      { replace: true },
+    );
     try {
       if (x) localStorage.setItem(CLAVE, String(x));
       else localStorage.removeItem(CLAVE);
@@ -95,4 +106,4 @@ export function PanelInstructor({ enElAire, onCambiarLugar }: { enElAire: boolea
       {contenido}
     </div>
   );
-}
+});

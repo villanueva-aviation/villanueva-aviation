@@ -1,6 +1,6 @@
 // Lección 13, repaso general: sorteo de maniobras, zona de trabajo y la lección de rampa a rampa. Puro, para poder probarlo.
 import { esC172, type Muestra } from "./evaluador.ts";
-import { anulaPorAp, MOTIVO_AP } from "./simWeb.ts";
+import { anulaPorAp, esSimWeb, MOTIVO_AP } from "./simWeb.ts";
 import { AVIONES_VOZ, type AvionVoz } from "../../data/checklistVozAviones.ts";
 import type { Aeropuerto } from "./aeropuertoSim.ts";
 import { traducirMotivo, type Idioma } from "./idiomaInstructor.ts";
@@ -384,7 +384,8 @@ export function alMuestrearRepaso(e: EstadoRepaso, m: Muestra, a: Aeropuerto | n
   let tomas = medirTomas(e.tomas, previo, m, vuelo.fase, e.etapa === "regreso");
   const aterrizo = nuevos.find((x) => x.tipo === "aterrizaje");
   // Sin aeropuerto no hay pistas con qué comparar: no se sabe.
-  if (aterrizo) tomas = { ...tomas, tocoEnPista: vuelo.aeropuerto ? aterrizo.pista != null : null };
+  // Simulador web: un helicóptero aterriza donde sea, así que no se califica si tocó en la pista.
+  if (aterrizo) tomas = { ...tomas, tocoEnPista: vuelo.aeropuerto && !esSimWeb(m) ? aterrizo.pista != null : null };
 
   let etapa: EtapaRepaso = e.etapa;
   let { zona, motivo, sinSenalDesde, avisoSenalT } = e;

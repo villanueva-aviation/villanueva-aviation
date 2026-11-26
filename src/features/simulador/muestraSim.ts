@@ -48,12 +48,14 @@ export function aMuestra(s: Sim, x: { t: number; sueloFt: number; decl: number; 
     navMhz: s.radios.nav1[0],
     navObs: s.radios.obs,
     navSenal: !!l,
-    navRadial: l?.radial,
+    // Números aunque no haya señal, como el lector de MSFS: undefined es «lector viejo» y el evaluador anula
+    // al instante, sin la espera de señal perdida.
+    navRadial: l?.radial ?? 0,
     // Grados de la barra; + = el curso está a la derecha.
-    navDesv: l?.desvGrados,
+    navDesv: l?.desvGrados ?? 0,
     navDesde: !l ? 0 : l.desde ? 2 : 1,
     navTieneDme: !!l?.vor.dme,
-    navDme: l?.dmeNm ?? undefined,
+    navDme: l?.dmeNm ?? 0,
     gpsNav: s.fuente === "gps",
   };
 }

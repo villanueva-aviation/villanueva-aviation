@@ -534,3 +534,10 @@ test("simulador web: el AP que mueve el helicóptero anula el checkride, no la p
   // En tierra (antes de despegar) no cuenta.
   assert.notEqual(correr(ponerVor(crearRepaso("checkride", IFR, 2, "ifr"), VOR), web((m) => m.enTierra)).e.etapa, "invalido");
 });
+
+test("simulador web: no se califica si tocó en la pista (un helicóptero aterriza donde sea)", () => {
+  const msfs = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr"), VOR), vueloIfr());
+  assert.equal(typeof msfs.e.tomas.tocoEnPista, "boolean");
+  const web = correr(ponerVor(crearRepaso("practica", IFR, 2, "ifr"), VOR), vueloIfr().map((m) => ({ ...m, titulo: TITULO_SIM_WEB })));
+  assert.equal(web.e.tomas.tocoEnPista, null);
+});

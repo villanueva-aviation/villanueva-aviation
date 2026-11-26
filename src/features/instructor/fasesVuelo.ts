@@ -1,5 +1,6 @@
 // Sigue un vuelo completo de rampa a rampa con las muestras del lector v1.4. Puro, para poder probarlo.
 import { esC172, lectorViejoVuelo, type Muestra } from "./evaluador.ts";
+import { esSimWeb } from "./simWeb.ts";
 import { pistaBajo, type Aeropuerto } from "./aeropuertoSim.ts";
 import { aNm } from "../home/navGeo.ts";
 
@@ -96,7 +97,8 @@ export function avanzarVuelo(ev: EvaluacionVuelo, m: Muestra, a: Aeropuerto | nu
       else if (m.enTierra && gs < CARRERA_KT) fase = "rodaje-regreso";
       break;
     case "rodaje-regreso":
-      if (!m.motor && gs < QUIETO_KT && pista === null) fase = "terminado";
+      // El helicóptero del simulador web no rueda: se apaga donde aterrizó, aunque sea sobre la pista.
+      if (!m.motor && gs < QUIETO_KT && (pista === null || esSimWeb(m))) fase = "terminado";
       break;
   }
   return { ...ev, fase, previo: m, aeropuerto, eventos, aireDesde, tierraDesde, pistaCarrera, maxDistNm };

@@ -4,6 +4,7 @@ import type { Muestra } from "./evaluador.ts";
 import { AEROPUERTO_PRUEBA, type Aeropuerto } from "./aeropuertoSim.ts";
 import { armarVuelo, avanzarVuelo, type EvaluacionVuelo, type FaseVuelo } from "./fasesVuelo.ts";
 import { simularVuelo } from "./simularVuelo.ts";
+import { TITULO_SIM_WEB } from "./simWeb.ts";
 
 /** Pasa las muestras por el evaluador; `aero(i)` es el aeropuerto que manda el lector en la muestra i. */
 const hasta = (ms: Muestra[], aero: (i: number) => Aeropuerto | null = () => AEROPUERTO_PRUEBA) => {
@@ -130,4 +131,16 @@ test("apagar el motor sobre la pista no termina", () => {
   let e = avanzarVuelo(ev, sobre11, AEROPUERTO_PRUEBA);
   e = avanzarVuelo(e, { ...sobre11, t: sobre11.t + 5 }, AEROPUERTO_PRUEBA);
   assert.equal(e.fase, "rodaje-regreso");
+});
+
+test("simulador web: apagar sobre la pista termina el vuelo (el helicóptero no rueda a la plataforma); en MSFS no", () => {
+  const ms = simularVuelo();
+  const [e1, e2] = AEROPUERTO_PRUEBA.pistas[0].extremos;
+  const apagado = ms.findIndex((m) => !m.motor && ms.indexOf(m) > ms.length / 2);
+  // Desde que apaga, quieto sobre el centro de la 11R y alineado con ella.
+  const enPista = ms.map((m, i) => (i >= apagado ? { ...m, lat: (e1.lat + e2.lat) / 2, lon: (e1.lon + e2.lon) / 2, rumboV: e1.rumboV, gs: 0 } : m));
+  // Como lección IFR (cualquier aeronave).
+  const fin = (xs: Muestra[]) => xs.slice(1).reduce((ev, m) => avanzarVuelo(ev, m, AEROPUERTO_PRUEBA), armarVuelo(xs[0], AEROPUERTO_PRUEBA, true)).fase;
+  assert.equal(fin(enPista), "rodaje-regreso");
+  assert.equal(fin(enPista.map((m) => ({ ...m, titulo: TITULO_SIM_WEB }))), "terminado");
 });

@@ -63,7 +63,10 @@ test("aMuestra: sin señal (otra frecuencia)", () => {
   const m = aMuestra({ ...s, radios: { ...s.radios, nav1: [110.5, 108] } }, { t: 0, sueloFt: 5000, decl: 7.3, vors: [vor] });
   assert.equal(m.navSenal, false);
   assert.equal(m.navDesde, 0);
-  assert.equal(m.navRadial, undefined);
+  // Como el lector de MSFS: números aunque no haya señal (undefined = «lector viejo» y anula al instante).
+  assert.equal(m.navRadial, 0);
+  assert.equal(m.navDesv, 0);
+  assert.equal(m.navDme, 0);
 });
 
 const mmgl: AeropuertoSim = {
