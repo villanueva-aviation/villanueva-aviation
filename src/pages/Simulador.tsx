@@ -11,6 +11,7 @@ import { Navegador } from "../features/simulador/Navegador";
 import { PanelAp } from "../features/simulador/PanelAp";
 import { Pfd } from "../features/simulador/Pfd";
 import { pulsar } from "../features/simulador/piloto.ts";
+import { alternarMotor } from "../features/simulador/bucle.ts";
 import { PanelRadios } from "../features/simulador/PanelRadios";
 import { guiaGps, nombreCom, recibirNav } from "../features/simulador/radios.ts";
 import type { Terreno } from "../features/simulador/terreno.ts";
@@ -114,6 +115,15 @@ export function Simulador() {
     <div className="flex flex-wrap gap-2">
       <button type="button" onClick={() => accion((s) => ({ ...s, pausa: !s.pausa }))} className="rounded-md bg-[#16233a] px-3 py-1.5 text-sm font-bold text-white">
         {sim.pausa ? "Seguir" : "Pausa"}
+      </button>
+      <button
+        type="button"
+        onClick={() => accion(alternarMotor)}
+        disabled={!e.enTierra}
+        title={e.enTierra ? undefined : "Solo en tierra"}
+        className="rounded-md bg-[#16233a] px-3 py-1.5 text-sm font-bold text-white disabled:opacity-40"
+      >
+        {sim.motor ? "Apagar motor" : "Encender motor"}
       </button>
       <button type="button" onClick={() => setEleccion({ ...eleccion })} className="rounded-md bg-[#16233a] px-3 py-1.5 text-sm font-bold text-white">Reiniciar</button>
       <button type="button" onClick={() => setEleccion(null)} className="rounded-md bg-[#16233a] px-3 py-1.5 text-sm text-white">Cambiar lugar</button>

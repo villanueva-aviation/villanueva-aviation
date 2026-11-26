@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { aNm, rumbo } from "../home/navGeo.ts";
-import { avanzar, inicio, pasosPendientes } from "./bucle.ts";
+import { alternarMotor, avanzar, inicio, pasosPendientes } from "./bucle.ts";
 import type { Vor } from "./datos.ts";
 
 const nada = new Set<string>();
@@ -102,4 +102,29 @@ test("con ALT puesto, la palanca sigue al AP y al apagarlo no hay salto", () => 
   for (let i = 0; i < 5 / 0.02; i++) s = avanzar(s, nada, [vor], sinSuelo, 5016, 7.3);
   assert.ok(Math.abs(s.e.vs) < 150, `vs ${s.e.vs}`);
   assert.ok(Math.abs(s.e.altFt - 8000) < 40, `alt ${s.e.altFt}`);
+});
+
+test("inicio arranca con el motor encendido", () => {
+  assert.equal(inicio(gdl).motor, true);
+  assert.equal(inicio(gdl, { vor, distNm: 10, altFt: 8000 }).motor, true);
+});
+
+test("con el motor apagado no despega aunque suba el colectivo", () => {
+  let s = alternarMotor(inicio(gdl));
+  assert.equal(s.motor, false);
+  const sube = new Set(["PageUp"]);
+  for (let i = 0; i < 250; i++) s = avanzar(s, sube, [vor], sinSuelo, 5016, 7.3);
+  assert.equal(s.e.enTierra, true);
+  assert.ok(Math.abs(s.e.altFt - 5016) < 1);
+  assert.equal(s.mandos.colectivo, 0);
+  // Encendido otra vez, el colectivo empieza abajo (sin salto) y ya puede subir.
+  s = alternarMotor(s);
+  assert.equal(s.motor, true);
+  for (let i = 0; i < 250; i++) s = avanzar(s, sube, [vor], sinSuelo, 5016, 7.3);
+  assert.ok(s.mandos.colectivo > 0.5);
+});
+
+test("el motor solo se apaga en tierra", () => {
+  const s = inicio(gdl, { vor, distNm: 10, altFt: 8000 });
+  assert.equal(alternarMotor(s), s);
 });

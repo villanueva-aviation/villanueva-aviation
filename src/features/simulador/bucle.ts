@@ -21,6 +21,7 @@ export type Sim = {
   gps: { lat: number; lon: number; ident: string; curso: number } | null; // curso verdadero del directo
   viento: Viento;
   pausa: boolean;
+  motor: boolean; // apagado: el colectivo no hace nada (la lección termina al apagar en la plataforma)
   t: number;
 };
 
@@ -56,8 +57,15 @@ export function avanzar(s: Sim, teclas: Teclas, vors: Vor[], suelo: (lat: number
     if (ap.ias) mandos = { ...mandos, cy: objetivos.cabeceo < 0 ? -objetivos.cabeceo / H135.cabeceoMax : -objetivos.cabeceo / H135.cabeceoArribaMax };
     if (ap.vert !== "ATT") mandos = { ...mandos, colectivo: objetivos.colectivo };
   }
-  const e = paso(s.e, objetivos, H135, s.viento, suelo(s.e.lat, s.e.lon) ?? sueloRespaldoFt, DT);
+  // Sin motor el colectivo se queda abajo (también si el AP lo pedía): al encender no hay salto.
+  if (!s.motor) mandos = { ...mandos, colectivo: 0 };
+  const e = paso(s.e, s.motor ? objetivos : { ...objetivos, colectivo: 0 }, H135, s.viento, suelo(s.e.lat, s.e.lon) ?? sueloRespaldoFt, DT);
   return { ...s, e, mandos, previos: mandos, ap, t: s.t + DT };
+}
+
+/** Enciende o apaga el motor; solo en tierra. */
+export function alternarMotor(s: Sim): Sim {
+  return s.e.enTierra ? { ...s, motor: !s.motor } : s;
 }
 
 export function inicio(lugar: { lat: number; lon: number; elevFt: number; rumboV: number }, enElAire?: { vor: Vor; distNm: number; altFt: number }): Sim {
@@ -87,6 +95,7 @@ export function inicio(lugar: { lat: number; lon: number; elevFt: number; rumboV
     gps: null,
     viento: { dir: 0, kt: 0 },
     pausa: false,
+    motor: true,
     t: 0,
   };
 }
