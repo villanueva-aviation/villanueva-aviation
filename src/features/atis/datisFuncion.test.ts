@@ -97,11 +97,12 @@ test("voz vatsim: n y h de armarVatsim dan audio/mpeg con ese texto", async () =
   assert.deepEqual(textos, [vivosCvg[1].texto]);
 });
 
-test("voz vatsim: callsign de otro aeropuerto 404 sin bajar el feed ni sintetizar", async () => {
+test("voz vatsim: callsign de otro aeropuerto o aeropuerto fuera de EE. UU. 404 sin bajar el feed ni sintetizar", async () => {
   const { deps, llamadas } = armar();
   let bajadas = 0;
-  const r = await responderVoz(qv({ icao: "KCVG", cs: "KJFK_ATIS" }), ENV, { ...deps, bajarVatsim: async () => { bajadas++; return vatsim; } });
-  assert.equal(r.status, 404);
+  const contando = { ...deps, bajarVatsim: async () => { bajadas++; return vatsim; } };
+  assert.equal((await responderVoz(qv({ icao: "KCVG", cs: "KJFK_ATIS" }), ENV, contando)).status, 404);
+  assert.equal((await responderVoz(qv({ icao: "SABE", cs: "SABE_ATIS" }), ENV, contando)).status, 404); // SABE_ATIS está en el feed
   assert.equal(bajadas, 0);
   assert.equal(llamadas(), 0);
 });

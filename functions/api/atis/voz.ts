@@ -3,6 +3,7 @@
 // Con red=vatsim y cs, el texto sale del ATIS de esa estación en el feed de VATSIM (solo si es del aeropuerto).
 import { armarDatis, armarVatsim, vivosDe, type EntradaDatis } from "../../../src/features/atis/datis.ts";
 import { bajarDatis, bajarVatsim } from "../../../src/features/atis/fuenteDatis.ts";
+import { formatoDe } from "../../../src/features/atis/formato.ts";
 import { atisRedDe, delAeropuerto, type VatsimDatos } from "../../../src/features/atis/red.ts";
 
 type Env = { AZURE_SPEECH_KEY?: string; AZURE_SPEECH_REGION?: string };
@@ -45,8 +46,8 @@ export async function responderVoz(q: URLSearchParams, env: Env, deps: Deps): Pr
   const n = Number(nTxt);
   const cs = q.get("red") === "vatsim" ? q.get("cs") ?? "" : null;
   if (cs !== null && !/^[A-Z0-9_]{3,20}$/.test(cs)) return texto("Solicitud inválida", 400);
-  // Un callsign de otro aeropuerto no se busca: ni se baja el feed ni se llama a Azure.
-  if (cs !== null && !delAeropuerto(cs, icao)) return texto("No encontrado", 404);
+  // Solo EE. UU. se lee textual, y un callsign de otro aeropuerto no se busca: ni se baja el feed ni se llama a Azure.
+  if (cs !== null && (formatoDe(icao) !== "faa" || !delAeropuerto(cs, icao))) return texto("No encontrado", 404);
 
   // Con VATSIM la llave lleva el callsign: el texto lo escribe el controlador y FNV-1a no es criptográfica,
   // así que un ATIS de la red nunca debe poder ocupar la llave de un audio del D-ATIS.
