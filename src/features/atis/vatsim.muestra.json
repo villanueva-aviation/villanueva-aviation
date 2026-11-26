@@ -1,0 +1,554 @@
+{
+ "tomado": "2026-11-26T03:33:29.0778277Z",
+ "atis": [
+  {
+   "callsign": "KOXC_ATIS",
+   "frequency": "132.975",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "Z",
+   "text_atis": [
+    "OXC ATIS INFORMATION Z. 0256Z. 07009KT 10SM CLR 02/M03 A3070",
+    "(THREE ZERO SEVEN ZERO). ILS RUNWAY 36 APPROACH IN USE. LANDING",
+    "AND DEPARTING RUNWAY 36. VISUAL APCH AVAILABLE ON REQUEST.",
+    "....ADVS YOU HAVE INFO Z"
+   ]
+  },
+  {
+   "callsign": "KBDR_ATIS",
+   "frequency": "119.150",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "W",
+   "text_atis": [
+    "BDR ATIS INFORMATION W. 0252Z. 04011KT 10SM OVC031 05/M02 A3070",
+    "(THREE ZERO SEVEN ZERO). ILS APCH RWY 6 IN USE. LANDING AND",
+    "DEPARTING RWY 6. LANDING AND DEPARTING RWY 29. VISUAL APCH",
+    "AVAILABLE ON REQUEST. ....ADVS YOU HAVE INFO W"
+   ]
+  },
+  {
+   "callsign": "KHVN_ATIS",
+   "frequency": "133.650",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "T",
+   "text_atis": [
+    "HVN ATIS INFORMATION T. 0253Z. 04006KT 10SM FEW031 04/M03 A3071",
+    "(THREE ZERO SEVEN ONE). ILS RUNWAY 2 APPROACH IN USE. LANDING",
+    "AND DEPARTING RUNWAY 2. VISUAL APCH AVAILABLE ON REQUEST. RNAV",
+    "APCH AVAILABLE ON REQUEST. ....ADVS YOU HAVE INFO T"
+   ]
+  },
+  {
+   "callsign": "KISP_ATIS",
+   "frequency": "120.725",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "H",
+   "text_atis": [
+    "ISP ATIS INFORMATION H. 0256Z. 07010KT 10SM FEW021 BKN032 OVC150",
+    "07/01 A3066 (THREE ZERO SIX SIX). ILS RWY 6 APCH IN USE. LANDING",
+    "AND DEPARTING RWY 6. VISUAL APCH AVAILABLE ON REQUEST. ....ADVS",
+    "YOU HAVE INFO H"
+   ]
+  },
+  {
+   "callsign": "KJAX_ATIS",
+   "frequency": "125.850",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "Q",
+   "text_atis": [
+    "KJAX ATIS INFO Q 0256Z. 31609KT 1 1/2SM RA BR OVC004 11/11 A2981",
+    "(TWO NINER EIGHT ONE). SIMULTANEOUS APCHS IN USE. ILS APCH TO",
+    "RWY 26 IN USE. RNP APCHS AVAILABLE ON REQUEST. DEPTG RWYS 26 AND",
+    "32. VFR AIRCRAFT SAY DIRECTION OF FLIGHT. PUSH AND START AT",
+    "PILOT DISCRETION IF ABLE TO PUSH INTO NON MOVEMENT AREA.",
+    "READBACK ALL RUNWAY ASSIGNMENTS AND HOLD SHORT",
+    "INSTRUCTIONS....ADVS YOU HAVE INFO Q."
+   ]
+  },
+  {
+   "callsign": "KSDF_ATIS",
+   "frequency": "118.725",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "F",
+   "text_atis": [
+    "LOUISVILLE INTERNATIONAL AIRPORT ATIS INFORMATION F 0256Z.",
+    "06006KT 10SM BKN090 OVC190 09/M02 A3013 (THREE ZERO ONE THREE).",
+    "ILS APCH RWY 35L AND 35R. SIMUL APCHS IN USE. RWY 35L ARRIVALS,",
+    "29, 11 NSE SENSI, AVBL ONLY FOR OPR NCT. SMUL DEPARTURES IN USE.",
+    "NOTAMS... INCREASED BIRD ACTIVITY IN THE VICINITY OF THE",
+    "AIRPORT. HAZD WX INFO FOR KENTUCKY AND INDIANA AVBL FMR FSS. UPS",
+    "RAMP CONTROL CLOSED. ...ADVS YOU HAVE INFO F"
+   ]
+  },
+  {
+   "callsign": "KCMH_ATIS",
+   "frequency": "124.600",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "E",
+   "text_atis": [
+    "JOHN GLENN COLUMBUS INTERNATIONAL AIRPORT ATIS INFORMATION E",
+    "0251Z. 08008KT 10SM SCT110 BKN250 06/M02 A3028 (THREE ZERO TWO",
+    "EIGHT). ILS, RWY 10L, AND, ILS, RWY 10R, SIMUL APCH IN USE.",
+    "NOTAMS... BIRD ACVTY VC CMH. READBACK ALL RWY HOLD SHORT",
+    "INSTRUCTIONS. CMH SCENERY MAY NOT MATCH CHARTS SEE",
+    "HTTP//AIRPORTS.INDY.CENTER/CMH ...ADVS YOU HAVE INFO E"
+   ]
+  },
+  {
+   "callsign": "KLOU_ATIS",
+   "frequency": "124.150",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "Q",
+   "text_atis": [
+    "BOWMAN TOWER ATIS INFORMATION Q 0253Z. 05010KT 10SM BKN085",
+    "09/M01 A3013 (THREE ZERO ONE THREE). RNAV RWY 33 APCH IN USE.",
+    "ALL ACFT READ BACK ALL HOLD SHRT INSTRUCTIONS AND ASSIGNED ALT.",
+    "...ADVS YOU HAVE INFO Q"
+   ]
+  },
+  {
+   "callsign": "KFTK_ATIS",
+   "frequency": "118.000",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "E",
+   "text_atis": [
+    "GODMAN TOWER ATIS INFORMATION E 0255Z. 05008KT 10SM BKN090",
+    "OVC110 09/M01 A3008 (THREE ZERO ZERO EIGHT). ILS RWY 36 APCH IN",
+    "USE. LANDING AND DEPARTING RWY 36. ...ADVS YOU HAVE INFO E"
+   ]
+  },
+  {
+   "callsign": "KBOS_ATIS",
+   "frequency": "135.000",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "Y",
+   "text_atis": [
+    "BOSTON LOGAN AIRPORT ATIS INFORMATION Y. 0254Z. 02006KT 10SM",
+    "SCT029 SCT200 04/M01 A3076 (THREE ZERO SEVEN SIX). ILS RWY 4R",
+    "APCH IN USE, DEPTG RWY 9. RWY 33R IS APPROVED FOR TURN OFF AFTER",
+    "LDG. READBACK ALL HOLD SHORT INSTRUCTIONS AND ASSIGNED",
+    "ALTITUDES. NUMEROUS CRANES IN BOSTON AREA AND IN VICINITY OF",
+    "LOGAN AIRPORT. ...ADVS YOU HAVE INFO Y"
+   ]
+  },
+  {
+   "callsign": "PHOG_ATIS",
+   "frequency": "128.600",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "C",
+   "text_atis": [
+    "PHOG ATIS INFO C 0254Z. 20017G28KT 10SM SCT050 25/17 A2982 (TWO",
+    "NINER EIGHT TWO). ARRIVALS EXPECT VISUAL APPROACH RWY 20 AND RWY",
+    "23. LANDING AND DEPARTING RWY 20, AND RWY 23. ...ADVS YOU HAVE",
+    "INFO C"
+   ]
+  },
+  {
+   "callsign": "PHTO_ATIS",
+   "frequency": "120.350",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "C",
+   "text_atis": [
+    "PHTO ATIS INFO C 0253Z. 33010KT 10SM SCT075 26/20 A2984 (TWO",
+    "NINER EIGHT FOUR). ARRIVING ILS 26 CIRCLE TO LAND RWY 8.",
+    "DEPARTING RWY 8 AND RWY 3. VISUAL APPROACHES IN USE. ...ADVS YOU",
+    "HAVE INFO C"
+   ]
+  },
+  {
+   "callsign": "PHKO_ATIS",
+   "frequency": "127.400",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "C",
+   "text_atis": [
+    "PHKO ATIS INFO C 0253Z. 20014KT 10SM FEW028 27/18 A2986 (TWO",
+    "NINER EIGHT SIX). EXPECT VIUSAL APPROACH RWY 17. LANDING AND",
+    "DEPARTING RWY 17. ...ADVS YOU HAVE INFO C"
+   ]
+  },
+  {
+   "callsign": "PHNL_ATIS",
+   "frequency": "127.900",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "A",
+   "text_atis": [
+    "PHNL ATIS INFO A 0253Z. 24013KT 10SM FEW032 BKN040 BKN050 26/18",
+    "A2985 (TWO NINER EIGHT FIVE). DEP RWY 26R, 22L, LDG RWY 26L.",
+    "EXPECT LDA, RNAV, OR VIS APP NOTAMS... ASDE-X SYSTEM IN USE,",
+    "SQUAWK MODE C ON ALL RUNWAYS AND TAXIWAYS. CLASS B DOES NOT",
+    "EXIST IF NO RADAR CONTROLLER ONLINE. IF B OFFLINE, PILOT MAY",
+    "EXPECT B CLEARANCE FROM CLNC DEL. ...ADVS YOU HAVE INFO A."
+   ]
+  },
+  {
+   "callsign": "PHLI_ATIS",
+   "frequency": "127.200",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "C",
+   "text_atis": [
+    "PHLI ATIS INFO C 0253Z. 34006KT 6SM -RA BR FEW020 BKN039 OVC045",
+    "21/19 A2986 (TWO NINER EIGHT SIX). ARRIVALS EXPECT VISUAL",
+    "APPROACHES RWY 17 AND RWY 21. LANDING AND DEPARTING RWY 17.",
+    "LANDING AND DEPARTING RWY 21. ...ADVS YOU HAVE INFO C"
+   ]
+  },
+  {
+   "callsign": "KCVG_A_ATIS",
+   "frequency": "134.375",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "J",
+   "text_atis": [
+    "CINCINATTI NORTHERN KENTUCKY INTERNATIONAL AIRPORT ARRIVAL",
+    "INFORMATION J 0252Z. 06015KT 10SM OVC100 07/M04 A3018 (THREE",
+    "ZERO ONE EIGHT). SIMUL APPROACHES IN USE. EXPECT ILS APPROACH TO",
+    "RWY 36R, RWY 36C. ALL AIRCRAFT SHALL READBACK RUNWAY HOLD SHORT",
+    "INSTRUCTION. NOTAMS... BIRD ACTIVITY VCNTY ARPT. RAMP CONTROL",
+    "CLOSED. ...ADVS YOU HAVE INFO J"
+   ]
+  },
+  {
+   "callsign": "KCVG_D_ATIS",
+   "frequency": "135.300",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "W",
+   "text_atis": [
+    "CINCINATTI NORTHERN KENTUCKY INTERNATIONAL AIRPORT DEPARTURE",
+    "INFORMATION W 0252Z. 06015KT 10SM OVC100 07/M04 A3018 (THREE",
+    "ZERO ONE EIGHT). DEPG RWY 36R. ALL AIRCRAFT SHALL READBACK",
+    "RUNWAY HOLD SHORT INSTRUCTION. NOTAMS... BIRD ACTIVITY VCNTY",
+    "ARPT. CVG RAMP TOWER CLOSED. CTC ATC AT AIR CARRIER SPOTS 2, 3,",
+    "10, DHL SPOTS 51, 52, 54, 55, AMAZON SPOT 75. ...ADVS YOU HAVE",
+    "INFO W"
+   ]
+  },
+  {
+   "callsign": "KJFK_ATIS",
+   "frequency": "128.725",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "G",
+   "text_atis": [
+    "JFK ATIS INFO G 0251Z. 07018G24KT 10SM FEW031 OVC210 07/01 A3065",
+    "(THREE ZERO SIX FIVE). APPROACH IN USE ILS RY 4R, ILS 4L. DEPTG",
+    "RY 4L.. NOTAMS... READBACK ALL RWY ASSIGNMENTS AND HOLD SHORT",
+    "INSTRUCTIONS. . ...ADVS YOU HAVE INFO G."
+   ]
+  },
+  {
+   "callsign": "KHOU_ATIS",
+   "frequency": "124.600",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "E",
+   "text_atis": [
+    "KHOU ATIS INFO E 0253Z. 33008KT 10SM CLR 09/M02 A3025 (THREE",
+    "ZERO TWO FIVE). VIS APCH RWY 31L IN USE. DEPTG RWY 31L.",
+    "NOTAMS... ALL ACFT TAXI WITH TRANSPONDER ON. READBACK ALL HOLD",
+    "SHORT INSTRUCTIONS. ...ADVS YOU HAVE INFO E"
+   ]
+  },
+  {
+   "callsign": "KAUS_ATIS",
+   "frequency": "124.400",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "O",
+   "text_atis": [
+    "AUSTIN BERGSTROM INTL ATIS INFO O 0253Z. 00000KT 10SM CLR 03/01",
+    "A3030 (THREE ZERO THREE ZERO). ARRIVALS EXPECT VIS APCH RWY 36R,",
+    "RWY 36L. DEPARTING RWY 36R, RWY 36L. SIMULAPP IN USE. NOTAMS...",
+    "SAID IN USE, SQUAWK ALTITUDE ON ALL SURFACE AREAS. DEPTG ACFT AT",
+    "MAIN AND SOUTH TERM CTC RAMP FOR PUSH. ALL OTHERS CTC GROUND.",
+    "....ADVS YOU HAVE INFO O"
+   ]
+  },
+  {
+   "callsign": "KMSY_ATIS",
+   "frequency": "127.550",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "D",
+   "text_atis": [
+    "ARMSTRONG NEW ORLEANS AIRPORT ATIS INFORMATION D. 0253Z.",
+    "33015G26KT 10SM FEW035 BKN046 11/05 A3011 (THREE ZERO ONE ONE).",
+    "ARRS EXPECT VISUAL APCH RWY 2. DEPTG RWY 29.. NOTAMS... ASSC IN",
+    "USE, SQUAWK ALTITUDE ON ALL SURFACE AREAS. READBACK ALL HOLD",
+    "SHORT INSTRUCTIONS. ....ADVS YOU HAVE INFO D"
+   ]
+  },
+  {
+   "callsign": "KPDX_ATIS",
+   "frequency": "128.350",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "R",
+   "text_atis": [
+    "KPDX ATIS INFO R 0253Z. 09009KT 10SM BKN070 OVC085 10/07 A3004",
+    "(THREE ZERO ZERO FOUR). ILS RWY 10R SIMUL ILS RWY 10L APCHS IN",
+    "USE. DEPTG RWYS 10L AND 10R. NOTAMS... RWY 21 PAPI OTS, EAST",
+    "END, MILITARY ARRESTING GEAR OTS. RWY 10R IM OTS. LLWS ADZYS IN",
+    "EFCT. CAUTION FOR INCREASED BIRD ACTIVITY. TWR FREQ ALL RWYS",
+    "123.77. USE 123.77 FOR CD AND GC. PUSHBACK ONTO TWYS T AND K",
+    "REQS ATC CLNC. . ...ADVS YOU HAVE INFO R."
+   ]
+  },
+  {
+   "callsign": "KMSP_A_ATIS",
+   "frequency": "135.350",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "B",
+   "text_atis": [
+    "KMSP ARR INFO B 0253Z. 07005KT 10SM CLR M01/M11 A3055 (THREE",
+    "ZERO FIVE FIVE). VIS RWY 12R APCH IN USE, VIS RWY 12L APCH IN",
+    "USE. FINAL APCH, OVER NOISE-SENSITIVE AREA. NOTAMS... RWY 4/22",
+    "CLSD. CTN, BIRDS NEAR MSP. READ BACK HS INSTRUCTIONS AND",
+    "ASSIGNED ALTS.. ALL ACFT TAXI WITH XPDR AND ALT ENCODING",
+    "ON....ADVS YOU HAVE INFO B"
+   ]
+  },
+  {
+   "callsign": "KMSP_D_ATIS",
+   "frequency": "120.800",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "O",
+   "text_atis": [
+    "KMSP DEP INFO O 0253Z. 07005KT 10SM CLR M01/M11 A3055 (THREE",
+    "ZERO FIVE FIVE). DEPTG RWY 12L, RWY 12R, RWY 17. NOTAMS... RWY",
+    "4/22 CLSD. ALL ACFT CTC ATC WHEN READY TO PUSHBACK OR TAXI. CTN,",
+    "BIRDS NEAR MSP. READ BACK HS INSTRUCTIONS AND ASSIGNED ALTS..",
+    "ALL ACFT TAXI WITH XPDR AND ALT ENCODING ON....ADVS YOU HAVE",
+    "INFO O"
+   ]
+  },
+  {
+   "callsign": "KBNA_ATIS",
+   "frequency": "135.100",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "K",
+   "text_atis": [
+    "KBNA ATIS INFO K 0253Z. 01010KT 10SM -RA SCT050 OVC075 09/04",
+    "A3005 (THREE ZERO ZERO FIVE). SIMUL VIS APCHS RWY 2L, 2R IN USE.",
+    "SIMUL DEPS RWY 2L, 2R. RNP APCHS AVBL UPON RQST. NOTAMS..BIRD",
+    "ACTIVITY INVOF ARPT, USE XTM CAUT. THE TERMINAL RAMP IS UNCTLD.",
+    "CTC ATC WHEN READY TO TAXI. . .NUMEROUS PROCEDURE CHANGES.",
+    "VERIFY NAVIGATION DATA...ADVS YOU HAVE INFO K"
+   ]
+  },
+  {
+   "callsign": "KLIT_ATIS",
+   "frequency": "125.650",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "B",
+   "text_atis": [
+    "KLIT ATIS INFO B 0253Z. 01006KT 10SM FEW035 FEW160 03/M04 A3023",
+    "(THREE ZERO TWO THREE). SIMUL VIS APCH RWYS 4R, 36 IN USE. SIMUL",
+    "DEPS RWYS 4R, 36 NOTAMS..RWY 4L/22R CLOSED ....ADVS YOU HAVE",
+    "INFO B"
+   ]
+  },
+  {
+   "callsign": "KFLL_ATIS",
+   "frequency": "135.000",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "J",
+   "text_atis": [
+    "KFLL ATIS INFO J 0253Z. 23003KT 10SM FEW008 SCT014 BKN050 22/21",
+    "A2975 (TWO NINER SEVEN FIVE). ARRIVALS EXPECT ILS APCH RWY 28R",
+    "OR 28L. DEPG RWYS RWY 28R AND 28L. PARL OPS ARE BEING CNTD.",
+    "NOTAM. TFR IN EFFECT FOR THE SOUTH FLORIDA AREA. TWY A CLSD BTWN",
+    "FEDEX RAMP AND SHELTAIR NORTH. RY 10L ALS OTS, RY 10L, 28R, 28L",
+    "THRESHOLD LGTS OTS. RWY 28R CONDITION CODES. 5 / 5 / 5 AT 0430Z",
+    "ZULU, RWY 28L CONDITION CODES. 5 / 5 / 5 AT 0430Z ZULU. CRANES",
+    "INVOF THE AIRPORT. NUMEROUS BIRDS IN THE VICINITY OF THE",
+    "AIRPORT. ...ADVS YOU HAVE INFO J."
+   ]
+  },
+  {
+   "callsign": "KTPA_D_ATIS",
+   "frequency": "128.475",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "S",
+   "text_atis": [
+    "KTPA DEP INFO S 0314Z. VRB03KT 10SM FEW007 SCT015 BKN075 BKN150",
+    "18/17 A2977 (TWO NINER SEVEN SEVEN). DEPG RY 1R, RY 1L.",
+    "NOTAMS... TPA LLWAS OTS. ALL ACFT RQRD TO HAVE TPNDR ON WHEN",
+    "OPNG ON TWYS AND RWYS. BIRD ACTIVITY VICINITY ARPT. HAZD WX INFO",
+    "FOR TPA AREA AVBL FM FSS. ...ADVS YOU HAVE INFO S."
+   ]
+  },
+  {
+   "callsign": "KTPA_A_ATIS",
+   "frequency": "126.450",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "F",
+   "text_atis": [
+    "KTPA ARR INFO F 0314Z. VRB03KT 10SM FEW007 SCT015 BKN075 BKN150",
+    "18/17 A2977 (TWO NINER SEVEN SEVEN). ILS APCH RY 1L GPS APCH RY",
+    "1R IN USE. TURBOJET ARRIVALS EXP RY 1L FOR NOISE ABATEMENT.",
+    "NOTAMS... TPA LLWAS OTS. ALL ACFT RQRD TO HAVE TPNDR ON WHEN",
+    "OPNG ON TWYS AND RWYS. BIRD ACTIVITY VICINITY ARPT. HAZD WX INFO",
+    "FOR TPA AREA AVBL FM FSS. RNAV VISUAL APCH RWY 1L NOT AVAILABLE.",
+    "...ADVS YOU HAVE INFO F."
+   ]
+  },
+  {
+   "callsign": "KMEM_ATIS",
+   "frequency": "127.750",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "B",
+   "text_atis": [
+    "KMEM ATIS INFO B 0254Z. 34009KT 10SM -RA OVC008 02/02 A3015",
+    "(THREE ZERO ONE FIVE). SIMUL ILS APCHS IN USE RWY 36L, 36R.",
+    "SIMUL DEPS IN USE RWY 36L, 36C. BIRD ACTIVITY RPTD INVOF ARPT.",
+    "READBACK ALL RWY HOLD SHORT INSTRUCTIONS. CONSOLIDATED WAKE",
+    "TURBULENCE SEPARATION STANDARDS IN EFFECT. ALL ACFT CTC GC FOR",
+    "PUSHBACK ONTO TWY N OR TWY J. .....ADVS YOU HAVE INFO B"
+   ]
+  },
+  {
+   "callsign": "KIAH_ATIS",
+   "frequency": "124.050",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "T",
+   "text_atis": [
+    "KIAH ATIS INFO T 0253Z. 31005KT 10SM CLR 09/M02 A3026 (THREE",
+    "ZERO TWO SIX). ARRIVALS EXPECT ILS OR RNAV Y RY 26R, ILS OR RNAV",
+    "Y RY 26L, ILS OR RNAV Y RY 27. SIMUL APPROACHES IN USE. DEPG RY",
+    "33R, RY 33L. NOTAMS... UNITED RAMP CONTROL IN EFFECT. BIRD",
+    "ACTIVITY VICINITY ARPT. TWY EA CLSD. NOTAM ATIS IN USE ON",
+    "FREQUENCY 126.225. SIMULTANEOUS PARALLEL DEPARTURES ARE IN",
+    "EFFECT PILOTS MUST ENSURE CORRECT DIRECTION OF INITIAL TURN.",
+    "...ADVS YOU HAVE INFO T"
+   ]
+  },
+  {
+   "callsign": "KPUB_ATIS",
+   "frequency": "125.250",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "A",
+   "text_atis": [
+    "KPUB ATIS INFO A 0253Z. 06006KT 10SM CLR 01/M08 A3032 (THREE",
+    "ZERO THREE TWO). VISUAL APCHS IN USE. LNDG AND DPTG RWY 08R AND",
+    "08L. RWY 17/35 AVBL UPON REQUEST. V F R DEPARTURES ADVISE ON",
+    "COURSE HEADING, ALTITUDE, AND IF FLIGHT FOLLOWING IS REUQESTED.",
+    "READ BACK ALL RUNWAY ASSIGNMENTS AND HOLD SHORT INSTRUCTIONS.",
+    "...ADVS YOU HAVE INFO A"
+   ]
+  },
+  {
+   "callsign": "KIND_ATIS",
+   "frequency": "134.250",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "F",
+   "text_atis": [
+    "INDIANAPOLIS INTERNATIONAL AIRPORT ATIS INFORMATION F 0254Z.",
+    "05013KT 10SM FEW070 BKN100 06/M03 A3021 (THREE ZERO TWO ONE).",
+    "PARL ILS RWY 5L AND ILS RWY 5R APCH IN USE. DEPG RWYS 5L, 5R.",
+    "CROSS RUNWAY OPERATIONS MAY BE IN EFFECT. NOTAMS... FEDEX RAMP",
+    "CONTROL CLOSED. AC AT FEDEX RAMP CTC ATC AT EXIT POINT WHEN",
+    "READY TO TAXI. ...ADVS YOU HAVE INFO F"
+   ]
+  },
+  {
+   "callsign": "KBZN_ATIS",
+   "frequency": "135.425",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "A",
+   "text_atis": [
+    "KBZN ATIS INFORMATION A. 0256Z . 16004KT 9SM CLR M05/M06 A3026",
+    "(THREE ZERO TWO SIX). VISUAL & INSTRUMENT APCHS IN USE, LDG",
+    "VISUAL/ILS RWY 12, VISUAL RWY 11, & VISUAL RWY 3. DEPTG RWY 12,",
+    "RWY 11, & RWY 3. VFR DEPS CTC GND WITH DRCTN OF FLT.. NOTAMS...",
+    "READBACK ALL RUNWAY ASSIGNMENTS AND HOLD SHORT INSTRUCTIONS. ALL",
+    "AIRCRAFT ON BGSKY2 DEPARTURE CHECK CROSSING RESTRICTIONS.",
+    "....ADVS YOU HAVE INFO A"
+   ]
+  },
+  {
+   "callsign": "UIII_ATIS",
+   "frequency": "126.900",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "F",
+   "text_atis": [
+    "IRKUTSK ATIS INFORMATION F. 0300Z",
+    "EXPECT ILS-Z APPROACH RWY 30. DEPARTURE RWY 30.",
+    "TRANSITION LEVEL 80",
+    "WIND 33007MPS",
+    "VISIBILITY VIS 10KM",
+    "SCT050CB",
+    "TM01 DM07",
+    "QNH 1018",
+    "NOSIG",
+    "ACKNOWLEDGE ATIS INFORMATION F"
+   ]
+  },
+  {
+   "callsign": "SABE_ATIS",
+   "frequency": "127.600",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "C",
+   "text_atis": [
+    "SABE ATIS INFORMATION C. 0300Z. 14012KT CAVOK 20/07 A1023 (ONE",
+    "ZERO TWO THREE) NOSIG. TRANSITION LEVEL 40. DEP AND ARR RWY 13.",
+    "EXPECT ILS Z APP RWY 13. NOTAMS... NOISE ABATEMENT PROCEDURES IN",
+    "EFFECT ....ADVS YOU HAVE INFO C"
+   ]
+  },
+  {
+   "callsign": "SADP_ATIS",
+   "frequency": "127.625",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "S",
+   "text_atis": [
+    "SADP ATIS INFORMATION S. 0300Z. 14013KT CAVOK 19/07 A1022 (ONE",
+    "ZERO TWO TWO). TRANSITION LEVEL 40. DEP AND ARR RWY 17. EXP ILS",
+    "ZULU APP RWY 17. NOTAMS... NOISE ABATEMENT PROCEDURE NADP 2 IN",
+    "EFFECT. . ...ADVS YOU HAVE INFO S"
+   ]
+  },
+  {
+   "callsign": "SADF_ATIS",
+   "frequency": "127.650",
+   "facility": 4,
+   "visual_range": 50,
+   "atis_code": "H",
+   "text_atis": [
+    "SADF ATIS INFORMATION H. 0300Z. 15011KT 120V180 CAVOK 20/07",
+    "A1022 (ONE ZERO TWO TWO). TRANSITION LEVEL 40. DEP AND ARR RWY",
+    "23. EXP RNP APP RWY 23. NOTAMS... NOISE ABATEMENT PROCEDURE NADP",
+    "2 IN EFFECT. . ...ADVS YOU HAVE INFO H"
+   ]
+  }
+ ]
+}
