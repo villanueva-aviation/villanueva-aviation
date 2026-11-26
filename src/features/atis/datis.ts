@@ -178,13 +178,15 @@ export function armarDatis(e: EntradaDatis, ap: AeropuertoAtis | null, ahoraMs: 
 }
 
 // ATIS de texto de VATSIM en EE. UU. como D-ATIS: la única regla de «se puede leer» (página y función de voz).
-// Pide letra, hora «HHMMZ.» (puede haber espacios antes del punto), altímetro y a lo más 1200 caracteres.
-const HORA_VATSIM = /(\d{4})Z\s*\./;
+// Pide letra, hora (el primer «HHMMZ», seguido de espacios opcionales y un punto), altímetro en el cuerpo
+// (después de la hora) y a lo más 1200 caracteres.
+const HORA_VATSIM = /(\d{4})Z(\s*\.)?/;
 export function entradaDeVatsim(icao: string, est: AtisRed): EntradaDatis | null {
   const texto = est.lineas.join(" ");
   const h = HORA_VATSIM.exec(texto);
-  if (!est.letra || !/^[A-Z]$/.test(est.letra) || !h || texto.length > 1200 || !ALTIMETRO.test(texto)) return null;
+  if (!est.letra || !/^[A-Z]$/.test(est.letra) || !h?.[2] || texto.length > 1200) return null;
   const cuerpo = texto.slice(h.index + h[0].length).trim();
+  if (!ALTIMETRO.test(cuerpo)) return null;
   return { airport: icao, type: est.tipo, code: est.letra, time: h[1], updatedAt: "", datis: `${icao.slice(1)} ATIS INFO ${est.letra} ${h[1]}Z. ${cuerpo}` };
 }
 

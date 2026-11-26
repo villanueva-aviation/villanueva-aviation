@@ -264,6 +264,27 @@ test("entradaDeVatsim: sin letra, sin hora con punto, sin altímetro o con más 
   assert.equal(entradaDeVatsim("UIII", est(porCs("UIII_ATIS"))), null); // «0300Z EXPECT»: sin punto
 });
 
+test("entradaDeVatsim: la hora es el primer HHMMZ; si no le sigue un punto no se lee (no salta a «1500Z.» de un aviso)", () => {
+  const aviso = "KXYZ ATIS INFO A 0453Z 18011KT 10SM FEW250 22/10 A2986. ILS RWY 16 APCH IN USE. TWY B CLOSED UNTIL 1500Z. NOTICE TO AIRMEN ...ADVS YOU HAVE INFO A.";
+  const x: AtisRed = { callsign: "KXYZ_ATIS", tipo: "combined", mhz: null, lineas: [aviso], letra: "A" };
+  assert.equal(entradaDeVatsim("KXYZ", x), null);
+  // Con el punto tras la primera hora se lee entero: clima, aproximación y pista no se pierden.
+  const bien = entradaDeVatsim("KXYZ", { ...x, lineas: [aviso.replace("0453Z ", "0453Z. ")] })!;
+  assert.equal(bien.time, "0453");
+  assert.match(leerDatis(bien).metar!, /^18011KT 10SM FEW250 22\/10 A2986$/);
+  assert.ok(leerDatis(bien).resto.includes("ILS RWY 16 APCH IN USE."));
+  // El altímetro cuenta solo después de la hora.
+  assert.equal(entradaDeVatsim("KXYZ", { ...x, lineas: ["A2986 KXYZ ATIS INFO A 0453Z. ILS RWY 16 APCH IN USE."] }), null);
+});
+
+test("entradaDeVatsim: 1200 caracteres se lee, 1201 no", () => {
+  const corto = "KXYZ ATIS INFO A 0453Z. 18011KT 10SM FEW250 22/10 A2986.";
+  const de = (n: number): AtisRed => ({ callsign: "KXYZ_ATIS", tipo: "combined", mhz: null, lineas: [corto + " " + "X".repeat(n - corto.length - 1)], letra: "A" });
+  assert.equal(de(1200).lineas[0].length, 1200);
+  assert.ok(entradaDeVatsim("KXYZ", de(1200)));
+  assert.equal(entradaDeVatsim("KXYZ", de(1201)), null);
+});
+
 test("armarVatsim: ningún cierre «..ADVS YOU HAVE INFO X» queda como aviso en vivo; URLs con red=vatsim y cs", () => {
   for (const x of usa) {
     const a = armarVatsim(icaoDe(x.callsign), est(x), null, AHORA)!;
@@ -284,7 +305,7 @@ test("armarVatsim: con ap null da los mismos vivos que con ap con pistas, en las
   }
 });
 
-test("datisPara sigue igual con esFrecuenciaSalidas (KATL 125.55 dep, 119.65 arr)", () => {
+test("esFrecuenciaSalidas: la frecuencia real de salidas (con tolerancia) o «DEP» en el nombre da salidas (KATL 125.55 dep, 119.65 arr)", () => {
   assert.equal(esFrecuenciaSalidas("KATL", 125.55, "KATL"), true);
   assert.equal(esFrecuenciaSalidas("KATL", 125.553, null), true); // dentro de la tolerancia
   assert.equal(esFrecuenciaSalidas("KATL", 119.65, "KATL"), false);
