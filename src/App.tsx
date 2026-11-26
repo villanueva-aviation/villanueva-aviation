@@ -63,6 +63,7 @@ const GimnasioAutorizaciones = lazy(() =>
   import("./pages/GimnasioAutorizacionesPage").then((m) => ({ default: m.GimnasioAutorizacionesPage })),
 );
 const ResumenHsi = lazy(() => import("./pages/ResumenHsi").then((m) => ({ default: m.ResumenHsi })));
+const Simulador = lazy(() => import("./pages/Simulador").then((m) => ({ default: m.Simulador })));
 const InstructorPrograma = lazy(() => import("./pages/InstructorPrograma").then((m) => ({ default: m.InstructorPrograma })));
 const AtisPrograma = lazy(() => import("./pages/AtisPrograma").then((m) => ({ default: m.AtisPrograma })));
 const InstructorRepaso = lazy(() => import("./pages/InstructorRepaso").then((m) => ({ default: m.InstructorRepaso })));
@@ -108,6 +109,7 @@ function ScrollToTop() {
 
 const TITULO_ES = "Villanueva Aviation — Todo para volar mejor tu simulador";
 const TITULOS: Record<string, string> = {
+  [ROUTES.simulador]: "Simulador H135 gratis en el navegador — Villanueva Aviation",
   [ROUTES.aeropuertoMMGL]: "Guadalajara MMGL: guía de radio, salida y llegada para tu simulador — Villanueva Aviation",
   [ROUTES.aeropuertoMMMX]: "Ciudad de México MMMX: guía de radio, salida y llegada para tu simulador — Villanueva Aviation",
   [ROUTES.aeropuertoMMMY]: "Monterrey MMMY: guía de radio, salida y llegada para tu simulador — Villanueva Aviation",
@@ -333,6 +335,7 @@ function RoutedContent() {
           <Route path={ROUTES.instructor} element={<InstructorLanding />} />
           <Route path={ROUTES.eventos} element={<Eventos />} />
           <Route path={ROUTES.resumenHsi} element={<ResumenHsi />} />
+          <Route path={ROUTES.simulador} element={<Simulador />} />
           <Route
             path={ROUTES.instructorPrograma}
             element={
@@ -543,6 +546,7 @@ function App() {
     pathname === ROUTES.empieza ||
     pathname === ROUTES.instructorPrograma ||
     pathname === ROUTES.atisPrograma ||
+    pathname === ROUTES.simulador ||
     pathname === ROUTES.instructorRepaso ||
     pathname.startsWith(ROUTES.instructorLeccion("")) ||
     pathname.startsWith(ROUTES.instructorIfr) ||

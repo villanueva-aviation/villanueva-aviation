@@ -22,7 +22,8 @@ export function avanzarTeclado(m: Mandos, teclas: Teclas, dt: number): Mandos {
   const centrar = t("KeyC");
   return {
     cx: centrar ? 0 : eje(m.cx, t("ArrowLeft"), t("ArrowRight"), 1.5, 2, dt, mantener),
-    cy: centrar ? 0 : eje(m.cy, t("ArrowDown"), t("ArrowUp"), 1.5, 2, dt, mantener),
+    // Adelante/atrás no regresa solo: hace de compensador para sostener la velocidad.
+    cy: centrar ? 0 : eje(m.cy, t("ArrowDown"), t("ArrowUp"), 1.5, 2, dt, true),
     colectivo: clamp(m.colectivo + ((t("PageUp") ? 0.3 : 0) - (t("PageDown") ? 0.3 : 0)) * dt, 0, 1),
     pedales: eje(m.pedales, t("KeyZ"), t("KeyX"), 2, 2, dt, mantener),
   };

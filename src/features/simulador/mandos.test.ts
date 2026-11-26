@@ -13,8 +13,14 @@ const durante = (m: Mandos, teclas: string[], s: number) => {
 test("las flechas mueven el cíclico y al soltar vuelve a 0 sin pasarse", () => {
   const a = durante(m0, ["ArrowLeft"], 0.5);
   cerca(a.cx, -0.75);
-  cerca(durante(m0, ["ArrowUp"], 0.5).cy, 0.75);
   cerca(durante(a, [], 0.5).cx, 0);
+});
+
+test("el cíclico adelante/atrás se queda donde lo dejas (hace de compensador)", () => {
+  const a = durante(m0, ["ArrowUp"], 0.5);
+  cerca(a.cy, 0.75);
+  cerca(durante(a, [], 1).cy, 0.75);
+  cerca(durante(a, ["KeyC"], 0.02).cy, 0);
 });
 
 test("el colectivo con Re Pág se queda donde lo dejas", () => {

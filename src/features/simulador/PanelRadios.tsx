@@ -46,7 +46,7 @@ function Radio({ nombre, banda, par, recibido, onCambio }: { nombre: string; ban
   );
 }
 
-export function Radios(props: {
+export function PanelRadios(props: {
   radios: { com1: Par; nav1: Par; nav2: Par; obs: number };
   recibido: { com1: string | null; nav1: string | null; nav2: string | null };
   onCambio: (r: Partial<{ com1: Par; nav1: Par; nav2: Par; obs: number }>) => void;
