@@ -4,8 +4,31 @@ import { aNm, rumbo } from "../home/navGeo.ts";
 import { GuiaControles } from "./Controles";
 import { buscar, cargarPais, type AeropuertoSim, type DatosPais, type Pais, type Vor } from "./datos.ts";
 import type { Viento } from "./modelo.ts";
+import type { EnElAire } from "./bucle.ts";
 
 const CLAVE = "simulador-pais";
+const CLAVE_AIRE = "simulador-aire";
+
+/** Dónde aparecer en el aire: radial (magnético), distancia y altitud; altitud null = 3,000 ft sobre el VOR. */
+type Aire = { radial: number; distNm: number; altFt: number | null };
+const AIRE_INICIAL: Aire = { radial: 180, distNm: 10, altFt: null };
+function leerAire(): Aire {
+  try {
+    const a = JSON.parse(localStorage.getItem(CLAVE_AIRE) ?? "null") as Partial<Aire> | null;
+    if (!a) return AIRE_INICIAL;
+    return {
+      radial: Number.isFinite(a.radial) ? Number(a.radial) : AIRE_INICIAL.radial,
+      distNm: Number.isFinite(a.distNm) ? Number(a.distNm) : AIRE_INICIAL.distNm,
+      altFt: Number.isFinite(a.altFt) ? Number(a.altFt) : null,
+    };
+  } catch {
+    return AIRE_INICIAL;
+  }
+}
+const cien = (ft: number) => Math.round(ft / 100) * 100;
+/** La altitud a la que aparece sobre este VOR: la elegida, pero nunca a menos de 1,000 ft sobre la estación. */
+const altitudSobre = (vor: Vor, a: Aire) => Math.max(cien(vor.elevFt + 1000), a.altFt ?? cien(vor.elevFt + 3000));
+const radial3 = (r: number) => String(r % 360 || 360).padStart(3, "0");
 const nombrePais = (() => {
   try {
     const d = new Intl.DisplayNames(["es"], { type: "region" });
@@ -18,7 +41,7 @@ const nombrePais = (() => {
 export type Eleccion = {
   datos: DatosPais;
   lugar: { lat: number; lon: number; elevFt: number; rumboV: number };
-  enElAire?: { vor: Vor; distNm: number; altFt: number };
+  enElAire?: EnElAire;
   aeropuerto: AeropuertoSim | null;
   vorCercano: Vor | null;
   viento: Viento;
@@ -53,6 +76,15 @@ export function ElegirLugar({ onElegir }: { onElegir: (e: Eleccion) => void }) {
   const [error, setError] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [viento, setViento] = useState<Viento>({ dir: 0, kt: 0 });
+  const [aire, setAireEstado] = useState<Aire>(leerAire);
+  const setAire = (a: Aire) => {
+    setAireEstado(a);
+    try {
+      localStorage.setItem(CLAVE_AIRE, JSON.stringify(a));
+    } catch {
+      /* sin almacenamiento: no pasa nada */
+    }
+  };
 
   useEffect(() => {
     fetch("/data/sim/paises.json")
@@ -81,7 +113,7 @@ export function ElegirLugar({ onElegir }: { onElegir: (e: Eleccion) => void }) {
 
   const enAire = (vor: Vor) => {
     if (!d) return;
-    onElegir({ datos: d, lugar: { lat: vor.lat, lon: vor.lon, elevFt: vor.elevFt, rumboV: 0 }, enElAire: { vor, distNm: 10, altFt: Math.round((vor.elevFt + 3000) / 100) * 100 }, aeropuerto: masCercano(d.aeropuertos.filter((a) => !a.helipuerto), vor), vorCercano: vor, viento });
+    onElegir({ datos: d, lugar: { lat: vor.lat, lon: vor.lon, elevFt: vor.elevFt, rumboV: 0 }, enElAire: { vor, distNm: aire.distNm, altFt: altitudSobre(vor, aire), radial: aire.radial % 360 }, aeropuerto: masCercano(d.aeropuertos.filter((a) => !a.helipuerto), vor), vorCercano: vor, viento });
   };
   const enPlataforma = (a: AeropuertoSim) => {
     if (!d) return;
@@ -127,12 +159,27 @@ export function ElegirLugar({ onElegir }: { onElegir: (e: Eleccion) => void }) {
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <section>
             <h2 className="mb-1 text-sm font-bold text-[#3ddc84]">VOR · empezar en el aire</h2>
+            <div className="mb-2 grid grid-cols-3 gap-2 text-xs">
+              <label className="grid gap-1">
+                <span className="text-[#7d8da3]">Radial</span>
+                <input type="number" min={1} max={360} step={10} value={aire.radial} onChange={(ev) => setAire({ ...aire, radial: Math.max(0, Math.min(360, Math.round(Number(ev.target.value) || 0))) })} className="w-full rounded-md border border-[#1f2b3d] bg-[#0a1220] px-2 py-1.5" />
+              </label>
+              <label className="grid gap-1">
+                <span className="text-[#7d8da3]">Distancia (NM)</span>
+                <input type="number" min={1} max={40} step={1} value={aire.distNm} onChange={(ev) => setAire({ ...aire, distNm: Math.max(1, Math.min(40, Number(ev.target.value) || 1)) })} className="w-full rounded-md border border-[#1f2b3d] bg-[#0a1220] px-2 py-1.5" />
+              </label>
+              <label className="grid gap-1">
+                <span className="text-[#7d8da3]">Altitud (ft)</span>
+                <input type="number" min={0} max={20000} step={500} value={aire.altFt ?? ""} placeholder="+3,000" onChange={(ev) => setAire({ ...aire, altFt: ev.target.value === "" ? null : Math.max(0, Math.min(20000, Number(ev.target.value) || 0)) })} className="w-full rounded-md border border-[#1f2b3d] bg-[#0a1220] px-2 py-1.5" />
+              </label>
+            </div>
+            <p className="mb-2 text-xs text-[#7d8da3]">Apareces con rumbo hacia la estación y el CRS puesto. Sin altitud: 3,000 ft sobre el VOR.</p>
             <ul className="grid gap-1">
               {res.vors.map((v) => (
                 <li key={v.ident + v.mhz}>
                   <button type="button" onClick={() => enAire(v)} className="w-full rounded-md border border-[#1f2b3d] bg-[#0a1220] px-3 py-2 text-left hover:border-[#3ddc84]">
                     <b className="font-display">{v.ident}</b> · {v.nombre}
-                    <span className="block text-xs text-[#9fb0c6]">{v.mhz.toFixed(2)} MHz{v.dme ? " · DME" : ""} · 10 NM al sur, 3,000 ft sobre el VOR</span>
+                    <span className="block text-xs text-[#9fb0c6]">{v.mhz.toFixed(2)} MHz{v.dme ? " · DME" : ""} · R-{radial3(aire.radial)}, {aire.distNm} NM, {altitudSobre(v, aire).toLocaleString("es-MX")} ft</span>
                   </button>
                 </li>
               ))}

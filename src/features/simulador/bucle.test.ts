@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { aNm, rumbo } from "../home/navGeo.ts";
 import { alternarMotor, avanzar, inicio, pasosPendientes } from "./bucle.ts";
 import type { Vor } from "./datos.ts";
+import { recibirNav } from "./radios.ts";
 
 const nada = new Set<string>();
 const sinSuelo = () => null;
@@ -34,6 +35,22 @@ test("en el aire empieza a 10 NM del VOR con rumbo hacia él", () => {
   assert.equal(s.e.altFt, 8000);
   assert.equal(s.e.enTierra, false);
   assert.equal(s.radios.nav1[0], 117.3);
+});
+
+test("en el aire en el radial y a la distancia que elige el cadete, con rumbo y CRS hacia la estación", () => {
+  const s = inicio(gdl, { vor, distNm: 15, altFt: 9500, radial: 90 });
+  const p = aNm(s.e.lat, s.e.lon, vor.lat, vor.lon);
+  assert.ok(Math.abs(Math.hypot(p.x, p.y) - 15) <= 0.1);
+  // El radial es magnético: la estación lo ve en 090 + declinación verdadero.
+  const desdeVor = rumbo({ x: 0, y: 0 }, p);
+  assert.ok(Math.abs(desdeVor - (90 + vor.decl)) <= 0.5, String(desdeVor));
+  assert.ok(Math.abs(s.e.rumboV - ((90 + vor.decl + 180) % 360)) <= 0.5, String(s.e.rumboV));
+  assert.equal(s.e.track, s.e.rumboV);
+  assert.equal(s.e.altFt, 9500);
+  assert.equal(s.radios.obs, 270);
+  const l = recibirNav(s.radios.nav1[0], s.radios.obs, s.e, [vor])!;
+  assert.ok(Math.abs(l.radial - 90) <= 0.5, String(l.radial));
+  assert.equal(l.desde, false);
 });
 
 test("en el aire sin tocar nada sostiene más o menos la altitud y la velocidad", () => {

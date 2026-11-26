@@ -68,19 +68,27 @@ export function alternarMotor(s: Sim): Sim {
   return s.e.enTierra ? { ...s, motor: !s.motor } : s;
 }
 
-export function inicio(lugar: { lat: number; lon: number; elevFt: number; rumboV: number }, enElAire?: { vor: Vor; distNm: number; altFt: number }): Sim {
+/** En el aire: `radial` magnético desde la estación (sin él, al sur verdadero); rumbo hacia ella. */
+export type EnElAire = { vor: Vor; distNm: number; altFt: number; radial?: number };
+
+export function inicio(lugar: { lat: number; lon: number; elevFt: number; rumboV: number }, enElAire?: EnElAire): Sim {
   let e = enPlataforma(lugar.lat, lugar.lon, lugar.elevFt, lugar.rumboV);
   let mandos: Mandos = { cx: 0, cy: 0, colectivo: 0, pedales: 0 };
   let decl = 0;
   if (enElAire) {
-    // Al sur del VOR, con rumbo verdadero 360 hacia él, en crucero de 90 kt.
+    // En el radial elegido, con rumbo hacia el VOR, en crucero de 90 kt.
     const { vor, distNm, altFt } = enElAire;
     decl = vor.decl;
+    const desde = enElAire.radial === undefined ? 180 : (((enElAire.radial + decl) % 360) + 360) % 360; // verdadero
+    const rumboV = (desde + 180) % 360;
+    const RAD = Math.PI / 180;
     const s = sigma(altFt);
     const ias = 90;
     const cabeceo = 5 - ias / Math.sqrt(s) / 8;
     const colectivo = potenciaRequerida(H135, ias) / s ** 1.2;
-    e = { ...e, lat: vor.lat - distNm / 60, lon: vor.lon, altFt, ias, gs: ias / Math.sqrt(s), cabeceo, rumboV: 0, track: 0, colectivo, enTierra: false };
+    const lat = vor.lat + (distNm * Math.cos(desde * RAD)) / 60;
+    const lon = vor.lon + (distNm * Math.sin(desde * RAD)) / 60 / Math.cos(vor.lat * RAD);
+    e = { ...e, lat, lon, altFt, ias, gs: ias / Math.sqrt(s), cabeceo, rumboV, track: rumboV, colectivo, enTierra: false };
     mandos = { cx: 0, cy: -cabeceo / H135.cabeceoMax, colectivo, pedales: 0 };
   }
   const nav = enElAire?.vor.mhz ?? 108;
