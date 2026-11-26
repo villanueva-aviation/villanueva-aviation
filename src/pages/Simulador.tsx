@@ -18,6 +18,10 @@ import type { Terreno } from "../features/simulador/terreno.ts";
 import { useSimulador, type Arranque } from "../features/simulador/useSimulador";
 import { VistaSintetica } from "../features/simulador/VistaSintetica";
 import { aNm, rumbo } from "../features/home/navGeo.ts";
+import type { Aeropuerto } from "../features/instructor/aeropuertoSim.ts";
+import { FuenteMuestrasContext, type FuenteMuestras } from "../features/instructor/fuenteMuestras.ts";
+import type { AeropuertoSim } from "../features/simulador/datos.ts";
+import { aAeropuerto, aeropuertoCercano, aMuestra, aVorSim } from "../features/simulador/muestraSim.ts";
 
 const Vista3D = memo(VistaSintetica);
 const tactil = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
@@ -42,7 +46,29 @@ export function Simulador() {
   const [eleccion, setEleccion] = useState<Eleccion | null>(null);
   const arranque = useMemo(() => (eleccion ? arranqueDe(eleccion) : null), [eleccion]);
   const terrenoRef = useRef<Terreno | null>(null);
-  const { sim, leerEstado, accion, teclas } = useSimulador(eleccion?.datos ?? null, arranque, terrenoRef);
+  const { sim, leerEstado, accion, teclas, suscribirMuestras } = useSimulador(eleccion?.datos ?? null, arranque, terrenoRef);
+  // El instructor IFR lee de aquí las mismas muestras, aeropuerto y VOR que le manda el lector de MSFS.
+  const fuente = useMemo<FuenteMuestras | null>(() => {
+    if (!eleccion || !arranque) return null;
+    const { vors, aeropuertos } = eleccion.datos;
+    const vorsSim = vors.map(aVorSim);
+    return {
+      suscribir: (f) => {
+        let crudo: AeropuertoSim | null = null;
+        let aero: Aeropuerto | null = null;
+        let cada = -Infinity;
+        return suscribirMuestras((s, t) => {
+          if (t - cada >= 1) {
+            cada = t;
+            const c = aeropuertoCercano(aeropuertos, s.e.lat, s.e.lon);
+            if (c !== crudo) aero = (crudo = c) && aAeropuerto(c!);
+          }
+          const sueloFt = terrenoRef.current?.alturaEn(s.e.lat, s.e.lon) ?? arranque.respaldoFt;
+          f({ muestras: [aMuestra(s, { t, sueloFt, decl: arranque.decl, vors })], aeropuerto: aero, vors: vorsSim });
+        });
+      },
+    };
+  }, [eleccion, arranque, suscribirMuestras]);
   const vista = useRef<HTMLDivElement>(null);
   const { capturado, capturar } = useControles(teclas, accion, vista);
   const [pestana, setPestana] = useState<"ap" | "radios" | "mapa">("ap");
@@ -131,6 +157,7 @@ export function Simulador() {
   );
 
   return (
+    <FuenteMuestrasContext.Provider value={fuente}>
     <div className="min-h-screen bg-[#05090f] text-[#e6edf3]">
       <Encabezado />
       <div className="mx-auto grid max-w-[1400px] gap-3 px-4 pb-4 lg:grid-cols-[1.35fr_1fr]">
@@ -184,6 +211,7 @@ export function Simulador() {
         Solo para simulación · Elevación: Mapzen/AWS Terrain Tiles · Navegación: OurAirports
       </footer>
     </div>
+    </FuenteMuestrasContext.Provider>
   );
 }
 

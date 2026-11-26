@@ -3,6 +3,7 @@ import type { Muestra } from "./evaluador.ts";
 import { continuarLectura, LECTOR_INICIAL, recibir } from "./lector.ts";
 import { leerAeropuerto, type Aeropuerto } from "./aeropuertoSim.ts";
 import { leerVors, type VorSim } from "./vorSim.ts";
+import { useFuenteMuestras } from "./fuenteMuestras.ts";
 
 const URL_LECTOR = "http://127.0.0.1:8766/muestra";
 const CADA_MS = 100;
@@ -13,6 +14,7 @@ export type EstadoLector = "sin-lector" | "sin-simulador" | "conectado";
  * Lee el lector local cada 100 ms. Sigue leyendo con la pestaña oculta o la ventana tapada por MSFS:
  * Chrome frena el temporizador a ~1 s, y por eso pide `?desde=` la última muestra recibida y el lector
  * le manda todas las que se juntaron. `alRecibir` recibe cada lote nuevo, en orden.
+ * Dentro del simulador web (FuenteMuestrasContext) toma sus muestras y no lee el lector local.
  */
 export function useLector(alRecibir?: (muestras: Muestra[]) => void): {
   estado: EstadoLector;
@@ -21,7 +23,8 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): {
   vors: VorSim[];
   continuarDesde: (t: number, guardadoMs: number) => void;
 } {
-  const [estado, setEstado] = useState<EstadoLector>("sin-lector");
+  const fuente = useFuenteMuestras();
+  const [estado, setEstado] = useState<EstadoLector>(fuente ? "sin-simulador" : "sin-lector");
   const [muestra, setMuestra] = useState<Muestra | null>(null);
   const [aeropuerto, setAeropuerto] = useState<Aeropuerto | null>(null);
   const [vors, setVors] = useState<VorSim[]>([]);
@@ -30,6 +33,18 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): {
   callback.current = alRecibir;
 
   useEffect(() => {
+    if (fuente) {
+      let aero: Aeropuerto | null | undefined;
+      let listaVors: VorSim[] | undefined;
+      return fuente.suscribir((l) => {
+        if (l.aeropuerto !== aero) setAeropuerto((aero = l.aeropuerto));
+        if (l.vors !== listaVors) setVors((listaVors = l.vors));
+        if (!l.muestras.length) return;
+        setEstado("conectado");
+        callback.current?.(l.muestras);
+        setMuestra(l.muestras[l.muestras.length - 1]);
+      });
+    }
     let vivo = true;
     let timer: number | undefined;
     let aeropuertoCrudo = "null"; // para no volver a renderizar si no cambio
@@ -72,7 +87,7 @@ export function useLector(alRecibir?: (muestras: Muestra[]) => void): {
       vivo = false;
       window.clearTimeout(timer);
     };
-  }, []);
+  }, [fuente]);
 
   const continuarDesde = useCallback((t: number, guardadoMs: number) => {
     lecturaRef.current = continuarLectura(lecturaRef.current, t, guardadoMs);

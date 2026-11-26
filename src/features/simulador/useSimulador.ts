@@ -16,6 +16,7 @@ export function useSimulador(datos: DatosPais | null, arranque: Arranque | null,
   const sim = useRef<Sim | null>(null);
   const publicado = useRef<Sim | null>(null);
   const oyentes = useRef(new Set<() => void>());
+  const oyentesMuestras = useRef(new Set<(s: Sim, t: number) => void>());
   const [teclas] = useState(() => new Set<string>());
 
   const publicar = useCallback(() => {
@@ -32,6 +33,7 @@ export function useSimulador(datos: DatosPais | null, arranque: Arranque | null,
     let antes = performance.now();
     let acumulado = 0;
     let ultimoAviso = 0;
+    let ultimaMuestra = -Infinity;
     const suelo = (lat: number, lon: number) => terrenoRef.current?.alturaEn(lat, lon) ?? null;
     const cuadro = (t: number) => {
       id = requestAnimationFrame(cuadro);
@@ -46,6 +48,12 @@ export function useSimulador(datos: DatosPais | null, arranque: Arranque | null,
       let s = sim.current!;
       for (let i = 0; i < r.pasos; i++) s = avanzar(s, teclas, datos.vors, suelo, arranque.respaldoFt, arranque.decl);
       sim.current = s;
+      // Muestras para el instructor a 10 Hz, con reloj de pared: no vuelve a cero al reiniciar y en pausa
+      // siguen llegando (con pausa: true), como las del lector de MSFS. Pestaña oculta: ninguna (arriba).
+      if (t - ultimaMuestra >= 100) {
+        ultimaMuestra = t;
+        for (const o of oyentesMuestras.current) o(s, t / 1000);
+      }
       if (t - ultimoAviso >= 1000 / 30) {
         ultimoAviso = t;
         publicar();
@@ -60,6 +68,13 @@ export function useSimulador(datos: DatosPais | null, arranque: Arranque | null,
     return () => oyentes.current.delete(o);
   }, []);
   const foto = useSyncExternalStore(suscribir, () => publicado.current);
+  /** Recibe el estado y el reloj (s) cada 100 ms mientras la pestaña está visible. */
+  const suscribirMuestras = useCallback((o: (s: Sim, t: number) => void) => {
+    oyentesMuestras.current.add(o);
+    return () => {
+      oyentesMuestras.current.delete(o);
+    };
+  }, []);
   const leer = useCallback(() => sim.current!, []);
   const leerEstado = useCallback(() => sim.current!.e, []);
   const accion = useCallback(
@@ -71,5 +86,5 @@ export function useSimulador(datos: DatosPais | null, arranque: Arranque | null,
     },
     [publicar],
   );
-  return { sim: foto, leer, leerEstado, accion, teclas };
+  return { sim: foto, leer, leerEstado, accion, teclas, suscribirMuestras };
 }
