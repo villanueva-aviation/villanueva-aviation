@@ -1,16 +1,17 @@
 // Qué dice la red (IVAO o VATSIM) de un aeropuerto: si hay controlador y si publica su ATIS.
 // Lo usa functions/api/atis/red.ts con los feeds públicos, y la página para elegir la fuente.
 // Regla del diseño: ante la duda, hay controlador, para nunca anunciar una pista distinta a la del ATC.
+import { esFrecuenciaSalidas } from "./datis.ts";
 import { formatoDe } from "./formato.ts";
-import { distanciaNm } from "./radio.ts";
+import { distanciaNm, TOLERANCIA_MHZ } from "./radio.ts";
 
 export type Red = "ivao" | "vatsim" | "ninguna";
-export type EstadoRed = { atc: boolean; atis: { lineas: string[]; letra: string | null } | null };
+export type EstadoRed = { atc: boolean; atis: { lineas: string[]; letra: string | null } | null; estaciones?: AtisRed[] };
 export type Fuente = "cliente" | "sin-letra" | "generado";
 
 // Una estación ATIS de la red ya convertida: tipo por el callsign (_A_ATIS / _D_ATIS), MHz del feed.
 export type AtisRed = { callsign: string; tipo: "combined" | "arr" | "dep"; mhz: number | null; lineas: string[]; letra: string | null };
-export type VatsimEstacion = { callsign: string; facility: number; visual_range: number; text_atis: string[] | null; atis_code?: string | null };
+export type VatsimEstacion = { callsign: string; facility: number; visual_range: number; text_atis: string[] | null; frequency?: string; atis_code?: string | null };
 export type VatsimDatos = { controllers: VatsimEstacion[]; atis: VatsimEstacion[] };
 export type VatsimTransceptores = { callsign: string; transceivers: { latDeg: number; lonDeg: number }[] }[];
 export type IvaoAtc = { callsign: string; atcSession: { position: string }; lastTrack: { latitude: number; longitude: number } | null; atis?: { lines: string[]; revision: string } };
@@ -26,7 +27,7 @@ const SERVIDOR_VOZ = /\.ivao\.aero\//;
 
 // EE. UU. (K, PA, PH, PG) llama a sus estaciones sin la primera letra: LAX_TWR para KLAX, ANC_TWR para PANC.
 const sinPrefijo = (icao: string) => /^(K|PA|PH|PG)/.test(icao) ? icao.slice(1) + "_" : null;
-const delAeropuerto = (callsign: string, icao: string) =>
+export const delAeropuerto = (callsign: string, icao: string) =>
   callsign.startsWith(icao + "_") || (!!sinPrefijo(icao) && callsign.startsWith(sinPrefijo(icao)!));
 // Por distancia solo cuentan estaciones de la misma región OACI: el centro de Houston en VATSIM publica
 // 600 NM de alcance y no controla Guadalajara. Regiones de una letra (C, Y, Z, U y la K de EE. UU.): compara la primera.
@@ -89,7 +90,8 @@ export function estadoVigente(e: EntradaRed, ahoraMs: number): EstadoRed | null 
 }
 
 export function estadoVatsim(datos: VatsimDatos, trans: VatsimTransceptores, ap: Ap): EstadoRed {
-  const atisRed = datos.atis.find((e) => delAeropuerto(e.callsign, ap.icao) && e.callsign.endsWith("ATIS"));
+  const estaciones = datos.atis.filter((e) => delAeropuerto(e.callsign, ap.icao) && e.callsign.endsWith("ATIS")).map(atisRedDe);
+  const atisRed = estaciones.find((e) => e.tipo === "combined") ?? estaciones[0];
   const posiciones = new Map(trans.map((t) => [t.callsign, t.transceivers]));
   const cerca = (e: VatsimEstacion) => VATSIM_LEJANAS.has(e.facility) && mismaRegion(e.callsign, ap.icao)
     && (posiciones.get(e.callsign) ?? []).some((t) => distanciaNm({ lat: t.latDeg, lon: t.lonDeg }, ap) < e.visual_range);
@@ -97,7 +99,22 @@ export function estadoVatsim(datos: VatsimDatos, trans: VatsimTransceptores, ap:
     && (posiciones.get(e.callsign) ?? []).some((t) => localCerca(e.callsign, t.latDeg, t.lonDeg, ap));
   const atc = !!atisRed || datos.controllers.some((e) => e.facility !== 0 && (delAeropuerto(e.callsign, ap.icao) || cerca(e) || local(e)));
   // En VATSIM la estación ATIS existe = vPilot la reproduce, aunque no publique texto.
-  return { atc, atis: atisRed ? { lineas: atisRed.text_atis ?? [], letra: atisRed.atis_code ?? null } : null };
+  return { atc, atis: atisRed ? { lineas: atisRed.lineas, letra: atisRed.letra } : null, estaciones };
+}
+
+// Una estación ATIS del feed de VATSIM ya convertida; la usan la página y la función de voz.
+export function atisRedDe(e: VatsimEstacion): AtisRed {
+  const mhz = Number(e.frequency ?? NaN);
+  const tipo = e.callsign.endsWith("_A_ATIS") ? "arr" : e.callsign.endsWith("_D_ATIS") ? "dep" : "combined";
+  return { callsign: e.callsign, tipo, mhz: Number.isFinite(mhz) ? mhz : null, lineas: e.text_atis ?? [], letra: e.atis_code ?? null };
+}
+
+// La estación que corresponde al COM sintonizado: la de esa frecuencia; si no, la combinada; si no, salidas o llegadas.
+export function estacionPara(estaciones: AtisRed[] | undefined, icao: string, mhz: number, nombreFrec: string | null): AtisRed | null {
+  if (!estaciones?.length) return null;
+  const tipo = esFrecuenciaSalidas(icao, mhz, nombreFrec) ? "dep" : "arr";
+  return estaciones.find((e) => e.mhz !== null && Math.abs(e.mhz - mhz) < TOLERANCIA_MHZ + 1e-9)
+    ?? estaciones.find((e) => e.tipo === "combined") ?? estaciones.find((e) => e.tipo === tipo) ?? estaciones[0];
 }
 
 export function estadoIvao(w: IvaoWhazzup, ap: Ap): EstadoRed {

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { datosDeRed, estadoIvao, estadoVatsim, estadoVigente, fuente, type IvaoAtc, type VatsimEstacion } from "./red.ts";
+import { atisRedDe, datosDeRed, estacionPara, estadoIvao, estadoVatsim, estadoVigente, fuente, type IvaoAtc, type VatsimEstacion } from "./red.ts";
 
 const MMGL = { icao: "MMGL", lat: 20.5218, lon: -103.3112 };
 
@@ -27,20 +27,20 @@ test("fuente: ATIS de la red → cliente; ATC sin ATIS → sin letra; nadie → 
 
 test("VATSIM: estación MMGL_ATIS da su texto y su letra", () => {
   const datos = { controllers: [], atis: [vat("MMGL_ATIS", 4, { atis_code: "C", text_atis: ["MMGL INFO C ..."] })] };
-  assert.deepEqual(estadoVatsim(datos, [], MMGL), { atc: true, atis: { lineas: ["MMGL INFO C ..."], letra: "C" } });
+  assert.deepEqual(estadoVatsim(datos, [], MMGL), { atc: true, atis: { lineas: ["MMGL INFO C ..."], letra: "C" }, estaciones: [{ callsign: "MMGL_ATIS", tipo: "combined", mhz: null, lineas: ["MMGL INFO C ..."], letra: "C" }] });
 });
 
 test("VATSIM: variantes MMGL_D_ATIS también cuentan", () => {
   const datos = { controllers: [], atis: [vat("MMGL_D_ATIS", 4, { atis_code: "C", text_atis: ["MMGL INFO C ..."] })] };
-  assert.deepEqual(estadoVatsim(datos, [], MMGL), { atc: true, atis: { lineas: ["MMGL INFO C ..."], letra: "C" } });
+  assert.deepEqual(estadoVatsim(datos, [], MMGL), { atc: true, atis: { lineas: ["MMGL INFO C ..."], letra: "C" }, estaciones: [{ callsign: "MMGL_D_ATIS", tipo: "dep", mhz: null, lineas: ["MMGL INFO C ..."], letra: "C" }] });
 });
 
 test("VATSIM: torre del aeropuerto sin ATIS", () => {
-  assert.deepEqual(estadoVatsim({ controllers: [vat("MMGL_TWR", 4)], atis: [] }, [], MMGL), { atc: true, atis: null });
+  assert.deepEqual(estadoVatsim({ controllers: [vat("MMGL_TWR", 4)], atis: [] }, [], MMGL), { atc: true, atis: null, estaciones: [] });
 });
 
 test("VATSIM: un prefijo parecido no cuenta", () => {
-  assert.deepEqual(estadoVatsim({ controllers: [vat("MMGLX_TWR", 4)], atis: [] }, [], MMGL), { atc: false, atis: null });
+  assert.deepEqual(estadoVatsim({ controllers: [vat("MMGLX_TWR", 4)], atis: [] }, [], MMGL), { atc: false, atis: null, estaciones: [] });
 });
 
 test("VATSIM: centro con transceptor dentro de su alcance cuenta, lejos no", () => {
@@ -90,7 +90,7 @@ test("IVAO: centro a 100 NM cuenta (150 NM), aproximación a 100 NM no (60 NM), 
 
 test("VATSIM: estación ATIS sin texto sigue siendo ATIS de la red (su voz suena en vPilot)", () => {
   const datos = { controllers: [], atis: [vat("MMGL_ATIS", 4, { atis_code: null, text_atis: null })] };
-  assert.deepEqual(estadoVatsim(datos, [], MMGL), { atc: true, atis: { lineas: [], letra: null } });
+  assert.deepEqual(estadoVatsim(datos, [], MMGL), { atc: true, atis: { lineas: [], letra: null }, estaciones: [{ callsign: "MMGL_ATIS", tipo: "combined", mhz: null, lineas: [], letra: null }] });
 });
 
 test("estadoVigente: respuesta reciente se usa; vieja se descarta; esperando la primera", () => {
@@ -179,4 +179,31 @@ test("datosDeRed: llegada y salida distintas; sin letra publicada la saca de INF
     { letra: "B", pista: "24R", salida: null, tl: null, taFt: null });
   assert.deepEqual(datosDeRed({ lineas: ["information charlie runway in use 9"], letra: "" }), { letra: "C", pista: "09", salida: null, tl: null, taFt: null });
   assert.deepEqual(datosDeRed({ lineas: ["EGLL ATIS D", "TRANSITION-LEVEL FL 70"], letra: "D" }), { letra: "D", pista: null, salida: null, tl: "70", taFt: null });
+});
+
+test("VATSIM: KCVG_A_ATIS y KCVG_D_ATIS quedan las dos, con tipo y MHz", () => {
+  const datos = { controllers: [], atis: [vat("KCVG_A_ATIS", 4, { frequency: "134.375", atis_code: "J", text_atis: ["A"] }), vat("KCVG_D_ATIS", 4, { frequency: "135.300", atis_code: "W", text_atis: ["D"] })] };
+  const e = estadoVatsim(datos, [], { icao: "KCVG", lat: 39.05, lon: -84.66 });
+  assert.deepEqual(e.estaciones!.map((s) => [s.callsign, s.tipo, s.mhz, s.letra]), [["KCVG_A_ATIS", "arr", 134.375, "J"], ["KCVG_D_ATIS", "dep", 135.3, "W"]]);
+});
+
+test("atisRedDe: tipo por callsign; sin frecuencia, mhz null", () => {
+  assert.equal(atisRedDe(vat("KATL_A_ATIS", 4, { frequency: "119.65" })).tipo, "arr");
+  assert.equal(atisRedDe(vat("KATL_D_ATIS", 4)).tipo, "dep");
+  assert.deepEqual(atisRedDe(vat("KBOS_ATIS", 4, { frequency: "135.00", atis_code: "Y", text_atis: ["X"] })), { callsign: "KBOS_ATIS", tipo: "combined", mhz: 135, lineas: ["X"], letra: "Y" });
+  assert.equal(atisRedDe(vat("KBOS_ATIS", 4)).mhz, null);
+  assert.equal(atisRedDe(vat("KBOS_ATIS", 4, { frequency: "abc" })).mhz, null);
+});
+
+test("estacionPara: por la frecuencia publicada; con relleno, la tabla de salidas; combinada gana sin coincidencia", () => {
+  const a = { callsign: "KATL_A_ATIS", tipo: "arr", mhz: 135.0, lineas: [], letra: "A" } as const;
+  const d = { callsign: "KATL_D_ATIS", tipo: "dep", mhz: 135.0, lineas: [], letra: "D" } as const;
+  assert.equal(estacionPara([a, d], "KATL", 125.55, "KATL"), d); // relleno 135.000: tabla ATIS_SALIDAS
+  assert.equal(estacionPara([a, d], "KATL", 119.65, "KATL"), a);
+  const d2 = { ...d, mhz: 125.55 };
+  assert.equal(estacionPara([{ ...a, mhz: 119.65 }, d2], "KATL", 125.55, null), d2);
+  const c = { callsign: "KBOS_ATIS", tipo: "combined", mhz: 135.0, lineas: [], letra: "Y" } as const;
+  assert.equal(estacionPara([c], "KBOS", 135.0, null), c);
+  assert.equal(estacionPara([], "KBOS", 135.0, null), null);
+  assert.equal(estacionPara(undefined, "KBOS", 135.0, null), null);
 });
