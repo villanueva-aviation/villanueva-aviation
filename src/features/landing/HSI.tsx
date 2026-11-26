@@ -45,10 +45,18 @@ interface PropsRosa {
   desviacion: number;
   curso?: number;
   marcador: number;
+  /** Solo el simulador: true = FROM, false = TO, null = sin señal (bandera NAV). Sin la prop, TO como siempre. */
+  desde?: boolean | null;
+  /** Marcación magnética de la segunda aguja (magenta), o null para ocultarla. */
+  brg2?: number | null;
+  /** Color de la aguja de curso: verde VOR, magenta GPS. */
+  colorCurso?: string;
 }
 
+export const MAGENTA = "#e04cd6";
+
 /** El interior del HSI dibujado alrededor de (160, 160): rosa, marcador, aguja de curso y avión. Lo reusa el PFD. */
-export function RosaHSI({ rumbo, desviacion, curso = 360, marcador }: PropsRosa) {
+export function RosaHSI({ rumbo, desviacion, curso = 360, marcador, desde, brg2, colorCurso = VERDE }: PropsRosa) {
   const marcas = [];
   for (let g = 0; g < 360; g += 5) {
     const mayor = g % 10 === 0;
@@ -75,18 +83,33 @@ export function RosaHSI({ rumbo, desviacion, curso = 360, marcador }: PropsRosa)
         <path d={`M${C - 10} ${C - R - 3} h20 v-7 h-6 l-4 5 l-4 -5 h-6 Z`} fill="#d4af37" transform={`rotate(${marcador} ${C} ${C})`} />
       </g>
 
+      {brg2 != null && (
+        <g transform={`rotate(${brg2 - rumbo} ${C} ${C})`} stroke={MAGENTA} strokeWidth="3" fill="none">
+          <line x1={C} y1={C - R + 4} x2={C} y2={C - 86} />
+          <line x1={C} y1={C + 86} x2={C} y2={C + R - 4} />
+          <path d={`M${C - 8} ${C - R + 18} l8 -14 l8 14`} />
+        </g>
+      )}
+
       {/* Aguja de curso VOR1 con barra de desviación */}
       <g transform={`rotate(${curso - rumbo} ${C} ${C})`}>
         {[-5, -4, -3, -2, -1, 1, 2, 3, 4, 5].map((k) => (
           <circle key={k} cx={C + k * PASO_PUNTO} cy={C} r="3.4" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" />
         ))}
         {/* Punta (de -80 a -58), barra de desviación (-50 a 50) y cola (58 a 82), sin tapar las letras de la rosa */}
-        <path d={`M${C} ${C - 80} l-11 15 h7 v7 h8 v-7 h7 Z`} fill={VERDE} />
-        <rect x={C - 4} y={C + 58} width="8" height="24" fill={VERDE} />
-        <rect x={C - 4 + desviacion * PASO_PUNTO} y={C - 50} width="8" height="100" rx="2" fill={VERDE} />
-        {/* Indicador TO */}
-        <path d={`M${C + 30} ${C - 40} l9 13 h-18 Z`} fill={VERDE} />
+        <path d={`M${C} ${C - 80} l-11 15 h7 v7 h8 v-7 h7 Z`} fill={colorCurso} />
+        <rect x={C - 4} y={C + 58} width="8" height="24" fill={colorCurso} />
+        {desde !== null && <rect x={C - 4 + desviacion * PASO_PUNTO} y={C - 50} width="8" height="100" rx="2" fill={colorCurso} />}
+        {/* Indicador TO / FROM */}
+        {!desde && desde !== null && <path d={`M${C + 30} ${C - 40} l9 13 h-18 Z`} fill={colorCurso} />}
+        {desde && <path d={`M${C + 30} ${C + 40} l9 -13 h-18 Z`} fill={colorCurso} />}
       </g>
+      {desde === null && (
+        <g>
+          <rect x={C + 22} y={C - 44} width="44" height="20" rx="3" fill="#c62828" />
+          <text x={C + 44} y={C - 29} textAnchor="middle" className="fill-white text-[13px] font-bold">NAV</text>
+        </g>
+      )}
 
       {/* Avión fijo al centro */}
       <path
