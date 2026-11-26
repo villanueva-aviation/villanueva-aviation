@@ -3,7 +3,7 @@
 import { memo, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../lib/routes";
-import { GuiaControles, PalancasTactiles } from "../features/simulador/Controles";
+import { GuiaControles, PalancasTactiles, PosicionMandos } from "../features/simulador/Controles";
 import { useControles } from "../features/simulador/useControles";
 import { ElegirLugar, type Eleccion } from "../features/simulador/ElegirLugar";
 import { HsiSim } from "../features/simulador/HsiSim";
@@ -145,6 +145,7 @@ export function Simulador() {
 
         {/* Laptop: todo a la derecha. Celular: pestañas. */}
         <div className="hidden content-start gap-2 lg:grid">
+          <PosicionMandos m={sim.mandos} />
           {panelAp}
           <button type="button" onClick={cambiarMapa} aria-expanded={verMapa} className="flex items-center justify-between rounded-md border border-[#1f2b3d] bg-[#0a1220] px-3 py-1.5 text-xs font-bold text-white hover:border-[#4cc9f0]">
             <span>Mapa de navegación</span>
@@ -154,6 +155,8 @@ export function Simulador() {
           {radios}
         </div>
         <div className="grid gap-2 lg:hidden">
+          {/* En celular las palancas táctiles ya muestran dónde va cada mando. */}
+          {!tactil && <PosicionMandos m={sim.mandos} />}
           <div className="grid grid-cols-3 gap-1" role="tablist">
             {(["ap", "radios", "mapa"] as const).map((p) => (
               <button key={p} role="tab" aria-selected={pestana === p} type="button" onClick={() => setPestana(p)} className={`rounded-md px-2 py-1.5 text-sm font-bold ${pestana === p ? "bg-[#24365a] text-white" : "bg-[#0a1220] text-[#9fb0c6]"}`}>

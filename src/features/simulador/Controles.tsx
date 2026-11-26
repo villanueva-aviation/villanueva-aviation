@@ -1,7 +1,7 @@
 // Entrada del piloto: teclado en window, ratón con Pointer Lock sobre la vista 3D y palancas táctiles.
 import { useRef, useState, type ReactNode } from "react";
 import type { Sim } from "./bucle.ts";
-import { MANTENER, type Asignacion } from "./mandos.ts";
+import { MANTENER, type Asignacion, type Mandos } from "./mandos.ts";
 import { elegirAsignacion, useAsignacion } from "./useControles";
 
 type Accion = (f: (s: Sim) => Sim, avisar?: boolean) => void;
@@ -84,6 +84,41 @@ export function PalancasTactiles({ sim, accion, teclas }: { sim: Sim; accion: Ac
         onActiva={activa}
         onCambio={(x, y) => accion((s) => ({ ...s, mandos: { ...s.mandos, cx: x, cy: y } }))}
       />
+    </div>
+  );
+}
+
+const pct = (v: number) => `${Math.round(Math.abs(v) * 100)}%`;
+const lado = (v: number, menos: string, mas: string) => (Math.abs(v) < 0.005 ? "centro" : `${v > 0 ? mas : menos} ${pct(v)}`);
+
+/** Dónde va cada mando, para verlo mientras vuelas (también lo que mueve el piloto automático). */
+export function PosicionMandos({ m }: { m: Mandos }) {
+  const C = "#4cc9f0";
+  return (
+    <div className="grid grid-cols-[auto_auto_1fr] items-end gap-4 rounded-lg border border-[#1f2b3d] bg-[#0a1220] p-3 text-[11px] text-[#9fb0c6]" aria-label="Posición de los mandos">
+      <figure className="grid justify-items-center gap-1">
+        <svg viewBox="0 0 24 84" className="h-[84px] w-6" role="img" aria-label={`Colectivo ${pct(m.colectivo)}`}>
+          <rect x="1" y="1" width="22" height="82" rx="3" fill="#05090f" stroke="#1f2b3d" />
+          <rect x="3" y={3 + 78 * (1 - m.colectivo)} width="18" height={78 * m.colectivo} rx="2" fill={C} opacity="0.8" />
+        </svg>
+        <figcaption className="text-center"><b className="block text-white">{pct(m.colectivo)}</b>Colectivo</figcaption>
+      </figure>
+      <figure className="grid justify-items-center gap-1">
+        <svg viewBox="0 0 84 84" className="h-[84px] w-[84px]" role="img" aria-label={`Cíclico ${lado(m.cy, "atrás", "adelante")}, ${lado(m.cx, "izquierda", "derecha")}`}>
+          <rect x="1" y="1" width="82" height="82" rx="4" fill="#05090f" stroke="#1f2b3d" />
+          <path d="M42 4V80M4 42H80" stroke="#1f2b3d" />
+          <circle cx={42 + m.cx * 36} cy={42 - m.cy * 36} r="6" fill={C} />
+        </svg>
+        <figcaption className="text-center"><b className="block text-white">{lado(m.cy, "atrás", "adel.")}</b>Cíclico · {lado(m.cx, "izq.", "der.")}</figcaption>
+      </figure>
+      <figure className="grid gap-1 self-center">
+        <svg viewBox="0 0 120 20" className="h-5 w-full" preserveAspectRatio="none" role="img" aria-label={`Pedales ${lado(m.pedales, "izquierda", "derecha")}`}>
+          <rect x="1" y="1" width="118" height="18" rx="3" fill="#05090f" stroke="#1f2b3d" />
+          <rect x={60 + Math.min(0, m.pedales) * 57} y="3" width={Math.abs(m.pedales) * 57} height="14" rx="2" fill={C} opacity="0.8" />
+          <path d="M60 1V19" stroke="#7d8da3" />
+        </svg>
+        <figcaption><b className="text-white">{lado(m.pedales, "izq.", "der.")}</b> · Pedales</figcaption>
+      </figure>
     </div>
   );
 }
