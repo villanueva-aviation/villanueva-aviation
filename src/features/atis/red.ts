@@ -110,11 +110,12 @@ export function atisRedDe(e: VatsimEstacion): AtisRed {
 }
 
 // La estación que corresponde al COM sintonizado: la de esa frecuencia; si no, la combinada; si no, salidas o llegadas.
+// null si no hay ninguna de esas: nunca suena la de llegadas en la frecuencia de salidas ni al revés.
 export function estacionPara(estaciones: AtisRed[] | undefined, icao: string, mhz: number, nombreFrec: string | null): AtisRed | null {
   if (!estaciones?.length) return null;
   const tipo = esFrecuenciaSalidas(icao, mhz, nombreFrec) ? "dep" : "arr";
   return estaciones.find((e) => e.mhz !== null && Math.abs(e.mhz - mhz) < TOLERANCIA_MHZ + 1e-9)
-    ?? estaciones.find((e) => e.tipo === "combined") ?? estaciones.find((e) => e.tipo === tipo) ?? estaciones[0];
+    ?? estaciones.find((e) => e.tipo === "combined") ?? estaciones.find((e) => e.tipo === tipo) ?? null;
 }
 
 export function estadoIvao(w: IvaoWhazzup, ap: Ap): EstadoRed {

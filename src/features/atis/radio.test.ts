@@ -80,6 +80,8 @@ test("debeCambiar", () => {
   assert.equal(debeCambiar(r, { ...r }), false);
   assert.equal(debeCambiar(r, { ...r, huella: "bbbbbbbb" }), true); // misma letra, otro texto
   assert.equal(debeCambiar(a, r), true);
+  const llegadas = { ...a, deRed: true, cs: "KATL_A_ATIS" };
+  assert.equal(debeCambiar(llegadas, { ...llegadas, cs: "KATL_D_ATIS" }), true); // misma letra, la otra estación
 });
 
 test("pausaTras", () => {

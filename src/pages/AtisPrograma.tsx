@@ -94,7 +94,7 @@ type PreguntaRed = EntradaRed & { pedidoMs: number };
 type EntradaMetar = { metar: Metar | null; pedidoMs: number; viejo: boolean };
 type PreguntaRealPagina = PreguntaReal & { pedidoMs: number };
 
-const clave = (a: Atis) => `${a.icao}-${a.letra}-${a.conControlador ? "atc" : a.deRed ? `red-${a.huella ?? ""}` : a.real ? `real-${a.huella}` : "gen"}`;
+const clave = (a: Atis) => `${a.icao}-${a.letra}-${a.conControlador ? "atc" : a.deRed ? `red-${a.cs ?? ""}-${a.huella ?? ""}` : a.real ? `real-${a.huella}` : "gen"}`;
 const nombreLetra = (l: string) => (/^[A-Z]$/.test(l) ? LETRAS[l.charCodeAt(0) - 65] : l);
 const duracion = (b: AudioBuffer) => b.duration - PAUSA_LOOP_SEG;
 const horaMetar = (a: Atis) => new Date(a.inicioMs).toISOString().slice(11, 16).replace(":", "");
@@ -287,12 +287,14 @@ function Programa() {
       const origen = fuente(red, vigente);
       // La estación de la red de la frecuencia sintonizada (VATSIM: llegadas o salidas aparte); IVAO solo da una.
       const estacion = origen === "cliente" ? estacionPara(vigente!.estaciones, s.ap.icao, com.mhz, nombreFrecuencia(s.ap, com.mhz)) : null;
-      const est = estacion ?? (origen === "cliente" ? vigente!.atis : null);
+      // Con lista de estaciones (VATSIM) solo vale la de esa frecuencia: sin ella se calla como con vPilot, nunca la otra.
+      // Sin lista (IVAO, o una respuesta vieja) se usa su único ATIS.
+      const est = origen !== "cliente" ? null : vigente!.estaciones?.length ? estacion : vigente!.atis;
       // Con el interruptor, en EE. UU. el ATIS de VATSIM se lee palabra por palabra como el D-ATIS; si no se puede leer,
       // como en los demás: su letra y su pista con las piezas, el METAR de aviationweather. Nunca el de otra estación.
       const textual = origen === "cliente" && leerVoz && red === "vatsim" && formatoDe(s.ap.icao) === "faa" && estacion
         ? armarVatsim(s.ap.icao, estacion, s.ap, Date.now()) : null;
-      const deRed = origen === "cliente" && leerVoz && !textual ? datosDeRed(est!) : null;
+      const deRed = est && leerVoz && !textual ? datosDeRed(est) : null;
       if (origen === "cliente" && !deRed && !textual) {
         apagar(c); // la red ya da su ATIS por voz en el cliente del piloto
         return { ...base, atis: null, faltantes: [], avisoMetar: null, origen, atisRed: est, avisoRed };
@@ -308,8 +310,10 @@ function Programa() {
       const real = !!datis;
 
       const e = metarDe(s.ap.icao);
-      const nuevo = textual ?? (datis ? armarDatis(datis, s.ap, Date.now())
+      const armado = textual ?? (datis ? armarDatis(datis, s.ap, Date.now())
         : e.metar ? armarAtis(e.metar, s.ap, { conControlador, deRed: deRed ?? undefined }) : null);
+      // Llegadas y salidas de VATSIM pueden tener la misma letra: el callsign las distingue (clave de carga y cambio).
+      const nuevo = armado && (deRed || textual) && estacion ? { ...armado, cs: estacion.callsign } : armado;
       if (nuevo && debeCambiar(c.atis ?? null, nuevo)) cargar(ctx, aps, c, nuevo);
       // Suena este mismo ATIS sin parte de su voz en vivo: cada 15 s se vuelve a cargar; entra en la pausa del loop como siguiente.
       else if (nuevo && !c.cargando && !c.siguiente && c.faltantes?.some((f) => f.startsWith("vivo-"))
@@ -318,7 +322,8 @@ function Programa() {
       // Uno que llegó tarde de otro aeropuerto (A→B→A rápido) no entra.
       // Uno que llegó tarde con la regla vieja de la red (se conectó o se fue un controlador) tampoco.
       if (c.siguiente && (c.siguiente.atis.icao !== s.ap.icao || c.siguiente.atis.conControlador !== conControlador
-        || !!c.siguiente.atis.deRed !== !!(deRed || textual) || !!c.siguiente.atis.real !== real)) c.siguiente = null;
+        || !!c.siguiente.atis.deRed !== !!(deRed || textual) || !!c.siguiente.atis.real !== real
+        || c.siguiente.atis.cs !== nuevo?.cs)) c.siguiente = null; // ni el de la otra estación (llegadas/salidas)
       const sig = c.siguiente;
       if (sig && entraSiguiente(c.sonando, Date.now(), c.faseMs, duracion(c.buffer ?? sig.buffer))) {
         Object.assign(c, sig, { siguiente: null });

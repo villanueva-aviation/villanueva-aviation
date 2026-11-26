@@ -207,3 +207,11 @@ test("estacionPara: por la frecuencia publicada; con relleno, la tabla de salida
   assert.equal(estacionPara([], "KBOS", 135.0, null), null);
   assert.equal(estacionPara(undefined, "KBOS", 135.0, null), null);
 });
+
+test("estacionPara: sin la estación del tipo de esa frecuencia da null, nunca la de llegadas por salidas ni al revés", () => {
+  const a = { callsign: "KATL_A_ATIS", tipo: "arr", mhz: 119.65, lineas: [], letra: "A" } as const;
+  const d = { callsign: "KATL_D_ATIS", tipo: "dep", mhz: 125.55, lineas: [], letra: "D" } as const;
+  assert.equal(estacionPara([d], "KATL", 119.65, "KATL"), null); // solo salidas en línea, sintonizada la de llegadas
+  assert.equal(estacionPara([a], "KATL", 125.55, "KATL"), null); // solo llegadas en línea, sintonizada la de salidas
+  assert.equal(estacionPara([{ ...d, mhz: null }], "KATL", 119.65, null), null);
+});
