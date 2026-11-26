@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../features/auth/AuthContext";
 import type { Idioma } from "../features/instructor/idiomaInstructor";
 import { fetchMisLecciones } from "../features/instructor/intentos";
-import { claveLeccion, estadoLeccion, LECCIONES_IFR } from "../features/instructor/lecciones";
+import { claveLeccion, estadoLeccion, estadoLeccionWeb, LECCIONES_IFR } from "../features/instructor/lecciones";
 import { usePremiumAccess } from "../features/payments/usePremiumAccess";
 import type { TemaIfr } from "../data/teoriaIfr";
 import { FOUNDER_EMAIL } from "../lib/constants";
@@ -20,6 +20,7 @@ const T = {
     ultimo: "Último vuelo",
     teoria: "Teoría con dibujos",
     volver: "Volver al programa VFR",
+    simWeb: "Volar en el simulador web",
   },
   en: {
     titulo: "IFR virtual instructor",
@@ -28,6 +29,7 @@ const T = {
     ultimo: "Last flight",
     teoria: "Illustrated theory",
     volver: "Back to the VFR program",
+    simWeb: "Fly it in the web simulator",
   },
 };
 
@@ -67,7 +69,9 @@ export function InstructorIfr() {
       <p className="text-sm text-white/70">{t.intro}</p>
       <ol className="space-y-1.5">
         {LECCIONES_IFR.map((l) => {
-          const e = estadoLeccion(l, { fundador: user?.email === FOUNDER_EMAIL, exclusivo: hasAccess });
+          const acceso = { fundador: user?.email === FOUNDER_EMAIL, exclusivo: hasAccess };
+          const e = estadoLeccion(l, acceso);
+          const web = estadoLeccionWeb(l, acceso) === "abierta";
           const tema = TEORIA[l.numero];
           const fila = (
             <span className="flex items-baseline justify-between gap-3">
@@ -87,6 +91,7 @@ export function InstructorIfr() {
                   <Link to={ROUTES.instructorVuelo(ultimoVuelo[claveLeccion(l)])} className="text-gold-300 underline">{t.ultimo}</Link>
                 )}
                 {e === "abierta" && tema && <Link to={ROUTES.instructorIfrTeoria(tema)} className="text-gold-300 underline">{t.teoria}</Link>}
+                {web && <Link to={`${ROUTES.simulador}?leccion=${l.numero}`} className="text-gold-300 underline">{t.simWeb}</Link>}
               </span>
             </li>
           );

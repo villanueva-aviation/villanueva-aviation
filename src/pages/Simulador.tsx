@@ -9,6 +9,7 @@ import { ElegirLugar, type Eleccion } from "../features/simulador/ElegirLugar";
 import { HsiSim } from "../features/simulador/HsiSim";
 import { Navegador } from "../features/simulador/Navegador";
 import { PanelAp } from "../features/simulador/PanelAp";
+import { PanelInstructor } from "../features/simulador/PanelInstructor";
 import { Pfd } from "../features/simulador/Pfd";
 import { pulsar } from "../features/simulador/piloto.ts";
 import { alternarMotor } from "../features/simulador/bucle.ts";
@@ -44,6 +45,13 @@ function arranqueDe(el: Eleccion): Arranque {
 
 export function Simulador() {
   const [eleccion, setEleccion] = useState<Eleccion | null>(null);
+  // Cada vuelo nuevo (elegir lugar o Reiniciar) empieza también la lección desde cero: si no, volver a la
+  // plataforma de golpe parecería un aterrizaje.
+  const [vuelo, setVuelo] = useState(0);
+  const volar = (el: Eleccion) => {
+    setEleccion(el);
+    setVuelo((v) => v + 1);
+  };
   const arranque = useMemo(() => (eleccion ? arranqueDe(eleccion) : null), [eleccion]);
   const terrenoRef = useRef<Terreno | null>(null);
   const { sim, leerEstado, accion, teclas, suscribirMuestras } = useSimulador(eleccion?.datos ?? null, arranque, terrenoRef);
@@ -72,27 +80,14 @@ export function Simulador() {
   const vista = useRef<HTMLDivElement>(null);
   const { capturado, capturar } = useControles(teclas, accion, vista);
   const [pestana, setPestana] = useState<"ap" | "radios" | "mapa">("ap");
-  const [verMapa, setVerMapa] = useState(() => {
-    try {
-      return localStorage.getItem("simulador-mapa") !== "0";
-    } catch {
-      return true;
-    }
-  });
-  const cambiarMapa = () => {
-    setVerMapa(!verMapa);
-    try {
-      localStorage.setItem("simulador-mapa", verMapa ? "0" : "1");
-    } catch {
-      /* sin almacenamiento: no pasa nada */
-    }
-  };
+  const [verMapa, cambiarMapa] = useMostrar("simulador-mapa");
+  const [verInstructor, cambiarInstructor] = useMostrar("simulador-instructor");
 
   if (!eleccion || !sim || !arranque) {
     return (
       <div className="min-h-screen bg-[#05090f]">
         <Encabezado />
-        <ElegirLugar onElegir={setEleccion} />
+        <ElegirLugar onElegir={volar} />
       </div>
     );
   }
@@ -151,7 +146,7 @@ export function Simulador() {
       >
         {sim.motor ? "Apagar motor" : "Encender motor"}
       </button>
-      <button type="button" onClick={() => setEleccion({ ...eleccion })} className="rounded-md bg-[#16233a] px-3 py-1.5 text-sm font-bold text-white">Reiniciar</button>
+      <button type="button" onClick={() => volar({ ...eleccion })} className="rounded-md bg-[#16233a] px-3 py-1.5 text-sm font-bold text-white">Reiniciar</button>
       <button type="button" onClick={() => setEleccion(null)} className="rounded-md bg-[#16233a] px-3 py-1.5 text-sm text-white">Cambiar lugar</button>
     </div>
   );
@@ -180,6 +175,17 @@ export function Simulador() {
           {botones}
         </div>
 
+        <div className="grid content-start gap-2">
+        {/* Una sola lección en la página: el panel sirve a laptop y celular, y al ocultarlo la lección sigue. */}
+        <section className="rounded-lg border border-[#1f2b3d] bg-[#0a1220]">
+          <button type="button" onClick={cambiarInstructor} aria-expanded={verInstructor} className="flex w-full items-center justify-between px-3 py-1.5 text-xs font-bold text-white">
+            <span>Instructor IFR</span>
+            <span className="text-[#4cc9f0]">{verInstructor ? "Ocultar ▲" : "Mostrar ▼"}</span>
+          </button>
+          <div hidden={!verInstructor} className="border-t border-[#1f2b3d] p-3 lg:max-h-[45vh] lg:overflow-y-auto">
+            <PanelInstructor key={vuelo} enElAire={!!eleccion.enElAire} onCambiarLugar={() => setEleccion(null)} />
+          </div>
+        </section>
         {/* Laptop: todo a la derecha. Celular: pestañas. */}
         <div className="hidden content-start gap-2 lg:grid">
           <PosicionMandos m={sim.mandos} />
@@ -203,6 +209,7 @@ export function Simulador() {
           </div>
           {pestana === "ap" ? panelAp : pestana === "radios" ? radios : mapa}
         </div>
+        </div>
       </div>
       <div className="mx-auto max-w-[1400px] px-4 pb-4">
         <GuiaControles />
@@ -213,6 +220,26 @@ export function Simulador() {
     </div>
     </FuenteMuestrasContext.Provider>
   );
+}
+
+/** Mostrar u ocultar una sección, recordado en este navegador (de entrada, visible). */
+function useMostrar(clave: string): [boolean, () => void] {
+  const [ver, setVer] = useState(() => {
+    try {
+      return localStorage.getItem(clave) !== "0";
+    } catch {
+      return true;
+    }
+  });
+  const cambiar = () => {
+    setVer(!ver);
+    try {
+      localStorage.setItem(clave, ver ? "0" : "1");
+    } catch {
+      /* sin almacenamiento: no pasa nada */
+    }
+  };
+  return [ver, cambiar];
 }
 
 function Encabezado() {
