@@ -62,6 +62,7 @@ test("aObjetivos convierte a grados de la ficha", () => {
 
 test("tocados marca solo el eje que cambió", () => {
   assert.deepEqual(tocados(m0, { ...m0, cx: 0.1 }), { lat: true, lon: false, col: false, ped: false });
-  assert.deepEqual(tocados(m0, { ...m0, colectivo: 0.51 }), { lat: false, lon: false, col: false, ped: false });
+  assert.deepEqual(tocados(m0, { ...m0, colectivo: 0.502 }), { lat: false, lon: false, col: true, ped: false });
+  assert.deepEqual(tocados(m0, { ...m0 }), { lat: false, lon: false, col: false, ped: false });
   assert.deepEqual(tocados(m0, { ...m0, cy: -0.05, colectivo: 0.6 }), { lat: false, lon: true, col: true, ped: false });
 });

@@ -6,7 +6,7 @@ import { aplicarRaton, MANTENER } from "./mandos.ts";
 const TECLAS_SIM = new Set(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "PageUp", "PageDown", "KeyZ", "KeyX", "KeyC"]);
 const esCampo = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName) || t.getAttribute("role") === "spinbutton");
 
-type Accion = (f: (s: Sim) => Sim) => void;
+type Accion = (f: (s: Sim) => Sim, avisar?: boolean) => void;
 
 /** Teclado y ratón. `vista` es el elemento que captura el ratón al hacer clic. */
 export function useControles(teclas: Set<string>, accion: Accion, vista: { current: HTMLElement | null }) {
@@ -26,7 +26,7 @@ export function useControles(teclas: Set<string>, accion: Accion, vista: { curre
     let derecho = false;
     const mover = (ev: MouseEvent) => {
       if (document.pointerLockElement !== vista.current) return;
-      accion((s) => ({ ...s, mandos: aplicarRaton(s.mandos, ev.movementX, ev.movementY, 0, derecho) }));
+      accion((s) => ({ ...s, mandos: aplicarRaton(s.mandos, ev.movementX, ev.movementY, 0, derecho) }), false);
     };
     const boton = (ev: MouseEvent) => {
       if (document.pointerLockElement !== vista.current || ev.button !== 2) return;
@@ -36,7 +36,7 @@ export function useControles(teclas: Set<string>, accion: Accion, vista: { curre
     const rueda = (ev: WheelEvent) => {
       if (document.pointerLockElement !== vista.current) return;
       ev.preventDefault();
-      accion((s) => ({ ...s, mandos: aplicarRaton(s.mandos, 0, 0, ev.deltaY < 0 ? 1 : -1, false) }));
+      accion((s) => ({ ...s, mandos: aplicarRaton(s.mandos, 0, 0, ev.deltaY < 0 ? 1 : -1, false) }), false);
     };
     const bloqueo = () => {
       const si = document.pointerLockElement === vista.current && !!vista.current;

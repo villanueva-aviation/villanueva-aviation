@@ -66,3 +66,40 @@ test("NAV con el AP vuela el radial del NAV1", () => {
   assert.equal(s.ap.lat, "NAV");
   assert.equal(s.ap.aviso, null);
 });
+
+test("Av Pág con ALT puesto desconecta el eje vertical aunque el colectivo se mueva poco por paso", () => {
+  let s = inicio(gdl, { vor, distNm: 10, altFt: 8000 });
+  s = { ...s, ap: { ...s.ap, ap: true, vert: "ALT", ref: { cabeceo: 0, inclinacion: 0, altFt: 8000 } } };
+  s = avanzar(s, new Set(["PageDown"]), [vor], sinSuelo, 5016, 7.3);
+  assert.equal(s.ap.vert, "ATT");
+  assert.match(s.ap.aviso ?? "", /desconectado/);
+});
+
+test("un movimiento pequeño del ratón (fuera del paso) desconecta HDG", () => {
+  let s = inicio(gdl, { vor, distNm: 10, altFt: 8000 });
+  s = { ...s, ap: { ...s.ap, ap: true, lat: "HDG" } };
+  s = { ...s, mandos: { ...s.mandos, cx: s.mandos.cx + 0.004 } };
+  s = avanzar(s, nada, [vor], sinSuelo, 5016, 7.3);
+  assert.equal(s.ap.lat, "ATT");
+});
+
+test("la vuelta de las flechas al centro no cuenta como tocar", () => {
+  let s = inicio(gdl, { vor, distNm: 10, altFt: 8000 });
+  s = { ...s, mandos: { ...s.mandos, cx: 0.5 }, previos: { ...s.mandos, cx: 0.5 } };
+  s = { ...s, ap: { ...s.ap, ap: true, lat: "HDG" } };
+  s = avanzar(s, nada, [vor], sinSuelo, 5016, 7.3);
+  assert.equal(s.ap.lat, "HDG");
+});
+
+test("con ALT puesto, la palanca sigue al AP y al apagarlo no hay salto", () => {
+  let s = inicio(gdl, { vor, distNm: 10, altFt: 8000 });
+  const viejo = { ...s.mandos, colectivo: 0.1 };
+  s = { ...s, mandos: viejo, previos: viejo, ap: { ...s.ap, ap: true, vert: "ALT", ias: true, ref: { cabeceo: 0, inclinacion: 0, altFt: 8000 } }, sel: { ...s.sel, iasSel: 90 } };
+  for (let i = 0; i < 100; i++) s = avanzar(s, nada, [vor], sinSuelo, 5016, 7.3);
+  assert.equal(s.ap.vert, "ALT");
+  assert.ok(s.mandos.colectivo > 0.4, `colectivo ${s.mandos.colectivo}`);
+  s = { ...s, ap: { ...s.ap, ap: false } };
+  for (let i = 0; i < 5 / 0.02; i++) s = avanzar(s, nada, [vor], sinSuelo, 5016, 7.3);
+  assert.ok(Math.abs(s.e.vs) < 150, `vs ${s.e.vs}`);
+  assert.ok(Math.abs(s.e.altFt - 8000) < 40, `alt ${s.e.altFt}`);
+});

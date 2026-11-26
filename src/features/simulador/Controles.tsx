@@ -3,7 +3,7 @@ import { useRef, type ReactNode } from "react";
 import type { Sim } from "./bucle.ts";
 import { MANTENER } from "./mandos.ts";
 
-type Accion = (f: (s: Sim) => Sim) => void;
+type Accion = (f: (s: Sim) => Sim, avisar?: boolean) => void;
 
 /**
  * Palanca táctil: devuelve x, y de −1 a 1 (y + = arriba). Al soltar, los ejes con `regresa` vuelven a 0
@@ -11,6 +11,14 @@ type Accion = (f: (s: Sim) => Sim) => void;
  */
 function Palanca({ etiqueta, valor, onCambio, regresa, onActiva }: { etiqueta: ReactNode; valor: { x: number; y: number }; onCambio: (x: number, y: number, soltar: boolean) => void; regresa: { x: boolean; y: boolean }; onActiva: (si: boolean) => void }) {
   const caja = useRef<HTMLDivElement>(null);
+  const activa = useRef(false);
+  // Levantar el dedo, o que el sistema cancele el toque: se suelta una sola vez.
+  const soltar = () => {
+    if (!activa.current) return;
+    activa.current = false;
+    onCambio(regresa.x ? 0 : valor.x, regresa.y ? 0 : valor.y, true);
+    onActiva(false);
+  };
   const leer = (ev: React.PointerEvent) => {
     const r = caja.current!.getBoundingClientRect();
     const x = Math.max(-1, Math.min(1, ((ev.clientX - r.left) / r.width) * 2 - 1));
@@ -23,6 +31,7 @@ function Palanca({ etiqueta, valor, onCambio, regresa, onActiva }: { etiqueta: R
       className="relative aspect-square w-full max-w-40 touch-none select-none rounded-2xl border border-[#2b3a52] bg-[#0a1220]"
       onPointerDown={(ev) => {
         ev.currentTarget.setPointerCapture(ev.pointerId);
+        activa.current = true;
         onActiva(true);
         const p = leer(ev);
         onCambio(p.x, p.y, false);
@@ -32,10 +41,9 @@ function Palanca({ etiqueta, valor, onCambio, regresa, onActiva }: { etiqueta: R
         const p = leer(ev);
         onCambio(p.x, p.y, false);
       }}
-      onPointerUp={() => {
-        onCambio(regresa.x ? 0 : valor.x, regresa.y ? 0 : valor.y, true);
-        onActiva(false);
-      }}
+      onPointerUp={soltar}
+      onPointerCancel={soltar}
+      onLostPointerCapture={soltar}
     >
       <div className="pointer-events-none absolute inset-x-1/2 inset-y-2 w-px bg-[#2b3a52]" />
       <div className="pointer-events-none absolute inset-x-2 inset-y-1/2 h-px bg-[#2b3a52]" />
@@ -50,7 +58,13 @@ function Palanca({ etiqueta, valor, onCambio, regresa, onActiva }: { etiqueta: R
 
 /** Dos palancas: izquierda colectivo (vertical) y pedales (horizontal); derecha cíclico. */
 export function PalancasTactiles({ sim, accion, teclas }: { sim: Sim; accion: Accion; teclas: Set<string> }) {
-  const activa = (si: boolean) => (si ? teclas.add(MANTENER) : teclas.delete(MANTENER));
+  // MANTENER mientras haya al menos un dedo en alguna palanca.
+  const dedos = useRef(0);
+  const activa = (si: boolean) => {
+    dedos.current = Math.max(0, dedos.current + (si ? 1 : -1));
+    if (dedos.current) teclas.add(MANTENER);
+    else teclas.delete(MANTENER);
+  };
   const m = sim.mandos;
   return (
     <div className="grid grid-cols-2 gap-4">

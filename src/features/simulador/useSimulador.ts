@@ -63,10 +63,11 @@ export function useSimulador(datos: DatosPais | null, arranque: Arranque | null,
   const leer = useCallback(() => sim.current!, []);
   const leerEstado = useCallback(() => sim.current!.e, []);
   const accion = useCallback(
-    (f: (s: Sim) => Sim) => {
+    // `avisar = false` para entradas muy frecuentes (ratón): el bucle publica a 30 Hz de todos modos.
+    (f: (s: Sim) => Sim, avisar = true) => {
       if (!sim.current) return;
       sim.current = f(sim.current);
-      publicar();
+      if (avisar) publicar();
     },
     [publicar],
   );

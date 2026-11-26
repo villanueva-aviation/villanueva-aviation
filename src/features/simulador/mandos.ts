@@ -48,7 +48,8 @@ export function aObjetivos(m: Mandos, f: Ficha): Objetivos {
   };
 }
 
+/** Ejes que cambiaron entre dos lecturas (cualquier cambio, por pequeño que sea). */
 export function tocados(antes: Mandos, ahora: Mandos): { lat: boolean; lon: boolean; col: boolean; ped: boolean } {
-  const c = (a: number, b: number) => Math.abs(a - b) > 0.02;
+  const c = (a: number, b: number) => Math.abs(a - b) > 1e-6;
   return { lat: c(antes.cx, ahora.cx), lon: c(antes.cy, ahora.cy), col: c(antes.colectivo, ahora.colectivo), ped: c(antes.pedales, ahora.pedales) };
 }

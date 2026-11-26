@@ -39,9 +39,23 @@ export function guiaActual(s: Sim, vors: Vor[]): Guia | null {
 
 export function avanzar(s: Sim, teclas: Teclas, vors: Vor[], suelo: (lat: number, lon: number) => number | null, sueloRespaldoFt: number, decl: number): Sim {
   if (s.pausa) return s;
-  const mandos = avanzarTeclado(s.mandos, teclas, DT);
-  const toc = tocados(s.previos, mandos);
+  let mandos = avanzarTeclado(s.mandos, teclas, DT);
+  // Tocar = una tecla de ese eje apretada, o un cambio hecho por ratón o palanca táctil desde el paso anterior.
+  // La vuelta sola de las flechas al centro no cuenta.
+  const fuera = tocados(s.previos, s.mandos);
+  const t = (...c: string[]) => c.some((k) => teclas.has(k));
+  const toc = {
+    lat: fuera.lat || t("ArrowLeft", "ArrowRight", "KeyC"),
+    lon: fuera.lon || t("ArrowUp", "ArrowDown", "KeyC"),
+    col: fuera.col || t("PageUp", "PageDown"),
+  };
   const { ap, objetivos } = pilotar(s.ap, s.e, s.sel, guiaActual(s, vors), aObjetivos(mandos, H135), toc, H135, decl, DT);
+  // Mientras el AP manda un eje, la palanca lo sigue: al apagarlo no hay salto.
+  if (ap.ap) {
+    if (ap.lat !== "ATT") mandos = { ...mandos, cx: objetivos.inclinacion / H135.inclinacionMax };
+    if (ap.ias) mandos = { ...mandos, cy: objetivos.cabeceo < 0 ? -objetivos.cabeceo / H135.cabeceoMax : -objetivos.cabeceo / H135.cabeceoArribaMax };
+    if (ap.vert !== "ATT") mandos = { ...mandos, colectivo: objetivos.colectivo };
+  }
   const e = paso(s.e, objetivos, H135, s.viento, suelo(s.e.lat, s.e.lon) ?? sueloRespaldoFt, DT);
   return { ...s, e, mandos, previos: mandos, ap, t: s.t + DT };
 }

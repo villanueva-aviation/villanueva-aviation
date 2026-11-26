@@ -66,6 +66,7 @@ export class Terreno {
   private pistasGrupo: THREE.Group | null = null;
   private aeropuerto: AeropuertoSim | null = null;
   private plano: THREE.Mesh;
+  private liberado = false;
 
   constructor(escena: THREE.Scene) {
     this.escena = escena;
@@ -106,11 +107,11 @@ export class Terreno {
         if (p) {
           this.piezas.delete(k);
           this.piezas.set(k, p); // LRU: al final = usado hace poco
-          if (!p.alturas && !p.cargando && Date.now() - p.fallo > REINTENTO_MS) void this.cargar(p, a.segmentos);
+          if (!p.alturas && !p.cargando && Date.now() - p.fallo > REINTENTO_MS) void this.cargar(k, p, a.segmentos);
         } else {
           const nueva: Pieza = { m, alturas: null, malla: null, fallo: 0, cargando: false };
           this.piezas.set(k, nueva);
-          void this.cargar(nueva, a.segmentos);
+          void this.cargar(k, nueva, a.segmentos);
         }
       }
     }
@@ -141,7 +142,7 @@ export class Terreno {
     malla.position.set(p.x, 0, p.z);
   }
 
-  private async cargar(p: Pieza, segmentos: number) {
+  private async cargar(k: string, p: Pieza, segmentos: number) {
     p.cargando = true;
     try {
       const r = await fetch(urlMosaico(p.m));
@@ -151,6 +152,8 @@ export class Terreno {
       const ctx = lienzo.getContext("2d")!;
       ctx.drawImage(bmp, 0, 0);
       const px = ctx.getImageData(0, 0, bmp.width, bmp.height).data;
+      // Si el mosaico salió del caché o la vista se cerró mientras bajaba, no se dibuja.
+      if (this.liberado || this.piezas.get(k) !== p) return;
       const alturas = new Float32Array(256 * 256);
       for (let i = 0; i < alturas.length; i++) alturas[i] = Math.max(0, metrosTerrarium(px[i * 4], px[i * 4 + 1], px[i * 4 + 2]));
       p.alturas = alturas;
@@ -267,6 +270,7 @@ export class Terreno {
   }
 
   liberar(): void {
+    this.liberado = true;
     for (const [k, p] of this.piezas) this.quitar(k, p);
     this.pistas(null);
     this.plano.geometry.dispose();
