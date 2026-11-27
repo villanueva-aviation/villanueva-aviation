@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { armarDatis, armarVatsim, datisPara, datisVigente, emitidoMs, entradaDeVatsim, esFrecuenciaSalidas, huella, leerDatis, nombreFrecuencia, metarDeTexto, urlVoz, vigenteDatis, vivosDe, type EntradaDatis } from "./datis.ts";
+import { armarDatis, armarVatsim, datisPara, datisVigente, emitidoMs, entradaDeVatsim, esFrecuenciaSalidas, huella, leerDatis, nombreFrecuencia, metarDeCrudo, metarDeTexto, urlVoz, vigenteDatis, vivosDe, type EntradaDatis } from "./datis.ts";
 import type { AeropuertoAtis } from "./datos.ts";
 import type { AtisRed, VatsimEstacion } from "./red.ts";
 
@@ -317,4 +317,21 @@ test("esFrecuenciaSalidas: la frecuencia real de salidas (con tolerancia) o «DE
 test("urlVoz: sin cs como en el plan 4; con cs agrega red=vatsim y cs", () => {
   assert.equal(urlVoz("KJFK", "combined", 0, "abc"), "/api/atis/voz?icao=KJFK&tipo=combined&n=0&h=abc");
   assert.equal(urlVoz("KJFK", "combined", 0, "abc", "KJFK_ATIS"), "/api/atis/voz?icao=KJFK&tipo=combined&n=0&h=abc&red=vatsim&cs=KJFK_ATIS");
+});
+
+test("metarDeCrudo: METAR AUTO de metar.vatsim.net con la forma de aviationweather", () => {
+  const ahora = Date.UTC(2026, 10, 27, 0, 40);
+  const m = metarDeCrudo("YBAF 270032Z AUTO 06012KT 9999 // SCT033 BKN037 OVC046 24/22 Q1021\n", ahora)!;
+  assert.equal(m.icaoId, "YBAF");
+  assert.equal(m.obsTime, Date.UTC(2026, 10, 27, 0, 32) / 1000);
+  assert.equal(m.rawOb, "YBAF 270032Z AUTO 06012KT 9999 // SCT033 BKN037 OVC046 24/22 Q1021");
+  assert.deepEqual([m.wdir, m.wspd, m.visib, m.altim, m.temp, m.dewp], [60, 12, "6+", 1021, 24, 22]);
+  assert.deepEqual(m.clouds.map((c) => `${c.cover}${c.base}`), ["SCT3300", "BKN3700", "OVC4600"]);
+  // Visibilidad métrica corta, RMK fuera, y el día 30 visto el día 1 es del mes pasado.
+  const v = metarDeCrudo("METAR MMMX 302345Z 36005KT 4000 HZ FEW020 18/10 A3020 RMK HZY=", Date.UTC(2026, 11, 1, 0, 10))!;
+  assert.equal(v.visib, 2.49);
+  assert.equal(v.rawOb, "MMMX 302345Z 36005KT 4000 HZ FEW020 18/10 A3020");
+  assert.equal(v.obsTime, Date.UTC(2026, 10, 30, 23, 45) / 1000);
+  assert.equal(metarDeCrudo("", ahora), null);
+  assert.equal(metarDeCrudo("No METAR available", ahora), null);
 });

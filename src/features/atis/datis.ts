@@ -138,6 +138,28 @@ export function metarDeTexto(icao: string, emitido: number, cuerpo: string): Met
   };
 }
 
+// METAR crudo de metar.vatsim.net («YBAF 270032Z AUTO 06012KT 9999 ... Q1021») con la forma de aviationweather;
+// respaldo para estaciones que aviationweather no tiene. Visibilidad en millas y QNH en hPa, como aviationweather.
+export function metarDeCrudo(crudo: string, ahoraMs: number): Metar | null {
+  const m = /^(?:METAR |SPECI )?([A-Z0-9]{4}) (\d{2})(\d{2})(\d{2})Z (.+)$/.exec(crudo.trim().split("\n")[0]);
+  if (!m) return null;
+  const [, icao, dd, hh, mi, resto] = m;
+  const hoy = new Date(ahoraMs);
+  let emitido = Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth(), Number(dd), Number(hh), Number(mi));
+  if (emitido > ahoraMs + 3_600_000) emitido = Date.UTC(hoy.getUTCFullYear(), hoy.getUTCMonth() - 1, Number(dd), Number(hh), Number(mi)); // día del mes pasado
+  const cuerpo = resto.split(/\sRMK\s/)[0].replace(/=$/, "");
+  const r = metarDeTexto(icao, emitido, cuerpo);
+  const q = /(?:^|\s)Q(\d{4})(?=\s|$)/.exec(cuerpo);
+  if (q) r.altim = Number(q[1]);
+  // Visibilidad métrica: el primer grupo de 4 cifras después del viento (9999 = 10 km o más, aviationweather dice "6+").
+  const metros = /(?:KT|MPS)(?:\s\d{3}V\d{3})?\s(\d{4})(?=\s|$)/.exec(cuerpo)?.[1];
+  if (r.visib === null && (metros || /(?:^|\s)CAVOK(?=\s|$)/.test(cuerpo))) {
+    r.visib = !metros || metros === "9999" ? "6+" : Math.round((Number(metros) / 1609.344) * 100) / 100;
+  }
+  r.rawOb = `${icao} ${dd}${hh}${mi}Z ${cuerpo}`;
+  return r;
+}
+
 // Grupos que solo trae un METAR (viento, visibilidad, capa de nubes): marcan la oración del clima.
 const GRUPO_METAR = /(?:^|\s)(?:(?:\d{3}|VRB)\d{2,3}(?:G\d{2,3})?KT|[PM]?\d+(?:\/\d+)?SM|(?:FEW|SCT|BKN|OVC|VV)(?:\d{3}|\/{3})|CLR|SKC)(?=[\s.,]|$)/;
 
